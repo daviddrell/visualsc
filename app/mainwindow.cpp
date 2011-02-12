@@ -5,6 +5,8 @@
 #include <QDir>
 #include <QSettings>
 
+// adding comments to get the git repository
+
 QString MainWindow::_keyLastFilePath = QString("lastFilePath");
 
 MainWindow::MainWindow(QWidget *parent) :
