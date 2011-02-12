@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml">
+    <state id="Main" position="0,0" size="844,397">
+        <state id="Test1" position="350,120" size="220,50">
+            <state id="Test1Sub1" position="0,0" size="100,50"/>
+        </state>
+        <state id="Test2" position="130,200" size="220,50">
+            <state id="Test2Sub1" position="0,0" size="100,50"/>
+        </state>
+        <state id="Test3" position="120,40" size="220,50">
+            <state id="Test3Sub1" position="0,0" size="100,50"/>
+        </state>
+        <state id="Test4" position="140,100" size="220,50">
+            <state id="Test4Sub1" position="0,0" size="100,50"/>
+        </state>
+        <state id="Test5" position="300,270" size="100,50"/>
+    </state>
+</scxml>

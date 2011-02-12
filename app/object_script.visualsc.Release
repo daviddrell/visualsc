@@ -1,0 +1,12 @@
+INPUT(
+./../bin/release/stateboxgraphic.o
+./../bin/release/smproject.o
+./../bin/release/selectablelinesegmentgraphic.o
+./../bin/release/projectdata.o
+./../bin/release/mainwindow.o
+./../bin/release/main.o
+./../bin/release/cornergrabber.o
+./../bin/release/moc_smproject.o
+./../bin/release/moc_selectablelinesegmentgraphic.o
+./../bin/release/moc_mainwindow.o
+);

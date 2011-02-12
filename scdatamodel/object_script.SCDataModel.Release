@@ -1,0 +1,12 @@
+INPUT(
+./../bin/release/scdatamodel.o
+./../bin/release/transitionattributes.o
+./../bin/release/stateattributes.o
+./../bin/release/sctransition.o
+./../bin/release/scstate.o
+./../bin/release/scxmlreader.o
+./../bin/release/moc_scdatamodel.o
+./../bin/release/moc_sctransition.o
+./../bin/release/moc_scstate.o
+./../bin/release/moc_scxmlreader.o
+);

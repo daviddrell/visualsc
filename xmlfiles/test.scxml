@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!-- A wrapper state that contains all other states in this file
+- it represents the complete state machine -->
+<scxml xmlns="http://www.w3.org/2005/07/scxml"
+       version="1.0"
+       initial="Main">
+  <state id="Main">
+    <!-- its initial state is Test1 -->
+    <initial>
+      <transition target="Test1"/>
+    </initial>
+
+    <!-- Really simple state showing the basic syntax. -->
+    <state id="Test1">
+      <initial>
+        <transition target="Test1Sub1"/>
+      </initial>
+      <!-- Runs before we go into the substate -->
+      <onentry>
+        <log expr="&quot;Inside Test1&quot;"/>
+      </onentry>
+
+      <!-- Here is our first substate -->
+      <state id="Test1Sub1">
+        <onentry>
+          <log expr="&quot;Inside Test1Sub1.&quot;"/>
+        </onentry>
+        <onexit>
+          <log expr="&quot;Leaving Test1Sub1&quot;"/>
+        </onexit>
+        <!-- Go to Sub2 on Event1 -->
+        <transition event="Event1" target="Test1Sub2"/>
+      </state>
+
+      <!-- Here is the second substate
+           It is final, so Test1 is done when we get here -->
+      <final id="Test1Sub2"/>
+
+      <!-- We get this event when we reach Test1Sub2. -->
+      <transition event="done.state.Test1" target="Test2"/>
+
+      <!-- We run this on the way out of Test1 -->
+      <onexit>
+        <log expr="&quot;Leaving Test1...&quot;"/>
+      </onexit>
+    </state>
+
+    <state id="Test2">
+      <initial>
+        <transition target="Test2Sub1"/>
+      </initial>
+
+      <!-- This time we reference a state
+           defined in an external file.  Note that we could have
+           loaded the entire file by leaving off the #Test2Sub1,
+           but in that case we would need to rename one of the
+           Test2Sub1 states (here or in the external file) to
+           avoid the name collision -->
+        <state id="Test2Sub1">
+            <onentry>
+              <log expr="&quot;Inside Test2Sub1&quot;"/>
+            </onentry>
+            <transition event="Event2" target="Test2Sub2"/>
+          </state>
+      <final id="Test2Sub2"/>
+
+      <!-- Test2Sub2 is defined as final, so this
+           event is generated when we reach it -->
+      <transition event="done.state.Test2" target="Test3"/>
+    </state>
+
+    <state id="Test3">
+      <initial>
+        <transition target="Test3Sub1"/>
+      </initial>
+
+      <state id="Test3Sub1">
+        <onentry>
+          <log expr="&quot;Inside Test3Sub1...&quot;"/>
+          <!-- Send our self an event in 5s -->
+          <send event="Timer"  delay="1500"/>
+        </onentry>
+        <!-- Transition on to Test4.
+             This will exit both us and our parent. -->
+        <transition event="Timer" target="Test4"/>
+        <onexit>
+          <log expr="&quot;Leaving Test3Sub1...&quot;"/>
+        </onexit>
+      </state>
+
+      <onexit>
+        <log expr="&quot;Leaving Test3...&quot;"/>
+      </onexit>
+    </state>
+
+    <state id="Test4">
+      <onentry>
+        <log expr="&quot;Inside Test4...&quot;"/>
+      </onentry>
+      <initial>
+        <transition target="Test4Sub1"/>
+      </initial>
+
+      <state id="Test4Sub1">
+        <onexit>
+          <log expr="&quot;Leaving Test4Sub1...&quot;"/>
+        </onexit>
+        <!-- This transition causes the state to exit immediately
+             after entering Test4Sub1.  The transition has no event
+             or guard so it is always active -->
+        <transition target="Test5"/>
+      </state>
+    </state>
+
+    <state id="Test5">
+      <onentry>
+        <log expr="&quot;Inside Test5...&quot;"/>
+      </onentry>
+      <initial>
+        <transition target="Test5P"/>
+      </initial>
+
+      <!-- Fire off our parallel states -->
+      <parallel id="Test5P">
+        <final id="Test5PSub1"/>
+        <final id="Test5PSub2"/>
+        <onexit>
+          <log expr="&quot;all parallel states done&quot;"/>
+        </onexit>
+      </parallel>
+
+      <!-- The parallel states are all final, so this
+           event is generated immediately.  Although not shown,
+           compound states (i.e., <state>s with content)
+           are permitted within <parallel> as well. -->
+      <transition event="done.state.Test5P" target="Done"/>
+    </state>
+
+    <!-- This final state is an immediate child of Main
+         -  when we get here, done.state.Main is generated. -->
+    <final id="Done"/>
+    <!-- End of Main > -->
+      <transition event="done.state.Main" target="final" />
+  </state>
+  <final id="final"/>
+</scxml>
