@@ -8,8 +8,7 @@ SCTransition::SCTransition(QObject * parent):
         event(),
         cond(),
         target(),
-        _attributes(),
-        _path()
+        _attributes()
 {
 }
 
@@ -59,11 +58,11 @@ void SCTransition::handleLineUnSelected()
 
 void SCTransition::setPath(QList<QPointF>& path)
 {
-    _path =  path;
+    _attributes.path =  path;
 
 }
 
 void SCTransition::getPath(QList<QPointF>& path)
 {
-    path = _path;
+    path = _attributes.path.pathPoints;
 }

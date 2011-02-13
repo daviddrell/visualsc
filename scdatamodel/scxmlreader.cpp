@@ -200,26 +200,14 @@ void SCXMLReader::readTransistionPath()
 
     for (int i=0; i < sl.length(); )
     {
-     //   *i = (*i).toLower();
-        if ( sl[i] == "m" && sl.length() > (i+2))
-        {
-            qreal x = sl[i+1].toDouble();
-            qreal y = sl[i+2].toDouble();
-            tp->path.append( QPointF(x,y));
-            i += 3;
-        }
-        else if ( sl.length() > (i+2)&& sl[i] == "L")
-        {
-            qreal x = sl[i+1].toDouble();
-            qreal y = sl[i+2].toDouble();
-            tp->path.append( QPointF(x,y));
-            i += 3;
-        }
-        else if ( sl.length() > (i+1))
+        if ( sl[i] == "m" ) i++;
+        if ( sl[i] == "L" ) i++;
+
+        if (  sl.length() > (i+1))
         {
             qreal x = sl[i].toDouble();
             qreal y = sl[i+1].toDouble();
-            tp->path.append( QPointF(x,y));
+            tp->pathPoints.append( QPointF(x,y));
             i += 2;
         }
         else

@@ -1,6 +1,7 @@
 #include "scgraphicsview.h"
 #include "sctransition.h"
 #include "transitionattributes.h"
+#include "selectablelinesegmentgraphic.h"
 #include <QList>
 
 
@@ -34,24 +35,24 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
 
     if ( parentState )
     {
-            StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
+        StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
 
-            if ( parentGraphic )
+        if ( parentGraphic )
+        {
+            // has the size been set on the parent?
+            if ( ! parentState->hasBeenSized() )
             {
-                // has the size been set on the parent?
-                if ( ! parentState->hasBeenSized() )
-                {
-                   // make sure the parent is big enough to hold all the states
+                // make sure the parent is big enough to hold all the states
 
-                    QPoint sz;
-                    parentGraphic->getSize(sz);
-                    sz.setX( sz.x() + 120 );
-                    parentGraphic->setSize( sz );
+                QPoint sz;
+                parentGraphic->getSize(sz);
+                sz.setX( sz.x() + 120 );
+                parentGraphic->setSize( sz );
 
-                }
-
-                increaseSizeOfAllAncestors (parentState);
             }
+
+            increaseSizeOfAllAncestors (parentState);
+        }
     }
 
 }
@@ -84,6 +85,50 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
     SCState *st = lookUpTargetState (ta.target);
 
     t->setTargetState(st);
+
+
+    // create a transition graphic
+    SelectableLineSegmentGraphic * transGraphic  = 0;
+
+    // is there a path defined?
+
+    if (  ta.path.pathPoints.count() < 2 )
+    {
+        QPointF position = QPointF(10,10);
+
+        transGraphic  = new SelectableLineSegmentGraphic(position,position, QPointF(position.x()  , position.y() + 15 ));
+    }
+    else if ( ta.path.pathPoints.count() == 2)
+    {
+
+        transGraphic  = new SelectableLineSegmentGraphic(ta.path.pathPoints[0],
+                                                         ta.path.pathPoints[0],
+                                                         ta.path.pathPoints[1]);
+
+    }
+    else
+    {
+
+        transGraphic  = new SelectableLineSegmentGraphic(ta.path.pathPoints[0],
+                                                         ta.path.pathPoints[0],
+                                                         ta.path.pathPoints[1]);
+//        QList<QPointF>::iterator i;
+//        for ( i = ta.path.pathPoints.begin(); i !=  ta.path.pathPoints.end(); i++)
+//        {
+
+//        }
+    }
+
+    // get the parent state graphic
+
+    SCState *parentState = dynamic_cast<SCState *>(t->parent());
+
+    StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
+
+    transGraphic->setZValue( parentGraphic->zValue() + 1 );
+    transGraphic->setParentItem(parentGraphic);
+
+
 }
 
 

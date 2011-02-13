@@ -17,8 +17,9 @@ class SCDATAMODELSHARED_EXPORT  TransitionPathAttributes
 public:
     TransitionPathAttributes();
     TransitionPathAttributes(TransitionPathAttributes & pathAttributes );
+    TransitionPathAttributes& operator=( QList<QPointF>& path ) ;
 
-    QList<QPointF>  path;
+    QList<QPointF>  pathPoints;
 };
 
 

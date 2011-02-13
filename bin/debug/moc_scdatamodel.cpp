@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'scdatamodel.h'
 **
-** Created: Sun Feb 13 07:25:23 2011
+** Created: Sun Feb 13 14:37:36 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.0)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -2,16 +2,16 @@
 
 
 TransitionPathAttributes::TransitionPathAttributes():
-        path()
+        pathPoints()
 {
 
 }
 
 // copy constructor
 TransitionPathAttributes::TransitionPathAttributes( TransitionPathAttributes& pathAttributes ):
-         path()
+         pathPoints()
 {
-   path.append(pathAttributes.path);
+   pathPoints.append(pathAttributes.pathPoints);
 }
 
 
@@ -25,5 +25,12 @@ TransitionAttributes::TransitionAttributes():
 
 }
 
+TransitionPathAttributes& TransitionPathAttributes::operator=( QList<QPointF>& src )
+{
+
+       pathPoints.append(src);
+
+      return *this;
+}
 
 

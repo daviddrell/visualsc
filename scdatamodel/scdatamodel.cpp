@@ -155,7 +155,7 @@ void SCDataModel::handleMakeANewTransitionPath(TransitionPathAttributes * tp)
 
     if ( _currentTransition == 0 ) return;
 
-    _currentTransition->setPath(tp->path);
+    _currentTransition->setPath(tp->pathPoints);
 
 
 }

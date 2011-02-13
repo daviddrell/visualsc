@@ -42,7 +42,6 @@ private slots:
 private:
 
     TransitionAttributes _attributes;
-    QList<QPointF>  _path;
     SCState *       _targetState;
 
 };
