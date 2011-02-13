@@ -50,6 +50,14 @@ public:
       */
     void getStates(QList<SCState *> & stateList);
 
+    /**
+      * \fn getAllStates
+      * \brief Get all states, including decendants
+      *
+      */
+    void getAllStates(QList<SCState *> & stateList);
+
+
 
     /**
       * \fn writeSCVXML

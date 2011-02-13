@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QList>
 #include <QPointF>
+class SCState;
 
 #include "scdatamodel_global.h"
 
@@ -17,7 +18,12 @@ public:
     ~SCTransition();
 
     void setPath(QList<QPointF> & path);
+    void getPath(QList<QPointF> & path);
     void setAttributes ( TransitionAttributes & ta);
+    void getAttributes ( TransitionAttributes & ta);
+    void setTargetState(SCState * st);
+    SCState * getTargetState();
+
 
     QString event;
     QString cond;
@@ -37,6 +43,7 @@ private:
 
     TransitionAttributes _attributes;
     QList<QPointF>  _path;
+    SCState *       _targetState;
 
 };
 

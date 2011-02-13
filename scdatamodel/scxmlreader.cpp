@@ -168,6 +168,10 @@ void SCXMLReader::readTransistion()
         {
             ta->type =  TransitionAttributes::Internal;
         }
+        else
+        {
+            ta->type = TransitionAttributes::External;
+        }
     }
 
    emit makeANewTransistion(ta);

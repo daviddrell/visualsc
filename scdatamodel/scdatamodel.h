@@ -21,10 +21,12 @@ public:
     bool save(QString scxmlFile, QString & message);
 
     void getStates(QList<SCState *>& list);
+    void getAllStates(QList<SCState *>& list);
 
 signals:
     void openCompleted(bool sucess, QStringList message);
     void newStateSignal(SCState * newState);
+    void newTransitionSignal(SCTransition * newTransition);
 
 private slots:
     void handleReaderDone(bool sucess, QStringList message);

@@ -9,7 +9,7 @@ TransitionPathAttributes::TransitionPathAttributes():
 
 // copy constructor
 TransitionPathAttributes::TransitionPathAttributes( TransitionPathAttributes& pathAttributes ):
-        path()
+         path()
 {
    path.append(pathAttributes.path);
 }

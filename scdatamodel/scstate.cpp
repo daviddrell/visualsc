@@ -96,15 +96,26 @@ void SCState::getStates(QList<SCState *> & stateList)
 
     for (int c = 0; c < this->children().count(); c++)
     {
-
-        // collect this state's transitions
-
         SCState* state = dynamic_cast< SCState*>(this->children()[c]);
         if ( state )
             stateList.append(  state );
     }
 }
 
+
+void SCState::getAllStates(QList<SCState *> & stateList)
+{
+
+    for (int c = 0; c < this->children().count(); c++)
+    {
+        SCState* state = dynamic_cast< SCState*>(this->children()[c]);
+        if ( state )
+        {
+            stateList.append(  state );
+            state->getAllStates(stateList);
+        }
+    }
+}
 
 
 

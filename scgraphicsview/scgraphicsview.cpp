@@ -1,4 +1,7 @@
 #include "scgraphicsview.h"
+#include "sctransition.h"
+#include "transitionattributes.h"
+#include <QList>
 
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
@@ -10,6 +13,7 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
 {
 
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
+    connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
     _view.setScene(& _scene);
 
@@ -51,6 +55,37 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
     }
 
 }
+
+
+SCState * SCGraphicsView::lookUpTargetState(QString target)
+{
+
+    QList<SCState *> states;
+    _dm->getAllStates(states);
+
+    QList<SCState *>::iterator i;
+    for (i = states.begin(); i != states.end(); ++i)
+    {
+        SCState *st = *i;
+        StateAttributes attr;
+        st->getAttributes(attr);
+        if (attr.name.asString() == target)
+            return st;
+    }
+
+    return NULL;
+}
+
+void SCGraphicsView::handleNewTransition (SCTransition *t)
+{
+    TransitionAttributes ta;
+    t->getAttributes(ta);
+
+    SCState *st = lookUpTargetState (ta.target);
+
+    t->setTargetState(st);
+}
+
 
 void SCGraphicsView::handleNewState (SCState *newState)
 {

@@ -62,6 +62,12 @@ void SCDataModel::getStates(QList<SCState *>& list)
     return _topState->getStates(list);
 }
 
+
+void SCDataModel::getAllStates(QList<SCState *>& list)
+{
+    return _topState->getAllStates(list);
+}
+
 void SCDataModel::handleTransitDown()
 {
     _level ++;
@@ -126,13 +132,17 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     _currentState->addTransistion(transition);
 
     delete ta; ta = 0;
+
+
 }
 
 void SCDataModel::handleLeaveTransitionElement()
 {
     qDebug() << "handleLeaveTransitionElement ";
 
-//    _currentTransition->creationDone();
+    //    _currentTransition->creationDone();
+
+    emit newTransitionSignal(_currentTransition);
 }
 
 void SCDataModel::handleMakeANewTransitionPath(TransitionPathAttributes * tp)

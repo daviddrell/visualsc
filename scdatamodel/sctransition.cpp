@@ -19,6 +19,16 @@ SCTransition::~SCTransition()
 }
 
 
+void SCTransition::setTargetState(SCState * st)
+{
+    _targetState = st;
+}
+
+SCState * SCTransition::getTargetState()
+{
+    return _targetState;
+}
+
 void SCTransition::setAttributes(TransitionAttributes & ta)
 {
      _attributes.cond = ta.cond;
@@ -26,6 +36,15 @@ void SCTransition::setAttributes(TransitionAttributes & ta)
      _attributes.path = ta.path;
      _attributes.target = ta.target;
      _attributes.type = ta.type;
+}
+
+void SCTransition::getAttributes(TransitionAttributes & ta)
+{
+    ta.cond   = _attributes.cond  ;
+    ta.event  = _attributes.event ;
+    ta.path   = _attributes.path;
+    ta.target = _attributes.target ;
+    ta.type   = _attributes.type ;
 }
 
 void SCTransition::handleLineSelected()
@@ -42,4 +61,9 @@ void SCTransition::setPath(QList<QPointF>& path)
 {
     _path =  path;
 
+}
+
+void SCTransition::getPath(QList<QPointF>& path)
+{
+    path = _path;
 }

@@ -22,7 +22,7 @@ public:
 };
 
 
-class TransitionAttributes
+class  SCDATAMODELSHARED_EXPORT TransitionAttributes
 {
 public:
     TransitionAttributes();

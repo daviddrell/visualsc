@@ -28,6 +28,7 @@ signals:
 private slots:
 
     void handleNewState(SCState * newState);
+    void handleNewTransition(SCTransition*);
 
 private:
 
@@ -42,6 +43,8 @@ private:
     //  private methods
 
     void increaseSizeOfAllAncestors (SCState * state);
+
+    SCState * lookUpTargetState(QString target);
 
 
 };
