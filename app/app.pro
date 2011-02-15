@@ -29,12 +29,14 @@ SOURCES += \
     smproject.cpp \
     projectdata.cpp \
     mainwindow.cpp \
-    main.cpp
+    main.cpp \
+    formeditorwindow.cpp
 
 HEADERS  += \
     smproject.h \
     projectdata.h \
-    mainwindow.h
+    mainwindow.h \
+    formeditorwindow.h
 
 FORMS    += \
     mainwindow.ui

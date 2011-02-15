@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect ( ui->actionSave, SIGNAL(triggered()), this, SLOT(handleFileSaveClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
 
+
 }
 
 MainWindow::~MainWindow()
@@ -53,6 +54,7 @@ void MainWindow::handleFileOpenClick()
 //    project = new SMProject(ui->graphicsView);
 
     project = new SMProject(  ui->centralWidget );
+
 
     ui->gridLayout->addWidget( project->getQGraphicsView() );
 

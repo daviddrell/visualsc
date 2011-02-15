@@ -21,6 +21,11 @@ SMProject::~SMProject()
     close();
 }
 
+SCDataModel * SMProject::getDM()
+{
+    return &_dm;
+}
+
 QGraphicsView * SMProject::getQGraphicsView()
 {
     return  _graphicsView.getQGraphicsView();

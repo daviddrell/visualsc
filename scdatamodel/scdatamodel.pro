@@ -7,7 +7,7 @@
 
 include (../visualsc.pri)
 
-QT       -= gui
+QT       += gui
 
 TARGET = scdatamodel
 TEMPLATE = lib

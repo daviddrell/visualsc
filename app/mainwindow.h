@@ -6,6 +6,7 @@
 #include <QString>
 #include "sceditcontroller.h"
 
+
 class QSettings;
 
 namespace Ui {
@@ -26,6 +27,7 @@ private:
     SMProject *project;
     QSettings *settings;
     static QString _keyLastFilePath;
+
 
 private slots:
     void handleFileOpenClick();

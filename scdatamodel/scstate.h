@@ -9,6 +9,7 @@ class QString;
 
 class QXmlStreamWriter;
 class QPoint;
+class QStandardItem;
 
 #include "scdatamodel_global.h"
 
@@ -28,6 +29,13 @@ public:
     void makeTargetConnections(QList<SCTransition*> & transitionList);
     void setAttributes(StateAttributes & sa);
     bool hasBeenSized();
+    int  getStateCount();
+
+    void setParentItem(QStandardItem * item);
+    void setItem(QStandardItem * item);
+
+    QStandardItem * getParentItem();
+    QStandardItem * getItem();
 
     /**
       * \fn getAttributes
@@ -81,8 +89,9 @@ public slots:
 private:
 
     StateAttributes         _stateAttributes;
-
-
+    int                     _stateCount;
+    QStandardItem *         _parentDMItem;
+    QStandardItem *         _thisDMItem;
 };
 
 #endif // SCSTATE_H

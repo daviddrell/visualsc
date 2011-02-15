@@ -19,6 +19,8 @@ public:
     TransitionPathAttributes(TransitionPathAttributes & pathAttributes );
     TransitionPathAttributes& operator=( QList<QPointF>& path ) ;
 
+    int getNumberAttributes(){return 1;}
+
     QList<QPointF>  pathPoints;
 };
 
@@ -27,6 +29,7 @@ class  SCDATAMODELSHARED_EXPORT TransitionAttributes
 {
 public:
     TransitionAttributes();
+    int getNumberAttributes(){return 5;}
 
     /*
      event

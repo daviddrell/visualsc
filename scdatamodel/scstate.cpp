@@ -1,11 +1,15 @@
 
 #include <QString>
 #include <QXmlStreamWriter>
-
+#include <QStandardItem>
 #include "scstate.h"
 
 SCState::SCState(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    _stateAttributes(),
+   _stateCount(0),
+   _parentDMItem(0),
+   _thisDMItem(0)
 {
 
 }
@@ -16,6 +20,25 @@ SCState::~SCState()
 
 }
 
+void SCState::setItem(QStandardItem * item)
+{
+    _thisDMItem = item;
+}
+
+void SCState::setParentItem(QStandardItem * item)
+{
+    _parentDMItem = item;
+}
+
+QStandardItem * SCState::getParentItem()
+{
+    return _parentDMItem;
+}
+
+QStandardItem * SCState::getItem()
+{
+    return _thisDMItem;
+}
 
 bool SCState::hasBeenSized()
 {
@@ -62,6 +85,8 @@ void SCState::addTransistion(SCTransition * t)
 
 void SCState::addState(SCState * s)
 {
+    _stateCount++;
+
     s->setParent(this);
 
     emit changed();
@@ -90,6 +115,11 @@ void SCState::getAllTransitions(QList<SCTransition*> & transitionList)
 
 }
 
+
+int SCState::getStateCount()
+{
+    return _stateCount;
+}
 
 void SCState::getStates(QList<SCState *> & stateList)
 {
@@ -136,10 +166,13 @@ void SCState::setSize(QPoint size)
 
 void SCState::setAttributes(StateAttributes & sa)
 {
+
     _stateAttributes.size.set(  sa.size.asPoint());
     _stateAttributes.name.set(  sa.name.asString());
     _stateAttributes.position.set(  sa.position.asPoint());
     _stateAttributes.hasBeenSized = sa.hasBeenSized;
+
+    _thisDMItem->setText(sa.name.asString());
 
     emit changed();
 

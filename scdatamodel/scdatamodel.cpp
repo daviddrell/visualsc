@@ -1,13 +1,41 @@
 #include "scdatamodel.h"
 #include <QFile>
 #include <QDebug>
+#include <QStandardItemModel>
 
 SCDataModel::SCDataModel(QObject * parent) :
         QObject (parent), _reader(), _writer(0), _level(0),_topLevel(0),
-        _currentState(NULL), _currentTransition(NULL),_topState(NULL)
+        _currentState(NULL), _currentTransition(NULL),_topState(NULL),
+        _qtDM(0)
 {
+    _qtDM = new QStandardItemModel(this);
+
+    // TODO destructor
 }
 
+QStandardItemModel * SCDataModel::getStandardModel()
+{
+    return _qtDM;
+}
+
+QStandardItem * SCDataModel::makeAStateItem(SCState *st)
+{
+    StateAttributes attr;
+
+    QStandardItem * item = new QStandardItem(st->getStateCount(), attr.getNumberAttributes());
+
+    return item;
+}
+
+QStandardItem * SCDataModel::makeATransitionItem(SCTransition *tr)
+{
+    TransitionAttributes attr;
+
+    QStandardItem * item = new QStandardItem(1 , attr.getNumberAttributes());
+
+    return item;
+
+}
 
 
 bool SCDataModel::save(QString fileName, QString& errorMessage)
@@ -98,15 +126,34 @@ void SCDataModel::handleMakeANewState(StateAttributes * sa)
     {
         state = new SCState();
         _topState = state;
+
+        // insert the new state into the Qt Data Model
+
+        QStandardItem * root = _qtDM->invisibleRootItem();
+        QStandardItem * thisItem = makeAStateItem(state);
+        root->appendRow( thisItem );
+        state->setParentItem(root);
+        state->setItem (thisItem);
+
         qDebug() << "adding new state at top level : " + sa->name.asString();
     }
     else if ( _level > _topLevel)
     {
         state = new SCState(_currentState);
+
+        QStandardItem * parent = _currentState->getItem();
+
+        // insert the new state into the Qt Data Model
+
+        QStandardItem * thisItem = makeAStateItem(state);
+        state->setItem (thisItem);
+        parent->appendRow( thisItem );
+
         qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + sa->name.asString();
     }
 
     state->setAttributes( * sa);
+
     delete sa; sa = NULL;
 
     _currentState  = state;

@@ -24,12 +24,13 @@ public:
     SMProject(QWidget *parentWidget);
     ~SMProject();
 
+
     void close();
 
     void readInputFile(QString file);
     void save(QString file);
     QGraphicsView * getQGraphicsView();
-
+    SCDataModel  * getDM();
 signals:
     void error(QString err);
 

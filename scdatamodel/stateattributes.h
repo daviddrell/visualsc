@@ -14,7 +14,7 @@ class  SCDATAMODELSHARED_EXPORT StateAttributes
 public:
     StateAttributes();
     StateAttributes(StateAttributes & sa);
-
+    int getNumberAttributes(){return 4;}
 
 
     class StateName
