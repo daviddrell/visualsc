@@ -6,6 +6,7 @@
 #include <QString>
 #include "sceditcontroller.h"
 
+class FormEditorWindow;
 
 class QSettings;
 
@@ -24,10 +25,10 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    SMProject *project;
-    QSettings *settings;
+    SMProject *_project;
+    QSettings *_settings;
     static QString _keyLastFilePath;
-
+    FormEditorWindow *_formEditorWindow;
 
 private slots:
     void handleFileOpenClick();

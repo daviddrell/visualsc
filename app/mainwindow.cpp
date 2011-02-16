@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QSettings>
+#include "formeditorwindow.h"
 
 // adding comments to get the git repository
 
@@ -11,12 +12,15 @@ QString MainWindow::_keyLastFilePath = QString("lastFilePath");
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
-        ui(new Ui::MainWindow)
+        ui(new Ui::MainWindow),
+        _project(0),
+        _settings(0),
+        _formEditorWindow(0)
 {
     QCoreApplication::setOrganizationName("David W Drell");
     QCoreApplication::setOrganizationDomain("davidwdrell.net");
     QCoreApplication::setApplicationName("Visual State Chart Editor");
-    settings  = new QSettings(this);
+    _settings  = new QSettings(this);
 
     ui->setupUi(this);
 
@@ -29,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete settings;
-    delete project;
+    delete _settings;
+    delete _project;
     delete ui;
 }
 
@@ -39,9 +43,9 @@ void MainWindow::handleFileOpenClick()
     QString prevFilePath=QDir::homePath();
     QString fileName ;
 
-    if ( settings->contains(_keyLastFilePath))
+    if ( _settings->contains(_keyLastFilePath))
     {
-        prevFilePath = settings->value(_keyLastFilePath).toString();
+        prevFilePath = _settings->value(_keyLastFilePath).toString();
     }
 
     fileName = QFileDialog::getOpenFileName(this,
@@ -49,37 +53,43 @@ void MainWindow::handleFileOpenClick()
 
 
 
-    settings->setValue(_keyLastFilePath, fileName);
-
-//    project = new SMProject(ui->graphicsView);
-
-    project = new SMProject(  ui->centralWidget );
+    _settings->setValue(_keyLastFilePath, fileName);
 
 
-    ui->gridLayout->addWidget( project->getQGraphicsView() );
+    _project = new SMProject(  ui->centralWidget );
 
-    project->readInputFile(fileName);
+    ui->gridLayout->addWidget( _project->getQGraphicsView() );
+
+    _project->readInputFile(fileName);
+
+
+    if ( _formEditorWindow )
+    {
+        delete _formEditorWindow;
+    }
+    _formEditorWindow = new FormEditorWindow(0, _project->getDM());
+    _formEditorWindow->show();
 }
 
 
 void MainWindow::handleFileSaveClick()
 {
-    if ( project == NULL) return;
+    if ( _project == NULL) return;
 
     QString prevFilePath=QDir::homePath();
     QString fileName ;
 
-    if ( settings->contains(_keyLastFilePath))
+    if ( _settings->contains(_keyLastFilePath))
     {
-        prevFilePath = settings->value(_keyLastFilePath).toString();
+        prevFilePath = _settings->value(_keyLastFilePath).toString();
     }
 
     fileName = QFileDialog::getSaveFileName(this,
                                             tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
 
-    settings->setValue(_keyLastFilePath, fileName);
+    _settings->setValue(_keyLastFilePath, fileName);
 
-    project->save(fileName);
+    _project->save(fileName);
 }
 
 
@@ -87,10 +97,10 @@ void MainWindow::handleFileSaveClick()
 void MainWindow::handleNewClick()
 {
 
-    if ( project)
+    if ( _project)
     {
-        delete project;
-        project = NULL;
+        delete _project;
+        _project = NULL;
     }
 
  //   project = new SMProject(ui->graphicsView);

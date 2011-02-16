@@ -75,7 +75,7 @@ private:
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
     void setCornerPositions();
-    void adjustSize(int x, int y);
+    void adjustDrawingSize(int x, int y);
 
 
     // private slots

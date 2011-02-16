@@ -173,7 +173,7 @@ void StateBoxGraphic::setTitle(QString t)
 
 void StateBoxGraphic::increaseWidth(int inc)
 {
-    adjustSize(inc, 0);
+    adjustDrawingSize(inc, 0);
 }
 
 QString StateBoxGraphic::getPositionAsString()
@@ -223,7 +223,7 @@ void StateBoxGraphic::setSize(QPoint size)
  *  edge of the box.
  *
  */
-void StateBoxGraphic::adjustSize(int x, int y)
+void StateBoxGraphic::adjustDrawingSize(int x, int y)
 {
     _width += x;
     _height += y;
@@ -231,13 +231,6 @@ void StateBoxGraphic::adjustSize(int x, int y)
     _drawingWidth =  _width - _XcornerGrabBuffer;
     _drawingHeight=  _height - _YcornerGrabBuffer;
 
-    if ( _stateModel )
-    {
-        QPoint sz;
-        sz.setX(_width);
-        sz.setY(_height);
-        _stateModel->setSize(sz);
-    }
 }
 
 /**
@@ -350,7 +343,7 @@ bool StateBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event
         int deltaWidth  =   newWidth - _width ;
         int deltaHeight =   newHeight - _height ;
 
-        adjustSize(  deltaWidth ,   deltaHeight);
+        adjustDrawingSize(  deltaWidth ,   deltaHeight);
 
         deltaWidth *= (-1);
         deltaHeight *= (-1);
@@ -373,6 +366,14 @@ bool StateBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event
         }
 
         setCornerPositions();
+
+        if ( _stateModel )
+        {
+            QPoint sz;
+            sz.setX(_width);
+            sz.setY(_height);
+            _stateModel->setSize(sz);
+        }
 
         this->update();
     }
