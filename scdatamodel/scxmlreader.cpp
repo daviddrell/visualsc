@@ -2,8 +2,6 @@
 #include <QFile>
 #include <iostream>
 #include "scstate.h"
-#include "stateattributes.h"
-#include "transitionattributes.h"
 #include <QPoint>
 #include <QString>
 #include <QStringList>
@@ -40,7 +38,7 @@ void SCXMLReader::run()
     while ( ! _reader.atEnd())
     {
         if ( ! _reader.isStartElement())
-             _reader.readNext();
+            _reader.readNext();
         else
             readElement();
     }
@@ -110,50 +108,53 @@ void SCXMLReader::readElement()
 
 void SCXMLReader::readState()
 {
-    StateAttributes * sa = new StateAttributes();
+    // make a parentless attribute container to hold all xml attributes.
+    // this container will be passed to the instantiated state which will
+    // then copy these attributes to its private container.
 
-    sa->name =_reader.attributes().value("id").toString();
+    // memory is allocated for the attributes on the heap. The slot will
+    // delete it when its done.
 
-    if ( ! _reader.attributes().value("position").isEmpty() )
+    StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
+
+    for (int i = 0; i < _reader.attributes().count(); i++)
     {
-        QStringList sl = _reader.attributes().value("position").toString().split(",");
-        if ( ! sl.isEmpty() && sl.length() > 0)
-        {
-            int x = sl[0].toInt()   ;
-            int y = sl[1].toInt()   ;
-            sa->position =QPoint (x,y);
-        }
+        QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
 
-        sa->hasBeenSized = true;
+        // look for the Sate Attribute Name (id in SCXML)
+        if ( XmlAttr.name() == "id")
+        {
+            StateAttributes::StateName *  sa = new StateAttributes::StateName (0,"name", XmlAttr.value().toString() );
+            stateAttributes->addItem( sa );
+        }
+        else if ( XmlAttr.name() == "size" )
+        {
+            StateAttributes::StateSize * sa = new StateAttributes::StateSize(NULL, XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+        else if ( XmlAttr.name() == "position" )
+        {
+            StateAttributes::StatePosition * sa  = new StateAttributes::StatePosition(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+        else // unknown attribute
+        {
+            StateAttributes::StateString * sa  = new StateAttributes::StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
     }
 
-    if ( ! _reader.attributes().value("size").isEmpty() )
-    {
-        QStringList sl = _reader.attributes().value("size").toString().split(",");
-        if ( ! sl.isEmpty() && sl.length() > 0)
-        {
-            int x = sl[0].toInt()   ;
-            int y = sl[1].toInt()   ;
-            sa->size =QPoint (x,y);
-        }
-
-        sa->hasBeenSized = true;
-
-    }
-
-
-    emit makeANewState(sa);
+    emit makeANewState( stateAttributes);
 }
 
 void SCXMLReader::readTransistion()
 {
-    TransitionAttributes * ta = new TransitionAttributes();
+    TransitionAttributes * ta = new TransitionAttributes(0,"TransitionAttributes");
 
-    ta->event =_reader.attributes().value("event").toString();
-    ta->cond =_reader.attributes().value("cond").toString();
-    ta->target =_reader.attributes().value("target").toString();
-
-    ta->type = TransitionAttributes::Internal; // default value
+    ta->value("event")->setValue(_reader.attributes().value("event").toString());
+    ta->value("cond")->setValue(_reader.attributes().value("cond").toString());
+    ta->value("target")->setValue(_reader.attributes().value("target").toString());
+    ta->value("type")->setValue("internal");
 
     /*
      event
@@ -165,56 +166,25 @@ void SCXMLReader::readTransistion()
     if ( ! _reader.attributes().value("type").isEmpty() )
     {
         if (_reader.attributes().value("type").toString().toLower() == "internal")
-        {
-            ta->type =  TransitionAttributes::Internal;
+        {   
+            ta->value("type")->setValue("internal");
         }
         else
-        {
-            ta->type = TransitionAttributes::External;
+        {   
+            ta->value("type")->setValue("external");
         }
     }
 
-   emit makeANewTransistion(ta);
+    emit makeANewTransistion(ta);
+    delete ta;
 }
 
 void SCXMLReader::readTransistionPath()
 {
-    TransitionPathAttributes * tp = new TransitionPathAttributes();
 
     QString data =_reader.attributes().value("d").toString();
 
-//    <path d="m 100 100 L 300 100 L 200 300 "
-//           fill="red" stroke="blue" stroke-width="3" />
-
-    //    <path d="m 100 100  300 100  200 300 "
-    //           fill="red" stroke="blue" stroke-width="3" />
-
-   // parse the data string
-    QStringList sl = data.split(" ");
-
-    for (int i=0; i < sl.length(); i++ )
-    {
-        if ( sl[i].trimmed().isEmpty())
-            sl.removeAt(i);
-    }
-
-    for (int i=0; i < sl.length(); )
-    {
-        if ( sl[i] == "m" ) i++;
-        if ( sl[i] == "L" ) i++;
-
-        if (  sl.length() > (i+1))
-        {
-            qreal x = sl[i].toDouble();
-            qreal y = sl[i+1].toDouble();
-            tp->pathPoints.append( QPointF(x,y));
-            i += 2;
-        }
-        else
-            break;
-    }
-
-   emit makeANewTransistionPath(tp);
+    emit makeANewTransistionPath(data);
 }
 
 void SCXMLReader::readFinal()

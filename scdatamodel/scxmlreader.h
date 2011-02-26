@@ -6,9 +6,8 @@
 #include <QXmlStreamReader>
 #include <QThread>
 
-class StateAttributes;
-class TransitionAttributes;
-class TransitionPathAttributes;
+#include "stateattributes.h"
+#include "transitionattributes.h"
 
 class StateData;
 
@@ -25,17 +24,17 @@ public:
 
 signals:
      void done(bool result, QStringList message);
-     void makeANewState(StateAttributes *);
+     void makeANewState(StateAttributes*);
      void enterStateElement();
      void leaveStateElement();
 
      void enterTransistionElement();
      void leaveTransistionElement();
-     void makeANewTransistion(TransitionAttributes *);
+     void makeANewTransistion(TransitionAttributes*);
 
      void enterTransitionPathElement();
      void leaveTransitionPathElement();
-     void makeANewTransistionPath(TransitionPathAttributes *);
+     void makeANewTransistionPath(QString path);
 
      void leaveElement();
      void enterElement();

@@ -76,11 +76,6 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     // has a user re-sized the state graphic or has it already been
     // set in the scxml? if not, then set the default sizes
 
-    if ( ! _stateModel->hasBeenSized()  )
-    {
-        QPoint sz(100,100);
-        setSize(sz);
-    }
 
 }
 
@@ -97,48 +92,16 @@ StateBoxGraphic::~StateBoxGraphic()
 void StateBoxGraphic::handleModelChanged()
 {
 
-    StateAttributes attr;
-    _stateModel->getAttributes(attr);
+    StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *> ( _stateModel->attributes.value("name"));
+    StateAttributes::StateSize * size = dynamic_cast<StateAttributes::StateSize *> (  _stateModel->attributes.value("size"));
+    StateAttributes::StatePosition * position =dynamic_cast<StateAttributes::StatePosition*> ( _stateModel->attributes.value("position"));
 
-    bool needsUpdating=false;
+    _title.setPlainText(name->asString());
 
-    if ( _title.toPlainText() != attr.name.asString())
-    {
-        _title.setPlainText( attr.name.asString());
-        needsUpdating = true;
-    }
+    setSize(size->asPointF().toPoint());
 
-    if (  _stateModel->hasBeenSized()  )
-    {
+    setPos(  position->asPointF() );
 
-        if ( _width != attr.size.asPoint().x())
-        {
-            _width = attr.size.asPoint().x();
-            needsUpdating = true;
-        }
-        if ( _height != attr.size.asPoint().y())
-        {
-            _height = attr.size.asPoint().y();
-            needsUpdating = true;
-        }
-
-        _drawingWidth =  _width - _XcornerGrabBuffer;
-        _drawingHeight=  _height - _YcornerGrabBuffer;
-
-        QPointF location = this->pos();
-
-        if (      location.x() != attr.position.asPoint().x()
-            ||    location.y() != attr.position.asPoint().y()   )
-            {
-            this->setPos(  attr.position.asPoint());
-            needsUpdating = true;
-        }
-    }
-
-    if (needsUpdating)
-    {
-      //  QTimer::singleShot(1,this, SLOT(queuedThisUpdate()));
-    }
 }
 
 void StateBoxGraphic::queuedThisUpdate()
@@ -206,7 +169,8 @@ void StateBoxGraphic::setSize(QPoint size)
 
     if ( _stateModel )
     {
-        _stateModel->setSize(size);
+        QPointF sizePointF =  QPointF ( size.x(),size.y() );
+        _stateModel->setSize (sizePointF );
     }
 }
 
@@ -394,7 +358,7 @@ void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 
     if ( _stateModel )
     {
-        _stateModel->setPosition(location.toPoint());
+        _stateModel->setPosition(location);
     }
 
 }

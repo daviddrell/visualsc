@@ -2,7 +2,9 @@
 #define FORMEDITORWINDOW_H
 
 #include <QMainWindow>
-
+#include "scdatamodel.h"
+#include <QList>
+#include <QModelIndex>
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -17,12 +19,14 @@ class QFont;
 class QToolButton;
 class QAbstractButton;
 class QGraphicsView;
-class QTreeView;
+class QTreeWidget;
+class QTreeWidgetItem;
 class QTableWidget;
 class QLabel;
 QT_END_NAMESPACE
 
-class SCDataModel;
+
+
 
 class FormEditorWindow : public QMainWindow
 {
@@ -53,6 +57,8 @@ private slots:
 
     void about();
 
+    void handleTreeViewItemClicked(QTreeWidgetItem*,int);
+
 private:
     void createToolBox();
     void createActions();
@@ -64,10 +70,11 @@ private:
     QMenu *createColorMenu(const char *slot, QColor defaultColor);
     QIcon createColorToolButtonIcon(const QString &image, QColor color);
     QIcon createColorIcon(QColor color);
+    void loadTree (QList<SCState*> & states );
 
-    QTreeView    *stateChartTreeView;
-    QTableWidget *propertyTable;
-    QLabel       *selectedChartItem;
+    QTreeWidget    *stateChartTreeView;
+    QTableWidget   *propertyTable;
+    QLabel         *selectedChartItem;
 
     QGraphicsView *view;
 
@@ -109,6 +116,7 @@ private:
     QAction *lineAction;
 
     SCDataModel * dm;
+
 
 };
 

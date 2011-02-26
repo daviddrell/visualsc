@@ -4,12 +4,34 @@
 #include <QDebug>
 
 SCTransition::SCTransition(QObject * parent):
-        QObject(parent),
-        event(),
-        cond(),
-        target(),
-        _attributes()
+        QObject(parent), attributes(parent, "transition.attributes")
 {
+    /*
+     event
+     cond
+     target
+     type  : "internal" "external"
+     position
+     path
+     */
+
+    TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (this, "target",QString());
+    attributes.addItem(target);
+
+    TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitionStringAttribute (this, "cond",QString());
+    attributes.addItem(cond);
+
+    TransitionAttributes::TransitionStringAttribute * type = new TransitionAttributes::TransitionStringAttribute (this, "type",QString("internal"));
+    attributes.addItem(type);
+
+    TransitionAttributes::TransitionPositionAttribute * position = new TransitionAttributes::TransitionPositionAttribute (this, "position",QPointF(0,0));
+    attributes.addItem(position);
+
+    QList<QPointF> emptyPath;
+    TransitionAttributes::TransitionPathAttribute * path = new TransitionAttributes::TransitionPathAttribute (this, QString("path"),emptyPath);
+    attributes.addItem(path);
+
+
 }
 
 SCTransition::~SCTransition()
@@ -18,33 +40,25 @@ SCTransition::~SCTransition()
 }
 
 
-void SCTransition::setTargetState(SCState * st)
+QString SCTransition::getAttributeValue(QString key)
 {
-    _targetState = st;
+    IAttribute * attr = attributes.value(key);
+    if ( attr )
+    {
+        return attr->asString();
+    }
+    else return QString();
 }
 
-SCState * SCTransition::getTargetState()
+void SCTransition::setAttributeValue(QString key, QString value)
 {
-    return _targetState;
+    IAttribute * attr = attributes.value(key);
+    if ( attr )
+    {
+        attr->setValue(value);
+    }
 }
 
-void SCTransition::setAttributes(TransitionAttributes & ta)
-{
-     _attributes.cond = ta.cond;
-     _attributes.event = ta.event;
-     _attributes.path = ta.path;
-     _attributes.target = ta.target;
-     _attributes.type = ta.type;
-}
-
-void SCTransition::getAttributes(TransitionAttributes & ta)
-{
-    ta.cond   = _attributes.cond  ;
-    ta.event  = _attributes.event ;
-    ta.path   = _attributes.path;
-    ta.target = _attributes.target ;
-    ta.type   = _attributes.type ;
-}
 
 void SCTransition::handleLineSelected()
 {
@@ -56,13 +70,17 @@ void SCTransition::handleLineUnSelected()
     emit unselected();
 }
 
+#if 0
 void SCTransition::setPath(QList<QPointF>& path)
 {
-    _attributes.path =  path;
+    TransitionPathAttribute * path = attributes.value("path");
 
-}
+    path->
+        }
 
 void SCTransition::getPath(QList<QPointF>& path)
 {
     path = _attributes.path.pathPoints;
 }
+#endif
+

@@ -1,9 +1,10 @@
 #include "formeditorwindow.h"
 
-
+#include <QVariant>
 #include <QtGui>
 #include <QLabel>
-#include "scdatamodel.h"
+#include <QList>
+#include <QStandardItemModel>
 
 
 FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
@@ -23,7 +24,9 @@ FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
     widget->setLayout(layout);
     setCentralWidget(widget);
 
-    stateChartTreeView = new QTreeView();
+    stateChartTreeView = new QTreeWidget();
+    stateChartTreeView->setColumnCount(1);
+    connect ( stateChartTreeView, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(handleTreeViewItemClicked(QTreeWidgetItem*,int)));
     layout->addWidget (stateChartTreeView );
 
     QVBoxLayout *vlayout = new QVBoxLayout;
@@ -33,12 +36,87 @@ FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
     vlayout->addWidget( selectedChartItem);
 
     propertyTable = new QTableWidget();
+    propertyTable->setColumnCount(2);
     vlayout->addWidget( propertyTable );
 
     setWindowTitle(tr("State Chart Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
 
-    stateChartTreeView->setModel( dm->getStandardModel());
+    //    stateChartTreeView->setModel( dm->getStandardModel());
+
+
+    QList<SCState*> states;
+    dm->getStates(states);
+    loadTree (states);
+}
+
+void FormEditorWindow::loadTree ( QList<SCState*> & states)
+{
+
+    static int level = 0;
+    static QTreeWidgetItem * parentItem = 0;
+
+    level ++;
+
+    for(int i = 0; i < states.count(); i++)
+    {
+        SCState * st = states.at(i);
+
+        QTreeWidgetItem * item=0;
+
+        if ( level == 1)
+        {
+            item = new QTreeWidgetItem();
+            stateChartTreeView->addTopLevelItem(item);
+        }
+        else
+        {
+            item = new QTreeWidgetItem(parentItem);
+        }
+
+        item->setText(0, st->attributes.value("name")->asString());
+
+        QList<SCState*> subStates;
+
+        st->getStates(subStates);
+
+        parentItem = item;
+
+        loadTree (subStates);
+
+    }
+
+    level --;
+
+}
+
+void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
+{
+    int row = 0;
+
+
+    QString text =  item->text(0);
+
+    SCState * st = dm->getStateByName(text);
+
+    propertyTable->clear();
+
+    propertyTable->setRowCount(st->attributes.count());
+
+    QMapIterator<QString,IAttribute*> i(st->attributes);
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+        IAttribute* attr = st->attributes.value(key)  ;
+
+        QTableWidgetItem * propName = new QTableWidgetItem(key);
+
+        QTableWidgetItem * propValue = new QTableWidgetItem(attr->asString());
+
+        propertyTable->setItem(row, 0, propName);
+        propertyTable->setItem(row++, 1, propValue);
+
+    }
 }
 
 void FormEditorWindow::backgroundButtonGroupClicked(QAbstractButton *button)
@@ -176,14 +254,14 @@ void FormEditorWindow::createActions()
     sendBackAction->setShortcut(tr("Ctrl+B"));
     sendBackAction->setStatusTip(tr("Send item to back"));
     connect(sendBackAction, SIGNAL(triggered()),
-        this, SLOT(sendToBack()));
+            this, SLOT(sendToBack()));
 
     deleteAction = new QAction(QIcon(":/FormEditorWindow/delete.png"),
                                tr("&Delete"), this);
     deleteAction->setShortcut(tr("Delete"));
     deleteAction->setStatusTip(tr("Delete item from diagram"));
     connect(deleteAction, SIGNAL(triggered()),
-        this, SLOT(deleteItem()));
+            this, SLOT(deleteItem()));
 
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
@@ -264,7 +342,7 @@ void FormEditorWindow::createToolbars()
                                                  Qt::black));
     textAction = fontColorToolButton->menu()->defaultAction();
     fontColorToolButton->setIcon(createColorToolButtonIcon(
-    ":/FormEditorWindow/textpointer.png", Qt::black));
+            ":/FormEditorWindow/textpointer.png", Qt::black));
     fontColorToolButton->setAutoFillBackground(true);
     connect(fontColorToolButton, SIGNAL(clicked()),
             this, SLOT(textButtonTriggered()));
@@ -274,10 +352,10 @@ void FormEditorWindow::createToolbars()
     fillColorToolButton = new QToolButton;
     fillColorToolButton->setPopupMode(QToolButton::MenuButtonPopup);
     fillColorToolButton->setMenu(createColorMenu(SLOT(itemColorChanged()),
-                         Qt::white));
+                                                 Qt::white));
     fillAction = fillColorToolButton->menu()->defaultAction();
     fillColorToolButton->setIcon(createColorToolButtonIcon(
-    ":/FormEditorWindow/floodfill.png", Qt::white));
+            ":/FormEditorWindow/floodfill.png", Qt::white));
     connect(fillColorToolButton, SIGNAL(clicked()),
             this, SLOT(fillButtonTriggered()));
 
@@ -286,10 +364,10 @@ void FormEditorWindow::createToolbars()
     lineColorToolButton = new QToolButton;
     lineColorToolButton->setPopupMode(QToolButton::MenuButtonPopup);
     lineColorToolButton->setMenu(createColorMenu(SLOT(lineColorChanged()),
-                                 Qt::black));
+                                                 Qt::black));
     lineAction = lineColorToolButton->menu()->defaultAction();
     lineColorToolButton->setIcon(createColorToolButtonIcon(
-        ":/FormEditorWindow/linecolor.png", Qt::black));
+            ":/FormEditorWindow/linecolor.png", Qt::black));
     connect(lineColorToolButton, SIGNAL(clicked()),
             this, SLOT(lineButtonTriggered()));
 
@@ -346,7 +424,7 @@ QMenu *FormEditorWindow::createColorMenu(const char *slot, QColor defaultColor)
     colors << Qt::black << Qt::white << Qt::red << Qt::blue << Qt::yellow;
     QStringList names;
     names << tr("black") << tr("white") << tr("red") << tr("blue")
-          << tr("yellow");
+            << tr("yellow");
 
     QMenu *colorMenu = new QMenu(this);
     for (int i = 0; i < colors.count(); ++i) {
@@ -365,7 +443,7 @@ QMenu *FormEditorWindow::createColorMenu(const char *slot, QColor defaultColor)
 
 
 QIcon FormEditorWindow::createColorToolButtonIcon(const QString &imageFile,
-                        QColor color)
+                                                  QColor color)
 {
     QPixmap pixmap(50, 80);
     pixmap.fill(Qt::transparent);

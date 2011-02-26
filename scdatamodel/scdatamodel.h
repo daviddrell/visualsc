@@ -26,6 +26,8 @@ public:
 
     void getStates(QList<SCState *>& list);
     void getAllStates(QList<SCState *>& list);
+    SCState* getStateByName(QString name);
+
 
     // Q Data Model Interface
     QStandardItemModel * getStandardModel();
@@ -38,9 +40,9 @@ signals:
 private slots:
     void handleReaderDone(bool sucess, QStringList message);
     void handleMakeANewState(StateAttributes*);
-    void handleMakeANewTransition(TransitionAttributes*);
+    void handleMakeANewTransition(TransitionAttributes::TransitionAttributes*);
     void handleLeaveTransitionElement();
-    void handleMakeANewTransitionPath(TransitionPathAttributes * tp);
+    void handleMakeANewTransitionPath(TransitionAttributes::TransitionPathAttribute * tp);
     void handleTransitUp();
     void handleTransitDown();
 

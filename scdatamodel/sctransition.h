@@ -9,27 +9,23 @@ class SCState;
 
 #include "scdatamodel_global.h"
 
+
+
 class SCDATAMODELSHARED_EXPORT  SCTransition : public QObject
 {
     Q_OBJECT
 
 public:
     SCTransition(QObject * parent);
+
     ~SCTransition();
 
-    void setPath(QList<QPointF> & path);
-    void getPath(QList<QPointF> & path);
-    void setAttributes ( TransitionAttributes & ta);
-    void getAttributes ( TransitionAttributes & ta);
-    void setTargetState(SCState * st);
-    SCState * getTargetState();
+    void    setAttributeValue(QString key, QString value);
+    QString getAttributeValue(QString key);
 
+    //public data members
 
-    QString event;
-    QString cond;
-    QString target;
-    TransitionAttributes::TRANSISTION_TYPE type;
-
+    TransitionAttributes attributes;
 
 signals:
     void selected();
@@ -41,9 +37,9 @@ private slots:
 
 private:
 
-    TransitionAttributes _attributes;
     SCState *       _targetState;
 
 };
+
 
 #endif // SCTRANSISTION_H

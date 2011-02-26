@@ -33,7 +33,10 @@ public:
     SCDataModel  * getDM();
 signals:
     void error(QString err);
+    void readInputFileCompleted (bool,QStringList );
 
+private slots:
+    void handleOpenCompleted (bool,QStringList );
 
 private:
 

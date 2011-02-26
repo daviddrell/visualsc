@@ -5,95 +5,140 @@
 #include <QStringList>
 #include <QPoint>
 
+#include "iattribute.h"
+
 #include "scdatamodel_global.h"
+#include <QPoint>
+#include <QString>
+#include <QMetaType>
 
 
-
-class  SCDATAMODELSHARED_EXPORT StateAttributes
+class  SCDATAMODELSHARED_EXPORT StateAttributes : public IAttributeContainer
 {
 public:
     StateAttributes();
-    StateAttributes(StateAttributes & sa);
-    int getNumberAttributes(){return 4;}
 
 
-    class StateName
+    StateAttributes(QObject * parent, QString key);
+
+    StateAttributes(const StateAttributes& sa);
+
+    StateAttributes& operator=( StateAttributes& sa );
+
+
+    virtual AttributeMajorType getMajorType();
+
+    ~StateAttributes() ;
+
+      //  NAME
+
+
+    class StateName :  public IAttribute
     {
     public:
-        StateName():_name(){}
-        StateName(QString n):_name(n){}
 
-        QString asString(){return _name;}
-        void    set(QString name){ _name = name;}
+        StateName(QObject*  parent,QString key,QString n);
+        StateName();
+        ~StateName();
+
+        StateName& operator=( StateName& sa );
+
+        QString asString();
+        void    setValue(const QString name);
+        int getType() ;
+
     private :
             QString _name;
     };
 
-    class StateSize
+
+
+    //  SIZE
+
+
+    class StateSize: public IAttribute
     {
     public:
-        StateSize(): _size(){}
-        StateSize(QPoint s): _size(s){}
 
-        QString asString()
-        {
-            return (QString::number(_size.x()) + QString(",") +  QString::number(_size.y()));
-        }
-        QPoint asPoint()
-        {
-            return (_size);
-        }
+        StateSize();
+        StateSize(QObject*  parent, QString key, QPoint s);
+        StateSize(QObject*  parent, QString key, QString s);
 
-        void    set(QString size)
-        {
-            QStringList sl = size.split(",");
-            if ( sl.length() == 2)
-            {
-                _size.setX( sl[0].toInt() );
-                _size.setY( sl[1].toInt() );
-            }
-        }
-        void    set(int w, int h){_size.setX(w); _size.setY(h);}
-        void    set(QPoint s){_size.setX(s.x()); _size.setY(s.y());}
+        ~StateSize();
+
+        StateSize& operator=( StateSize& sa );
+
+
+        int getType() ;
+
+        QString asString();
+        QPointF asPointF() const;
+
+        void    setValue(QString size);
+        void    setValue(const int w,const int h);
+        void    setValue(const QPointF s);
     private :
-            QPoint _size;
+            QPointF _size;
     };
 
-    class StatePosition
+
+
+    // POSITION
+
+
+    class StatePosition:  public IAttribute
     {
     public:
-        StatePosition() : _position(){}
-        StatePosition(QPoint p) : _position(p){}
+        StatePosition();
 
-        QString asString()
-        {
-            return (QString::number(_position.x()) + QString(",") +  QString::number(_position.y()));
-        }
-        QPoint asPoint()
-        {
-            return (_position);
-        }
+        StatePosition(QObject*  parent,QString key,QPointF p);
 
-        void    set(QString position)
-        {
-            QStringList sl = position.split(",");
-            if ( sl.length() == 2)
-            {
-                _position.setX( sl[0].toInt() );
-                _position.setY( sl[1].toInt() );
-            }
-        }
-        void    set(int w, int h){_position.setX(w); _position.setY(h);}
-        void    set(QPoint p){_position.setX(p.x()); _position.setY(p.y());}
+        StatePosition(QObject*  parent,QString key,QString s);
+
+        ~StatePosition();
+
+        StatePosition& operator=( StatePosition& sa );
+
+        int getType();
+
+        QString asString();
+        QPointF asPointF() const;
+
+        void    setValue(const QString position);
+        void    setValue(int w, int h);
+        void    setValue(const QPointF p);
     private :
-            QPoint _position;
+            QPointF _position;
+
     };
 
-    StateName name;
-    StateSize size;
-    StatePosition position;
-    bool          hasBeenSized;
+    class StateString:  public IAttribute
+    {
+    public:
+        StateString(QObject*  parent,QString key,QString s);
+        StateString() ;
+        ~StateString() ;
+
+        StateString& operator=( StateString& sa );
+
+        int getType();
+
+        QString asString();
+
+
+        void    setValue(const QString value);
+
+        private :
+            QString _value;
+
+    };
 
 };
+
+Q_DECLARE_METATYPE(StateAttributes);
+Q_DECLARE_METATYPE( StateAttributes::StateName);
+Q_DECLARE_METATYPE( StateAttributes::StateSize);
+Q_DECLARE_METATYPE(StateAttributes::StatePosition);
+Q_DECLARE_METATYPE(StateAttributes::StateString);
 
 #endif // STATEATTRIBUTES_H

@@ -60,8 +60,17 @@ void MainWindow::handleFileOpenClick()
 
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
 
+
+    connect (_project, SIGNAL(readInputFileCompleted(bool,QStringList)), this, SLOT(handleReadInputFileDone(bool,QStringList)) );
+
     _project->readInputFile(fileName);
 
+
+}
+
+
+void MainWindow::handleReadInputFileDone(bool ,QStringList)
+{
 
     if ( _formEditorWindow )
     {
@@ -69,8 +78,8 @@ void MainWindow::handleFileOpenClick()
     }
     _formEditorWindow = new FormEditorWindow(0, _project->getDM());
     _formEditorWindow->show();
-}
 
+}
 
 void MainWindow::handleFileSaveClick()
 {

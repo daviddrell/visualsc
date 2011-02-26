@@ -1,6 +1,6 @@
 #ifndef SCSTATE_H
 #define SCSTATE_H
-
+#include <QMetaType>
 #include <QObject>
 #include <QList>
 #include "stateattributes.h"
@@ -14,21 +14,23 @@ class QStandardItem;
 #include "scdatamodel_global.h"
 
 
+
 class SCDATAMODELSHARED_EXPORT  SCState : public QObject
 {
     Q_OBJECT
 public:
     explicit SCState(QObject *parent = 0);
+    explicit SCState(const SCState& st);
     ~SCState();
 
-    void setStateName(QString name);
-    void setSize(QPoint size);
-    void setPosition(QPoint pos);
+    void setStateName(QString n);
     void addTransistion(SCTransition*);
     void addState(SCState *);
-    void makeTargetConnections(QList<SCTransition*> & transitionList);
-    void setAttributes(StateAttributes & sa);
-    bool hasBeenSized();
+   // void makeTargetConnections(QList<SCTransition*> & transitionList);
+
+    void setAttributeValue(QString key, QString value);
+    QString getAttributeValue(QString key);
+
     int  getStateCount();
 
     void setParentItem(QStandardItem * item);
@@ -37,12 +39,9 @@ public:
     QStandardItem * getParentItem();
     QStandardItem * getItem();
 
-    /**
-      * \fn getAttributes
-      * \brief Get this state's attributes
-      *
-      */
-    void getAttributes(StateAttributes& attr);
+    void setSize (QPointF& size);
+    void setSize (QPoint& size);
+    void setPosition (QPointF& size);
 
     /**
       * \fn getAllTransitions
@@ -76,6 +75,8 @@ public:
     void writeSCVXML(QXmlStreamWriter & xmlWriter);
 
 
+    StateAttributes         attributes;
+
 signals:
 
      void changed();
@@ -88,10 +89,15 @@ public slots:
 
 private:
 
-    StateAttributes         _stateAttributes;
     int                     _stateCount;
     QStandardItem *         _parentDMItem;
     QStandardItem *         _thisDMItem;
+
+    void initCommon();
+
 };
+
+Q_DECLARE_METATYPE (SCState*)
+
 
 #endif // SCSTATE_H

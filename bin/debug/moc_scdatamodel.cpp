@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'scdatamodel.h'
 **
-** Created: Sun Feb 13 14:37:36 2011
+** Created: Mon Feb 21 11:43:44 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -39,10 +39,10 @@ static const uint qt_meta_data_SCDataModel[] = {
      143,   13,   12,   12, 0x08,
      178,   12,   12,   12, 0x08,
      216,   12,   12,   12, 0x08,
-     264,   12,   12,   12, 0x08,
-     298,  295,   12,   12, 0x08,
-     354,   12,   12,   12, 0x08,
-     372,   12,   12,   12, 0x08,
+     286,   12,   12,   12, 0x08,
+     320,  317,   12,   12, 0x08,
+     397,   12,   12,   12, 0x08,
+     415,   12,   12,   12, 0x08,
 
        0        // eod
 };
@@ -54,9 +54,10 @@ static const char qt_meta_stringdata_SCDataModel[] = {
     "newTransition\0newTransitionSignal(SCTransition*)\0"
     "handleReaderDone(bool,QStringList)\0"
     "handleMakeANewState(StateAttributes*)\0"
-    "handleMakeANewTransition(TransitionAttributes*)\0"
+    "handleMakeANewTransition(TransitionAttributes::TransitionAttributes*)\0"
     "handleLeaveTransitionElement()\0tp\0"
-    "handleMakeANewTransitionPath(TransitionPathAttributes*)\0"
+    "handleMakeANewTransitionPath(TransitionAttributes::TransitionPathAttri"
+    "bute*)\0"
     "handleTransitUp()\0handleTransitDown()\0"
 };
 
@@ -94,9 +95,9 @@ int SCDataModel::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 2: newTransitionSignal((*reinterpret_cast< SCTransition*(*)>(_a[1]))); break;
         case 3: handleReaderDone((*reinterpret_cast< bool(*)>(_a[1])),(*reinterpret_cast< QStringList(*)>(_a[2]))); break;
         case 4: handleMakeANewState((*reinterpret_cast< StateAttributes*(*)>(_a[1]))); break;
-        case 5: handleMakeANewTransition((*reinterpret_cast< TransitionAttributes*(*)>(_a[1]))); break;
+        case 5: handleMakeANewTransition((*reinterpret_cast< TransitionAttributes::TransitionAttributes*(*)>(_a[1]))); break;
         case 6: handleLeaveTransitionElement(); break;
-        case 7: handleMakeANewTransitionPath((*reinterpret_cast< TransitionPathAttributes*(*)>(_a[1]))); break;
+        case 7: handleMakeANewTransitionPath((*reinterpret_cast< TransitionAttributes::TransitionPathAttribute*(*)>(_a[1]))); break;
         case 8: handleTransitUp(); break;
         case 9: handleTransitDown(); break;
         default: ;

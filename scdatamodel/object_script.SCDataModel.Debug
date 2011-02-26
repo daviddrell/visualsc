@@ -5,8 +5,10 @@ INPUT(
 ./../bin/debug/sctransition.o
 ./../bin/debug/scstate.o
 ./../bin/debug/scxmlreader.o
+./../bin/debug/iattribute.o
 ./../bin/debug/moc_scdatamodel.o
 ./../bin/debug/moc_sctransition.o
 ./../bin/debug/moc_scstate.o
 ./../bin/debug/moc_scxmlreader.o
+./../bin/debug/moc_iattribute.o
 );

@@ -34,6 +34,7 @@ private slots:
     void handleFileOpenClick();
     void handleFileSaveClick();
     void handleNewClick();
+    void handleReadInputFileDone(bool,QStringList);
 };
 
 #endif // MAINWINDOW_H

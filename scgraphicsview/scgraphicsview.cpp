@@ -40,18 +40,18 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
         if ( parentGraphic )
         {
             // has the size been set on the parent?
-            if ( ! parentState->hasBeenSized() )
-            {
-                // make sure the parent is big enough to hold all the states
+//            if ( ! parentState->hasBeenSized() )
+//            {
+//                // make sure the parent is big enough to hold all the states
 
-                QPoint sz;
-                parentGraphic->getSize(sz);
-                sz.setX( sz.x() + 120 );
-                parentGraphic->setSize( sz );
+//                QPoint sz;
+//                parentGraphic->getSize(sz);
+//                sz.setX( sz.x() + 120 );
+//                parentGraphic->setSize( sz );
 
-            }
+//            }
 
-            increaseSizeOfAllAncestors (parentState);
+//            increaseSizeOfAllAncestors (parentState);
         }
     }
 
@@ -61,63 +61,55 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
 SCState * SCGraphicsView::lookUpTargetState(QString target)
 {
 
-    QList<SCState *> states;
-    _dm->getAllStates(states);
+//    QList<SCState *> states;
+//    _dm->getAllStates(states);
 
-    QList<SCState *>::iterator i;
-    for (i = states.begin(); i != states.end(); ++i)
-    {
-        SCState *st = *i;
-        StateAttributes attr;
-        st->getAttributes(attr);
-        if (attr.name.asString() == target)
-            return st;
-    }
+//    QList<SCState *>::iterator i;
+//    for (i = states.begin(); i != states.end(); ++i)
+//    {
+//        SCState *st = *i;
+//        StateAttributes attr;
+//        st->getAttributes(attr);
+//        if (attr.name.asString() == target)
+//            return st;
+//    }
 
     return NULL;
 }
 
 void SCGraphicsView::handleNewTransition (SCTransition *t)
 {
-    TransitionAttributes ta;
-    t->getAttributes(ta);
+     // create a transition graphic
 
-    SCState *st = lookUpTargetState (ta.target);
-
-    t->setTargetState(st);
-
-
-    // create a transition graphic
     SelectableLineSegmentGraphic * transGraphic  = 0;
 
-    // is there a path defined?
 
-    if (  ta.path.pathPoints.count() < 2 )
+    TransitionAttributes::TransitionPositionAttribute * pos =
+            dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> (  t->attributes.value("position"));
+    QPointF position = pos->asQPointF();
+
+    TransitionAttributes::TransitionPathAttribute * p =
+            dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
+
+
+    QList<QPointF> path = p->asQPointFList();
+
+    if (  path.count() < 2  )
     {
-        QPointF position = QPointF(10,10);
+
+        position = QPointF(10,10);
 
         transGraphic  = new SelectableLineSegmentGraphic(position,position, QPointF(position.x()  , position.y() + 15 ));
     }
-    else if ( ta.path.pathPoints.count() == 2)
+    else if ( path.count() >= 2)
     {
 
-        transGraphic  = new SelectableLineSegmentGraphic(ta.path.pathPoints[0],
-                                                         ta.path.pathPoints[0],
-                                                         ta.path.pathPoints[1]);
+        transGraphic  = new SelectableLineSegmentGraphic(path[0],
+                                                         path[0],
+                                                         path[1]);
 
     }
-    else
-    {
 
-        transGraphic  = new SelectableLineSegmentGraphic(ta.path.pathPoints[0],
-                                                         ta.path.pathPoints[0],
-                                                         ta.path.pathPoints[1]);
-//        QList<QPointF>::iterator i;
-//        for ( i = ta.path.pathPoints.begin(); i !=  ta.path.pathPoints.end(); i++)
-//        {
-
-//        }
-    }
 
     // get the parent state graphic
 
@@ -127,7 +119,6 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
 
     transGraphic->setZValue( parentGraphic->zValue() + 1 );
     transGraphic->setParentItem(parentGraphic);
-
 
 }
 

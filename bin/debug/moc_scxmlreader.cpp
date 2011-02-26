@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'scxmlreader.h'
 **
-** Created: Sat Feb 12 08:08:16 2011
+** Created: Mon Feb 21 09:16:41 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -40,9 +40,9 @@ static const uint qt_meta_data_SCXMLReader[] = {
      175,   12,   12,   12, 0x05,
      218,   12,   12,   12, 0x05,
      247,   12,   12,   12, 0x05,
-     276,   12,   12,   12, 0x05,
-     327,   12,   12,   12, 0x05,
-     342,   12,   12,   12, 0x05,
+     281,  276,   12,   12, 0x05,
+     314,   12,   12,   12, 0x05,
+     329,   12,   12,   12, 0x05,
 
        0        // eod
 };
@@ -56,8 +56,8 @@ static const char qt_meta_stringdata_SCXMLReader[] = {
     "leaveTransistionElement()\0"
     "makeANewTransistion(TransitionAttributes*)\0"
     "enterTransitionPathElement()\0"
-    "leaveTransitionPathElement()\0"
-    "makeANewTransistionPath(TransitionPathAttributes*)\0"
+    "leaveTransitionPathElement()\0path\0"
+    "makeANewTransistionPath(QString)\0"
     "leaveElement()\0enterElement()\0"
 };
 
@@ -99,7 +99,7 @@ int SCXMLReader::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 6: makeANewTransistion((*reinterpret_cast< TransitionAttributes*(*)>(_a[1]))); break;
         case 7: enterTransitionPathElement(); break;
         case 8: leaveTransitionPathElement(); break;
-        case 9: makeANewTransistionPath((*reinterpret_cast< TransitionPathAttributes*(*)>(_a[1]))); break;
+        case 9: makeANewTransistionPath((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 10: leaveElement(); break;
         case 11: enterElement(); break;
         default: ;
@@ -167,7 +167,7 @@ void SCXMLReader::leaveTransitionPathElement()
 }
 
 // SIGNAL 9
-void SCXMLReader::makeANewTransistionPath(TransitionPathAttributes * _t1)
+void SCXMLReader::makeANewTransistionPath(QString _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 9, _a);

@@ -19,7 +19,8 @@ SOURCES += scdatamodel.cpp \
     stateattributes.cpp \
     sctransition.cpp \
     scstate.cpp \
-    scxmlreader.cpp
+    scxmlreader.cpp \
+    iattribute.cpp
 
 HEADERS += scdatamodel.h\
         SCDataModel_global.h \
@@ -27,4 +28,5 @@ HEADERS += scdatamodel.h\
     stateattributes.h \
     sctransition.h \
     scstate.h \
-    scxmlreader.h
+    scxmlreader.h \
+    iattribute.h

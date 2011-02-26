@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'sceditcontroller.h'
 **
-** Created: Sat Feb 12 08:08:20 2011
+** Created: Sat Feb 19 12:01:40 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.0)
 **
 ** WARNING! All changes made in this file will be lost!

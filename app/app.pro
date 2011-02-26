@@ -43,3 +43,6 @@ FORMS    += \
 
 OTHER_FILES += \
     design.pptx 
+
+RESOURCES += \
+    resources/formeditorwindow.qrc

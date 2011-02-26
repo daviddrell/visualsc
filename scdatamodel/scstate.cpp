@@ -3,21 +3,63 @@
 #include <QXmlStreamWriter>
 #include <QStandardItem>
 #include "scstate.h"
+#include <QVariant>
+
 
 SCState::SCState(QObject *parent) :
     QObject(parent),
-    _stateAttributes(),
+    attributes(this, "stateAttributes"),
    _stateCount(0),
    _parentDMItem(0),
    _thisDMItem(0)
 {
-
+   initCommon();
 }
 
+
+SCState::SCState(const SCState& st) :
+    QObject(st.parent()),
+    attributes(st.attributes),
+   _stateCount(st._stateCount),
+   _parentDMItem(st._parentDMItem),
+   _thisDMItem(st._thisDMItem)
+{
+    initCommon();
+}
 
 SCState::~SCState()
 {
 
+}
+
+void SCState::initCommon()
+{
+    StateAttributes::StateName * name = new StateAttributes::StateName (this, "name",QString());
+    StateAttributes::StateSize * size = new StateAttributes::StateSize (this, "size",QPoint(100,50));
+    StateAttributes::StatePosition * position = new StateAttributes::StatePosition (this, "position",QPoint(0,0));
+
+    attributes.addItem(name);
+    attributes.addItem(size);
+    attributes.addItem(position);
+}
+
+QString SCState::getAttributeValue(QString key)
+{
+    IAttribute * attr = attributes.value(key);
+    if ( attr )
+    {
+        return attr->asString();
+    }
+    else return QString();
+}
+
+void SCState::setAttributeValue(QString key, QString value)
+{
+    IAttribute * attr = attributes.value(key);
+    if ( attr )
+    {
+        attr->setValue(value);
+    }
 }
 
 void SCState::setItem(QStandardItem * item)
@@ -40,18 +82,34 @@ QStandardItem * SCState::getItem()
     return _thisDMItem;
 }
 
-bool SCState::hasBeenSized()
+void SCState::setSize(QPointF &size)
 {
-    return _stateAttributes.hasBeenSized;
+    StateAttributes::StateSize * sz = dynamic_cast<StateAttributes::StateSize *> (attributes.value("size"));
+    sz->setValue(size);
 }
 
+void SCState::setSize(QPoint &size)
+{
+    QPointF pointF = QPointF(size.x(),size.y());
+    setSize(pointF);
+}
+
+void SCState::setPosition(QPointF &position)
+{
+    StateAttributes::StatePosition * pos = dynamic_cast<StateAttributes::StatePosition *> (attributes.value("position"));
+    pos->setValue(position);
+}
+
+#if 0
 void SCState::makeTargetConnections(QList<SCTransition*> & transitionList)
 {
 
     for (int t = 0; t < transitionList.count(); t++)
     {
         SCTransition * trans = transitionList.value(t);
-        if ( trans->target == this->objectName() )
+        TransitionAttributes attr;
+        trans->getAttributes(attr);
+        if ( attr.target == this->objectName() )
         {
      //       connect (trans, SIGNAL(selected()), this, SLOT(handleTransitionSelected()) );
    //         connect (trans, SIGNAL(unselected()), this, SLOT(handleTransitionUnSelected()) );
@@ -67,6 +125,7 @@ void SCState::makeTargetConnections(QList<SCTransition*> & transitionList)
     }
 
 }
+#endif
 
 
 void SCState::addTransistion(SCTransition * t)
@@ -148,52 +207,12 @@ void SCState::getAllStates(QList<SCState *> & stateList)
 }
 
 
-
-void SCState::setPosition(QPoint pos)
-{
-    _stateAttributes.position.set(pos);
-
-    emit changed();
-}
-
-void SCState::setSize(QPoint size)
-{
-    _stateAttributes.size.set(size);
-    _stateAttributes.hasBeenSized = true;
-
-    emit changed();
-}
-
-void SCState::setAttributes(StateAttributes & sa)
-{
-
-    _stateAttributes.size.set(  sa.size.asPoint());
-    _stateAttributes.name.set(  sa.name.asString());
-    _stateAttributes.position.set(  sa.position.asPoint());
-    _stateAttributes.hasBeenSized = sa.hasBeenSized;
-
-    _thisDMItem->setText(sa.name.asString());
-
-    emit changed();
-
-}
-
-
-void SCState::getAttributes(StateAttributes& attr)
-{
-     attr.name.set( _stateAttributes.name.asString());
-     attr.position.set( _stateAttributes.position.asPoint());
-     attr.size.set( _stateAttributes.size.asPoint());
-}
-
-
-
 void SCState::writeSCVXML(QXmlStreamWriter & sw)
 {
     sw.writeStartElement(QString("state"));
-    sw.writeAttribute(QString("id"), _stateAttributes.name.asString());
-    sw.writeAttribute(QString("position"),_stateAttributes.position.asString());
-    sw.writeAttribute(QString("size"),_stateAttributes.size.asString());
+    sw.writeAttribute(QString("id"), attributes.value("name")->asString());
+    sw.writeAttribute(QString("position"),attributes.value("position")->asString());
+    sw.writeAttribute(QString("size"),attributes.value("size")->asString());
 
     for(int i=0; i < children().length(); i++)
     {
@@ -205,12 +224,12 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
     sw.writeEndElement();
 }
 
+
 void SCState::setStateName(QString n)
 {
     this->setObjectName(n);
 
-    emit changed();
-
+    attributes.value("name")->setValue(n);
 }
 
 

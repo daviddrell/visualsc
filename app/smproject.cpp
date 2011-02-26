@@ -33,8 +33,16 @@ QGraphicsView * SMProject::getQGraphicsView()
 
 void SMProject::readInputFile(QString file)
 {
-     _dm.open(file);
-//    _editController.openFile(file);
+    connect(& _dm, SIGNAL(openCompleted(bool,QStringList)), this, SLOT(handleOpenCompleted(bool,QStringList)));
+
+    _dm.open(file);
+
+}
+
+
+void SMProject::handleOpenCompleted(bool result ,QStringList messages)
+{
+    emit readInputFileCompleted ( result, messages);
 }
 
 void SMProject::save(QString fileName)

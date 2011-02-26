@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'sctransition.h'
 **
-** Created: Sun Feb 13 14:37:37 2011
+** Created: Mon Feb 21 07:42:20 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.0)
 **
 ** WARNING! All changes made in this file will be lost!

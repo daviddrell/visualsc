@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QStandardItemModel>
+#include <QMapIterator>
 
 SCDataModel::SCDataModel(QObject * parent) :
         QObject (parent), _reader(), _writer(0), _level(0),_topLevel(0),
@@ -20,18 +21,18 @@ QStandardItemModel * SCDataModel::getStandardModel()
 
 QStandardItem * SCDataModel::makeAStateItem(SCState *st)
 {
-    StateAttributes attr;
 
-    QStandardItem * item = new QStandardItem(st->getStateCount(), attr.getNumberAttributes());
+    QStandardItem * item = new QStandardItem(0,1);
+    QString name = st->attributes.value("name")->asString();
+    item->setData( name, Qt::UserRole );
 
     return item;
 }
 
 QStandardItem * SCDataModel::makeATransitionItem(SCTransition *tr)
 {
-    TransitionAttributes attr;
 
-    QStandardItem * item = new QStandardItem(1 , attr.getNumberAttributes());
+    QStandardItem * item = new QStandardItem(0,0);
 
     return item;
 
@@ -70,6 +71,7 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
 
 void SCDataModel::open(QString file)
 {
+
     connect(&_reader, SIGNAL(done(bool, QStringList)), this, SLOT(handleReaderDone(bool, QStringList)));
 
     connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)));
@@ -78,7 +80,7 @@ void SCDataModel::open(QString file)
 
     connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)));
     connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()));
-    connect(&_reader, SIGNAL(makeANewTransistionPath(TransitionPathAttributes*)), this, SLOT(handleMakeANewTransitionPath(TransitionPathAttributes*)));
+    connect(&_reader, SIGNAL(makeANewTransistionPath(TransitionPathAttribute*)), this, SLOT(handleMakeANewTransitionPath(TransitionPathAttribute*)));
 
     _reader.readFile(file);
     _reader.start();
@@ -87,7 +89,24 @@ void SCDataModel::open(QString file)
 
 void SCDataModel::getStates(QList<SCState *>& list)
 {
+    if ( _topState == NULL ) list = QList<SCState *>();
+
     return _topState->getStates(list);
+}
+
+
+SCState * SCDataModel::getStateByName(QString name)
+{
+    QList<SCState *> list;
+    _topState->getAllStates(list);
+
+    for(int i =0; i < list.count(); i++)
+    {
+        SCState *st = list.at(i);
+        if ( st->attributes.value("name")->asString() == name)
+            return st;
+    }
+    return NULL;
 }
 
 
@@ -115,7 +134,7 @@ void SCDataModel::handleTransitUp()
         _currentState = dynamic_cast<SCState*> (_currentState->parent());
 }
 
-void SCDataModel::handleMakeANewState(StateAttributes * sa)
+void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 {
     SCState * state = NULL;
 
@@ -125,7 +144,11 @@ void SCDataModel::handleMakeANewState(StateAttributes * sa)
     if ( _topLevel == _level )
     {
         state = new SCState();
+        state->setObjectName( sa->value("name")->asString() );
         _topState = state;
+
+        sa->setParent(state);
+        state->attributes.setAttributes( *sa);
 
         // insert the new state into the Qt Data Model
 
@@ -135,30 +158,44 @@ void SCDataModel::handleMakeANewState(StateAttributes * sa)
         state->setParentItem(root);
         state->setItem (thisItem);
 
-        qDebug() << "adding new state at top level : " + sa->name.asString();
+
+        qDebug() << "adding new state at top level : " + sa->value("name")->asString();
     }
     else if ( _level > _topLevel)
     {
         state = new SCState(_currentState);
+        state->setObjectName( sa->value("name")->asString() );
+        sa->setParent(state);
+        state->attributes.setAttributes( *sa);
 
-        QStandardItem * parent = _currentState->getItem();
 
         // insert the new state into the Qt Data Model
 
+        QStandardItem * parent = _currentState->getItem();
         QStandardItem * thisItem = makeAStateItem(state);
         state->setItem (thisItem);
         parent->appendRow( thisItem );
 
-        qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + sa->name.asString();
+        qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + sa->value("name")->asString();
     }
 
-    state->setAttributes( * sa);
 
-    delete sa; sa = NULL;
 
     _currentState  = state;
 
     emit newStateSignal(state);
+
+
+    // clean up memory for passed in attributes
+
+    QMapIterator<QString,IAttribute*> i(*sa);
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+        IAttribute* sourceAttr = sa->value(key)  ;
+        delete sourceAttr;
+    }
+    delete sa;
 
 }
 
@@ -166,20 +203,32 @@ void SCDataModel::handleMakeANewState(StateAttributes * sa)
 
 void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
 {
-    qDebug() << "handleMakeANewTransition, : "  + ta->target;
+    qDebug() << "handleMakeANewTransition, : "  + ta->value("target")->asString();
 
     SCTransition * transition = new SCTransition(_currentState);
 
     if ( _currentState == 0)
         return;
 
-    transition->setAttributes(*ta);
+    transition->attributes.setAttributes(*ta);
 
     _currentTransition = transition;
     _currentState->addTransistion(transition);
 
-    delete ta; ta = 0;
 
+    // clean up memory for passed in attributes
+
+    QMapIterator<QString,IAttribute*> i(*ta);
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+        IAttribute* sourceAttr = ta->value(key)  ;
+        delete sourceAttr;
+    }
+
+    delete ta;
+
+    emit newTransitionSignal(_currentTransition);
 
 }
 
@@ -189,10 +238,10 @@ void SCDataModel::handleLeaveTransitionElement()
 
     //    _currentTransition->creationDone();
 
-    emit newTransitionSignal(_currentTransition);
+
 }
 
-void SCDataModel::handleMakeANewTransitionPath(TransitionPathAttributes * tp)
+void SCDataModel::handleMakeANewTransitionPath ( TransitionAttributes::TransitionPathAttribute * tp)
 {
 
     qDebug() << "handleMakeANewTransitionPath : " ;
@@ -202,8 +251,10 @@ void SCDataModel::handleMakeANewTransitionPath(TransitionPathAttributes * tp)
 
     if ( _currentTransition == 0 ) return;
 
-    _currentTransition->setPath(tp->pathPoints);
+    TransitionAttributes::TransitionPathAttribute *path =
+            dynamic_cast<TransitionAttributes::TransitionPathAttribute *>( _currentTransition->attributes.value("path"));
 
+    path->setValue( tp->asString());
 
 }
 
@@ -229,7 +280,7 @@ void SCDataModel::handleReaderDone(bool sucess, QStringList message)
     // can look up themselves in the target fields and make the target
     // connections
 
-    _topState->makeTargetConnections( * masterTransistionList);
+    //_topState->makeTargetConnections( * masterTransistionList);
 
     delete masterTransistionList;
 
