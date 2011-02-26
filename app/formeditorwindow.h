@@ -117,6 +117,8 @@ private:
 
     SCDataModel * dm;
 
+private slots:
+    void handlePropertyChanged(IAttribute * attr);
 
 };
 

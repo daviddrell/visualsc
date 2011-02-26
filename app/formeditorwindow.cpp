@@ -99,6 +99,15 @@ void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
 
     SCState * st = dm->getStateByName(text);
 
+
+    for (int r =0; r <propertyTable->rowCount(); r++ )
+    {
+        QTableWidgetItem * item = propertyTable->itemAt(r,0);
+        delete item;
+        item = propertyTable->itemAt(r,1);
+        delete item;
+    }
+
     propertyTable->clear();
 
     propertyTable->setRowCount(st->attributes.count());
@@ -109,6 +118,8 @@ void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
         QString key  = i.next().key();
         IAttribute* attr = st->attributes.value(key)  ;
 
+        connect ( attr, SIGNAL(changed(IAttribute*)), this, SLOT(handlePropertyChanged(IAttribute*)));
+
         QTableWidgetItem * propName = new QTableWidgetItem(key);
 
         QTableWidgetItem * propValue = new QTableWidgetItem(attr->asString());
@@ -116,6 +127,18 @@ void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
         propertyTable->setItem(row, 0, propName);
         propertyTable->setItem(row++, 1, propValue);
 
+    }
+
+}
+
+void FormEditorWindow::handlePropertyChanged(IAttribute *attr)
+{
+    for (int r =0; r <propertyTable->rowCount(); r++ )
+    {
+        if ( propertyTable->itemAt(r,0)->text() == attr->key() )
+        {
+            propertyTable->itemAt(r,0)->setText( attr->asString() );
+        }
     }
 }
 

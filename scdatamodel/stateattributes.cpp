@@ -67,7 +67,11 @@ QString StateAttributes::StateName::asString()
 
 void    StateAttributes::StateName::setValue(const QString name)
 {
-    _name = name;
+    if ( name != _name )
+    {
+        _name = name;
+        emit changed(this );
+    }
 }
 
 int StateAttributes::StateName::getType()
@@ -125,19 +129,36 @@ void    StateAttributes::StateSize::setValue(QString size)
     QStringList sl = size.split(",");
     if ( sl.length() == 2)
     {
-        _size.setX( sl[0].toInt() );
-        _size.setY( sl[1].toInt() );
+        QPointF nSize(sl[0].toInt(),sl[1].toInt());
+
+        if ( nSize != _size )
+        {
+            _size = nSize;
+            emit changed(this);
+        }
     }
 }
 
 void    StateAttributes::StateSize::setValue(const int w,const int h)
 {
-    _size.setX(w); _size.setY(h);
+
+    QPointF nSize(w,h);
+
+    if ( nSize != _size )
+    {
+        _size = nSize;
+        emit changed(this);
+    }
 }
 
-void    StateAttributes::StateSize::setValue(const QPointF s)
+void    StateAttributes::StateSize::setValue(const QPointF nSize)
 {
-    _size.setX(s.x()); _size.setY(s.y());
+
+    if ( nSize != _size )
+    {
+        _size = nSize;
+        emit changed(this);
+    }
 }
 
 
@@ -185,23 +206,38 @@ QPointF StateAttributes::StatePosition::asPointF() const
 void    StateAttributes::StatePosition::setValue(const QString position)
 {
     QStringList sl = position.split(",");
-    if ( sl.length() == 2)
+    if ( sl.length() != 2)
     {
-        _position.setX( sl[0].toInt() );
-        _position.setY( sl[1].toInt() );
+        return;
+    }
+
+    QPointF nPosition(sl[0].toInt(),sl[1].toInt());
+
+    if ( nPosition != _position )
+    {
+        _position = nPosition;
+        emit changed(this);
     }
 }
 
 void    StateAttributes::StatePosition::setValue(int w, int h)
-{
-    _position.setX(w);
-    _position.setY(h);
+{   
+    QPointF nPosition( w,  h);
+
+    if ( nPosition != _position )
+    {
+        _position = nPosition;
+        emit changed(this);
+    }
 }
 
-void    StateAttributes::StatePosition::setValue(const QPointF p)
-{
-    _position.setX(p.x());
-    _position.setY(p.y());
+void    StateAttributes::StatePosition::setValue(const QPointF nPosition)
+{ 
+    if ( nPosition != _position )
+    {
+        _position = nPosition;
+        emit changed(this);
+    }
 }
 
 
@@ -242,6 +278,12 @@ QString StateAttributes::StateString::asString()
 void    StateAttributes::StateString::setValue(const QString value)
 {
     _value= value;
+
+    if ( value != _value )
+    {
+        _value = value;
+        emit changed(this);
+    }
 }
 
 

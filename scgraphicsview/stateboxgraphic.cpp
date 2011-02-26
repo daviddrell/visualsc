@@ -98,9 +98,11 @@ void StateBoxGraphic::handleModelChanged()
 
     _title.setPlainText(name->asString());
 
-    setSize(size->asPointF().toPoint());
+    QPoint pt = size->asPointF().toPoint();
+    setSize(pt);
 
-    setPos(  position->asPointF() );
+    QPointF ps = position->asPointF();
+    setPos( ps  );
 
 }
 
@@ -232,7 +234,7 @@ bool StateBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event
     case QEvent::GraphicsSceneMouseRelease:
         {
             corner->setMouseState(CornerGrabber::kMouseReleased);
-
+            updateModel();
         }
         break;
 
@@ -331,13 +333,6 @@ bool StateBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event
 
         setCornerPositions();
 
-        if ( _stateModel )
-        {
-            QPoint sz;
-            sz.setX(_width);
-            sz.setY(_height);
-            _stateModel->setSize(sz);
-        }
 
         this->update();
     }
@@ -346,6 +341,18 @@ bool StateBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event
 }
 
 
+void StateBoxGraphic::updateModel ()
+{
+
+    if ( _stateModel )
+    {
+        QPointF ps = this->pos();
+        _stateModel->setPosition(ps);
+        QPoint sz;
+        this->getSize(sz);
+        _stateModel->setSize(sz);
+    }
+}
 
 // for supporting moving the box across the scene
 void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
@@ -356,11 +363,8 @@ void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
     location.setY( ( static_cast<int>(location.y()) / _gridSpace) * _gridSpace );
     this->setPos(location);
 
-    if ( _stateModel )
-    {
-        _stateModel->setPosition(location);
-    }
 
+    updateModel();
 }
 
 

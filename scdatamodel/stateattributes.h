@@ -33,7 +33,7 @@ public:
       //  NAME
 
 
-    class StateName :  public IAttribute
+    class SCDATAMODELSHARED_EXPORT StateName :  public IAttribute
     {
     public:
 
@@ -56,7 +56,7 @@ public:
     //  SIZE
 
 
-    class StateSize: public IAttribute
+    class  SCDATAMODELSHARED_EXPORT StateSize: public IAttribute
     {
     public:
 
@@ -86,7 +86,7 @@ public:
     // POSITION
 
 
-    class StatePosition:  public IAttribute
+    class  SCDATAMODELSHARED_EXPORT StatePosition:  public IAttribute
     {
     public:
         StatePosition();
@@ -112,7 +112,7 @@ public:
 
     };
 
-    class StateString:  public IAttribute
+    class  SCDATAMODELSHARED_EXPORT StateString:  public IAttribute
     {
     public:
         StateString(QObject*  parent,QString key,QString s);

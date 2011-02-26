@@ -76,6 +76,7 @@ private:
 
     void setCornerPositions();
     void adjustDrawingSize(int x, int y);
+    void updateModel();
 
 
     // private slots
