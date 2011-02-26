@@ -8,9 +8,10 @@
 
 
 FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
-        QMainWindow(parent, Qt::WindowStaysOnTopHint)
+        QMainWindow(parent, Qt::WindowStaysOnTopHint),
+        dm(dataModel),
+        _currentlySelected(NULL)
 {
-    dm = dataModel;
 
     createActions();
 
@@ -39,6 +40,8 @@ FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
     propertyTable->setColumnCount(2);
     vlayout->addWidget( propertyTable );
 
+
+
     setWindowTitle(tr("State Chart Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
 
@@ -48,6 +51,22 @@ FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
     QList<SCState*> states;
     dm->getStates(states);
     loadTree (states);
+}
+
+void FormEditorWindow::handlePropertyCellChanged(int r, int c)
+{
+    if ( c != 1 ) return;
+
+    QString key = propertyTable->item(r,0)->text();
+    QString value = propertyTable->item(r,1)->text();
+
+    SCState * state = dynamic_cast<SCState*>(_currentlySelected);
+    if ( state == NULL ) return;
+
+    IAttribute * attr = state->attributes.value(key);
+
+    attr->setValue(value);
+
 }
 
 void FormEditorWindow::loadTree ( QList<SCState*> & states)
@@ -99,6 +118,8 @@ void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
 
     SCState * st = dm->getStateByName(text);
 
+    _currentlySelected = st;
+
 
     for (int r =0; r <propertyTable->rowCount(); r++ )
     {
@@ -109,6 +130,8 @@ void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
     }
 
     propertyTable->clear();
+
+    disconnect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
 
     propertyTable->setRowCount(st->attributes.count());
 
@@ -122,12 +145,19 @@ void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
 
         QTableWidgetItem * propName = new QTableWidgetItem(key);
 
+        propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
+
         QTableWidgetItem * propValue = new QTableWidgetItem(attr->asString());
+
+        propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
 
         propertyTable->setItem(row, 0, propName);
         propertyTable->setItem(row++, 1, propValue);
 
     }
+
+    connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
+
 
 }
 
@@ -135,9 +165,12 @@ void FormEditorWindow::handlePropertyChanged(IAttribute *attr)
 {
     for (int r =0; r <propertyTable->rowCount(); r++ )
     {
-        if ( propertyTable->itemAt(r,0)->text() == attr->key() )
+        QString txt = propertyTable->item(r,0)->text();
+        QString key = attr->key() ;
+
+        if (  txt == key )
         {
-            propertyTable->itemAt(r,0)->setText( attr->asString() );
+            propertyTable->item(r,1)->setText( attr->asString() );
         }
     }
 }

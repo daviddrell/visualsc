@@ -41,6 +41,7 @@ void SCState::initCommon()
     attributes.addItem(name);
     attributes.addItem(size);
     attributes.addItem(position);
+
 }
 
 QString SCState::getAttributeValue(QString key)

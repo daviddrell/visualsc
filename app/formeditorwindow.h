@@ -116,9 +116,11 @@ private:
     QAction *lineAction;
 
     SCDataModel * dm;
+    QObject     * _currentlySelected;
 
 private slots:
     void handlePropertyChanged(IAttribute * attr);
+    void handlePropertyCellChanged(int, int);
 
 };
 

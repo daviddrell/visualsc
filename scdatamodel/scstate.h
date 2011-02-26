@@ -86,6 +86,8 @@ signals:
 public slots:
 
 
+ private slots:
+
 
 private:
 

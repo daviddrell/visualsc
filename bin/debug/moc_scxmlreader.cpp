@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'scxmlreader.h'
 **
-** Created: Mon Feb 21 09:16:41 2011
+** Created: Sat Feb 26 12:37:07 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.0)
 **
 ** WARNING! All changes made in this file will be lost!

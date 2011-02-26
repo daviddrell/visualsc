@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'stateboxgraphic.h'
 **
-** Created: Sun Feb 20 14:27:06 2011
+** Created: Sat Feb 26 13:08:35 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_StateBoxGraphic[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   14, // methods
+       1,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -31,15 +31,14 @@ static const uint qt_meta_data_StateBoxGraphic[] = {
        0,       // signalCount
 
  // slots: signature, parameters, type, tag, flags
-      17,   16,   16,   16, 0x08,
-      38,   16,   16,   16, 0x08,
+      22,   17,   16,   16, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_StateBoxGraphic[] = {
-    "StateBoxGraphic\0\0handleModelChanged()\0"
-    "queuedThisUpdate()\0"
+    "StateBoxGraphic\0\0attr\0"
+    "handleAttributeChanged(IAttribute*)\0"
 };
 
 const QMetaObject StateBoxGraphic::staticMetaObject = {
@@ -71,11 +70,10 @@ int StateBoxGraphic::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: handleModelChanged(); break;
-        case 1: queuedThisUpdate(); break;
+        case 0: handleAttributeChanged((*reinterpret_cast< IAttribute*(*)>(_a[1]))); break;
         default: ;
         }
-        _id -= 2;
+        _id -= 1;
     }
     return _id;
 }

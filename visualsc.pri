@@ -1,12 +1,8 @@
 
 
-CONFIG(release, debug|release)
-{
+CONFIG(release, debug|release) {
     OBJECTS_DIR = $${PWD}/bin/release
-}
-
-CONFIG(debug, debug|release)
-{
+} else {
     OBJECTS_DIR = $${PWD}/bin/debug
 }
 

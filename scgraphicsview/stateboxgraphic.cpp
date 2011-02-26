@@ -49,11 +49,19 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     // this graphic representation of a state is linked to a state in the model
 
-    connect (_stateModel, SIGNAL(changed()), this, SLOT(handleModelChanged()), Qt::QueuedConnection);
 
-    // load up the initial values
+    StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *> ( _stateModel->attributes.value("name"));
+    connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(name);
 
-    handleModelChanged();
+    StateAttributes::StateSize * size = dynamic_cast<StateAttributes::StateSize *> (  _stateModel->attributes.value("size"));
+    connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(size);
+
+    StateAttributes::StatePosition * position =dynamic_cast<StateAttributes::StatePosition*> ( _stateModel->attributes.value("position"));
+    connect (position, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(position);
+
 
     _corners[0] = NULL;
     _corners[1] = NULL;
@@ -65,10 +73,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     _title.setPos(35,35);
 
-    //  QTextDocument doc();
-    // doc.allFormats();
-    //   _text.setDocument()
-    //Qt::AlignHCenter
+
     _title.setParentItem(this);
 
     this->setAcceptHoverEvents(true);
@@ -89,27 +94,36 @@ StateBoxGraphic::~StateBoxGraphic()
 }
 
 
-void StateBoxGraphic::handleModelChanged()
+void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
 {
+    StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *> (attr);
+    StateAttributes::StateSize * size = dynamic_cast<StateAttributes::StateSize *> ( attr);
+    StateAttributes::StatePosition * position =dynamic_cast<StateAttributes::StatePosition*> (attr);
 
-    StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *> ( _stateModel->attributes.value("name"));
-    StateAttributes::StateSize * size = dynamic_cast<StateAttributes::StateSize *> (  _stateModel->attributes.value("size"));
-    StateAttributes::StatePosition * position =dynamic_cast<StateAttributes::StatePosition*> ( _stateModel->attributes.value("position"));
 
-    _title.setPlainText(name->asString());
+    if ( name )
+    {
+        _title.setPlainText(name->asString());
+    }
+    else if ( size )
+    {
+        QPoint pt = size->asPointF().toPoint();
+        setSize(pt);
+    }
+    else if ( position)
+    {
+        QPointF ps = position->asPointF();
+        setPos( ps  );
+    }
 
-    QPoint pt = size->asPointF().toPoint();
-    setSize(pt);
-
-    QPointF ps = position->asPointF();
-    setPos( ps  );
-
+    QGraphicsItem *parent = this->parentItem();
+    if ( parent)
+        parent->update();
+    else
+        this->update();
 }
 
-void StateBoxGraphic::queuedThisUpdate()
-{
-    this->update();
-}
+
 
 void StateBoxGraphic::setHighlighted(bool on)
 {

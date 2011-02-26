@@ -19,6 +19,7 @@
 #include "cornergrabber.h"
 
 class SCState;
+class IAttribute;
 
 
 
@@ -83,8 +84,9 @@ private:
 
 private slots:
 
-    void handleModelChanged();
-    void queuedThisUpdate();
+
+    void handleAttributeChanged(IAttribute *attr);
+
 
 
 private:

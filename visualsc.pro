@@ -1,7 +1,7 @@
 
-include (visualsc.pri)
-
 TEMPLATE= subdirs
+
+include (visualsc.pri)
 
 CONFIG += ordered
 
