@@ -13,6 +13,8 @@ QT       += core gui
 TARGET = visualsc
 TEMPLATE = app
 
+QMAKE_CLEAN += visualsc
+
 INCLUDEPATH += ../scdatamodel
 win32:LIBS += $${LIB_PATH}/scdatamodel.dll
 unix:LIBS += -L$${LIB_PATH} -lscdatamodel

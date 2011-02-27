@@ -13,6 +13,8 @@ TEMPLATE = lib
 
 scgraphicsview.depends = scdatamodel sceditcontroller
 
+$QMAKE_CLEAN += $$TARGET
+
 DEFINES += SCGRAPHICSVIEW_LIBRARY
 
 INCLUDEPATH += ../sceditcontroller

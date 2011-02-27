@@ -11,6 +11,7 @@ QT       -= gui
 TARGET = sceditcontroller 
 TEMPLATE = lib
 
+QMAKE_CLEAN += $$TARGET
 
 sceditcontroller.depends = scdatamodel
 

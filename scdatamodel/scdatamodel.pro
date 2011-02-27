@@ -12,6 +12,8 @@ QT       += gui
 TARGET = scdatamodel
 TEMPLATE = lib
 
+QMAKE_CLEAN += $$TARGET
+
 DEFINES += SCDATAMODEL_LIBRARY
 
 SOURCES += scdatamodel.cpp \

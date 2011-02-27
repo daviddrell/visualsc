@@ -12,5 +12,7 @@ SUBDIRS = scdatamodel\
 
 app.depends = scdatamodel  scgraphicsview sceditcontroller
 
+TARGET = app
+
 OTHER_FILES += \
     visualsc/design.pptx 
