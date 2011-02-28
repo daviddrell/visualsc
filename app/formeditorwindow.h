@@ -42,7 +42,8 @@ private slots:
     void pointerGroupClicked(int id);
     void bringToFront();
     void sendToBack();
-
+    void insertTransition();
+    void insertState();
     void textInserted(QGraphicsTextItem *item);
     void currentFontChanged(const QFont &font);
     void fontSizeChanged(const QString &size);
@@ -64,13 +65,12 @@ private:
     void createActions();
     void createMenus();
     void createToolbars();
-    QWidget *createBackgroundCellWidget(const QString &text,
-                                        const QString &image);
+    QWidget *createBackgroundCellWidget(const QString &text, const QString &image);
 
     QMenu *createColorMenu(const char *slot, QColor defaultColor);
     QIcon createColorToolButtonIcon(const QString &image, QColor color);
     QIcon createColorIcon(QColor color);
-    void loadTree (QList<SCState*> & states );
+    void loadTree ( QTreeWidgetItem * parentItem , QList<SCState*> & states);
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;
@@ -84,6 +84,8 @@ private:
 
     QAction *toFrontAction;
     QAction *sendBackAction;
+    QAction *insertTransitionAction;
+    QAction *insertStateAction;
     QAction *aboutAction;
 
     QMenu *fileMenu;

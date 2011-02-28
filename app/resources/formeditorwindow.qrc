@@ -11,5 +11,7 @@
         <file>sendtoback.png</file>
         <file>textpointer.png</file>
         <file>underline.png</file>
+        <file>transitionbutton.bmp</file>
+        <file>statebutton.bmp</file>
     </qresource>
 </RCC>

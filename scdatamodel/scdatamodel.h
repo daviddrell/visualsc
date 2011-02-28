@@ -27,7 +27,9 @@ public:
     void getStates(QList<SCState *>& list);
     void getAllStates(QList<SCState *>& list);
     SCState* getStateByName(QString name);
+    SCState* getTopState( );
 
+    SCTransition* insertNewTransition(SCState *source, QString event );
 
     // Q Data Model Interface
     QStandardItemModel * getStandardModel();

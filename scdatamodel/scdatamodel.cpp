@@ -95,9 +95,18 @@ void SCDataModel::getStates(QList<SCState *>& list)
 }
 
 
+SCState * SCDataModel::getTopState()
+{
+    return _topState;
+}
+
+
 SCState * SCDataModel::getStateByName(QString name)
 {
     QList<SCState *> list;
+
+    list.append(_topState);
+
     _topState->getAllStates(list);
 
     for(int i =0; i < list.count(); i++)
@@ -201,6 +210,20 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 
 
+SCTransition* SCDataModel::insertNewTransition(SCState *source, QString event )
+{
+     if ( source == NULL)  return NULL;
+
+     SCTransition * transition = new SCTransition(source);
+
+     transition->setAttributeValue("event", event);
+
+     emit newTransitionSignal(transition);
+
+     return transition;
+ }
+
+
 void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
 {
     qDebug() << "handleMakeANewTransition, : "  + ta->value("target")->asString();
@@ -240,6 +263,7 @@ void SCDataModel::handleLeaveTransitionElement()
 
 
 }
+
 
 void SCDataModel::handleMakeANewTransitionPath ( TransitionAttributes::TransitionPathAttribute * tp)
 {

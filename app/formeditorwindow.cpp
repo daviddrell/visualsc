@@ -20,10 +20,13 @@ FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
 
 
     // central widget and outter layout
+
     QHBoxLayout *layout = new QHBoxLayout;
     QWidget *widget = new QWidget;
     widget->setLayout(layout);
     setCentralWidget(widget);
+
+    //  start tree view
 
     stateChartTreeView = new QTreeWidget();
     stateChartTreeView->setColumnCount(1);
@@ -36,21 +39,22 @@ FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
     selectedChartItem = new QLabel();
     vlayout->addWidget( selectedChartItem);
 
+
+    //  property table
+
     propertyTable = new QTableWidget();
     propertyTable->setColumnCount(2);
     vlayout->addWidget( propertyTable );
 
 
-
     setWindowTitle(tr("State Chart Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
 
-    //    stateChartTreeView->setModel( dm->getStandardModel());
-
 
     QList<SCState*> states;
-    dm->getStates(states);
-    loadTree (states);
+    states.append( dm->getTopState());
+
+    loadTree (NULL, states);
 }
 
 void FormEditorWindow::handlePropertyCellChanged(int r, int c)
@@ -69,13 +73,11 @@ void FormEditorWindow::handlePropertyCellChanged(int r, int c)
 
 }
 
-void FormEditorWindow::loadTree ( QList<SCState*> & states)
+
+// recursively walk through the state tree and build the tree view
+
+void FormEditorWindow::loadTree ( QTreeWidgetItem * parentItem , QList<SCState*> & states)
 {
-
-    static int level = 0;
-    static QTreeWidgetItem * parentItem = 0;
-
-    level ++;
 
     for(int i = 0; i < states.count(); i++)
     {
@@ -83,7 +85,7 @@ void FormEditorWindow::loadTree ( QList<SCState*> & states)
 
         QTreeWidgetItem * item=0;
 
-        if ( level == 1)
+        if (parentItem == 0)
         {
             item = new QTreeWidgetItem();
             stateChartTreeView->addTopLevelItem(item);
@@ -99,13 +101,9 @@ void FormEditorWindow::loadTree ( QList<SCState*> & states)
 
         st->getStates(subStates);
 
-        parentItem = item;
-
-        loadTree (subStates);
+        loadTree (item, subStates);
 
     }
-
-    level --;
 
 }
 
@@ -204,6 +202,20 @@ void FormEditorWindow::bringToFront()
 
 }
 
+void FormEditorWindow::insertTransition()
+{
+    SCState * st = dynamic_cast<SCState *> (_currentlySelected);
+
+    if ( st == NULL ) return;
+
+    dm->insertNewTransition(st,"test event");
+
+}
+
+void FormEditorWindow::insertState()
+{
+
+}
 
 void FormEditorWindow::sendToBack()
 {
@@ -296,28 +308,36 @@ void FormEditorWindow::about()
 
 void FormEditorWindow::createActions()
 {
+    insertStateAction = new QAction(QIcon(":/FormEditorWindow/statebutton.bmp"), tr("Insert State"), this);
+    insertStateAction->setShortcut(tr("Ctrl+I"));
+    insertStateAction->setStatusTip(tr("Insert State"));
+    connect(insertStateAction, SIGNAL(triggered()), this, SLOT(insertState()));
+
+
+    insertTransitionAction = new QAction(QIcon(":/FormEditorWindow/transitionbutton.bmp"), tr("Insert Transition"), this);
+    insertTransitionAction->setShortcut(tr("Ctrl+I"));
+    insertTransitionAction->setStatusTip(tr("Insert Transition"));
+    connect(insertTransitionAction, SIGNAL(triggered()), this, SLOT(insertTransition()));
+
+
     toFrontAction = new QAction(QIcon(":/FormEditorWindow/bringtofront.png"),
                                 tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
     toFrontAction->setStatusTip(tr("Bring item to front"));
-    connect(toFrontAction, SIGNAL(triggered()),
-            this, SLOT(bringToFront()));
-
+    connect(toFrontAction, SIGNAL(triggered()), this, SLOT(bringToFront()));
 
 
     sendBackAction = new QAction(QIcon(":/FormEditorWindow/sendtoback.png"),
                                  tr("Send to &Back"), this);
     sendBackAction->setShortcut(tr("Ctrl+B"));
     sendBackAction->setStatusTip(tr("Send item to back"));
-    connect(sendBackAction, SIGNAL(triggered()),
-            this, SLOT(sendToBack()));
+    connect(sendBackAction, SIGNAL(triggered()), this, SLOT(sendToBack()));
 
     deleteAction = new QAction(QIcon(":/FormEditorWindow/delete.png"),
                                tr("&Delete"), this);
     deleteAction->setShortcut(tr("Delete"));
     deleteAction->setStatusTip(tr("Delete item from diagram"));
-    connect(deleteAction, SIGNAL(triggered()),
-            this, SLOT(deleteItem()));
+    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
 
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
@@ -329,27 +349,21 @@ void FormEditorWindow::createActions()
     QPixmap pixmap(":/FormEditorWindow/bold.png");
     boldAction->setIcon(QIcon(pixmap));
     boldAction->setShortcut(tr("Ctrl+B"));
-    connect(boldAction, SIGNAL(triggered()),
-            this, SLOT(handleFontChange()));
+    connect(boldAction, SIGNAL(triggered()), this, SLOT(handleFontChange()));
 
-    italicAction = new QAction(QIcon(":/FormEditorWindow/italic.png"),
-                               tr("Italic"), this);
+    italicAction = new QAction(QIcon(":/FormEditorWindow/italic.png"),   tr("Italic"), this);
     italicAction->setCheckable(true);
     italicAction->setShortcut(tr("Ctrl+I"));
-    connect(italicAction, SIGNAL(triggered()),
-            this, SLOT(handleFontChange()));
+    connect(italicAction, SIGNAL(triggered()), this, SLOT(handleFontChange()));
 
-    underlineAction = new QAction(QIcon(":/FormEditorWindow/underline.png"),
-                                  tr("Underline"), this);
+    underlineAction = new QAction(QIcon(":/FormEditorWindow/underline.png"),  tr("Underline"), this);
     underlineAction->setCheckable(true);
     underlineAction->setShortcut(tr("Ctrl+U"));
-    connect(underlineAction, SIGNAL(triggered()),
-            this, SLOT(handleFontChange()));
+    connect(underlineAction, SIGNAL(triggered()), this, SLOT(handleFontChange()));
 
     aboutAction = new QAction(tr("A&bout"), this);
     aboutAction->setShortcut(tr("Ctrl+B"));
-    connect(aboutAction, SIGNAL(triggered()),
-            this, SLOT(about()));
+    connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 }
 
 
@@ -364,6 +378,8 @@ void FormEditorWindow::createMenus()
     itemMenu->addSeparator();
     itemMenu->addAction(toFrontAction);
     itemMenu->addAction(sendBackAction);
+    itemMenu->addAction(insertTransitionAction);
+    itemMenu->addAction(insertStateAction);
 
     aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(aboutAction);
@@ -378,6 +394,8 @@ void FormEditorWindow::createToolbars()
     editToolBar->addAction(deleteAction);
     editToolBar->addAction(toFrontAction);
     editToolBar->addAction(sendBackAction);
+    editToolBar->addAction(insertTransitionAction);
+    editToolBar->addAction(insertStateAction);
 
     fontCombo = new QFontComboBox();
     connect(fontCombo, SIGNAL(currentFontChanged(QFont)),
