@@ -74,13 +74,13 @@ void SCDataModel::open(QString file)
 
     connect(&_reader, SIGNAL(done(bool, QStringList)), this, SLOT(handleReaderDone(bool, QStringList)));
 
-    connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)));
-    connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()));
-    connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()));
+    connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::QueuedConnection);
+    connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()), Qt::QueuedConnection);
+    connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()), Qt::QueuedConnection);
 
-    connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)));
-    connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()));
-    connect(&_reader, SIGNAL(makeANewTransistionPath(TransitionPathAttribute*)), this, SLOT(handleMakeANewTransitionPath(TransitionPathAttribute*)));
+    connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)), Qt::QueuedConnection);
+    connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::QueuedConnection);
+    connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::QueuedConnection);
 
     _reader.readFile(file);
     _reader.start();
@@ -147,17 +147,29 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 {
     SCState * state = NULL;
 
-    if ( _currentState == 0)
-        _topLevel = _level;
-
-    if ( _topLevel == _level )
+    if ( _currentState == 0 )
     {
+        _topLevel = _level;
         state = new SCState();
-        state->setObjectName( sa->value("name")->asString() );
+        state->attributes.setAttributes( *sa);
+
         _topState = state;
 
-        sa->setParent(state);
-        state->attributes.setAttributes( *sa);
+        QString name;
+
+        if ( ! sa->contains("name"))
+        {
+            name = "State Machine";
+
+            StateAttributes::StateName *nm = new StateAttributes::StateName(NULL,"name",name);
+            state->attributes.addItem(nm);
+        }
+        else
+        {
+            name = sa->value("name")->asString();
+        }
+
+        state->setObjectName( name);
 
         // insert the new state into the Qt Data Model
 
@@ -167,15 +179,39 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         state->setParentItem(root);
         state->setItem (thisItem);
 
-
-        qDebug() << "adding new state at top level : " + sa->value("name")->asString();
+        qDebug() << "adding new state at top level : " + state->attributes.value("name")->asString();
     }
     else if ( _level > _topLevel)
     {
         state = new SCState(_currentState);
-        state->setObjectName( sa->value("name")->asString() );
-        sa->setParent(state);
         state->attributes.setAttributes( *sa);
+
+        QString name ;
+        if (! sa->contains("name"))
+        {
+            // is this an initial state?
+            if ( sa->value("type")->asString() == "initial")
+            {
+                name =     _currentState->objectName() + "_initial" ;
+            }
+            else if ( sa->value("type")->asString() == "final")
+            {
+                name =     _currentState->objectName() + "_final" ;
+            }
+            else
+            {
+                name = _currentState->objectName() + "_" + QString::number( _currentState->children().count() );
+            }
+
+            StateAttributes::StateName *nm = new StateAttributes::StateName(NULL,"name",name);
+            state->attributes.addItem(nm);
+        }
+        else
+        {
+            name = sa->value("name")->asString();
+        }
+
+        state->setObjectName( name );
 
 
         // insert the new state into the Qt Data Model
@@ -185,7 +221,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         state->setItem (thisItem);
         parent->appendRow( thisItem );
 
-        qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + sa->value("name")->asString();
+        qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
     }
 
 
@@ -195,15 +231,6 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
     emit newStateSignal(state);
 
 
-    // clean up memory for passed in attributes
-
-    QMapIterator<QString,IAttribute*> i(*sa);
-    while (i.hasNext())
-    {
-        QString key  = i.next().key();
-        IAttribute* sourceAttr = sa->value(key)  ;
-        delete sourceAttr;
-    }
     delete sa;
 
 }
@@ -238,20 +265,9 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     _currentTransition = transition;
     _currentState->addTransistion(transition);
 
-
-    // clean up memory for passed in attributes
-
-    QMapIterator<QString,IAttribute*> i(*ta);
-    while (i.hasNext())
-    {
-        QString key  = i.next().key();
-        IAttribute* sourceAttr = ta->value(key)  ;
-        delete sourceAttr;
-    }
+    emit newTransitionSignal(_currentTransition);
 
     delete ta;
-
-    emit newTransitionSignal(_currentTransition);
 
 }
 
@@ -265,7 +281,7 @@ void SCDataModel::handleLeaveTransitionElement()
 }
 
 
-void SCDataModel::handleMakeANewTransitionPath ( TransitionAttributes::TransitionPathAttribute * tp)
+void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 {
 
     qDebug() << "handleMakeANewTransitionPath : " ;
@@ -278,7 +294,7 @@ void SCDataModel::handleMakeANewTransitionPath ( TransitionAttributes::Transitio
     TransitionAttributes::TransitionPathAttribute *path =
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *>( _currentTransition->attributes.value("path"));
 
-    path->setValue( tp->asString());
+    path->setValue( pathStr );
 
 }
 

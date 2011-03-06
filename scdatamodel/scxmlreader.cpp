@@ -6,6 +6,10 @@
 #include <QString>
 #include <QStringList>
 
+#include "sctransition.h"
+#include "scstate.h"
+
+
 SCXMLReader::SCXMLReader(): QThread(NULL), _reader(),_file(), _resultMessages()
 {
 
@@ -58,12 +62,31 @@ void SCXMLReader::readElement()
 
     emit enterElement();
 
+    if (_reader.name() == "scxml")
+    {
+        emit enterStateElement();
+        readState(kSTATE_TYPE_Machine);
+        enteredAStateElement = true;
+    }
     if (_reader.name() == "state")
     {
         emit enterStateElement();
-        readState();
+        readState(kSTATE_TYPE_Normal);
         enteredAStateElement = true;
     }
+    else if (_reader.name() == "initial")
+    {
+        emit enterStateElement();
+        readState(kSTATE_TYPE_Initial);
+        enteredAStateElement = true;
+    }
+    else if (_reader.name() == "final")
+    {
+        emit enterStateElement();
+        readState(kSTATE_TYPE_Final);
+        enteredAStateElement = true;
+    }
+
     else if (_reader.name() == "transition")
     {
         emit enterTransistionElement();
@@ -76,8 +99,6 @@ void SCXMLReader::readElement()
         readTransistionPath();
         enteredATransistionPathElement = true;
     }
-    else if ( _reader.name() == "final")
-        readFinal();
     else if ( _reader.name() == "onentry")
         readOnEntry();
     else if ( _reader.name() == "onexit")
@@ -100,13 +121,14 @@ void SCXMLReader::readElement()
 
     emit leaveElement();
 
+
     if (enteredAStateElement )       {emit leaveStateElement();}
     if (enteredATransistionElement ) {emit leaveTransistionElement();}
     if (enteredATransistionPathElement ) {emit leaveTransitionPathElement();}
 
 }
 
-void SCXMLReader::readState()
+void SCXMLReader::readState(STATE_TYPE stateType)
 {
     // make a parentless attribute container to hold all xml attributes.
     // this container will be passed to the instantiated state which will
@@ -116,6 +138,32 @@ void SCXMLReader::readState()
     // delete it when its done.
 
     StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
+
+
+
+    QString stateTypeStr;
+    switch ( stateType)
+    {
+    case  kSTATE_TYPE_Normal:
+        stateTypeStr = "id";
+        break;
+
+    case  kSTATE_TYPE_Initial:
+        stateTypeStr = "initial";
+        break;
+
+    case  kSTATE_TYPE_Final:
+        stateTypeStr = "final";
+        break;
+
+    case  kSTATE_TYPE_Machine:
+        stateTypeStr = "machine";
+        break;
+    }
+
+    StateAttributes::StateString *  sa = new StateAttributes::StateString (0,"type", stateTypeStr );
+    stateAttributes->addItem( sa );
+
 
     for (int i = 0; i < _reader.attributes().count(); i++)
     {
@@ -145,23 +193,26 @@ void SCXMLReader::readState()
     }
 
     emit makeANewState( stateAttributes);
+
 }
 
 void SCXMLReader::readTransistion()
 {
     TransitionAttributes * ta = new TransitionAttributes(0,"TransitionAttributes");
 
-    ta->value("event")->setValue(_reader.attributes().value("event").toString());
-    ta->value("cond")->setValue(_reader.attributes().value("cond").toString());
-    ta->value("target")->setValue(_reader.attributes().value("target").toString());
-    ta->value("type")->setValue("internal");
+    TransitionAttributes::TransitionStringAttribute * event = new TransitionAttributes::TransitionStringAttribute(NULL,"event", _reader.attributes().value("event").toString());
 
-    /*
-     event
-     cond
-     target
-     type
-     */
+    TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitionStringAttribute (NULL,"cond", _reader.attributes().value("cond").toString());
+
+    TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (NULL,"target", _reader.attributes().value("target").toString());
+
+    TransitionAttributes::TransitionStringAttribute * ttype = new  TransitionAttributes::TransitionStringAttribute (NULL,"type", _reader.attributes().value("internal").toString());
+
+    ta->addItem(event);
+    ta->addItem(cond);
+    ta->addItem(target);
+    ta->addItem(ttype);
+
 
     if ( ! _reader.attributes().value("type").isEmpty() )
     {
@@ -176,7 +227,7 @@ void SCXMLReader::readTransistion()
     }
 
     emit makeANewTransistion(ta);
-    delete ta;
+
 }
 
 void SCXMLReader::readTransistionPath()
@@ -185,6 +236,7 @@ void SCXMLReader::readTransistionPath()
     QString data =_reader.attributes().value("d").toString();
 
     emit makeANewTransistionPath(data);
+
 }
 
 void SCXMLReader::readFinal()
@@ -231,3 +283,5 @@ void SCXMLReader::readOnExit()
 
 
 }
+
+

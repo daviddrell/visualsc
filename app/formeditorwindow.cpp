@@ -54,8 +54,21 @@ FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
     QList<SCState*> states;
     states.append( dm->getTopState());
 
+    connect (dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
+
     loadTree (NULL, states);
 }
+
+void FormEditorWindow::handleNewTransition(SCTransition*)
+{
+    QList<SCState*> states;
+    states.append( dm->getTopState());
+
+    stateChartTreeView->clear();
+
+    loadTree (NULL, states);
+}
+
 
 void FormEditorWindow::handlePropertyCellChanged(int r, int c)
 {
@@ -79,7 +92,9 @@ void FormEditorWindow::handlePropertyCellChanged(int r, int c)
 void FormEditorWindow::loadTree ( QTreeWidgetItem * parentItem , QList<SCState*> & states)
 {
 
-    for(int i = 0; i < states.count(); i++)
+    int c = states.count();
+
+    for(int i = 0; i < c; i++)
     {
         SCState * st = states.at(i);
 

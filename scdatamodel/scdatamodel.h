@@ -42,9 +42,9 @@ signals:
 private slots:
     void handleReaderDone(bool sucess, QStringList message);
     void handleMakeANewState(StateAttributes*);
-    void handleMakeANewTransition(TransitionAttributes::TransitionAttributes*);
+    void handleMakeANewTransition(TransitionAttributes*);
     void handleLeaveTransitionElement();
-    void handleMakeANewTransitionPath(TransitionAttributes::TransitionPathAttribute * tp);
+    void handleMakeANewTransitionPath(QString path);
     void handleTransitUp();
     void handleTransitDown();
 

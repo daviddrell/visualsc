@@ -59,6 +59,7 @@ private slots:
     void about();
 
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
+    void handleNewTransition(SCTransition*);
 
 private:
     void createToolBox();

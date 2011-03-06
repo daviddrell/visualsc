@@ -35,6 +35,7 @@ TransitionAttributes::TransitionAttributes(const TransitionAttributes& ta):
 
 TransitionAttributes::~TransitionAttributes()
 {
+
 }
 
 

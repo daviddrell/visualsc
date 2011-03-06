@@ -41,12 +41,14 @@ signals:
 
 private:
 
+    enum STATE_TYPE{kSTATE_TYPE_Normal=0, kSTATE_TYPE_Initial, kSTATE_TYPE_Final, kSTATE_TYPE_Machine};
+
     QXmlStreamReader _reader;
     QString _file;
     QStringList _resultMessages;
 
     void readElement();
-    void readState();
+    void readState(STATE_TYPE t= kSTATE_TYPE_Normal);
     void readTransistion();
     void readTransistionPath();
     void readFinal();

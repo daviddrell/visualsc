@@ -17,6 +17,10 @@
 
     <!-- Really simple state showing the basic syntax. -->
     <state id="Test1">
+      <transition target="Test1">
+      <path d="m 100 100  300 100  200 300 "
+               fill="red" stroke="blue" stroke-width="3" />
+      </transition>
       <initial>
         <transition target="Test1Sub1"/>
       </initial>

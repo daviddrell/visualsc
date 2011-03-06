@@ -45,6 +45,13 @@ IAttributeContainer::IAttributeContainer():
 
 IAttributeContainer::~IAttributeContainer()
 {
+    QMapIterator<QString,IAttribute*> i(*this);
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+        IAttribute* attr = this->value(key)  ;
+        delete attr;
+    }
 }
 
 QString IAttributeContainer::key() {return _containerName; }
