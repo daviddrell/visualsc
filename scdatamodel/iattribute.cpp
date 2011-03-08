@@ -63,50 +63,6 @@ void IAttributeContainer::addItem( IAttribute* attr)
     emit attributeAdded(attr);
 }
 
-
-void IAttributeContainer::setAttributes(const IAttributeContainer& sourceAttrList)
-{
-    // if the dest container has a matching key,
-    // update the value to be the source value.
-    // else, add the source to the container
-    //
-    // remove from the dest list any attributes that are not in the souce list
-
-    QMapIterator<QString,IAttribute*> i(sourceAttrList);
-    while (i.hasNext())
-    {
-        QString key  = i.next().key();
-        IAttribute* sourceAttr = sourceAttrList.value(key)  ;
-        IAttribute* destAttr = this->value( key ) ;
-        if ( destAttr )
-        {
-            destAttr->setValue( sourceAttr->asString());
-        }
-        else
-        {
-            addItem( sourceAttr);
-            emit attributeAdded(sourceAttr);
-        }
-    }
-
-    // now delete local attributes that are not contained in the source list
-
-   QMapIterator<QString,IAttribute*> j(sourceAttrList);
-
-    while (j.hasNext())
-    {
-        QString key  = j.next().key();
-
-        if ( !sourceAttrList.contains(key) )
-        {
-            IAttribute* attr = this->value(key);
-            this->remove(key);
-            emit attributeDeleted(attr);
-            delete attr;
-        }
-    }
-}
-
 /**
       * \fn operator=
       * \abstract sets the values of the abtribute list to the same values as the passed-in list, equivalent to setAttributes

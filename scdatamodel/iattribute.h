@@ -71,7 +71,8 @@ public:
       * \abstract sets the values of the abtribute list to the same values as the passed-in list
       */
 
-    virtual void setAttributes(const IAttributeContainer& sourceAttrList);
+    virtual void setAttributes(const IAttributeContainer& sourceAttrList) = 0;
+
     /**
       * \fn operator=
       * \abstract sets the values of the abtribute list to the same values as the passed-in list, equivalent to setAttributes

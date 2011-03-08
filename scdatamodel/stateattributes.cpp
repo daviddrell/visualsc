@@ -3,18 +3,15 @@
 StateAttributes::StateAttributes() :
         IAttributeContainer()
 {
-    qRegisterMetaType<StateAttributes>("StateAttributes");
 }
 
 StateAttributes::StateAttributes(QObject * parent, QString key) :
         IAttributeContainer(parent, key)
 {
-    qRegisterMetaType<StateAttributes>("StateAttributes");
 }
 
 StateAttributes::StateAttributes(const StateAttributes& sa): IAttributeContainer(sa)
 {
-    qRegisterMetaType<StateAttributes>("StateAttributes");
 }
 
 StateAttributes& StateAttributes::operator=( StateAttributes& sa )
@@ -32,6 +29,81 @@ StateAttributes::AttributeMajorType StateAttributes::getMajorType()
 StateAttributes::~StateAttributes()
 { }
 
+
+
+void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
+{
+    // if the dest container has a matching key,
+    // update the value to be the source value.
+    // else, add the source to the container
+    //
+    // remove from the dest list any attributes that are not in the souce list
+
+    QMapIterator<QString,IAttribute*> i(sourceAttrList);
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+        IAttribute* sourceAttr = sourceAttrList.value(key)  ;
+        IAttribute* destAttr = this->value( key ) ;
+        if ( destAttr )
+        {
+            destAttr->setValue( sourceAttr->asString());
+        }
+        else
+        {
+            IAttribute* newAttr=NULL;
+
+            StateAttributes::StateName *nm ;
+            StateAttributes::StatePosition *ps;
+            StateAttributes::StateSize *sz;
+             StateAttributes::StateString *str ;
+
+            if ( (  nm = dynamic_cast<StateAttributes::StateName *>(sourceAttr) ) != NULL )
+            {
+                StateAttributes::StateName * newNm = new StateAttributes::StateName (*nm);
+                addItem(newNm);
+                newAttr= newNm;
+            }
+            else if ( ( ps = dynamic_cast<StateAttributes::StatePosition *>(sourceAttr) ) != NULL )
+            {
+                StateAttributes::StatePosition * newPs = new StateAttributes::StatePosition (*ps);
+                addItem(newPs);
+                newAttr = newPs;
+            }
+            else if ( ( sz = dynamic_cast<StateAttributes::StateSize *>(sourceAttr) ) != NULL )
+            {
+                StateAttributes::StateSize * newSz = new StateAttributes::StateSize (*sz);
+                addItem(newSz);
+                newAttr = newSz;
+            }
+            else if ( (  str = dynamic_cast<StateAttributes::StateString *>(sourceAttr) ) != NULL )
+            {
+                StateAttributes::StateString * newStr = new StateAttributes::StateString (*str);
+                addItem(newStr);
+                newAttr = newStr;
+            }
+
+            if ( newAttr ) emit attributeAdded(newAttr);
+        }
+    }
+
+    // now delete local attributes that are not contained in the source list
+
+   QMapIterator<QString,IAttribute*> j(sourceAttrList);
+
+    while (j.hasNext())
+    {
+        QString key  = j.next().key();
+
+        if ( !sourceAttrList.contains(key) )
+        {
+            IAttribute* attr = this->value(key);
+            this->remove(key);
+            emit attributeDeleted(attr);
+            delete attr;
+        }
+    }
+}
 
 
 
@@ -247,15 +319,14 @@ void    StateAttributes::StatePosition::setValue(const QPointF nPosition)
 
 StateAttributes::StateString::StateString(QObject*  parent,QString key,QString s) :IAttribute(parent, key), _value(s)
 {
-     qRegisterMetaType<StateAttributes>("StateAttributes::StateString");
 }
+
 StateAttributes::StateString::StateString() :IAttribute(), _value()
 {
-     qRegisterMetaType<StateAttributes>("StateAttributes::StateString");
 }
+
 StateAttributes::StateString::~StateString()
 {
-     qRegisterMetaType<StateAttributes>("StateAttributes::StateString");
 }
 
 StateAttributes::StateString::StateString& StateAttributes::StateString::operator=( StateString& sa )

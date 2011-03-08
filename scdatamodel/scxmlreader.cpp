@@ -145,7 +145,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
     switch ( stateType)
     {
     case  kSTATE_TYPE_Normal:
-        stateTypeStr = "id";
+        stateTypeStr = "normal";
         break;
 
     case  kSTATE_TYPE_Initial:

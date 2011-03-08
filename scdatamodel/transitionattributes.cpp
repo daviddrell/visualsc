@@ -39,6 +39,79 @@ TransitionAttributes::~TransitionAttributes()
 }
 
 
+
+void TransitionAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
+{
+    // if the dest container has a matching key,
+    // update the value to be the source value.
+    // else, add the source to the container
+    //
+    // remove from the dest list any attributes that are not in the souce list
+
+    QMapIterator<QString,IAttribute*> i(sourceAttrList);
+
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+        IAttribute* sourceAttr = sourceAttrList.value(key)  ;
+        IAttribute* destAttr = this->value( key ) ;
+
+        if ( destAttr )
+        {
+            destAttr->setValue( sourceAttr->asString());
+        }
+        else
+        {
+            IAttribute* newAttr=NULL;
+
+            TransitionAttributes::TransitionPathAttribute *pt;
+            TransitionAttributes::TransitionPositionAttribute *ps;
+            TransitionAttributes::TransitionStringAttribute *str;
+
+            if ( ( pt = dynamic_cast<TransitionAttributes::TransitionPathAttribute *>(sourceAttr)) != NULL)
+            {
+                TransitionAttributes::TransitionPathAttribute * newPt = new TransitionAttributes::TransitionPathAttribute (*pt);
+                addItem(newPt);
+                newAttr= newPt;
+            }
+            else if ( (  ps = dynamic_cast<TransitionAttributes::TransitionPositionAttribute *>(sourceAttr) ) != NULL )
+            {
+                TransitionAttributes::TransitionPositionAttribute * newPs = new TransitionAttributes::TransitionPositionAttribute (*ps);
+                addItem(newPs);
+                newAttr = newPs;
+            }
+            else if ( ( str = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(sourceAttr) ) != NULL )
+            {
+                TransitionAttributes::TransitionStringAttribute * newStr = new TransitionAttributes::TransitionStringAttribute (*str);
+                addItem(newStr);
+                newAttr = newStr;
+            }
+
+            if ( newAttr ) emit attributeAdded(newAttr);
+        }
+    }
+
+    // now delete local attributes that are not contained in the source list
+
+   QMapIterator<QString,IAttribute*> j(sourceAttrList);
+
+    while (j.hasNext())
+    {
+        QString key  = j.next().key();
+
+        if ( !sourceAttrList.contains(key) )
+        {
+            IAttribute* attr = this->value(key);
+            this->remove(key);
+            emit attributeDeleted(attr);
+            delete attr;
+        }
+    }
+}
+
+
+
+
 TransitionAttributes::AttributeMajorType TransitionAttributes::getMajorType()
 {
     return IAttributeContainer::aMajorType_Transition ;

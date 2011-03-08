@@ -18,15 +18,15 @@ class  SCDATAMODELSHARED_EXPORT StateAttributes : public IAttributeContainer
 public:
     StateAttributes();
 
-
     StateAttributes(QObject * parent, QString key);
 
     StateAttributes(const StateAttributes& sa);
 
     StateAttributes& operator=( StateAttributes& sa );
 
-
     virtual AttributeMajorType getMajorType();
+
+    virtual void setAttributes(const IAttributeContainer& sourceAttrList);
 
     ~StateAttributes() ;
 
@@ -135,10 +135,5 @@ public:
 
 };
 
-Q_DECLARE_METATYPE(StateAttributes);
-Q_DECLARE_METATYPE( StateAttributes::StateName);
-Q_DECLARE_METATYPE( StateAttributes::StateSize);
-Q_DECLARE_METATYPE(StateAttributes::StatePosition);
-Q_DECLARE_METATYPE(StateAttributes::StateString);
 
 #endif // STATEATTRIBUTES_H

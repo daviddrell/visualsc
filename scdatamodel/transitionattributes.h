@@ -20,6 +20,8 @@ public:
     TransitionAttributes();
     ~TransitionAttributes();
 
+    virtual void setAttributes(const IAttributeContainer& sourceAttrList);
+
     virtual AttributeMajorType getMajorType();
 
 

@@ -23,7 +23,7 @@ public:
     void    setAttributeValue(QString key, QString value);
     QString getAttributeValue(QString key);
 
-    //public data members
+     //public data members
 
     TransitionAttributes attributes;
 
