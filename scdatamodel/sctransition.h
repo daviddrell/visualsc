@@ -8,7 +8,7 @@
 class SCState;
 
 #include "scdatamodel_global.h"
-
+class QXmlStreamWriter;
 
 
 class SCDATAMODELSHARED_EXPORT  SCTransition : public QObject
@@ -22,6 +22,7 @@ public:
 
     void    setAttributeValue(QString key, QString value);
     QString getAttributeValue(QString key);
+    void    writeSCVXML(QXmlStreamWriter & sw);
 
      //public data members
 
