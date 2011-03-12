@@ -98,6 +98,8 @@ void FormEditorWindow::loadTree ( QTreeWidgetItem * parentItem , QList<SCState*>
     {
         SCState * st = states.at(i);
 
+        if ( !  st ) continue;
+
         QTreeWidgetItem * item=0;
 
         if (parentItem == 0)

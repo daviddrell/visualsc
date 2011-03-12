@@ -182,11 +182,14 @@ QString TransitionAttributes::TransitionPathAttribute::asString()
     QListIterator<QPointF> i(_pathPoints);
     while (i.hasNext())
     {
-        string.append(QString::number( i.next().x() ));
-        string = " ";
-        string.append(QString::number( i.next().y() ));
-        string = " ";
+        QPointF p = i.next();
+        string.append(QString::number( p.x() ));
+        string.append( " ");
+        string.append(QString::number( p.y() ));
+        string.append( " ");
     }
+
+
     return string;
 }
 
@@ -206,6 +209,14 @@ void TransitionAttributes::TransitionPathAttribute::setValue(const QString data)
         if ( sl[i].trimmed().isEmpty())
             sl.removeAt(i);
     }
+
+    /* at this point we should have three values, either:
+     m 100 100
+     or
+     L 100 100
+       */
+
+    if ( sl.length() < 3) return;
 
     for (int i=0; i < sl.length(); )
     {

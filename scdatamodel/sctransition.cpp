@@ -1,5 +1,6 @@
 #include "sctransition.h"
 #include "scstate.h"
+#include "QXmlStreamWriter"
 
 #include <QDebug>
 
@@ -69,6 +70,25 @@ void SCTransition::handleLineUnSelected()
 {
     emit unselected();
 }
+
+
+void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
+{
+    sw.writeStartElement(QString("transition"));
+    sw.writeAttribute(QString("target"), attributes.value("target")->asString());
+
+    if (  attributes.contains("path"))
+    {
+         sw.writeStartElement(QString("path"));
+         QString path = attributes.value("path")->asString();
+         sw.writeAttribute(QString("d"),path);
+         sw.writeEndElement();
+    }
+
+
+    sw.writeEndElement();
+}
+
 
 #if 0
 void SCTransition::setPath(QList<QPointF>& path)

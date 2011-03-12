@@ -265,9 +265,11 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     _currentTransition = transition;
     _currentState->addTransistion(transition);
 
-    emit newTransitionSignal(_currentTransition);
+
 
     delete ta;
+
+    qDebug() << "leave handleMakeANewTransition, : "  ;
 
 }
 
@@ -275,8 +277,7 @@ void SCDataModel::handleLeaveTransitionElement()
 {
     qDebug() << "handleLeaveTransitionElement ";
 
-    //    _currentTransition->creationDone();
-
+    emit newTransitionSignal(_currentTransition);
 
 }
 
@@ -296,16 +297,27 @@ void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 
     path->setValue( pathStr );
 
+    _currentTransition->attributes.addItem(path);
+
+     qDebug() << "leave handleMakeANewTransitionPath : " ;
+
 }
 
 void SCDataModel::handleReaderDone(bool sucess, QStringList message)
 {
 
-    if ( ! sucess )
+    if ( ! _topState  )
     {
         emit openCompleted ( sucess, message);
         return;
     }
+
+    if ( ! sucess  )
+    {
+        emit openCompleted ( sucess, message);
+        return;
+    }
+
     // connect transistions to target states
 
     QList<SCTransition*> * masterTransistionList = new QList<SCTransition*>();

@@ -220,6 +220,10 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
         SCState * sc = dynamic_cast<SCState*>(children()[i]);
         if (sc)
             sc->writeSCVXML(sw);
+
+        SCTransition * st = dynamic_cast<SCTransition*>(children()[i]);
+        if (st)
+            st->writeSCVXML(sw);
     }
 
     sw.writeEndElement();
