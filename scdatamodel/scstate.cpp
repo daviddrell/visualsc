@@ -175,6 +175,20 @@ void SCState::getAllTransitions(QList<SCTransition*> & transitionList)
 
 }
 
+void SCState::getTransitions(QList<SCTransition*> & transitionList)
+{
+
+    for (int c = 0; c < this->children().count(); c++)
+    {
+
+        // collect this state's transitions
+
+        SCTransition* trans = dynamic_cast< SCTransition*>(this->children()[c]);
+        if ( trans )
+            transitionList.append(  trans );
+    }
+
+}
 
 int SCState::getStateCount()
 {

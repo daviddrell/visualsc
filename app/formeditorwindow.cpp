@@ -5,7 +5,8 @@
 #include <QLabel>
 #include <QList>
 #include <QStandardItemModel>
-
+#include <QVariant>
+#include "customtreewidgetitem.h"
 
 FormEditorWindow::FormEditorWindow(QWidget *parent, SCDataModel *dataModel) :
         QMainWindow(parent, Qt::WindowStaysOnTopHint),
@@ -74,13 +75,24 @@ void FormEditorWindow::handlePropertyCellChanged(int r, int c)
 {
     if ( c != 1 ) return;
 
+    IAttribute * attr;
+
     QString key = propertyTable->item(r,0)->text();
     QString value = propertyTable->item(r,1)->text();
 
     SCState * state = dynamic_cast<SCState*>(_currentlySelected);
-    if ( state == NULL ) return;
+    if ( state != NULL )
+    {
+        attr = state->attributes.value(key);
+    }
+    else
+    {
+        SCTransition * transition = dynamic_cast<SCTransition*>(_currentlySelected);
+        if ( transition == NULL) return;
 
-    IAttribute * attr = state->attributes.value(key);
+        attr = transition->attributes.value(key);
+    }
+
 
     attr->setValue(value);
 
@@ -89,7 +101,7 @@ void FormEditorWindow::handlePropertyCellChanged(int r, int c)
 
 // recursively walk through the state tree and build the tree view
 
-void FormEditorWindow::loadTree ( QTreeWidgetItem * parentItem , QList<SCState*> & states)
+void FormEditorWindow::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states)
 {
 
     int c = states.count();
@@ -100,20 +112,31 @@ void FormEditorWindow::loadTree ( QTreeWidgetItem * parentItem , QList<SCState*>
 
         if ( !  st ) continue;
 
-        QTreeWidgetItem * item=0;
+        CustomTreeWidgetItem * item=0;
 
         if (parentItem == 0)
         {
-            item = new QTreeWidgetItem();
-            stateChartTreeView->addTopLevelItem(item);
+            item = new CustomTreeWidgetItem();
+            stateChartTreeView->addTopLevelItem((QTreeWidgetItem*)item);
         }
         else
         {
-            item = new QTreeWidgetItem(parentItem);
+            item = new CustomTreeWidgetItem(parentItem);
         }
+
+
+        item->setData( st);
 
         item->setText(0, st->attributes.value("name")->asString());
 
+        // get all transitions in this state
+        QList<SCTransition*> transitions;
+
+        st->getTransitions(transitions);
+
+        loadTree (item, transitions);
+
+        // get all substates of this state
         QList<SCState*> subStates;
 
         st->getStates(subStates);
@@ -124,18 +147,113 @@ void FormEditorWindow::loadTree ( QTreeWidgetItem * parentItem , QList<SCState*>
 
 }
 
-void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
+void FormEditorWindow::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransition*> & transitions)
 {
+
+    int c = transitions.count();
+
+    for(int i = 0; i < c; i++)
+    {
+        SCTransition * tr = transitions.at(i);
+
+        if ( !  tr ) continue;
+
+        CustomTreeWidgetItem * item=0;
+
+        item = new CustomTreeWidgetItem(parentItem);
+
+        item->setData( tr);
+
+        item->setText(0, tr->attributes.value("target")->asString());
+
+    }
+
+}
+
+
+IAttributeContainer * FormEditorWindow::getCurrentlySelectedAttributes()
+{
+    IAttributeContainer * attributes;
+    SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
+    if ( st!= NULL)
+    {
+        _currentlySelected = st;
+        attributes =  & st->attributes;
+    }
+    else
+    {
+        SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
+        if ( transition == NULL) return NULL;
+        _currentlySelected = transition;
+        attributes =  & transition->attributes;
+    }
+
+    return attributes;
+}
+
+QString FormEditorWindow::getCurrentlySelectedTitle()
+{
+    QString title;
+
+    IAttributeContainer * attributes;
+    SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
+    if ( st!= NULL)
+    {
+        attributes =  & st->attributes;
+        IAttribute* attr = attributes->value("name")  ;
+        title = attr->asString();
+
+    }
+    else
+    {
+        SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
+        if ( transition == NULL) QString("programming error getCurrentlySelectedTitle ");
+         attributes =  & transition->attributes;
+        IAttribute* attr = attributes->value("target")  ;
+        title = attr->asString();
+    }
+
+    return title;
+}
+
+QString FormEditorWindow::getCurrentlySelectedType()
+{
+
+
+    SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
+    if ( st!= NULL)
+    {
+        return QString("State");
+    }
+    else
+    {
+        SCTransition * transition  = dynamic_cast<SCTransition *>(  _currentlySelected );
+        if ( transition == NULL) return QString("programming error getCurrentlySelectedType ");
+        return QString("Transition");
+    }
+}
+
+void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
+{
+
+    CustomTreeWidgetItem * item = dynamic_cast<CustomTreeWidgetItem*>(qitem);
+
+    // display the type : State or Transition
+    // display the name of the item
+    // load its attributes in the table
+
     int row = 0;
 
+    _currentlySelected =  item->data();
 
-    QString text =  item->text(0);
+    // load the Title
 
-    SCState * st = dm->getStateByName(text);
+    QString selectedItemTitle = getCurrentlySelectedType()  + " : " +  getCurrentlySelectedTitle();
 
-    _currentlySelected = st;
+    selectedChartItem->setText(selectedItemTitle );
 
 
+    // clear the tabel, delete the old table items
     for (int r =0; r <propertyTable->rowCount(); r++ )
     {
         QTableWidgetItem * item = propertyTable->itemAt(r,0);
@@ -146,15 +264,21 @@ void FormEditorWindow::handleTreeViewItemClicked(QTreeWidgetItem* item,int col)
 
     propertyTable->clear();
 
+
+    // load the new attributes
+
+    IAttributeContainer * attributes =  getCurrentlySelectedAttributes();
+
+
     disconnect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
 
-    propertyTable->setRowCount(st->attributes.count());
+    propertyTable->setRowCount(attributes->count());
 
-    QMapIterator<QString,IAttribute*> i(st->attributes);
+    QMapIterator<QString,IAttribute*> i(*attributes);
     while (i.hasNext())
     {
         QString key  = i.next().key();
-        IAttribute* attr = st->attributes.value(key)  ;
+        IAttribute* attr = attributes->value(key)  ;
 
         connect ( attr, SIGNAL(changed(IAttribute*)), this, SLOT(handlePropertyChanged(IAttribute*)));
 

@@ -12,13 +12,14 @@
 #include "cornergrabber.h"
 #include <QGraphicsPolygonItem>
 #include <QPainterPath>
+class SCTransition;
 
 class SelectableLineSegmentGraphic : public QObject, public QGraphicsPolygonItem
 {
     Q_OBJECT
 
 public:
-    SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end );
+    SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition );
 
 signals:
     void selected();
@@ -40,9 +41,13 @@ private:
     CornerGrabber*  _corners[2];// 0,1  - starting at x=0,y=0
     QPolygonF       _selectRegion;
 
+     SCTransition*  _transitionModel;
+
 
     // private methods
 
+
+    void updateModel ();
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events

@@ -9,7 +9,7 @@
 #include "scgraphicsview.h"
 #include <QTimer>
 #include "scdatamodel.h"
-#include "sceditcontroller.h"
+
 
 
 class SelectableLineSegmentGraphic;
@@ -47,7 +47,7 @@ private:
 
     SCDataModel      _dm;
     SCGraphicsView   _graphicsView;
-    SCEditController _editController;
+
 
 
     private:

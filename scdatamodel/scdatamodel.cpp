@@ -100,6 +100,14 @@ SCState * SCDataModel::getTopState()
     return _topState;
 }
 
+QObject * SCDataModel::getItemByName(QString name)
+{
+    QObject *item=NULL;
+    if ( (item = getStateByName(name)) != NULL ) return item;
+    if ( (item = getTransitionByName(name))!= NULL) return item;
+
+    return item;
+}
 
 SCState * SCDataModel::getStateByName(QString name)
 {
@@ -114,6 +122,23 @@ SCState * SCDataModel::getStateByName(QString name)
         SCState *st = list.at(i);
         if ( st->attributes.value("name")->asString() == name)
             return st;
+    }
+    return NULL;
+}
+
+
+SCTransition * SCDataModel::getTransitionByName(QString name)
+{
+    QList<SCTransition *> list;
+
+
+    _topState->getAllTransitions(list);
+
+    for(int i =0; i < list.count(); i++)
+    {
+        SCTransition *tr = list.at(i);
+        if ( tr->attributes.value("target")->asString() == name)
+            return tr;
     }
     return NULL;
 }

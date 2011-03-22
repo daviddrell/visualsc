@@ -50,6 +50,14 @@ public:
       */
      void getAllTransitions( QList<SCTransition*> & list);
 
+     /**
+       * \fn getTransitions
+       * \brief Get transitions of this state only
+       *
+       */
+
+     void getTransitions(QList<SCTransition*> & transitionList);
+
     /**
       * \fn getStates
       * \brief Get direct children states, no decendants

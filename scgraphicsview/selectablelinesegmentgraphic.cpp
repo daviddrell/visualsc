@@ -1,9 +1,13 @@
 #include "selectablelinesegmentgraphic.h"
 #include "math.h"
 
+#include "sctransition.h"
+#include "transitionattributes.h"
+
 #include <QDebug>
 
-SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end ):
+
+SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition ):
         QGraphicsPolygonItem(),
         _pen(),
         _dragStart(0,0),
@@ -13,10 +17,10 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
         _lineEnd_0 ( this->mapFromParent(start)),
         _lineEnd_1 ( this->mapFromParent(end)),
         _cornerGrabbed(false),
-        _selectRegion()
+        _selectRegion(),
+        _transitionModel(transition)
 {
     this->setPos(position);
-
 
 
     _pen.setWidth(2);
@@ -88,7 +92,7 @@ bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, Q
         {
             corner->setMouseState(CornerGrabber::kMouseReleased);
             _cornerGrabbed = false;
-
+            updateModel();
         }
         break;
 
@@ -134,8 +138,6 @@ void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, Corne
     mouseY = scenePosition.y();
     mouseX = scenePosition.x();
 
-
-
     // which corner needs to get moved?
     if ( corner == _corners[0])
     {
@@ -168,7 +170,6 @@ void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, Corne
     enclosePath(lineStartX, lineStartY,  lineEndX, lineEndY  );
 
     setCornerPositions();
-
 
 }
 
@@ -262,10 +263,34 @@ void SelectableLineSegmentGraphic::enclosePath(qreal lineStartX,qreal lineStartY
 }
 
 
+void SelectableLineSegmentGraphic::updateModel ()
+{
+
+    if ( _transitionModel )
+    {
+        TransitionAttributes::TransitionPositionAttribute *posAttr = dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> ( _transitionModel->attributes.value("position"));
+
+        QPointF ps = this->pos();
+        posAttr->setValue(ps);
+
+        TransitionAttributes::TransitionPathAttribute * pathAttr = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (_transitionModel->attributes.value("path"));
+
+        QList<QPointF> path;
+
+        path.append(ps);
+        path.append(_lineEnd_0);
+        path.append(_lineEnd_1);
+
+        pathAttr->setValue(path);
+
+    }
+}
+
 // for supporting moving the box across the scene
 void SelectableLineSegmentGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
     event->setAccepted(true);
+    updateModel();
 }
 
 

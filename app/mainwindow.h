@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include "smproject.h"
 #include <QString>
-#include "sceditcontroller.h"
+
 
 class FormEditorWindow;
 

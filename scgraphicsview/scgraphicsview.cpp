@@ -99,14 +99,15 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
 
         position = QPointF(10,10);
 
-        transGraphic  = new SelectableLineSegmentGraphic(position,position, QPointF(position.x()  , position.y() + 15 ));
+        transGraphic  = new SelectableLineSegmentGraphic(position,position, QPointF(position.x()  , position.y() + 15 ), t);
     }
     else if ( path.count() >= 2)
     {
 
         transGraphic  = new SelectableLineSegmentGraphic(path[0],
                                                          path[0],
-                                                         path[1]);
+                                                         path[1],
+                                                         t);
 
     }
 

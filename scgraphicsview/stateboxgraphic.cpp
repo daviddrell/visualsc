@@ -103,6 +103,7 @@ void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
 
     if ( name )
     {
+        this->setObjectName(name->asString()); // help debug tracing - id which object this is
         _title.setPlainText(name->asString());
     }
     else if ( size )

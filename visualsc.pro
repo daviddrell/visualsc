@@ -6,11 +6,10 @@ include (visualsc.pri)
 CONFIG += ordered
 
 SUBDIRS = scdatamodel\
-          sceditcontroller\
           scgraphicsview\
           app
 
-app.depends = scdatamodel  scgraphicsview sceditcontroller
+app.depends = scdatamodel  scgraphicsview 
 
 TARGET = app
 

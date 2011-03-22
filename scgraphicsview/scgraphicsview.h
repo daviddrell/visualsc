@@ -3,7 +3,6 @@
 
 #include "scgraphicsview_global.h"
 #include "scdatamodel.h"
-#include "sceditcontroller.h"
 #include <QObject>
 #include <QGraphicsView>
 #include "stateattributes.h"

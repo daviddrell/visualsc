@@ -32,13 +32,15 @@ SOURCES += \
     projectdata.cpp \
     mainwindow.cpp \
     main.cpp \
-    formeditorwindow.cpp
+    formeditorwindow.cpp \
+    customtreewidgetitem.cpp
 
 HEADERS  += \
     smproject.h \
     projectdata.h \
     mainwindow.h \
-    formeditorwindow.h
+    formeditorwindow.h \
+    customtreewidgetitem.h
 
 FORMS    += \
     mainwindow.ui

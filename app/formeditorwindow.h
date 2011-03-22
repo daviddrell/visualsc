@@ -21,6 +21,7 @@ class QAbstractButton;
 class QGraphicsView;
 class QTreeWidget;
 class QTreeWidgetItem;
+class CustomTreeWidgetItem;
 class QTableWidget;
 class QLabel;
 QT_END_NAMESPACE
@@ -61,7 +62,15 @@ private slots:
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
     void handleNewTransition(SCTransition*);
 
+    void handlePropertyChanged(IAttribute * attr);
+    void handlePropertyCellChanged(int, int);
+
 private:
+
+    IAttributeContainer * getCurrentlySelectedAttributes();
+    QString               getCurrentlySelectedTitle();
+    QString               getCurrentlySelectedType();
+
     void createToolBox();
     void createActions();
     void createMenus();
@@ -71,7 +80,8 @@ private:
     QMenu *createColorMenu(const char *slot, QColor defaultColor);
     QIcon createColorToolButtonIcon(const QString &image, QColor color);
     QIcon createColorIcon(QColor color);
-    void loadTree ( QTreeWidgetItem * parentItem , QList<SCState*> & states);
+    void loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states);
+    void loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransition*> & transitions);
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;
@@ -121,9 +131,7 @@ private:
     SCDataModel * dm;
     QObject     * _currentlySelected;
 
-private slots:
-    void handlePropertyChanged(IAttribute * attr);
-    void handlePropertyCellChanged(int, int);
+
 
 };
 
