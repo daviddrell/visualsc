@@ -13,6 +13,8 @@
 #include <QGraphicsPolygonItem>
 #include <QPainterPath>
 class SCTransition;
+class IAttribute;
+
 
 class SelectableLineSegmentGraphic : public QObject, public QGraphicsPolygonItem
 {
@@ -65,8 +67,12 @@ private:
 
     void createCustomPath(QPointF mouseLocation, CornerGrabber*);
 
-    void enclosePath(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
+    void enclosePathInSceneCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
+    void enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
 
+private slots:
+
+    void handleAttributeChanged(IAttribute *attr);
 
 };
 

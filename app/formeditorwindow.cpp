@@ -208,7 +208,7 @@ QString FormEditorWindow::getCurrentlySelectedTitle()
     {
         SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
         if ( transition == NULL) QString("programming error getCurrentlySelectedTitle ");
-         attributes =  & transition->attributes;
+        attributes =  & transition->attributes;
         IAttribute* attr = attributes->value("target")  ;
         title = attr->asString();
     }

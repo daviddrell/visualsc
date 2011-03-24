@@ -20,6 +20,9 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
         _selectRegion(),
         _transitionModel(transition)
 {
+    _corners[0] = NULL;
+    _corners[1] = NULL;
+
     this->setPos(position);
 
 
@@ -45,6 +48,47 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
 
     this->setPolygon(_selectRegion);
 
+    TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> ( _transitionModel->attributes.value("target"));
+    connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(name);
+
+    TransitionAttributes::TransitionPathAttribute * path = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  _transitionModel->attributes.value("path"));
+    connect (path, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(path);
+
+    TransitionAttributes::TransitionPositionAttribute * tpos =dynamic_cast<TransitionAttributes::TransitionPositionAttribute*> ( _transitionModel->attributes.value("position"));
+    connect (tpos, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(tpos);
+
+}
+
+
+
+void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
+{
+   // TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> (attr);
+    TransitionAttributes::TransitionPathAttribute * path = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> ( attr);
+    TransitionAttributes::TransitionPositionAttribute * position =dynamic_cast< TransitionAttributes::TransitionPositionAttribute*> (attr);
+
+    if ( position)
+    {
+        QPointF ps = position->asQPointF();
+        setPos( ps  );
+    }
+    else if ( path )
+    {
+        QList<QPointF> pts = path->asQPointFList();
+        if ( pts.count() < 3) return;
+        setPos(pts[0]);
+        _lineEnd_0 = pts[1];
+        _lineEnd_1 = pts[2];
+
+        enclosePathInItemCoordiates(_lineEnd_0.x(), _lineEnd_0.y(), _lineEnd_1.x(), _lineEnd_1.y()  );
+
+    }
+    setCornerPositions();
+
+    this->update();
 }
 
 
@@ -167,13 +211,28 @@ void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, Corne
     _lineEnd_1.setX(  mapFromScene(lineEndX,lineEndY ).x()  );
     _lineEnd_1.setY(  mapFromScene(lineEndX,lineEndY ).y());
 
-    enclosePath(lineStartX, lineStartY,  lineEndX, lineEndY  );
+    enclosePathInSceneCoordiates(lineStartX, lineStartY,  lineEndX, lineEndY  );
 
     setCornerPositions();
 
 }
 
-void SelectableLineSegmentGraphic::enclosePath(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  )
+void SelectableLineSegmentGraphic::enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  )
+{
+    QPointF lineEnd_0;
+    QPointF lineEnd_1;
+
+    lineEnd_0.setX(  mapToScene(lineStartX, lineStartY).x()  );
+    lineEnd_0.setY(  mapToScene(lineStartX, lineStartY).y() );
+
+    lineEnd_1.setX(  mapToScene(lineEndX,lineEndY ).x());
+    lineEnd_1.setY(  mapToScene(lineEndX,lineEndY ).y());
+
+    enclosePathInSceneCoordiates( lineEnd_0.x(), lineEnd_0.y(), lineEnd_1.x(), lineEnd_1.y()  );
+
+}
+
+void SelectableLineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  )
 {
 
 
@@ -319,7 +378,10 @@ void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * 
     _corners[1]->setParentItem(NULL);
 
     delete _corners[0];
+    _corners[0]  = NULL;
+
     delete _corners[1];
+    _corners[1]  = NULL;
 
     qDebug()<<"SelectableLineSegmentGraphic::hoverLeaveEvent";
     emit unselected();
@@ -344,6 +406,8 @@ void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * 
 
 void SelectableLineSegmentGraphic::setCornerPositions()
 {
+    if ( _corners[0] == NULL || _corners[1] == NULL )return;
+
     int cornerWidth = (_corners[0]->boundingRect().width())/2;
     int cornerHeight = ( _corners[0]->boundingRect().height())/2;
 

@@ -238,6 +238,8 @@ void TransitionAttributes::TransitionPathAttribute::setValue(const QString data)
 void TransitionAttributes::TransitionPathAttribute::setValue(QList<QPointF>& path )
 {
     _pathPoints = path;
+
+    emit changed(this);
 }
 
 int TransitionAttributes::TransitionPathAttribute::getType()
@@ -294,6 +296,8 @@ QString TransitionAttributes::TransitionStringAttribute::asString()
 void TransitionAttributes::TransitionStringAttribute::setValue(QString str )
 {
     _string = str;
+    emit changed(this);
+
 }
 
 int TransitionAttributes::TransitionStringAttribute::getType()
@@ -356,12 +360,16 @@ void TransitionAttributes::TransitionPositionAttribute::setValue(const int w,con
 {
     _position.setX(w);
     _position.setY(h);
+    emit changed(this);
+
 }
 
 
 void TransitionAttributes::TransitionPositionAttribute::setValue(const QPointF s)
 {
     _position = s;
+    emit changed(this);
+
 }
 
 
@@ -372,6 +380,7 @@ void TransitionAttributes::TransitionPositionAttribute::setValue(const QString p
     {
         _position.setX( sl[0].toInt() );
         _position.setY( sl[1].toInt() );
+        emit changed(this);
     }
 }
 
