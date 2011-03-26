@@ -46,7 +46,8 @@ FORMS    += \
     mainwindow.ui
 
 OTHER_FILES += \
-    design.pptx 
+    design.pptx \ 
+    COPYING.txt
 
 RESOURCES += \
     resources/formeditorwindow.qrc

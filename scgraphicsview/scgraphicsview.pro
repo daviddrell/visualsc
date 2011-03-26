@@ -35,3 +35,6 @@ HEADERS += scgraphicsview.h\
     stateboxgraphic.h \
     selectablelinesegmentgraphic.h \
     cornergrabber.h
+
+OTHER_FILES += \
+    COPYING.txt

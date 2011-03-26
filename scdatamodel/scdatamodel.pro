@@ -32,3 +32,6 @@ HEADERS += scdatamodel.h\
     scstate.h \
     scxmlreader.h \
     iattribute.h
+
+OTHER_FILES += \
+    COPYING.txt
