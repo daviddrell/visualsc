@@ -1,0 +1,13 @@
+visualsc - Visual State Chart Editor for SCXML.
+
+visualsc is a graphical state chart editor built on Qt.
+It adds graphical attributes to state elements in a SCXML file.
+
+When completed, the project will include statemachine engines
+(in various languages) that read SCXML directly so that one
+can design a state machine graphically and transform that image
+into a running statemachine (via SCXML files) bypassing the source
+code phase. Additionally, visualsc will allow a developer to annimate
+actual state chart execution using debug tracing from the runtime machines.
+
+
