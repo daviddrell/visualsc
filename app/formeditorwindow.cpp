@@ -149,6 +149,8 @@ void FormEditorWindow::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCSt
 
         item->setText(0, st->attributes.value("name")->asString());
 
+        item->setIcon(0,QIcon(":/FormEditorWindow/statebutton.bmp"));
+
         // get all transitions in this state
         QList<SCTransition*> transitions;
 
@@ -185,6 +187,8 @@ void FormEditorWindow::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTr
         item->setData( tr);
 
         item->setText(0, tr->attributes.value("target")->asString());
+
+        item->setIcon(0,QIcon(":/FormEditorWindow/transitionbutton.bmp"));
 
     }
 
