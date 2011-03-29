@@ -282,13 +282,13 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 
 
-SCTransition* SCDataModel::insertNewTransition(SCState *source, QString event )
+SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
 {
      if ( source == NULL)  return NULL;
 
      SCTransition * transition = new SCTransition(source);
 
-     transition->setAttributeValue("event", event);
+     transition->setAttributeValue("target", target);
 
      emit newTransitionSignal(transition);
 
@@ -329,8 +329,11 @@ void SCDataModel::handleLeaveTransitionElement()
 
 void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 {
+    TransitionAttributes::TransitionStringAttribute *targetAttr =  dynamic_cast<TransitionAttributes::TransitionStringAttribute *>( _currentTransition->attributes.value("target"));
 
-    qDebug() << "handleMakeANewTransitionPath : " ;
+    QString target = targetAttr->asString();
+
+    qDebug() << "handleMakeANewTransitionPath (" + target + ") : " + pathStr ;
 
     if ( _currentState == 0)
         return;
@@ -341,6 +344,8 @@ void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *>( _currentTransition->attributes.value("path"));
 
     path->setValue( pathStr );
+
+    qDebug() << "interpreted path is " + path->asString();
 
     _currentTransition->attributes.addItem(path);
 

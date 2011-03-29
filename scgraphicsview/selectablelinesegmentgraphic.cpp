@@ -86,14 +86,20 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
 
 void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
 {
-   // TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> (attr);
+    TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> (attr);
     TransitionAttributes::TransitionPathAttribute * path = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> ( attr);
     TransitionAttributes::TransitionPositionAttribute * position =dynamic_cast< TransitionAttributes::TransitionPositionAttribute*> (attr);
+
+    if ( name )
+    {
+        qDebug()<<"transition attr changed, name: " + name->asString();
+    }
 
     if ( position)
     {
         QPointF ps = position->asQPointF();
         setPos( ps  );
+        qDebug()<<"transition attr changed, position: " + QString( QString::number(ps.x()) + ", " + QString::number(ps.y()) );
     }
     else if ( path )
     {
@@ -104,6 +110,11 @@ void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
         _lineEnd_1 = pts[2];
 
         enclosePathInItemCoordiates(_lineEnd_0.x(), _lineEnd_0.y(), _lineEnd_1.x(), _lineEnd_1.y()  );
+
+        qDebug()<<"transition attr changed, path: " + QString(
+                QString::number (_lineEnd_0.x()) +" " + QString::number ( _lineEnd_0.y()) +" " +  QString::number (_lineEnd_1.x()) +" " + QString::number ( _lineEnd_1.y())
+                );
+
 
     }
     setCornerPositions();

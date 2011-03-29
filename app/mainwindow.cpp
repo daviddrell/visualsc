@@ -132,6 +132,13 @@ void MainWindow::handleNewClick()
         _project = NULL;
     }
 
- //   project = new SMProject(ui->graphicsView);
+    _project = new SMProject(  ui->centralWidget );
+
+    ui->gridLayout->addWidget( _project->getQGraphicsView() );
+
+    _formEditorWindow = new FormEditorWindow(0, _project->getDM());
+    _formEditorWindow->show();
+
+
 
 }

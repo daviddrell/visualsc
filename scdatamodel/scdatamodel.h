@@ -51,6 +51,11 @@ public:
     QObject * getItemByName(QString name);
     SCState* getTopState( );
 
+    /**
+      * \fn insertNewTransition
+      * \param source - the SCState from which the transition leaves
+      * \param event  -  the string which represents the event that causes the transition to occur
+      */
     SCTransition* insertNewTransition(SCState *source, QString event );
 
     // Q Data Model Interface

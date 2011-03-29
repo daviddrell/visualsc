@@ -373,7 +373,7 @@ void FormEditorWindow::insertTransition()
 
     if ( st == NULL ) return;
 
-    dm->insertNewTransition(st,"test event");
+    dm->insertNewTransition(st,"target-1");
 
 }
 
