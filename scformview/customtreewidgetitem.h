@@ -33,8 +33,10 @@ public:
     void setData(QObject* d);
     QObject * data();
 
+
 private:
     QObject * _stateOrTransitionItem;
+
 };
 
 #endif // CUSTOMTREEWIDGETITEM_H

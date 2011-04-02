@@ -28,6 +28,9 @@
 #include <QList>
 #include <QModelIndex>
 
+class StateSelectionWindow;
+
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QToolBox;
@@ -86,6 +89,7 @@ private slots:
 
     void handlePropertyChanged(IAttribute * attr);
     void handlePropertyCellChanged(int, int);
+    void handleStateSelectionWindowStateSelected(SCState *st, QString name);
 
 private:
 
@@ -150,9 +154,9 @@ private:
     QAction *fillAction;
     QAction *lineAction;
 
-    SCDataModel * dm;
+    SCDataModel * _dm;
     QObject     * _currentlySelected;
-
+    StateSelectionWindow * _targetStateSelectionWindow;
 
 
 };

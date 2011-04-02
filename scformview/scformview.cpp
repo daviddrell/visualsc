@@ -27,10 +27,11 @@
 #include <QStandardItemModel>
 #include <QVariant>
 #include "customtreewidgetitem.h"
+#include "stateselectionwindow.h"
 
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         QMainWindow(parent, Qt::WindowStaysOnTopHint),
-        dm(dataModel),
+        _dm(dataModel),
         _currentlySelected(NULL)
 {
 
@@ -73,9 +74,9 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
 
 
     QList<SCState*> states;
-    states.append( dm->getTopState());
+    states.append( _dm->getTopState());
 
-    connect (dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
+    connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
     loadTree (NULL, states);
 }
@@ -83,7 +84,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
 void SCFormView::handleNewTransition(SCTransition*)
 {
     QList<SCState*> states;
-    states.append( dm->getTopState());
+    states.append( _dm->getTopState());
 
     stateChartTreeView->clear();
 
@@ -367,13 +368,30 @@ void SCFormView::bringToFront()
 
 }
 
+
 void SCFormView::insertTransition()
 {
     SCState * st = dynamic_cast<SCState *> (_currentlySelected);
 
     if ( st == NULL ) return;
 
-    dm->insertNewTransition(st,"target-1");
+    // create a new tree
+    _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
+
+    connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*,QString)), this, SLOT(handleStateSelectionWindowStateSelected(SCState*,QString)));
+    _targetStateSelectionWindow->show();
+
+
+}
+
+void SCFormView::handleStateSelectionWindowStateSelected(SCState* ,QString target)
+{
+    SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
+    _dm->insertNewTransition(st, target);
+    _targetStateSelectionWindow->close();
+
+    delete _targetStateSelectionWindow;
+    _targetStateSelectionWindow = NULL;
 
 }
 

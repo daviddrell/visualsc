@@ -41,11 +41,13 @@ OTHER_FILES += \
 
 HEADERS += \
     scformview.h \
-    customtreewidgetitem.h
+    customtreewidgetitem.h \
+    stateselectionwindow.h
 
 SOURCES += \
     scformview.cpp \
-    customtreewidgetitem.cpp
+    customtreewidgetitem.cpp \
+    stateselectionwindow.cpp
 
 RESOURCES += \
     resources/scformview.qrc
