@@ -24,7 +24,8 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QSettings>
-#include "formeditorwindow.h"
+#include "scformview.h"
+
 
 // adding comments to get the git repository
 
@@ -96,7 +97,7 @@ void MainWindow::handleReadInputFileDone(bool ,QStringList)
     {
         delete _formEditorWindow;
     }
-    _formEditorWindow = new FormEditorWindow(0, _project->getDM());
+    _formEditorWindow = new SCFormView(0, _project->getDM());
     _formEditorWindow->show();
 
 }
@@ -136,7 +137,7 @@ void MainWindow::handleNewClick()
 
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
 
-    _formEditorWindow = new FormEditorWindow(0, _project->getDM());
+    _formEditorWindow = new SCFormView(0, _project->getDM());
     _formEditorWindow->show();
 
 

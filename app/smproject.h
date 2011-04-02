@@ -44,13 +44,13 @@ public:
     SMProject(QWidget *parentWidget);
     ~SMProject();
 
-
     void close();
 
     void readInputFile(QString file);
     void save(QString file);
     QGraphicsView * getQGraphicsView();
     SCDataModel  * getDM();
+
 signals:
     void error(QString err);
     void readInputFileCompleted (bool,QStringList );
@@ -61,10 +61,8 @@ private slots:
 private:
 
     // private data
-    ProjectData     _pd;
 
     QString         _file;
-
     SCDataModel      _dm;
     SCGraphicsView   _graphicsView;
 

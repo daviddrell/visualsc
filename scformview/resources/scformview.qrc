@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/FormEditorWindow">
+    <qresource prefix="/SCFormView">
         <file>bold.png</file>
         <file>bringtofront.png</file>
         <file>delete.png</file>

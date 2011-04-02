@@ -450,7 +450,7 @@ void SelectableLineSegmentGraphic::setCornerPositions()
 
 
 
-void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *i, QWidget *w)
+void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 
     // this paint will draw the bounding box for debugging:

@@ -26,7 +26,7 @@
 #include <QString>
 
 
-class FormEditorWindow;
+class SCFormView;
 
 class QSettings;
 
@@ -48,7 +48,7 @@ private:
     SMProject *_project;
     QSettings *_settings;
     static QString _keyLastFilePath;
-    FormEditorWindow *_formEditorWindow;
+    SCFormView *_formEditorWindow;
 
 private slots:
     void handleFileOpenClick();

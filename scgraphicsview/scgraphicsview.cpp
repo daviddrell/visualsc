@@ -78,7 +78,7 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
 }
 
 
-SCState * SCGraphicsView::lookUpTargetState(QString target)
+SCState * SCGraphicsView::lookUpTargetState(QString )
 {
 
 //    QList<SCState *> states;

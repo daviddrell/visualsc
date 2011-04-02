@@ -19,28 +19,24 @@ INCLUDEPATH += ../scdatamodel
 win32:LIBS += $${LIB_PATH}/scdatamodel.dll
 unix:LIBS += -L$${LIB_PATH} -lscdatamodel
 
-INCLUDEPATH += ../sceditcontroller
-win32:LIBS += $${LIB_PATH}/sceditcontroller.dll
-unix:LIBS += -L$${LIB_PATH} -lsceditcontroller
 
 INCLUDEPATH += ../scgraphicsview
 win32:LIBS += $${LIB_PATH}/scgraphicsview.dll
 unix:LIBS += -L$${LIB_PATH} -lscgraphicsview
 
+
+INCLUDEPATH += ../scformview
+win32:LIBS += $${LIB_PATH}/scformview.dll
+unix:LIBS += -L$${LIB_PATH} -lscformview
+
 SOURCES += \
     smproject.cpp \
-    projectdata.cpp \
     mainwindow.cpp \
-    main.cpp \
-    formeditorwindow.cpp \
-    customtreewidgetitem.cpp
+    main.cpp
 
 HEADERS  += \
     smproject.h \
-    projectdata.h \
-    mainwindow.h \
-    formeditorwindow.h \
-    customtreewidgetitem.h
+    mainwindow.h
 
 FORMS    += \
     mainwindow.ui
@@ -49,5 +45,4 @@ OTHER_FILES += \
     design.pptx \ 
     COPYING.txt
 
-RESOURCES += \
-    resources/formeditorwindow.qrc
+RESOURCES +=

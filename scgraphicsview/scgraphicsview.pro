@@ -11,13 +11,11 @@ QT       += core gui
 TARGET = scgraphicsview
 TEMPLATE = lib
 
-scgraphicsview.depends = scdatamodel sceditcontroller
+scgraphicsview.depends = scdatamodel
 
 $QMAKE_CLEAN += $$TARGET
 
 DEFINES += SCGRAPHICSVIEW_LIBRARY
-
-INCLUDEPATH += ../sceditcontroller
 
 
 INCLUDEPATH += ../scdatamodel

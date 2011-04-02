@@ -28,10 +28,8 @@
 
 
 SMProject::SMProject(QWidget *parentWidget): QObject(parentWidget),
-        _pd(),_file(), _dm(this),_graphicsView( parentWidget, & _dm)
+        _file(), _dm(this),_graphicsView( parentWidget, & _dm)
 {
-
-
 
 }
 

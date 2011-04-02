@@ -49,7 +49,7 @@ QStandardItem * SCDataModel::makeAStateItem(SCState *st)
     return item;
 }
 
-QStandardItem * SCDataModel::makeATransitionItem(SCTransition *tr)
+QStandardItem * SCDataModel::makeATransitionItem(SCTransition *)
 {
 
     QStandardItem * item = new QStandardItem(0,0);
