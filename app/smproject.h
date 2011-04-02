@@ -23,7 +23,6 @@
 
 #include <QGraphicsView>
 #include <QString>
-#include "projectdata.h"
 #include "scstate.h"
 #include <QObject>
 #include "scgraphicsview.h"
