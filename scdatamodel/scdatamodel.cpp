@@ -76,8 +76,8 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     _writer->setAutoFormatting(true);
 
     _writer->writeStartDocument();
-    _writer->writeStartElement("scxml");
-    _writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
+    //_writer->writeStartElement("scxml");
+    //_writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
 
     _topState->writeSCVXML( *_writer );
 

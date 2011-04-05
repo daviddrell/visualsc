@@ -91,7 +91,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     _outterborderPen.setWidth(2);
     _outterborderPen.setColor(_outterborderColor);
 
-    _title.setPos(35,35);
+    _title.setPos(25,10);
 
 
     _title.setParentItem(this);
@@ -529,6 +529,7 @@ void StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *
 
     // draw the top box, the visible one
     _outterborderPen.setStyle(Qt::SolidLine);
+    _outterborderPen.setWidth(1);
 
     //      qDebug()<<"StateBoxGraphic::paint highlight = " + QString(_isHighlighted?"True":"False");
 
@@ -543,8 +544,8 @@ void StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *
         painter->setPen(_outterborderPen);
     }
 
-    QBrush brush2(QColor(187,250,185,255),Qt::SolidPattern);  // the box fill color
-    //   QBrush brush2(QColor(255,255,255,255),Qt::SolidPattern);  // the box fill color
+   // QBrush brush2(QColor(187,250,185,255),Qt::SolidPattern);  // the box fill color
+    QBrush brush2(QColor(255,255,255,255),Qt::SolidPattern);  // white fill
 
     painter->setBrush( brush2);
 
@@ -557,8 +558,8 @@ void StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *
 
     // keep the text centered and within the bounds of the box
 
-    //int halfSize = _text.textWidth()/2;
-    // _text.setPos( (_width/2) - halfSize, _text.pos().y()   );
+    int halfSize = _title.textWidth()/2 + 10;
+     _title.setPos( (_width/2) - halfSize, _title.pos().y()   );
 
 
 }
