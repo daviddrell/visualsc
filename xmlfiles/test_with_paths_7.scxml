@@ -1,88 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scxml xmlns="http://www.w3.org/2005/07/scxml">
-    <state id="State Machine" position="0,0" size="100,50">
-        <state id="Main" position="-70,-210" size="100,50">
-            <state id="Main_initial" position="20,80" size="100,50">
-                <transition target="Test1">
-                    <path d="m 100 100 300 100 200 300 "/>
-                </transition>
-            </state>
-            <state id="Test1" position="-300,110" size="100,50">
-                <transition target="Test1">
-                    <path d="m 100 100 300 100 200 300 "/>
-                </transition>
-                <state id="Test1_initial" position="80,-70" size="100,50">
-                    <transition target="Test1Sub1">
-                        <path d="m "/>
-                    </transition>
-                </state>
-                <state id="Test1Sub1" position="90,80" size="100,50">
-                    <transition target="Test1Sub2">
-                        <path d="m "/>
-                    </transition>
-                </state>
-                <state id="Test1Sub2" position="30,150" size="100,50"/>
-                <transition target="Test2">
-                    <path d="m "/>
-                </transition>
-            </state>
-            <state id="Test2" position="210,130" size="100,50">
-                <state id="Test2_initial" position="210,70" size="100,50">
-                    <transition target="Test2Sub1">
-                        <path d="m "/>
-                    </transition>
-                </state>
-                <state id="Test2Sub1" position="120,110" size="100,50">
-                    <transition target="Test2Sub2">
-                        <path d="m "/>
-                    </transition>
-                </state>
-                <state id="Test2Sub2" position="60,170" size="100,50"/>
-                <transition target="Test3">
-                    <path d="m "/>
-                </transition>
-            </state>
-            <state id="Test3" position="-20,-120" size="100,50">
-                <state id="Test3_initial" position="-110,-160" size="100,50">
-                    <transition target="Test3Sub1">
-                        <path d="m "/>
-                    </transition>
-                </state>
-                <state id="Test3Sub1" position="0,-200" size="100,50">
-                    <transition target="Test4">
-                        <path d="m "/>
-                    </transition>
-                </state>
-            </state>
-            <state id="Test4" position="320,-140" size="100,50">
-                <state id="Test4_initial" position="10,-130" size="100,50">
-                    <transition target="Test4Sub1">
-                        <path d="m "/>
-                    </transition>
-                </state>
-                <state id="Test4Sub1" position="140,100" size="100,50">
-                    <transition target="Test5">
-                        <path d="m "/>
-                    </transition>
-                </state>
-            </state>
-            <state id="Test5" position="-120,150" size="100,50">
-                <state id="Test5_initial" position="-170,40" size="100,50">
-                    <transition target="Test5P">
-                        <path d="m "/>
-                    </transition>
-                </state>
-                <state id="Test5PSub1" position="-260,-90" size="100,50"/>
-                <state id="Test5PSub2" position="-20,-190" size="100,50"/>
-                <transition target="Done">
-                    <path d="m "/>
-                </transition>
-            </state>
-            <state id="Done" position="150,-130" size="100,50"/>
-            <transition target="final">
-                <path d="m 55 2 10 10 119 200 "/>
+<state id="State Machine" position="-1340,-920" size="1134,831">
+    <state id="Main" position="20,80" size="1070,674">
+        <state id="Main_initial" position="150,40" size="100,50">
+            <transition target="Test1">
+                <path d="m -270 -71 300 100 397 163 "/>
             </transition>
         </state>
-        <state id="final" position="200,-10" size="100,50"/>
+        <state id="Test1" position="760,20" size="223,261">
+            <transition target="Test1">
+                <path d="m -123 -40 300 100 290 341 "/>
+            </transition>
+            <state id="Test1_initial" position="40,30" size="100,50">
+                <transition target="Test1Sub1">
+                    <path d="m 0 0 10 10 26 30 "/>
+                </transition>
+            </state>
+            <state id="Test1Sub1" position="30,90" size="100,50">
+                <transition target="Test1Sub2">
+                    <path d="m 0 0 10 10 -28 30 "/>
+                </transition>
+            </state>
+            <state id="Test1Sub2" position="20,130" size="100,50"/>
+            <transition target="Test2">
+                <path d="m 0 0 10 10 -23 39 "/>
+            </transition>
+        </state>
+        <state id="Test2" position="80,260" size="306,264">
+            <state id="Test2_initial" position="50,80" size="100,50">
+                <transition target="Test2Sub1">
+                    <path d="m "/>
+                </transition>
+            </state>
+            <state id="Test2Sub1" position="60,30" size="100,50">
+                <transition target="Test2Sub2">
+                    <path d="m "/>
+                </transition>
+            </state>
+            <state id="Test2Sub2" position="50,150" size="100,50"/>
+            <transition target="Test3">
+                <path d="m "/>
+            </transition>
+        </state>
+        <state id="Test3" position="730,320" size="147,154">
+            <state id="Test3_initial" position="10,20" size="100,50">
+                <transition target="Test3Sub1">
+                    <path d="m 0 0 10 10 -38 21 "/>
+                </transition>
+            </state>
+            <state id="Test3Sub1" position="10,70" size="100,50">
+                <transition target="Test4">
+                    <path d="m 0 0 10 10 -32 24 "/>
+                </transition>
+            </state>
+        </state>
+        <state id="Test4" position="440,80" size="298,198">
+            <state id="Test4_initial" position="110,40" size="100,50">
+                <transition target="Test4Sub1">
+                    <path d="m 0 0 10 10 35 24 "/>
+                </transition>
+            </state>
+            <state id="Test4Sub1" position="60,90" size="100,50">
+                <transition target="Test5">
+                    <path d="m 0 0 10 10 29 29 "/>
+                </transition>
+            </state>
+        </state>
+        <state id="Test5" position="530,300" size="176,213">
+            <state id="Test5_initial" position="20,60" size="100,50">
+                <transition target="Test5P">
+                    <path d="m 0 0 10 10 -34 34 "/>
+                </transition>
+            </state>
+            <state id="Test5PSub1" position="20,20" size="100,50"/>
+            <state id="Test5PSub2" position="20,130" size="100,50"/>
+            <transition target="Done">
+                <path d="m -1 0 10 10 -81 37 "/>
+            </transition>
+        </state>
+        <state id="Done" position="450,20" size="100,50"/>
+        <transition target="final">
+            <path d="m 52 26 10 10 119 200 "/>
+        </transition>
     </state>
-</scxml>
+    <state id="final" position="280,20" size="100,50"/>
+</state>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scxml xmlns="http://www.w3.org/2005/07/scxml">
     <state id="State Machine" position="0,0" size="100,50">
-        <state id="State Machine" position="-500,-280" size="1090,709">
             <state id="Main" position="30,100" size="984,483">
                 <state id="Main_initial" position="220,20" size="133,78">
                     <transition target="Test1">
@@ -86,5 +85,4 @@
             </state>
             <state id="final" position="50,-150" size="100,50"/>
         </state>
-    </state>
 </scxml>
