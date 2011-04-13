@@ -26,6 +26,89 @@
 #include <QMap>
 #include <QMapIterator>
 
+/**
+ *  \defgroup Attributes
+ *
+ * Attributes are intented to be contained in IAttributeContainer-s.
+ * Attributes should must subclass IAttribute and implement asString(), setValue() and getType().
+ * New Attribute sub-types should be added to the AttributeType enum.
+ *
+ * Generally, a view can query attribute containers for attributes, then query attributes
+ * for their values using asString(), without checking the type.
+ *
+ * Below is an example of generic attribute handling from the FormView, which loads the attribute
+ * table view when a state or transition is clicked in the tree-view.
+ *
+ * <b> Notes on State and Transition Identifiers</b>
+
+  SCXML does not require a state have an id. But here we definitely need a consistent
+     method of refering to a state. So 'name' is used as the definitive identifier for states in this model.
+     When the model is saved back to an SCXML file, the name is pushed as the 'id' field. So all states in SCXML
+     files produced by this program will end up with an id.
+
+  In SCXML, Transitions are identified by their target states with the 'target' attribute.
+     In order to genericise attribute handling, this program identifies transitions with the 'name' key (same as for state
+     identifiers). Thus internally, all states and transitions have 'name's. When saved back to an SCXML file,
+     the transition name is written as the 'target' attribute.
+
+
+ \code
+    // get an interator to the IAttributeContainer which is define as Map of key strings and IAttribute pointers.
+    //  the key strings are the attribute id's or names, for example "name", "path", "size", "pos", "target".
+
+    QMapIterator<QString,IAttribute*> i(*attributes);
+
+    while (i.hasNext())
+    {
+        QString key  = i.next().key(); // get this key for this attribute, e.g. 'name', 'path', 'size', etc
+
+        IAttribute* attr = attributes->value(key)  ;// get the map value, which is the IAttribute pointer
+
+        // all IAttributes have a changed signal, so connect to it so we can be notified if another view changes
+        // the value while we are displaying it here in this view, so we can update our view
+
+        connect ( attr, SIGNAL(changed(IAttribute*)), this, SLOT(handlePropertyChanged(IAttribute*)));
+
+        // create a table entry for this attribute
+
+        QTableWidgetItem * propName = new QTableWidgetItem(key);
+
+        propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
+
+        // load the table entry with the attribute's value as a string
+
+        QTableWidgetItem * propValue = new QTableWidgetItem(attr->asString());
+
+        propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+
+        // the table has two columns, one with the property (attribute) key and the other with the value
+
+        propertyTable->setItem(row, 0, propName);
+        propertyTable->setItem(row++, 1, propValue);
+
+    }
+ \endcode
+
+ *
+ *
+ */
+
+/**
+ * \class IAttribute
+ *
+ * \brief This is the base abstract class for state and transition attributes.
+ *
+ * \ingroup Attributes
+ *
+ * Attributes are intented to be contained in IAttributeContainer-s.
+ * Attributes should must subclass IAttribute and implement asString(), setValue() and getType().
+ * New Attribute sub-types should be added to the AttributeType enum.
+ *
+ * Generally, a view can query attribute containers for attributes, then query attributes
+ * for their values using asString(), without checking the type.
+ *
+ */
+
 class IAttribute: public QObject
 {
     Q_OBJECT
@@ -60,7 +143,19 @@ private:
 };
 
 
-// container - a Map of IAttribute-subclasses
+/**
+ * \class IAttributeContainer
+ *
+ * \brief This is the base abstract class for state and transition attribute containers.
+ *
+ * \ingroup Attributes
+ *
+ * Attributes are intented to be contained in IAttributeContainer-s.
+ *
+ * \sa Attributes
+ *
+ */
+
 
 class IAttributeContainer : public QObject, public QMap<QString,IAttribute*>
 {
