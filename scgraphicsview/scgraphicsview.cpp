@@ -147,6 +147,10 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
 void SCGraphicsView::handleNewState (SCState *newState)
 {
 
+    StateAttributes::StateString * type = dynamic_cast<StateAttributes::StateString *> ( newState->attributes.value("type"));
+    if ( type != 0 && (type->asString() == "machine"))
+        return; // don't draw a picture for the top-level machine
+
     SCState * parentState = 0;
     StateBoxGraphic * parentGraphic =0;
     StateBoxGraphic * stateGraphic = 0;

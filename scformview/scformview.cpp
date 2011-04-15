@@ -24,7 +24,6 @@
 #include <QtGui>
 #include <QLabel>
 #include <QList>
-#include <QStandardItemModel>
 #include <QVariant>
 #include "customtreewidgetitem.h"
 #include "stateselectionwindow.h"
@@ -77,11 +76,23 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
     states.append( _dm->getTopState());
 
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
+    connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
 
     loadTree (NULL, states);
 }
 
 void SCFormView::handleNewTransition(SCTransition*)
+{
+    QList<SCState*> states;
+    states.append( _dm->getTopState());
+
+    stateChartTreeView->clear();
+
+    loadTree (NULL, states);
+}
+
+
+void SCFormView::handleNewState(SCState*)
 {
     QList<SCState*> states;
     states.append( _dm->getTopState());
@@ -320,6 +331,7 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
 
     }
 
+    // watch for user changes to the attributes
     connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
 
 
@@ -327,6 +339,9 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
 
 void SCFormView::handlePropertyChanged(IAttribute *attr)
 {
+    // user changed something, walk the table to find the attribute that the user changed,
+    // and update the data model
+
     for (int r =0; r <propertyTable->rowCount(); r++ )
     {
         QString txt = propertyTable->item(r,0)->text();
@@ -335,6 +350,15 @@ void SCFormView::handlePropertyChanged(IAttribute *attr)
         if (  txt == key )
         {
             propertyTable->item(r,1)->setText( attr->asString() );
+
+            if ( key =="name")
+            {
+                // the user changed the name
+                selectedChartItem->setText( attr->asString()  );
+
+                stateChartTreeView->currentItem()->setText( 0, attr->asString() );
+
+            }
         }
     }
 }
@@ -375,7 +399,9 @@ void SCFormView::insertTransition()
 
     if ( st == NULL ) return;
 
-    // create a new tree
+    // need to force the user to select a target state for this new transition
+
+    // create a new state tree window to select a state from
     _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
 
     connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*,QString)), this, SLOT(handleStateSelectionWindowStateSelected(SCState*,QString)));
@@ -386,6 +412,8 @@ void SCFormView::insertTransition()
 
 void SCFormView::handleStateSelectionWindowStateSelected(SCState* ,QString target)
 {
+    // user has clicked on a new state, create the transition with this target state
+
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
     _dm->insertNewTransition(st, target);
     _targetStateSelectionWindow->close();
@@ -397,6 +425,10 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* ,QString targe
 
 void SCFormView::insertState()
 {
+    SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
+    if ( st == NULL ) return;
+
+    _dm->insertNewState(st);
 
 }
 

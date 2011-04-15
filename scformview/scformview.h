@@ -52,7 +52,11 @@ class QLabel;
 QT_END_NAMESPACE
 
 
-
+/** \class SCFormView
+  *
+  * \brief This form window allows users to navigate the state machine using a tree widget, and to edit state and transition attributes
+  *
+  */
 
 class SCFormView : public QMainWindow
 {
@@ -86,6 +90,7 @@ private slots:
 
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
     void handleNewTransition(SCTransition*);
+    void handleNewState(SCState*);
 
     void handlePropertyChanged(IAttribute * attr);
     void handlePropertyCellChanged(int, int);

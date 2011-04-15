@@ -28,9 +28,6 @@
 #include "scxmlreader.h"
 #include <QXmlStreamWriter>
 
-class QStandardItemModel;
-class QStandardItem;
-
 class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 {
       Q_OBJECT
@@ -43,6 +40,7 @@ public:
     void open(QString scxmlFile);
 
     bool save(QString scxmlFile, QString & message);
+    void initializeEmptyStateMachine();
 
     void getStates(QList<SCState *>& list);
     void getAllStates(QList<SCState *>& list);
@@ -51,6 +49,11 @@ public:
     QObject * getItemByName(QString name);
     SCState* getTopState( );
 
+    /** \fn insertNewState
+      * \brief Creates and returns a pointer to a new state inserted in the provided parent state.
+      */
+    SCState* insertNewState(SCState *parent);
+
     /**
       * \fn insertNewTransition
       * \param source - the SCState from which the transition leaves
@@ -58,8 +61,6 @@ public:
       */
     SCTransition* insertNewTransition(SCState *source, QString event );
 
-    // Q Data Model Interface
-    QStandardItemModel * getStandardModel();
 
 signals:
     void openCompleted(bool sucess, QStringList message);
@@ -83,14 +84,11 @@ private:
     SCState         *_currentState;
     SCTransition    *_currentTransition;
     SCState         *_topState;
-    QStandardItemModel *_qtDM; // standard Qt Data Model implementation
 
 
 //private methods
 
-    QStandardItem * makeAStateItem(SCState *st);
 
-    QStandardItem * makeATransitionItem(SCTransition *tr);
 
 
 };

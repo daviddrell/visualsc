@@ -48,6 +48,11 @@ QGraphicsView * SMProject::getQGraphicsView()
     return  _graphicsView.getQGraphicsView();
 }
 
+void SMProject::initNewSM()
+{
+    _dm.initializeEmptyStateMachine();
+}
+
 void SMProject::readInputFile(QString file)
 {
     connect(& _dm, SIGNAL(openCompleted(bool,QStringList)), this, SLOT(handleOpenCompleted(bool,QStringList)));

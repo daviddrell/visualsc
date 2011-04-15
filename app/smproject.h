@@ -43,6 +43,8 @@ public:
     SMProject(QWidget *parentWidget);
     ~SMProject();
 
+    void initNewSM();
+
     void close();
 
     void readInputFile(QString file);

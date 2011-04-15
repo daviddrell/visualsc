@@ -21,42 +21,16 @@
 #include "scdatamodel.h"
 #include <QFile>
 #include <QDebug>
-#include <QStandardItemModel>
 #include <QMapIterator>
 
 SCDataModel::SCDataModel(QObject * parent) :
         QObject (parent), _reader(), _writer(0), _level(0),_topLevel(0),
-        _currentState(NULL), _currentTransition(NULL),_topState(NULL),
-        _qtDM(0)
+        _currentState(NULL), _currentTransition(NULL),_topState(NULL)
 {
-    _qtDM = new QStandardItemModel(this);
 
     // TODO destructor
 }
 
-QStandardItemModel * SCDataModel::getStandardModel()
-{
-    return _qtDM;
-}
-
-QStandardItem * SCDataModel::makeAStateItem(SCState *st)
-{
-
-    QStandardItem * item = new QStandardItem(0,1);
-    QString name = st->attributes.value("name")->asString();
-    item->setData( name, Qt::UserRole );
-
-    return item;
-}
-
-QStandardItem * SCDataModel::makeATransitionItem(SCTransition *)
-{
-
-    QStandardItem * item = new QStandardItem(0,0);
-
-    return item;
-
-}
 
 
 bool SCDataModel::save(QString fileName, QString& errorMessage)
@@ -76,10 +50,24 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     _writer->setAutoFormatting(true);
 
     _writer->writeStartDocument();
-    //_writer->writeStartElement("scxml");
-    //_writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
 
-    _topState->writeSCVXML( *_writer );
+    // the top level state should be of type 'machine', and is a special type of state element called 'scxml'
+    StateAttributes::StateString* type =  dynamic_cast<StateAttributes::StateString*> ( _topState->attributes.value("type"));
+
+    if ( type  && ( type->asString() == "machine"))
+    {
+        _writer->writeStartElement("scxml");
+        _writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
+    }
+
+    // recursively write out all the state elements
+    QList<SCState*> topLevelKids;
+    _topState->getStates(topLevelKids);
+    for (int i = 0; i < topLevelKids.count(); i++ )
+    {
+        SCState  * state = topLevelKids.at(0);
+        state->writeSCVXML( *_writer );
+    }
 
     _writer->writeEndDocument();
 
@@ -112,6 +100,16 @@ void SCDataModel::getStates(QList<SCState *>& list)
     if ( _topState == NULL ) list = QList<SCState *>();
 
     return _topState->getStates(list);
+}
+
+
+SCState* SCDataModel::insertNewState(SCState *parent)
+{
+    SCState * state = new SCState (parent);
+
+    emit newStateSignal(state);
+
+    return state;
 }
 
 
@@ -188,14 +186,51 @@ void SCDataModel::handleTransitUp()
         _currentState = dynamic_cast<SCState*> (_currentState->parent());
 }
 
+
+void SCDataModel::initializeEmptyStateMachine()
+{
+    if ( _topState != 0 )
+    {
+        delete _topState;
+        _topState = 0;
+    }
+
+    _topLevel =_level = 0;
+    StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
+
+    StateAttributes::StateString *  sa = new StateAttributes::StateString (0,"type","machine");
+    stateAttributes->addItem( sa );
+
+    StateAttributes::StateString *nsp = new StateAttributes::StateString(NULL,"xmlns","http://www.w3.org/2005/07/scxml");
+    stateAttributes->addItem(nsp);
+
+    StateAttributes::StateName *nm = new StateAttributes::StateName(NULL,"name", "State Machine");
+    stateAttributes->addItem(nm);
+
+    _topState = new SCState(true);
+    _topState->attributes.setAttributes( *stateAttributes);
+
+
+    _currentState  = _topState;
+
+    emit newStateSignal(_topState);
+
+
+    delete sa;
+
+}
+
 void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 {
     SCState * state = NULL;
 
     if ( _currentState == 0 )
     {
+
+        // TODO: add scxml rules check - top state must be element 'scxml' and the reader should have assign an attribute type='machine'
+
         _topLevel = _level;
-        state = new SCState();
+        state = new SCState(true);
         state->attributes.setAttributes( *sa);
 
         _topState = state;
@@ -215,14 +250,6 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         }
 
         state->setObjectName( name);
-
-        // insert the new state into the Qt Data Model
-
-        QStandardItem * root = _qtDM->invisibleRootItem();
-        QStandardItem * thisItem = makeAStateItem(state);
-        root->appendRow( thisItem );
-        state->setParentItem(root);
-        state->setItem (thisItem);
 
         qDebug() << "adding new state at top level : " + state->attributes.value("name")->asString();
     }
@@ -258,14 +285,6 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
         state->setObjectName( name );
 
-
-        // insert the new state into the Qt Data Model
-
-        QStandardItem * parent = _currentState->getItem();
-        QStandardItem * thisItem = makeAStateItem(state);
-        state->setItem (thisItem);
-        parent->appendRow( thisItem );
-
         qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
     }
 
@@ -284,16 +303,16 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
 {
-     if ( source == NULL)  return NULL;
+    if ( source == NULL)  return NULL;
 
-     SCTransition * transition = new SCTransition(source);
+    SCTransition * transition = new SCTransition(source);
 
-     transition->setAttributeValue("target", target);
+    transition->setAttributeValue("target", target);
 
-     emit newTransitionSignal(transition);
+    emit newTransitionSignal(transition);
 
-     return transition;
- }
+    return transition;
+}
 
 
 void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
@@ -349,7 +368,7 @@ void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 
     _currentTransition->attributes.addItem(path);
 
-     qDebug() << "leave handleMakeANewTransitionPath : " ;
+    qDebug() << "leave handleMakeANewTransitionPath : " ;
 
 }
 

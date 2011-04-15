@@ -20,17 +20,13 @@
 
 #include <QString>
 #include <QXmlStreamWriter>
-#include <QStandardItem>
 #include "scstate.h"
 #include <QVariant>
 
 
 SCState::SCState(QObject *parent) :
     QObject(parent),
-    attributes(this, "stateAttributes"),
-   _stateCount(0),
-   _parentDMItem(0),
-   _thisDMItem(0)
+    attributes(this, "stateAttributes")
 {
    initCommon();
 }
@@ -38,13 +34,20 @@ SCState::SCState(QObject *parent) :
 
 SCState::SCState(const SCState& st) :
     QObject(st.parent()),
-    attributes(st.attributes),
-   _stateCount(st._stateCount),
-   _parentDMItem(st._parentDMItem),
-   _thisDMItem(st._thisDMItem)
+    attributes(st.attributes)
 {
     initCommon();
 }
+
+
+
+SCState::SCState( bool topState) :
+    QObject(NULL),
+    attributes(this, "stateAttributes")
+{
+   if ( ! topState ) initCommon();
+}
+
 
 SCState::~SCState()
 {
@@ -53,7 +56,20 @@ SCState::~SCState()
 
 void SCState::initCommon()
 {
-    StateAttributes::StateName * name = new StateAttributes::StateName (this, "name",QString());
+    QString defaultName = QString();
+
+    SCState * parent = dynamic_cast<SCState *>(this->parent());
+
+    if  ( parent )
+    {
+        QString parentsName = parent->attributes.value("name")->asString();
+
+        int childCount = parent->getStateCount();
+
+        defaultName = "sub_of_" +parentsName + "_" + QString::number(childCount);
+    }
+
+    StateAttributes::StateName * name = new StateAttributes::StateName (this, "name",defaultName);
     StateAttributes::StateSize * size = new StateAttributes::StateSize (this, "size",QPoint(100,50));
     StateAttributes::StatePosition * position = new StateAttributes::StatePosition (this, "position",QPoint(0,0));
 
@@ -61,7 +77,17 @@ void SCState::initCommon()
     attributes.addItem(size);
     attributes.addItem(position);
 
+    this->setObjectName(defaultName);// to support debug tracing
+
+    connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
+
 }
+
+void SCState::handleNameChanged(IAttribute *name)
+{
+    this->setObjectName(name->asString());// to support debug tracing
+}
+
 
 QString SCState::getAttributeValue(QString key)
 {
@@ -82,25 +108,6 @@ void SCState::setAttributeValue(QString key, QString value)
     }
 }
 
-void SCState::setItem(QStandardItem * item)
-{
-    _thisDMItem = item;
-}
-
-void SCState::setParentItem(QStandardItem * item)
-{
-    _parentDMItem = item;
-}
-
-QStandardItem * SCState::getParentItem()
-{
-    return _parentDMItem;
-}
-
-QStandardItem * SCState::getItem()
-{
-    return _thisDMItem;
-}
 
 void SCState::setSize(QPointF &size)
 {
@@ -164,7 +171,7 @@ void SCState::addTransistion(SCTransition * t)
 
 void SCState::addState(SCState * s)
 {
-    _stateCount++;
+
 
     s->setParent(this);
 
@@ -211,7 +218,9 @@ void SCState::getTransitions(QList<SCTransition*> & transitionList)
 
 int SCState::getStateCount()
 {
-    return _stateCount;
+    QList<SCState*> children;
+    this->getStates(children);
+    return (children.count());
 }
 
 void SCState::getStates(QList<SCState *> & stateList)

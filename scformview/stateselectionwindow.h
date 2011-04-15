@@ -16,6 +16,11 @@ class CustomTreeWidgetItem;
 class QTreeWidgetItem;
 #include <QList>
 
+/** \class StateSelectionWindow
+  *
+  * \brief This widget is used to display a list of available states, so that the user can select a state as a transition target
+  *
+  */
 class StateSelectionWindow  : public QMainWindow
 {
     Q_OBJECT

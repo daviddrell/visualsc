@@ -135,6 +135,8 @@ void MainWindow::handleNewClick()
 
     _project = new SMProject(  ui->centralWidget );
 
+    _project->initNewSM();
+
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
 
     _formEditorWindow = new SCFormView(0, _project->getDM());

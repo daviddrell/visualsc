@@ -28,7 +28,7 @@ class QString;
 
 class QXmlStreamWriter;
 class QPoint;
-class QStandardItem;
+
 
 #include "scdatamodel_global.h"
 
@@ -38,8 +38,9 @@ class SCDATAMODELSHARED_EXPORT  SCState : public QObject
 {
     Q_OBJECT
 public:
-    explicit SCState(QObject *parent = 0);
-    explicit SCState(const SCState& st);
+    SCState(QObject *parent = 0);
+    SCState(const SCState& st);
+    SCState( bool topState=false);
     ~SCState();
 
     void setStateName(QString n);
@@ -51,12 +52,6 @@ public:
     QString getAttributeValue(QString key);
 
     int  getStateCount();
-
-    void setParentItem(QStandardItem * item);
-    void setItem(QStandardItem * item);
-
-    QStandardItem * getParentItem();
-    QStandardItem * getItem();
 
     void setSize (QPointF& size);
     void setSize (QPoint& size);
@@ -113,14 +108,13 @@ signals:
 public slots:
 
 
- private slots:
+private slots:
+
+     void handleNameChanged(IAttribute* name);
 
 
 private:
 
-    int                     _stateCount;
-    QStandardItem *         _parentDMItem;
-    QStandardItem *         _thisDMItem;
 
     void initCommon();
 
