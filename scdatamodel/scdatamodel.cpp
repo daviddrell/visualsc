@@ -65,7 +65,7 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     _topState->getStates(topLevelKids);
     for (int i = 0; i < topLevelKids.count(); i++ )
     {
-        SCState  * state = topLevelKids.at(0);
+        SCState  * state = topLevelKids.at(i);
         state->writeSCVXML( *_writer );
     }
 

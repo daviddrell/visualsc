@@ -45,7 +45,21 @@ SCState::SCState( bool topState) :
     QObject(NULL),
     attributes(this, "stateAttributes")
 {
-   if ( ! topState ) initCommon();
+    if ( ! topState )
+    {
+        initCommon();
+    }
+    else
+    {
+        StateAttributes::StateName * name = new StateAttributes::StateName (this, "name","State Machine"); // assign a default name
+
+        attributes.addItem(name);
+
+        this->setObjectName("State Machine");// to support debug tracing
+
+        connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
+
+    }
 }
 
 
