@@ -94,6 +94,8 @@ void SCFormView::handleNewTransition(SCTransition*)
 
 void SCFormView::handleNewState(SCState*)
 {
+    // pass the loadTree function a list of top-level states and starting node
+    // the top node (NULL) has only one top state
     QList<SCState*> states;
     states.append( _dm->getTopState());
 
@@ -410,12 +412,12 @@ void SCFormView::insertTransition()
 
 }
 
-void SCFormView::handleStateSelectionWindowStateSelected(SCState* ,QString target)
+void SCFormView::handleStateSelectionWindowStateSelected(SCState* ,QString targetName)
 {
     // user has clicked on a new state, create the transition with this target state
 
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
-    _dm->insertNewTransition(st, target);
+    _dm->insertNewTransition(st, targetName);
     _targetStateSelectionWindow->close();
 
     delete _targetStateSelectionWindow;
@@ -423,10 +425,14 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* ,QString targe
 
 }
 
+#include <QDebug>
+
 void SCFormView::insertState()
 {
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
     if ( st == NULL ) return;
+
+    qDebug() << "inserting new state into partent = " + _currentlySelected->objectName();
 
     _dm->insertNewState(st);
 

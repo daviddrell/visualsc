@@ -24,7 +24,7 @@
 #include <QDebug>
 
 SCTransition::SCTransition(QObject * parent):
-        QObject(parent), attributes(parent, "transition.attributes")
+        QObject(parent), attributes(this, "transition.attributes")
 {
     /*
      event

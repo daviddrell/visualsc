@@ -58,6 +58,8 @@ StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
 void StateSelectionWindow::handleDoneButtonPushed()
 {
 
+    if ( _currentlySelected == NULL ) return;
+
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
     emit stateSelected (st,  st->attributes.value("name")->asString());
 }
