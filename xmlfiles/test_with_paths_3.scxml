@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scxml xmlns="http://www.w3.org/2005/07/scxml">
     <state id="Main" position="-150,-230" size="844,397">
-        <state id="Test1" position="470,290" size="215,97">
-            <state id="Test1Sub1" position="70,10" size="119,83"/>
+        <state id="Test1" position="450,180" size="299,162">
+            <state id="Test1Sub1" position="-70,20" size="68,69"/>
         </state>
         <state id="Test2" position="50,230" size="218,102">
             <state id="Test2Sub1" position="50,10" size="123,79"/>

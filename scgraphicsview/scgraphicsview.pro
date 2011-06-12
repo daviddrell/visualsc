@@ -26,13 +26,17 @@ unix:LIBS += -L$${LIB_PATH} -lscdatamodel
 SOURCES += scgraphicsview.cpp \ 
     stateboxgraphic.cpp \
     selectablelinesegmentgraphic.cpp \
-    cornergrabber.cpp
+    cornergrabber.cpp \
+    selectabletextblock.cpp \
+    selectableboxgraphic.cpp
 
 HEADERS += scgraphicsview.h\
         scgraphicsview_global.h \ 
     stateboxgraphic.h \
     selectablelinesegmentgraphic.h \
-    cornergrabber.h
+    cornergrabber.h \
+    selectabletextblock.h \
+    selectableboxgraphic.h
 
 OTHER_FILES += \
     COPYING.txt
