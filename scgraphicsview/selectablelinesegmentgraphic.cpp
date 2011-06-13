@@ -439,12 +439,8 @@ void SelectableLineSegmentGraphic::setCornerPositions()
 {
     if ( _corners[0] == NULL || _corners[1] == NULL )return;
 
-    int cornerWidth = (_corners[0]->boundingRect().width())/2;
-    int cornerHeight = ( _corners[0]->boundingRect().height())/2;
-
-    _corners[0]->setPos(_lineEnd_0.x() - cornerWidth, _lineEnd_0.y() - cornerHeight );
-    _corners[1]->setPos(_lineEnd_1.x()- cornerWidth, _lineEnd_1.y() - cornerHeight );
-
+    _corners[0]->setPos(_lineEnd_0.x(), _lineEnd_0.y()  );
+    _corners[1]->setPos(_lineEnd_1.x(), _lineEnd_1.y()  );
 
 }
 

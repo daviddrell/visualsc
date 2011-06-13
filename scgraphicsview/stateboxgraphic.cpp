@@ -28,23 +28,7 @@
 #include "scstate.h"
 #include <QTimer>
 
-/**
-  *  This box can be re-sized and it can be moved. For moving, we capture
-  *  the mouse move events and move the box location accordingly.
-  *
-  *  To resize the box, we place small indicator boxes on the four corners that give the user
-  *  a visual cue to grab with the mouse. The user then drags the corner to stretch
-  *  or shrink the box.  The corner grabbers are implemented with the CornerGrabber class.
-  *  The CornerGrabber class captures the mouse when the mouse is over the corner's area,
-  *  but the StateBox object (which owns the corners) captures and processes the mouse
-  *  events on behalf of the CornerGrabbers (because the owner wants to be
-  *  resized, not the CornerGrabbers themselves). This is accomplished by installed a scene event filter
-  *  on the CornerGrabber objects:
-          _corners[0]->installSceneEventFilter(this);
-  *
-  *
-  *
-  */
+
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         SelectableBoxGraphic(parent),

@@ -20,6 +20,7 @@
 
 #include "cornergrabber.h"
 
+
 CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnASquare) :
     QGraphicsItem(parent),
     mouseDownX(0),
@@ -102,7 +103,13 @@ void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 QRectF CornerGrabber::boundingRect() const
 {
-    return QRectF(0,0,_width,_height);
+
+    QPointF topLeft (0-(_width/2), 0-(_height/2));
+    QPointF bottomRight ( _width/2 ,_height/2);
+
+    QRectF rect (topLeft, bottomRight);
+    return rect;
+
 }
 
 QPointF CornerGrabber::getCenterPoint()
@@ -120,7 +127,9 @@ QPointF CornerGrabber::getCenterPoint()
              return QPointF(pos().x() + _width/2,pos().y() - _height/2);
      }
      else
-         return QPointF(pos().x() + _width/2,pos().y() + _height/2);
+     {
+         return QPointF(pos()) ;
+     }
 
 }
 
@@ -133,8 +142,10 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
     _outterborderPen.setStyle(Qt::SolidLine);
     painter->setPen(_outterborderPen);
 
-    QPointF topLeft (0, 0);
-    QPointF bottomRight ( _width, _height);
+
+    QPointF topLeft (0-(_width/2), 0-(_height/2));
+    QPointF bottomRight ( _width/2 ,_height/2);
+
 
     QRectF rect (topLeft, bottomRight);
 
