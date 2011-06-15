@@ -31,7 +31,8 @@ CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnAS
     _height(6),
     _corner(corner),
     _mouseButtonState(kMouseReleased),
-    _placedOnASquare(placedOnASquare)
+    _placedOnASquare(placedOnASquare),
+    _paintStyle(kBox)
 {
     setParentItem(parent);
 
@@ -39,6 +40,12 @@ CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnAS
     _outterborderPen.setColor(_outterborderColor);
 
    this->setAcceptHoverEvents(true);
+}
+
+void CornerGrabber::setPaintStyle(PaintStyle s)
+{
+    _paintStyle  = s;
+    this->update();
 }
 
 void CornerGrabber::setMouseState(int s)
@@ -133,24 +140,45 @@ QPointF CornerGrabber::getCenterPoint()
 
 }
 
+
+
 void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 
-    // fill the box with solid color, use sharp corners
+    if ( _paintStyle == kBox)
+    {
+        // fill the box with solid color, use sharp corners
 
-    _outterborderPen.setCapStyle(Qt::SquareCap);
-    _outterborderPen.setStyle(Qt::SolidLine);
-    painter->setPen(_outterborderPen);
+        _outterborderPen.setCapStyle(Qt::SquareCap);
+        _outterborderPen.setStyle(Qt::SolidLine);
+        painter->setPen(_outterborderPen);
 
+        QPointF topLeft (0-(_width/2), 0-(_height/2));
+        QPointF bottomRight ( _width/2 ,_height/2);
 
-    QPointF topLeft (0-(_width/2), 0-(_height/2));
-    QPointF bottomRight ( _width/2 ,_height/2);
+        QRectF rect (topLeft, bottomRight);
 
+        QBrush brush (Qt::SolidPattern);
+        brush.setColor (_outterborderColor);
 
-    QRectF rect (topLeft, bottomRight);
+        if ( _outterborderColor == Qt::red)
+        {
+            painter->fillRect(rect,brush);
+        }
+        else
+        {
+            painter->drawRect(rect);
+        }
+    }
+    else // kCrossHair
+    {
+        painter->setPen( _outterborderColor );
 
-    QBrush brush (Qt::SolidPattern);
-    brush.setColor (_outterborderColor);
-    painter->fillRect(rect,brush);
+        // center of the box is at 0,0
+        painter->drawLine( QPointF(0,0), QPointF(0,-(_height/2)) );
+        painter->drawLine( QPointF(0,0), QPointF(0, (_height/2)) );
+        painter->drawLine( QPointF(0,0), QPointF(-(_width/2) , 0) );
+        painter->drawLine( QPointF(0,0), QPointF((_width/2) , 0) );
+    }
 
 }

@@ -369,6 +369,11 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
     _corners[3] = new CornerGrabber(this,3, true);
 
 
+    _corners[0]->setPaintStyle( CornerGrabber::kCrossHair);
+    _corners[1]->setPaintStyle( CornerGrabber::kCrossHair);
+    _corners[2]->setPaintStyle( CornerGrabber::kCrossHair);
+    _corners[3]->setPaintStyle( CornerGrabber::kCrossHair);
+
     _corners[0]->installSceneEventFilter(this);
     _corners[1]->installSceneEventFilter(this);
     _corners[2]->installSceneEventFilter(this);
