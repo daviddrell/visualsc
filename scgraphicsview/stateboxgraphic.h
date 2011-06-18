@@ -33,6 +33,8 @@ class IAttribute;
 
 /**
   * \class StateBoxGraphic
+    \ingroup GraphicsView
+    \brief This visually prepresents the state.
 
   */
 

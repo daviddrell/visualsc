@@ -34,6 +34,13 @@
 
 
 
+/**
+  * \class CornerGrabber
+    \ingroup GraphicsView
+    \brief This object provides a visual cue for the user to grab the corner of a box for dragging (or the end of a line).
+  */
+
+
 class CornerGrabber : public QGraphicsItem
 {
 
@@ -63,7 +70,7 @@ private:
     virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
     // once the hover event handlers are implemented in this class,
-    // the mouse events must allow be implemented because of
+    // the mouse events must also be implemented because of
     // some linkage issue - apparrently there is some connection
     // between the hover events and mouseMove/Press/Release
     // events which triggers a vtable issue

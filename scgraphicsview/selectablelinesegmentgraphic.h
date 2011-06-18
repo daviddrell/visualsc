@@ -36,6 +36,14 @@ class SCTransition;
 class IAttribute;
 
 
+/**
+  * \class SelectableLineSegmentGraphic
+  * \ingroup GraphicsView
+  *
+  * \brief this is intened as a prototype for the line path segment that will graphically form a transition path.
+  *
+  */
+
 class SelectableLineSegmentGraphic : public QObject, public QGraphicsPolygonItem
 {
     Q_OBJECT

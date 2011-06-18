@@ -25,13 +25,25 @@
 #include "stateattributes.h"
 #include "sctransition.h"
 class QString;
-
 class QXmlStreamWriter;
 class QPoint;
-
-
 #include "scdatamodel_global.h"
 
+/**
+
+  \class   SCState
+  \ingroup DataModel
+  \brief   The class represents a state in a state-chart Data-Model
+
+  The state contains children elements which are sub-states (also instances of SCState) and
+  state-transitions (SCTransition class). The state also contains a public attribute container as
+  well as convenience methods to accessing the attributes. Since te attribute container is public,
+  attributes can be accessed directly.
+
+  The children states and transitions are contained as QObject children in the base QObject class
+  (see addState or addTransition methods).
+
+  */
 
 
 class SCDATAMODELSHARED_EXPORT  SCState : public QObject

@@ -19,7 +19,7 @@ class QTreeWidgetItem;
 /** \class StateSelectionWindow
   *
   * \brief This widget is used to display a list of available states, so that the user can select a state as a transition target
-  *
+  * \ingroup FormView
   */
 class StateSelectionWindow  : public QMainWindow
 {

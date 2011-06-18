@@ -30,6 +30,14 @@
 #include <QMetaType>
 
 
+/**
+ * \class TransitionAttributes
+ *
+ * \ingroup DataModel
+ * \ingroup Attributes
+ *
+ */
+
 
 class  SCDATAMODELSHARED_EXPORT TransitionAttributes: public IAttributeContainer
 {

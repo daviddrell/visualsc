@@ -26,10 +26,23 @@
 #include <QList>
 #include <QPointF>
 class SCState;
-
 #include "scdatamodel_global.h"
 class QXmlStreamWriter;
 
+
+/**
+
+  \class   SCTransition
+  \ingroup DataModel
+  \brief   The class represents a transition in a state-chart Data-Model
+
+  The transition does not contain children elements. The transiton does contain a public attribute container as
+  well as convenience methods to accessing the attributes. Since te attribute container is public,
+  attributes can be accessed directly.
+
+  The transition holds a reference to the target state.
+
+  */
 
 class SCDATAMODELSHARED_EXPORT  SCTransition : public QObject
 {

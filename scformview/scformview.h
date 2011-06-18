@@ -52,10 +52,18 @@ class QLabel;
 QT_END_NAMESPACE
 
 
+/**
+    \defgroup FormView
+
+    The FormView provides a standard windows form for viewing and editing the state chart. It includs a tree widget for hierarchical navigation
+    of the state chart. It also is the primary means of inserting and deleting chart elements. The size and position of chart
+    elements can be edited in the form's attribute table, but graphical attributes are best edited with the graphicsview.
+*/
+
 /** \class SCFormView
   *
   * \brief This form window allows users to navigate the state machine using a tree widget, and to edit state and transition attributes
-  *
+  * \ingroup FormView
   */
 
 class SCFormView : public QMainWindow

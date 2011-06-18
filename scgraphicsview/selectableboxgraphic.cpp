@@ -41,7 +41,7 @@
   *  The CornerGrabber class captures the mouse when the mouse is over the corner's area,
   *  but the SelectableBoxGraphic object (which owns the corners) captures and processes the mouse
   *  events on behalf of the CornerGrabbers (because the owner wants to be
-  *  resized, not the CornerGrabbers themselves). This is accomplished by installed a scene event filter
+  *  resized, not the CornerGrabbers themselves). This is accomplished by installing a scene event filter
   *  on the CornerGrabber objects:
           _corners[0]->installSceneEventFilter(this);
   *

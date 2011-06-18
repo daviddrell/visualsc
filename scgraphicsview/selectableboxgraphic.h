@@ -16,6 +16,11 @@ class CornerGrabber;
 class IAttribute;
 
 /**
+  * \class SelectableBoxGraphic
+  *
+  *  This QGraphicsObject is designed to the base class for all scene objects that will be contained in a box.
+  *  For example the StateBoxGraphic and SelectableTextBlock both use this class.
+
   *  This box can be re-sized and it can be moved. For moving, we capture
   *  the mouse move events and move the box location accordingly.
   *
@@ -29,7 +34,7 @@ class IAttribute;
   *  on the CornerGrabber objects:
           _corners[0]->installSceneEventFilter(this);
 
-  *
+  * \ingroup GraphicsView
   */
 
 class SelectableBoxGraphic :  public QGraphicsObject

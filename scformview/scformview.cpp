@@ -245,7 +245,7 @@ QString SCFormView::getCurrentlySelectedTitle()
     else
     {
         SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
-        if ( transition == NULL) QString("programming error getCurrentlySelectedTitle ");
+        if ( transition == NULL) return QString("programming error getCurrentlySelectedTitle ");
         attributes =  & transition->attributes;
         IAttribute* attr = attributes->value("target")  ;
         title = attr->asString();

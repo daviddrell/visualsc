@@ -33,6 +33,14 @@
 #include <QMetaType>
 
 
+/**
+ * \class StateAttributes
+ *
+ * \ingroup DataModel
+ * \ingroup Attributes
+ *
+ */
+
 class  SCDATAMODELSHARED_EXPORT StateAttributes : public IAttributeContainer
 {
 public:

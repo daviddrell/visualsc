@@ -6,6 +6,8 @@
 
 /**
   * \class SelectableTextBlock
+  * \ingroup GraphicsView
+  * \brief This item holds text such as the state name, transition names, commentary blocks, etc.
   *
   * This text block is selectable, movable, re-sizable, and its can be given a fill color and border design.
   * The text attributes are stored into the scxml file.

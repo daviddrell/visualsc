@@ -28,7 +28,8 @@ class QObject;
 /** \class CustomTreeWidgetItem
   *
   * \brief This tree-view diplays the state machine.
-  *
+  * \ingroup FormView
+
   * It is essentially a QTreeWidgetItem, but it also holds a pointer to the state or transition item (from the data-model)
   * for each node in the tree.
   *

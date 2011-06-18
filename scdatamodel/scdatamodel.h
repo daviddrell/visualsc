@@ -28,6 +28,40 @@
 #include "scxmlreader.h"
 #include <QXmlStreamWriter>
 
+/**
+ \defgroup DataModel
+
+ Elements of a state chart are states and state transitions. Each of these elements have attributes.
+ In addition, states and transitions can have sub elements such as commentary text. Each sub element may
+ have attributes.
+
+ Examples of attributes are a state's id/name, state type (initial, final, etc), a state's graphical position, size.
+
+ The data model holds a reference to the top-level state (class SCState). The top level state is also known
+ as the state-machine. The top level state holds an attribute container
+ for its attributes as well as a QList of substates and a QList of transitions which are sourced from that state.
+
+ <b> Notes on State and Transition Identifiers</b>
+
+  SCXML does not require a state have an id. But here we definitely need a consistent
+     method of refering to a state. So 'name' is used as the definitive identifier for states in this model.
+     When the model is saved back to an SCXML file, the name is pushed as the 'id' field. So all states in SCXML
+     files produced by this program will end up with an id.
+
+  In SCXML, Transitions are identified by their target states with the 'target' attribute.
+     In order to genericise attribute handling, this program identifies transitions with the 'name' key (same as for state
+     identifiers). Thus internally, all states and transitions have 'name's. When saved back to an SCXML file,
+     the transition name is written as the 'target' attribute.
+
+
+*/
+
+
+/**
+  \class SCDataModel
+  \ingroup DataModel
+  */
+
 class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 {
       Q_OBJECT

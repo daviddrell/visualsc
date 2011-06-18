@@ -31,6 +31,19 @@
 
 #include <QMap>
 
+/**
+  \defgroup GraphicsView
+
+  The GraphicsView is the core of the state chart VisualSC program. It allows the user to graphical manipulate the chart.
+
+  */
+
+
+/**
+  * \class SCGraphicsView
+  * \brief The is the primary QWidget which holds the view, and the scene.
+  * \ingroup GraphicsView
+  */
 
 class SCGRAPHICSVIEWSHARED_EXPORT SCGraphicsView : QWidget
 {
