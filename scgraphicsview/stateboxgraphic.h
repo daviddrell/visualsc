@@ -24,6 +24,7 @@
 
 
 #include "selectableboxgraphic.h"
+#include "selectabletextblock.h"
 
 class SCState;
 class IAttribute;
@@ -43,7 +44,9 @@ public:
     StateBoxGraphic(QGraphicsObject*parent, SCState * state);
     ~StateBoxGraphic();
 
-    QGraphicsTextItem _title;    ///< sample text to go in the title area.
+  //  QGraphicsTextItem _title;    ///< sample text to go in the title area.
+
+    SelectableTextBlock _title;    ///< sample text to go in the title area.
 
     void setGridSpace(int space);
     void setTitle(QString t);

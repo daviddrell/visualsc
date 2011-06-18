@@ -51,8 +51,7 @@
 
 SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         QGraphicsObject(parent),
-        _outterborderColor(Qt::black),
-        _outterborderPen(),
+        _pen(),
         _dragStart(0,0),
         _gridSpace(10),
         _width(250),
@@ -64,16 +63,18 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _drawingHeight( _height -  _YcornerGrabBuffer),
         _drawingOrigenX( _XcornerGrabBuffer),
         _drawingOrigenY( _YcornerGrabBuffer),
-        _isHighlighted(false)
+        _isHighlighted(false),
+        _isHovered(false),
+        _showBoxStyle(kWhenSelected),
+        _drawBoxLineStyle(kDrawDotted),
+        _boxStyle(kTransparent),
+        _hoverLineThickness(3)
 {
 
     _corners[0] = NULL;
     _corners[1] = NULL;
     _corners[2] = NULL;
     _corners[3] = NULL;
-
-    _outterborderPen.setWidth(2);
-    _outterborderPen.setColor(_outterborderColor);
 
     _title.setPos(25,10);
 
@@ -93,6 +94,26 @@ SelectableBoxGraphic::~SelectableBoxGraphic()
 }
 
 
+void SelectableBoxGraphic::setHoverLineThickness(int t )
+{
+    _hoverLineThickness = t;
+}
+
+
+void SelectableBoxGraphic::setShowBoxLineStyle(ShowBoxStyle s )
+{
+    _showBoxStyle = s;
+}
+
+void SelectableBoxGraphic::setDrawBoxLineStyle( DrawBoxLineStyle s)
+{
+    _drawBoxLineStyle = s;
+}
+
+void SelectableBoxGraphic::setBoxStyle( BoxStyle s)
+{
+    _boxStyle = s;
+}
 
 void SelectableBoxGraphic::setHighlighted(bool on)
 {
@@ -131,8 +152,6 @@ void SelectableBoxGraphic::setSize(QPoint size)
 
     _drawingWidth =  _width - _XcornerGrabBuffer;
     _drawingHeight=  _height - _YcornerGrabBuffer;
-
-
 }
 
 /**
@@ -150,11 +169,17 @@ void SelectableBoxGraphic::setSize(QPoint size)
  */
 void SelectableBoxGraphic::adjustDrawingSize(int x, int y)
 {
-    _width += x;
-    _height += y;
+    // call the virtual setSize() so that children can capture this and edit size before applying
+    //_width += x;
+    //_height += y;
+
+    QPoint newSize  (_width + x, _height+y);
+
+    setSize (newSize);
 
     _drawingWidth =  _width - _XcornerGrabBuffer;
     _drawingHeight=  _height - _YcornerGrabBuffer;
+
 
 }
 
@@ -335,7 +360,7 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
-    _outterborderColor = Qt::black;
+    _isHovered = false;
 
     _corners[0]->setParentItem(NULL);
     _corners[1]->setParentItem(NULL);
@@ -361,7 +386,8 @@ void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 
 void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
-    _outterborderColor = Qt::red;
+    _isHovered = true;
+
 
     _corners[0] = new CornerGrabber(this,0, true);
     _corners[1] = new CornerGrabber(this,1, true);
@@ -397,13 +423,16 @@ QRectF SelectableBoxGraphic::boundingRect() const
 }
 
 
-// example of a drop shadow effect on a box, using QLinearGradient and two boxes
 
-void SelectableBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 
+    int shadowThickness = 5;
 
-    /*
+    if ( _boxStyle == kSolidWithShadow )
+    {
+
+        /*
      The drop shadow effect will be created by drawing a filled, rounded corner rectangle with a gradient fill.
      Then on top of this will be drawn  filled, rounded corner rectangle, filled with a solid color, and offset such that the gradient filled
      box is only visible below for a few pixels on two edges.
@@ -412,71 +441,84 @@ void SelectableBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsI
      while the under box will be offset, and start at (shadowThickness+0, shadowThickness+0) and go to  (_width, _height).
        */
 
-    int shadowThickness = 3;
 
-    QLinearGradient gradient;
-    gradient.setStart(_drawingOrigenX,_drawingOrigenY);
-    gradient.setFinalStop( _drawingWidth ,_drawingOrigenY);
-    QColor grey1(150,150,150,125);// starting color of the gradient - can play with the starting color and ,point since its not visible anyway
+        QLinearGradient gradient;
+        gradient.setStart(_drawingOrigenX,_drawingOrigenY);
+        gradient.setFinalStop( _drawingWidth ,_drawingOrigenY);
+        QColor grey1(125,125,125,125);// starting color of the gradient - can play with the starting color and ,point since its not visible anyway
 
-    // grey2 is ending color of the gradient - this is what will show up as the shadow. the last parameter is the alpha blend, its set
-    // to 125 allowing a mix of th color and and the background, making more realistic shadow effect.
-    QColor grey2(225,225,225,125);
+        // grey2 is ending color of the gradient - this is what will show up as the shadow. the last parameter is the alpha blend, its set
+        // to 125 allowing a mix of th color and and the background, making more realistic shadow effect.
+        QColor grey2(225,225,225,125);
 
 
-    gradient.setColorAt((qreal)0, grey1 );
-    gradient.setColorAt((qreal)1, grey2 );
+        gradient.setColorAt((qreal)0, grey1 );
+        gradient.setColorAt((qreal)1, grey2 );
 
-    QBrush brush(gradient);
+        QBrush brush(gradient);
 
-    painter->setBrush( brush);
+        painter->setBrush( brush);
 
-    // for the desired effect, no border will be drawn, and because a brush was set, the drawRoundRect will fill the box with the gradient brush.
-    _outterborderPen.setStyle(Qt::NoPen);
-    painter->setPen(_outterborderPen);
+        // for the desired effect, no border will be drawn, and because a brush was set, the drawRoundRect will fill the box with the gradient brush.
+        QPen pen;
+        pen.setStyle(Qt::NoPen);
+        painter->setPen(pen);
 
-    QPointF topLeft (_drawingOrigenX,_drawingOrigenX);
-    QPointF bottomRight ( _drawingWidth , _drawingHeight);
+        QPointF topLeft (_drawingOrigenX,_drawingOrigenX);
+        QPointF bottomRight ( _drawingWidth , _drawingHeight);
 
-    QRectF rect (topLeft, bottomRight);
+        QRectF rect (topLeft, bottomRight);
 
-    painter->drawRoundRect(rect,10,10); // corner radius of 25 pixels
+        painter->drawRoundRect(rect,10,10); // corner radius of 25 pixels
+    }
+
 
     // draw the top box, the visible one
-    _outterborderPen.setStyle(Qt::SolidLine);
-    _outterborderPen.setWidth(1);
 
-    //      qDebug()<<"SelectableBoxGraphic::paint highlight = " + QString(_isHighlighted?"True":"False");
 
     if ( _isHighlighted )
-    {
-        QPen pen (Qt::red);
-        pen.setWidth(5);
-        painter->setPen(pen);
-    }
+        _pen.setColor(Qt::red);
     else
+        _pen.setColor(Qt::black);
+
+    if ( _isHovered )
+         _pen.setWidth(_hoverLineThickness);
+    else
+        _pen.setWidth(1);
+
+    if ( _drawBoxLineStyle == kDrawSolid )
+        _pen.setStyle( Qt::SolidLine );
+    else
+        _pen.setStyle( Qt::DotLine );
+
+    painter->setPen(_pen);
+
+
+    if ( _boxStyle != kTransparent )
     {
-        painter->setPen(_outterborderPen);
+        // QBrush brush2(QColor(187,250,185,255),Qt::SolidPattern);  // the box fill color
+         QBrush brush2(QColor(255,255,255,255),Qt::SolidPattern);  // white fill
+         painter->setBrush( brush2);
     }
 
-   // QBrush brush2(QColor(187,250,185,255),Qt::SolidPattern);  // the box fill color
-    QBrush brush2(QColor(255,255,255,255),Qt::SolidPattern);  // white fill
-
-    painter->setBrush( brush2);
 
     QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
-    QPointF bottomRight2 ( _drawingWidth-shadowThickness, _drawingHeight-shadowThickness);
+    QPointF bottomRight2 ( _drawingWidth - shadowThickness, _drawingHeight - shadowThickness);
 
     QRectF rect2 (topLeft2, bottomRight2);
 
     painter->drawRoundRect(rect2,10,10);
 
-    // keep the text centered and within the bounds of the box
-
-    int halfSize = _title.textWidth()/2 + 10;
-     _title.setPos( (_width/2) - halfSize, _title.pos().y()   );
+}
 
 
+void SelectableBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    if  ( (_showBoxStyle == kAlways) || (( _showBoxStyle == kWhenSelected) && ( _isHovered == true)))
+    {
+        paintWithVisibleBox (painter,0,0);
+    }
+    //else no painting required
 }
 
 

@@ -2,8 +2,7 @@
 #define SELECTABLETEXTBLOCK_H
 
 #include <QGraphicsTextItem>
-
-class CornerGrabber;
+#include "selectableboxgraphic.h"
 
 /**
   * \class SelectableTextBlock
@@ -12,14 +11,26 @@ class CornerGrabber;
   * The text attributes are stored into the scxml file.
   */
 
-class SelectableTextBlock : public QGraphicsTextItem
+class SelectableTextBlock : public SelectableBoxGraphic
 {
 public:
-    SelectableTextBlock();
+    SelectableTextBlock(QGraphicsObject *parent=NULL);
 
-private: //data
+    void setPlainText(QString text);
+    virtual void setSize(QPoint size); ///< from base class
 
-       CornerGrabber*  _corners[4];// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
+private:
+
+    // private methods
+
+
+   virtual void graphicHasChanged(); ///< pure virtual in base SelectableBoxGraphic, subclass must implement this, used to record user changes back to the data model
+
+   // private data
+   QGraphicsTextItem _textItem;
+
+   QPoint _minSize;
+
 };
 
 #endif // SELECTABLETEXTBLOCK_H

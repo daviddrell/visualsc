@@ -36,8 +36,12 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _stateModel(stateModel)
 {
 
+
     // this graphic representation of a state is linked to a state in the model
 
+    setShowBoxLineStyle ( SelectableBoxGraphic::kAlways );
+    setDrawBoxLineStyle  ( SelectableBoxGraphic::kDrawSolid );
+    setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
 
     StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *> ( _stateModel->attributes.value("name"));
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);

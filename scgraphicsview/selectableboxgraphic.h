@@ -42,12 +42,22 @@ public:
 
     QGraphicsTextItem _title;    ///< sample text to go in the title area.
 
-    void setSize(QPoint size);
+    virtual void setSize(QPoint size); ///< set the size of this object
     void increaseWidth(int inc);
     QString getPositionAsString();
     QString getSizeAsString();
     void    getSize(QPoint& size);
     void setHighlighted(bool);
+
+    enum BoxStyle {kSolidWithShadow, kSolidNoShadow, kTransparent};
+    enum ShowBoxStyle { kAlways, kWhenSelected};
+    enum DrawBoxLineStyle { kDrawSolid, kDrawDotted};
+
+    void setShowBoxLineStyle(ShowBoxStyle s );///< show box allways, or only when selected
+    void setDrawBoxLineStyle( DrawBoxLineStyle s);///< if drawing box, draw solid or dotted line
+    void setBoxStyle (BoxStyle s); ///< set box style
+    void setHoverLineThickness(int t);///< set line thickness when hovered
+
 
 private:
 
@@ -72,6 +82,8 @@ private:
     void updateModel();
 
 
+    void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+
     // private slots
 
 private slots:
@@ -84,8 +96,7 @@ private slots:
 private:
     //private data
 
-    QColor _outterborderColor; ///< the hover event handlers will toggle this between red and black
-    QPen _outterborderPen; ///< the pen is used to paint the red/black border
+    QPen     _pen ;
 
     QPointF _dragStart;
     int     _gridSpace;
@@ -103,7 +114,14 @@ private:
 
     CornerGrabber*  _corners[4];// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
 
-    bool    _isHighlighted;
+    bool    _isHighlighted; ///< highlighting is used to indicate visually a group of objects that are related when one of the group is selected
+    bool    _isHovered;
+
+    ShowBoxStyle     _showBoxStyle;
+    DrawBoxLineStyle _drawBoxLineStyle;
+    BoxStyle         _boxStyle;
+    int              _hoverLineThickness;
+
 
 };
 
