@@ -47,11 +47,11 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(name);
 
-    StateAttributes::StateSize * size = dynamic_cast<StateAttributes::StateSize *> (  _stateModel->attributes.value("size"));
+    SizeAttribute * size = dynamic_cast<SizeAttribute *> (  _stateModel->attributes.value("size"));
     connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(size);
 
-    StateAttributes::StatePosition * position =dynamic_cast<StateAttributes::StatePosition*> ( _stateModel->attributes.value("position"));
+    PositionAttribute * position =dynamic_cast<PositionAttribute*> ( _stateModel->attributes.value("position"));
     connect (position, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(position);
 
@@ -73,8 +73,8 @@ StateBoxGraphic::~StateBoxGraphic()
 void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
 {
     StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *> (attr);
-    StateAttributes::StateSize * size = dynamic_cast<StateAttributes::StateSize *> ( attr);
-    StateAttributes::StatePosition * position =dynamic_cast<StateAttributes::StatePosition*> (attr);
+    SizeAttribute * size = dynamic_cast<SizeAttribute *> ( attr);
+    PositionAttribute * position =dynamic_cast<PositionAttribute*> (attr);
 
 
     if ( name )

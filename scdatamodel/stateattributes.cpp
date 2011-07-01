@@ -68,8 +68,8 @@ void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
             IAttribute* newAttr=NULL;
 
             StateAttributes::StateName *nm ;
-            StateAttributes::StatePosition *ps;
-            StateAttributes::StateSize *sz;
+            PositionAttribute *ps;
+            SizeAttribute *sz;
              StateAttributes::StateString *str ;
 
             if ( (  nm = dynamic_cast<StateAttributes::StateName *>(sourceAttr) ) != NULL )
@@ -78,15 +78,15 @@ void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
                 addItem(newNm);
                 newAttr= newNm;
             }
-            else if ( ( ps = dynamic_cast<StateAttributes::StatePosition *>(sourceAttr) ) != NULL )
+            else if ( ( ps = dynamic_cast<PositionAttribute *>(sourceAttr) ) != NULL )
             {
-                StateAttributes::StatePosition * newPs = new StateAttributes::StatePosition (*ps);
+                PositionAttribute * newPs = new PositionAttribute (*ps);
                 addItem(newPs);
                 newAttr = newPs;
             }
-            else if ( ( sz = dynamic_cast<StateAttributes::StateSize *>(sourceAttr) ) != NULL )
+            else if ( ( sz = dynamic_cast<SizeAttribute *>(sourceAttr) ) != NULL )
             {
-                StateAttributes::StateSize * newSz = new StateAttributes::StateSize (*sz);
+                SizeAttribute * newSz = new SizeAttribute (*sz);
                 addItem(newSz);
                 newAttr = newSz;
             }
@@ -160,161 +160,6 @@ void    StateAttributes::StateName::setValue(const QString name)
     }
 }
 
-
-
-
-//  SIZE
-
-
-
-
-StateAttributes::StateSize::StateSize():IAttribute(), _size()
-{
-    qRegisterMetaType<StateAttributes>("StateAttributes::StateSize");
-}
-StateAttributes::StateSize::StateSize(QObject*  parent, QString key, QPoint s):IAttribute(parent, key), _size(s)
-{
-    qRegisterMetaType<StateAttributes>("StateAttributes::StateSize");
-}
-
-StateAttributes::StateSize::StateSize(QObject*  parent, QString key, QString s):IAttribute(parent, key), _size()
-{
-    qRegisterMetaType<StateAttributes>("StateAttributes::StateSize");
-    setValue(s);
-}
-
-StateAttributes::StateSize::~StateSize(){}
-
-StateAttributes::StateSize& StateAttributes::StateSize::operator=( StateSize& sa )
-{
-    _size = sa._size;
-    return *this;
-}
-
-
-QString StateAttributes::StateSize::asString()
-{
-    return (QString::number(_size.x()) + QString(",") +  QString::number(_size.y()));
-}
-
-QPointF StateAttributes::StateSize::asPointF() const
-{
-    return (_size);
-}
-
-void    StateAttributes::StateSize::setValue(QString size)
-{
-    QStringList sl = size.split(",");
-    if ( sl.length() == 2)
-    {
-        QPointF nSize(sl[0].toInt(),sl[1].toInt());
-
-        if ( nSize != _size )
-        {
-            _size = nSize;
-            emit changed(this);
-        }
-    }
-}
-
-void    StateAttributes::StateSize::setValue(const int w,const int h)
-{
-
-    QPointF nSize(w,h);
-
-    if ( nSize != _size )
-    {
-        _size = nSize;
-        emit changed(this);
-    }
-}
-
-void    StateAttributes::StateSize::setValue(const QPointF nSize)
-{
-
-    if ( nSize != _size )
-    {
-        _size = nSize;
-        emit changed(this);
-    }
-}
-
-
-
-// POSITION
-
-
-
-StateAttributes::StatePosition::StatePosition() :IAttribute( ), _position()
-{
-    qRegisterMetaType<StateAttributes>("StateAttributes::StatePosition");
-}
-
-StateAttributes::StatePosition::StatePosition(QObject*  parent,QString key,QPointF p) :IAttribute(parent, key), _position(p)
-{
-    qRegisterMetaType<StateAttributes>("StateAttributes::StatePosition");
-}
-
-StateAttributes::StatePosition::StatePosition(QObject*  parent,QString key,QString s) :IAttribute(parent, key), _position()
-{
-    qRegisterMetaType<StateAttributes>("StateAttributes::StatePosition");
-    setValue(s);
-}
-
-StateAttributes::StatePosition::~StatePosition(){}
-
-StateAttributes::StatePosition::StatePosition& StateAttributes::StatePosition::operator=( StatePosition& sa )
-                                                                                        {
-    _position = sa._position;
-    return *this;
-}
-
-QString StateAttributes::StatePosition::asString()
-{
-    return (QString::number(_position.x()) + QString(",") +  QString::number(_position.y()));
-}
-
-QPointF StateAttributes::StatePosition::asPointF() const
-{
-    return (_position);
-}
-
-void    StateAttributes::StatePosition::setValue(const QString position)
-{
-    QStringList sl = position.split(",");
-    if ( sl.length() != 2)
-    {
-        return;
-    }
-
-    QPointF nPosition(sl[0].toInt(),sl[1].toInt());
-
-    if ( nPosition != _position )
-    {
-        _position = nPosition;
-        emit changed(this);
-    }
-}
-
-void    StateAttributes::StatePosition::setValue(int w, int h)
-{   
-    QPointF nPosition( w,  h);
-
-    if ( nPosition != _position )
-    {
-        _position = nPosition;
-        emit changed(this);
-    }
-}
-
-void    StateAttributes::StatePosition::setValue(const QPointF nPosition)
-{ 
-    if ( nPosition != _position )
-    {
-        _position = nPosition;
-        emit changed(this);
-    }
-}
 
 
 

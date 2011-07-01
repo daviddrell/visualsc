@@ -24,13 +24,10 @@
 #include <QString>
 #include <QStringList>
 #include <QPoint>
-
 #include "iattribute.h"
-
+#include "sizeattribute.h"
+#include "positionattribute.h"
 #include "scdatamodel_global.h"
-#include <QPoint>
-#include <QString>
-#include <QMetaType>
 
 
 /**
@@ -56,8 +53,6 @@ public:
 
     ~StateAttributes() ;
 
-      //  NAME
-
 
     class SCDATAMODELSHARED_EXPORT StateName :  public IAttribute
     {
@@ -77,60 +72,6 @@ public:
     };
 
 
-
-    //  SIZE
-
-
-    class  SCDATAMODELSHARED_EXPORT StateSize: public IAttribute
-    {
-    public:
-
-        StateSize();
-        StateSize(QObject*  parent, QString key, QPoint s);
-        StateSize(QObject*  parent, QString key, QString s);
-
-        ~StateSize();
-
-        StateSize& operator=( StateSize& sa );
-
-        QString asString();
-        QPointF asPointF() const;
-
-        void    setValue(QString size);
-        void    setValue(const int w,const int h);
-        void    setValue(const QPointF s);
-    private :
-            QPointF _size;
-    };
-
-
-
-    // POSITION
-
-
-    class  SCDATAMODELSHARED_EXPORT StatePosition:  public IAttribute
-    {
-    public:
-        StatePosition();
-
-        StatePosition(QObject*  parent,QString key,QPointF p);
-
-        StatePosition(QObject*  parent,QString key,QString s);
-
-        ~StatePosition();
-
-        StatePosition& operator=( StatePosition& sa );
-
-        QString asString();
-        QPointF asPointF() const;
-
-        void    setValue(const QString position);
-        void    setValue(int w, int h);
-        void    setValue(const QPointF p);
-    private :
-            QPointF _position;
-
-    };
 
     class  SCDATAMODELSHARED_EXPORT StateString:  public IAttribute
     {

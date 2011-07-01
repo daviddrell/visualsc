@@ -196,12 +196,12 @@ void SCXMLReader::readState(STATE_TYPE stateType)
         }
         else if ( XmlAttr.name() == "size" )
         {
-            StateAttributes::StateSize * sa = new StateAttributes::StateSize(NULL, XmlAttr.name().toString(), XmlAttr.value().toString());
+            SizeAttribute * sa = new SizeAttribute(NULL, XmlAttr.name().toString(), XmlAttr.value().toString());
             stateAttributes->addItem( sa );
         }
         else if ( XmlAttr.name() == "position" )
         {
-            StateAttributes::StatePosition * sa  = new StateAttributes::StatePosition(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+            PositionAttribute * sa  = new PositionAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
             stateAttributes->addItem( sa );
         }
         else // unknown attribute

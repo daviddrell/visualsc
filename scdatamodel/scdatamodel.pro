@@ -23,7 +23,9 @@ SOURCES += scdatamodel.cpp \
     scstate.cpp \
     scxmlreader.cpp \
     iattribute.cpp \
-    textblockattributes.cpp
+    textblockattributes.cpp \
+    sizeattribute.cpp \
+    positionattribute.cpp
 
 HEADERS += scdatamodel.h\
         SCDataModel_global.h \
@@ -33,7 +35,9 @@ HEADERS += scdatamodel.h\
     scstate.h \
     scxmlreader.h \
     iattribute.h \
-    textblockattributes.h
+    textblockattributes.h \
+    sizeattribute.h \
+    positionattribute.h
 
 OTHER_FILES += \
     COPYING.txt

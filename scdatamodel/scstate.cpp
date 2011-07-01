@@ -84,8 +84,8 @@ void SCState::initCommon()
     }
 
     StateAttributes::StateName * name = new StateAttributes::StateName (this, "name",defaultName);
-    StateAttributes::StateSize * size = new StateAttributes::StateSize (this, "size",QPoint(100,50));
-    StateAttributes::StatePosition * position = new StateAttributes::StatePosition (this, "position",QPoint(0,0));
+    SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
+    PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
 
     attributes.addItem(name);
     attributes.addItem(size);
@@ -125,7 +125,7 @@ void SCState::setAttributeValue(QString key, QString value)
 
 void SCState::setSize(QPointF &size)
 {
-    StateAttributes::StateSize * sz = dynamic_cast<StateAttributes::StateSize *> (attributes.value("size"));
+    SizeAttribute * sz = dynamic_cast<SizeAttribute *> (attributes.value("size"));
     sz->setValue(size);
 }
 
@@ -137,7 +137,7 @@ void SCState::setSize(QPoint &size)
 
 void SCState::setPosition(QPointF &position)
 {
-    StateAttributes::StatePosition * pos = dynamic_cast<StateAttributes::StatePosition *> (attributes.value("position"));
+    PositionAttribute * pos = dynamic_cast<PositionAttribute *> (attributes.value("position"));
     pos->setValue(position);
 }
 
