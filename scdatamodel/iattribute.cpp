@@ -36,6 +36,13 @@ IAttribute::IAttribute(const IAttribute& a) : QObject(a.parent()), _key(a.key())
 {
 }
 
+IAttribute& IAttribute::operator =(const IAttribute& a)
+{
+    QObject(a.parent());
+    _key = a._key;
+    return *this;
+}
+
 QString IAttribute::key() const {return _key; }
 
 

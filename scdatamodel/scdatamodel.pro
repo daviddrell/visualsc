@@ -22,7 +22,8 @@ SOURCES += scdatamodel.cpp \
     sctransition.cpp \
     scstate.cpp \
     scxmlreader.cpp \
-    iattribute.cpp
+    iattribute.cpp \
+    textblockattributes.cpp
 
 HEADERS += scdatamodel.h\
         SCDataModel_global.h \
@@ -31,7 +32,8 @@ HEADERS += scdatamodel.h\
     sctransition.h \
     scstate.h \
     scxmlreader.h \
-    iattribute.h
+    iattribute.h \
+    textblockattributes.h
 
 OTHER_FILES += \
     COPYING.txt

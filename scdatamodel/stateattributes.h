@@ -52,8 +52,6 @@ public:
 
     StateAttributes& operator=( StateAttributes& sa );
 
-    virtual AttributeMajorType getMajorType();
-
     virtual void setAttributes(const IAttributeContainer& sourceAttrList);
 
     ~StateAttributes() ;
@@ -73,7 +71,6 @@ public:
 
         QString asString();
         void    setValue(const QString name);
-        int getType() ;
 
     private :
             QString _name;
@@ -95,9 +92,6 @@ public:
         ~StateSize();
 
         StateSize& operator=( StateSize& sa );
-
-
-        int getType() ;
 
         QString asString();
         QPointF asPointF() const;
@@ -127,8 +121,6 @@ public:
 
         StatePosition& operator=( StatePosition& sa );
 
-        int getType();
-
         QString asString();
         QPointF asPointF() const;
 
@@ -149,10 +141,7 @@ public:
 
         StateString& operator=( StateString& sa );
 
-        int getType();
-
         QString asString();
-
 
         void    setValue(const QString value);
 

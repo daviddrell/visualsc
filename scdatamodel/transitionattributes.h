@@ -50,8 +50,6 @@ public:
 
     virtual void setAttributes(const IAttributeContainer& sourceAttrList);
 
-    virtual AttributeMajorType getMajorType();
-
 
     class SCDATAMODELSHARED_EXPORT  TransitionPathAttribute : public  IAttribute
     {
@@ -71,8 +69,6 @@ public:
         virtual void setValue(const QString value)  ;
 
         virtual void setValue(QList<QPointF>& path )  ;
-
-        virtual int getType();
 
     private:
 
@@ -95,7 +91,6 @@ public:
 
         virtual void    setValue(const QString value)  ;
 
-        virtual int     getType();
 
     private:
 
@@ -117,8 +112,6 @@ public:
         virtual void    setValue(const QString position)  ;
         void            setValue(const int w,const int h);
         void            setValue(const QPointF s);
-
-        virtual int     getType();
 
     private:
 

@@ -86,6 +86,8 @@ void SCDataModel::open(QString file)
     connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()), Qt::QueuedConnection);
     connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()), Qt::QueuedConnection);
 
+    connect(&_reader, SIGNAL(makeANewStateIDTextBlock(StateAttributes*)), this, SLOT(handleMakeANewStateIDTextBlock(StateAttributes*)), Qt::QueuedConnection);
+
     connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)), Qt::QueuedConnection);
     connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::QueuedConnection);
     connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::QueuedConnection);

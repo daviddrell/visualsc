@@ -130,13 +130,6 @@ void TransitionAttributes::setAttributes(const IAttributeContainer& sourceAttrLi
 
 
 
-
-TransitionAttributes::AttributeMajorType TransitionAttributes::getMajorType()
-{
-    return IAttributeContainer::aMajorType_Transition ;
-}
-
-
 void TransitionAttributes::initCommon()
 {
     qRegisterMetaType<TransitionAttributes>("TransitionAttributes");
@@ -261,13 +254,6 @@ void TransitionAttributes::TransitionPathAttribute::setValue(QList<QPointF>& pat
     emit changed(this);
 }
 
-int TransitionAttributes::TransitionPathAttribute::getType()
-{
-    return (int)QVariant::UserType + (int)IAttribute::aType_Path;
-}
-
-
-
 
 //////////////////////////////////////////
 //
@@ -300,7 +286,7 @@ TransitionAttributes::TransitionStringAttribute::~TransitionStringAttribute()
 }
 
 TransitionAttributes::TransitionStringAttribute& TransitionAttributes::TransitionStringAttribute::operator=( QString& str)
-                                                                                                           {
+{
     _string = str;
     return *this;
 }
@@ -318,12 +304,6 @@ void TransitionAttributes::TransitionStringAttribute::setValue(QString str )
     emit changed(this);
 
 }
-
-int TransitionAttributes::TransitionStringAttribute::getType()
-{
-    return (int)QVariant::String;
-}
-
 
 
 
@@ -403,9 +383,6 @@ void TransitionAttributes::TransitionPositionAttribute::setValue(const QString p
     }
 }
 
-int TransitionAttributes::TransitionPositionAttribute::getType()
-{
-    return (int)QVariant::PointF;
-}
+
 
 

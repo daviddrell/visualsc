@@ -43,11 +43,10 @@
  as the state-machine. The top level state holds an attribute container
  for its attributes as well as a QList of substates and a QList of transitions which are sourced from that state.
 
- Attributes must subclass IAttribute and implement asString(), setValue() and getType().
- New Attribute sub-types should be added to the AttributeType enum.
+ Attributes must subclass IAttribute and implement asString(), setValue().
 
  Generally, a view can query attribute containers for attributes, then query attributes
- for their values using asString(), without checking the type.
+ for their values using asString().
 
  Below is an example of generic attribute handling from the FormView, which loads the attribute
  table view when a state or transition is clicked in the tree-view.
@@ -103,7 +102,7 @@
  * \ingroup DataModel
  *
  * Attributes are intented to be contained in IAttributeContainer-s.
- * Attributes must subclass IAttribute and implement asString(), setValue() and getType().
+ * Attributes must subclass IAttribute and implement asString(), setValue().
  * New Attribute sub-types should be added to the AttributeType enum.
  *
  * Generally, a view can query attribute containers for attributes, then query attributes
@@ -131,21 +130,22 @@ public:
 
     IAttribute(const IAttribute& a);
 
-    enum AttributeType {
-        aType_Name,
-        aType_Position,
-        aType_Size,
-        aType_Path
-    };
+    IAttribute& operator=(const IAttribute& a);
+
+//    enum AttributeType {
+//        aType_Name,
+//        aType_Position,
+//        aType_Size,
+//        aType_Path
+//    };
 
     virtual QString asString()=0;
     virtual void setValue(const QString value)  = 0 ;
-    virtual int getType() = 0;
-
     virtual QString key() const;
 
 signals:
     void changed( IAttribute* attr);
+    void error(QString err);
 
 private:
     QString _key;
@@ -175,7 +175,6 @@ class IAttributeContainer : public QObject, public QMap<QString,IAttribute*>
 
 public:
 
-    enum AttributeMajorType { aMajorType_State, aMajorType_Transition};
 
     IAttributeContainer(QObject *parent, QString key);
 
@@ -185,7 +184,6 @@ public:
 
     ~IAttributeContainer();
 
-    virtual AttributeMajorType getMajorType() = 0;
 
     virtual QString key() ;
 

@@ -23,7 +23,7 @@
 #include "transitionattributes.h"
 #include "selectablelinesegmentgraphic.h"
 #include <QList>
-
+#include <QDebug>
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
         QWidget (parentWidget),
@@ -106,7 +106,17 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
 
     TransitionAttributes::TransitionPositionAttribute * pos =
             dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> (  t->attributes.value("position"));
-    QPointF position = pos->asQPointF();
+
+    QPointF position(0,0);
+
+    if ( pos == 0 )
+    {
+        qDebug()<< "pos returned null in SCGraphicsView::handleNewTransition";
+    }
+    else
+    {
+        position = pos->asQPointF();
+    }
 
     TransitionAttributes::TransitionPathAttribute * p =
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));

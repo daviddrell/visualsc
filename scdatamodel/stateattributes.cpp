@@ -40,11 +40,6 @@ StateAttributes& StateAttributes::operator=( StateAttributes& sa )
 }
 
 
-StateAttributes::AttributeMajorType StateAttributes::getMajorType()
-{
-    return IAttributeContainer::aMajorType_State ;
-}
-
 StateAttributes::~StateAttributes()
 { }
 
@@ -165,10 +160,6 @@ void    StateAttributes::StateName::setValue(const QString name)
     }
 }
 
-int StateAttributes::StateName::getType()
-{
-    return QVariant::String;
-}
 
 
 
@@ -200,10 +191,6 @@ StateAttributes::StateSize& StateAttributes::StateSize::operator=( StateSize& sa
     return *this;
 }
 
-int StateAttributes::StateSize::getType()
-{
-    return QVariant::PointF;
-}
 
 QString StateAttributes::StateSize::asString()
 {
@@ -282,8 +269,6 @@ StateAttributes::StatePosition::StatePosition& StateAttributes::StatePosition::o
     return *this;
 }
 
-int StateAttributes::StatePosition::getType() {return QVariant::PointF;}
-
 QString StateAttributes::StatePosition::asString()
 {
     return (QString::number(_position.x()) + QString(",") +  QString::number(_position.y()));
@@ -354,10 +339,6 @@ StateAttributes::StateString::StateString& StateAttributes::StateString::operato
     return *this;
 }
 
-int StateAttributes::StateString::getType()
-{
-    return QVariant::String;
-}
 
 QString StateAttributes::StateString::asString()
 {
