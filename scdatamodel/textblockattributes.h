@@ -12,26 +12,43 @@
 #include <QMetaType>
 
 
-/**
- * \class StateIDTextBlockAttributes
- *
- * \ingroup DataModel
- * \ingroup Attributes
- *
- */
 
 
-
-class SCDATAMODELSHARED_EXPORT  FontFamily :  public IAttribute
+/** \class TextAttribute
+    \brief Not really an attribute, but the text itself which fills the textblock
+  *
+  */
+class SCDATAMODELSHARED_EXPORT  TextAttribute :  public IAttribute
 {
 public:
-    FontFamily(QObject * parent, QString key, QString initValue);
-    FontFamily(const FontFamily& fontFamilyAttribute);
-    FontFamily();
+    TextAttribute(QObject * parent, QString key, QString initValue);
+    TextAttribute(const TextAttribute& textAttribute);
+    TextAttribute();
 
-    ~FontFamily();
+    ~TextAttribute();
 
-    FontFamily& operator=( const FontFamily& fontFamilyAttribute);
+    TextAttribute& operator=( const TextAttribute& textAttribute);
+
+    virtual QString asString();
+
+    virtual void    setValue(const QString value)  ;
+
+private:
+
+    QString _text;
+};
+
+
+class SCDATAMODELSHARED_EXPORT  FontFamilyAttribute :  public IAttribute
+{
+public:
+    FontFamilyAttribute(QObject * parent, QString key, QString initValue);
+    FontFamilyAttribute(const FontFamilyAttribute& fontFamilyAttribute);
+    FontFamilyAttribute();
+
+    ~FontFamilyAttribute();
+
+    FontFamilyAttribute& operator=( const FontFamilyAttribute& fontFamilyAttribute);
 
     virtual QString asString();
 
@@ -44,15 +61,16 @@ private:
 
 
 
-class SCDATAMODELSHARED_EXPORT  FontSize :  public IAttribute
+class SCDATAMODELSHARED_EXPORT  FontSizeAttribute :  public IAttribute
 {
 public:
-    FontSize(QObject * parent, QString key, int initValue);
-    FontSize(const FontSize & fontSizeAttribute );
-    FontSize();
+    FontSizeAttribute(QObject * parent, QString key, int initValue);
+    FontSizeAttribute(QObject * parent, QString key, QString initValue);
+    FontSizeAttribute(const FontSizeAttribute & fontSizeAttribute );
+    FontSizeAttribute();
 
-    ~FontSize();
-    FontSize& operator=(const  FontSize& fontSizeAttribute);
+    ~FontSizeAttribute();
+    FontSizeAttribute& operator=(const  FontSizeAttribute& fontSizeAttribute);
 
     virtual QString asString();
     virtual int asInt();
@@ -65,15 +83,15 @@ private:
 };
 
 
-class SCDATAMODELSHARED_EXPORT  FontColor :  public IAttribute
+class SCDATAMODELSHARED_EXPORT  FontColorAttribute :  public IAttribute
 {
 public:
-    FontColor(QObject * parent, QString key, QColor initValue);
-    FontColor(const FontColor& fontColorAttribute );
-    FontColor();
+    FontColorAttribute(QObject * parent, QString key, QColor initValue);
+    FontColorAttribute(const FontColorAttribute& fontColorAttribute );
+    FontColorAttribute();
 
-    ~FontColor();
-    FontColor& operator=( const FontColor& fontColorAttribute);
+    ~FontColorAttribute();
+    FontColorAttribute& operator=( const FontColorAttribute& fontColorAttribute);
 
     virtual QString asString();
     QColor asQColor();
@@ -92,15 +110,16 @@ private:
     QColor _color;
 };
 
-class SCDATAMODELSHARED_EXPORT  FontBold :  public IAttribute
+class SCDATAMODELSHARED_EXPORT  FontBoldAttribute :  public IAttribute
 {
 public:
-    FontBold(QObject * parent, QString key, bool initValue);
-    FontBold(const FontBold & fontBoldAttribute );
-    FontBold();
+    FontBoldAttribute(QObject * parent, QString key, bool initValue);
+    FontBoldAttribute(QObject * parent, QString key, QString initValue);
+    FontBoldAttribute(const FontBoldAttribute & fontBoldAttribute );
+    FontBoldAttribute();
 
-    ~FontBold();
-    FontBold& operator=(const FontBold& fontBoldAttribute);
+    ~FontBoldAttribute();
+    FontBoldAttribute& operator=(const FontBoldAttribute& fontBoldAttribute);
 
     virtual QString asString();
     bool asBool();
@@ -114,14 +133,15 @@ private:
 };
 
 
-class SCDATAMODELSHARED_EXPORT  FontUnderline :  public IAttribute
+class SCDATAMODELSHARED_EXPORT  FontUnderlineAttribute :  public IAttribute
 {
 public:
-    FontUnderline(QObject * parent, QString key, bool initValue);
-    FontUnderline(const FontUnderline & fontUnderlineAttribute );
-    FontUnderline();
-    ~FontUnderline();
-    FontUnderline& operator=( const FontUnderline& fontUnderlineAttribute);
+    FontUnderlineAttribute(QObject * parent, QString key, bool initValue);
+    FontUnderlineAttribute(QObject * parent, QString key, QString initValue);
+    FontUnderlineAttribute(const FontUnderlineAttribute & fontUnderlineAttribute );
+    FontUnderlineAttribute();
+    ~FontUnderlineAttribute();
+    FontUnderlineAttribute& operator=( const FontUnderlineAttribute& fontUnderlineAttribute);
 
     virtual QString asString();
             bool asBool();
@@ -135,6 +155,17 @@ private:
     bool _underline;
 };
 
+
+
+/**
+ * \class StateIDTextBlockAttributes
+ *
+ * \ingroup DataModel
+ * \ingroup Attributes
+ *
+ */
+
+
 class  SCDATAMODELSHARED_EXPORT TextBlockAttributes: public IAttributeContainer
 {
 public:
@@ -144,8 +175,10 @@ public:
     TextBlockAttributes();
     ~TextBlockAttributes();
 
-    virtual void setAttributes(const IAttributeContainer& sourceAttrList);
+    TextBlockAttributes& operator=( TextBlockAttributes& sa );
 
+
+    virtual void setAttributes(const IAttributeContainer& sourceAttrList);
 
 
 
@@ -155,11 +188,11 @@ private: // methods
 };
 
 
-Q_DECLARE_METATYPE(FontFamily);
-Q_DECLARE_METATYPE(FontSize);
-Q_DECLARE_METATYPE(FontColor);
-Q_DECLARE_METATYPE(FontBold);
-Q_DECLARE_METATYPE(FontUnderline);
+Q_DECLARE_METATYPE(FontFamilyAttribute);
+Q_DECLARE_METATYPE(FontSizeAttribute);
+Q_DECLARE_METATYPE(FontColorAttribute);
+Q_DECLARE_METATYPE(FontBoldAttribute);
+Q_DECLARE_METATYPE(FontUnderlineAttribute);
 Q_DECLARE_METATYPE(TextBlockAttributes);
 
 #endif // STATEIDTEXTBLOCKATTRIBUTES_H

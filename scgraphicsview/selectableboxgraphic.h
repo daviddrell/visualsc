@@ -40,19 +40,18 @@ class IAttribute;
 class SelectableBoxGraphic :  public QGraphicsObject
 {
 
+
 public:
 
     SelectableBoxGraphic(QGraphicsObject*parent);
     ~SelectableBoxGraphic();
 
-    QGraphicsTextItem _title;    ///< sample text to go in the title area.
-
     virtual void setSize(QPoint size); ///< set the size of this object
-    void increaseWidth(int inc);
+    void    increaseWidth(int inc);
     QString getPositionAsString();
     QString getSizeAsString();
     void    getSize(QPoint& size);
-    void setHighlighted(bool);
+    void    setHighlighted(bool);
 
     enum BoxStyle {kSolidWithShadow, kSolidNoShadow, kTransparent};
     enum ShowBoxStyle { kAlways, kWhenSelected};
@@ -84,17 +83,9 @@ private:
 
     void setCornerPositions();
     void adjustDrawingSize(int x, int y);
-    void updateModel();
 
 
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-
-    // private slots
-
-private slots:
-
-
-    void handleAttributeChanged(IAttribute *attr);
 
 
 

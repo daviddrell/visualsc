@@ -46,6 +46,41 @@ IAttribute& IAttribute::operator =(const IAttribute& a)
 QString IAttribute::key() const {return _key; }
 
 
+// GenericAttribute
+
+
+GenericAttribute::GenericAttribute() : IAttribute()
+{
+}
+
+GenericAttribute::GenericAttribute(QObject *parent, QString initkey, QString initValue) :
+    IAttribute(parent, initkey),
+    _value(initValue)
+{
+}
+
+GenericAttribute::GenericAttribute(const GenericAttribute& a) : IAttribute(a)
+{
+}
+
+GenericAttribute& GenericAttribute::operator =(const GenericAttribute& a)
+{
+    IAttribute::operator =(a);
+    _value = a._value;
+    return *this;
+}
+
+QString GenericAttribute::asString()
+{
+    return _value;
+}
+
+void GenericAttribute::setValue(const QString value)
+{
+    _value = value;
+}
+
+
 
 // container - a Map of IAttribute-subclasses
 

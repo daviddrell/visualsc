@@ -6,7 +6,7 @@ SizeAttribute::SizeAttribute():IAttribute(), _size()
     qRegisterMetaType<SizeAttribute>("SizeAttribute");
 }
 
-SizeAttribute::SizeAttribute(QObject*  parent, QString key, QPoint s):IAttribute(parent, key), _size(s)
+SizeAttribute::SizeAttribute(QObject*  parent, QString key, QPointF s):IAttribute(parent, key), _size(s)
 {
     qRegisterMetaType<SizeAttribute>("SizeAttribute");
 }

@@ -28,7 +28,7 @@
 class SCState;
 #include "scdatamodel_global.h"
 class QXmlStreamWriter;
-
+#include "scitem.h"
 
 /**
 
@@ -44,7 +44,7 @@ class QXmlStreamWriter;
 
   */
 
-class SCDATAMODELSHARED_EXPORT  SCTransition : public QObject
+class SCDATAMODELSHARED_EXPORT  SCTransition : public SCItem
 {
     Q_OBJECT
 
@@ -53,6 +53,7 @@ public:
 
     ~SCTransition();
 
+    virtual IAttributeContainer * getAttributes(); //reimplemented from base SCItem
     void    setAttributeValue(QString key, QString value);
     QString getAttributeValue(QString key);
     void    writeSCVXML(QXmlStreamWriter & sw);

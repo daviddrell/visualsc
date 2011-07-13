@@ -49,6 +49,7 @@ class QTreeWidgetItem;
 class CustomTreeWidgetItem;
 class QTableWidget;
 class QLabel;
+class TextBlock;
 QT_END_NAMESPACE
 
 
@@ -121,6 +122,7 @@ private:
     QIcon createColorIcon(QColor color);
     void loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states);
     void loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransition*> & transitions);
+    void loadTree ( CustomTreeWidgetItem * parentItem , TextBlock* textBlock);
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;

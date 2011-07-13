@@ -13,5 +13,6 @@
         <file>underline.png</file>
         <file>transitionbutton.bmp</file>
         <file>statebutton.bmp</file>
+        <file>textblock.bmp</file>
     </qresource>
 </RCC>

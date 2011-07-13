@@ -28,6 +28,7 @@
 
 #include "stateattributes.h"
 #include "transitionattributes.h"
+#include "textblock.h"
 
 class StateData;
 
@@ -55,9 +56,9 @@ signals:
      void enterTransitionPathElement();
      void leaveTransitionPathElement();
      void makeANewTransistionPath(QString path);
+     void makeANewTextBlockElement(QString text, TextBlockAttributes*);
 
-     void leaveElement();
-     void enterElement();
+
 
 private:
 
@@ -67,6 +68,7 @@ private:
     QString _file;
     QStringList _resultMessages;
 
+    void readTextBlockElement();
     void readElement();
     void readState(STATE_TYPE t= kSTATE_TYPE_Normal);
     void readTransistion();

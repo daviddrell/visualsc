@@ -25,16 +25,18 @@
 
 
 SCState::SCState(QObject *parent) :
-    QObject(parent),
-    attributes(this, "stateAttributes")
+    SCItem(parent),
+    attributes(this, "stateAttributes"),
+    _IdTextBlock(NULL)
 {
    initCommon();
 }
 
 
 SCState::SCState(const SCState& st) :
-    QObject(st.parent()),
-    attributes(st.attributes)
+    SCItem(st.parent()),
+    attributes(st.attributes),
+    _IdTextBlock()
 {
     initCommon();
 }
@@ -42,23 +44,15 @@ SCState::SCState(const SCState& st) :
 
 
 SCState::SCState( bool topState) :
-    QObject(NULL),
-    attributes(this, "stateAttributes")
+    SCItem(NULL),
+    attributes(this, "stateAttributes"),
+    _IdTextBlock()
 {
-    if ( ! topState )
+    initCommon();
+
+    if ( topState )
     {
-        initCommon();
-    }
-    else
-    {
-        StateAttributes::StateName * name = new StateAttributes::StateName (this, "name","State Machine"); // assign a default name
-
-        attributes.addItem(name);
-
-        this->setObjectName("State Machine");// to support debug tracing
-
-        connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
-
+        this->setStateName( "State Machine" );
     }
 }
 
@@ -72,6 +66,7 @@ void SCState::initCommon()
 {
     QString defaultName = QString();
 
+
     SCState * parent = dynamic_cast<SCState *>(this->parent());
 
     if  ( parent )
@@ -83,6 +78,7 @@ void SCState::initCommon()
         defaultName = "sub_of_" +parentsName + "_" + QString::number(childCount);
     }
 
+
     StateAttributes::StateName * name = new StateAttributes::StateName (this, "name",defaultName);
     SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
@@ -93,13 +89,23 @@ void SCState::initCommon()
 
     this->setObjectName(defaultName);// to support debug tracing
 
+    _IdTextBlock = new TextBlock();
+    _IdTextBlock->setParent(this);
+    _IdTextBlock->setText(name->asString());
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
 
+}
+
+
+TextBlock* SCState::getIDTextBlock()
+{
+    return  _IdTextBlock;
 }
 
 void SCState::handleNameChanged(IAttribute *name)
 {
     this->setObjectName(name->asString());// to support debug tracing
+    _IdTextBlock->setText(name->asString());
 }
 
 
@@ -111,6 +117,11 @@ QString SCState::getAttributeValue(QString key)
         return attr->asString();
     }
     else return QString();
+}
+
+IAttributeContainer * SCState::getAttributes()
+{
+    return   & attributes;
 }
 
 void SCState::setAttributeValue(QString key, QString value)
@@ -280,6 +291,11 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
         SCTransition * st = dynamic_cast<SCTransition*>(children()[i]);
         if (st)
             st->writeSCVXML(sw);
+
+        TextBlock * tb = dynamic_cast<TextBlock*>(children()[i]);
+        if (tb)
+            tb->writeSCVXML(sw);
+
     }
 
     sw.writeEndElement();
@@ -289,6 +305,10 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
 void SCState::setStateName(QString n)
 {
     this->setObjectName(n);
+
+
+    // no need to set the textblock here, its been connected to the name attribute
+   // _IdTextBlock.setText(n);
 
     attributes.value("name")->setValue(n);
 }

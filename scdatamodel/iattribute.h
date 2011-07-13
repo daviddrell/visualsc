@@ -152,6 +152,25 @@ private:
 
 };
 
+class GenericAttribute: public IAttribute
+{
+public:
+
+    GenericAttribute();
+
+    GenericAttribute(QObject *parent, QString initkey, QString initValue);
+
+    GenericAttribute(const GenericAttribute& a);
+
+    GenericAttribute& operator=(const GenericAttribute& a);
+
+    virtual QString asString();
+    virtual void setValue(const QString value);
+
+private:
+    QString _value;
+
+};
 
 /**
  * \class IAttributeContainer

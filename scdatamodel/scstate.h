@@ -27,7 +27,9 @@
 class QString;
 class QXmlStreamWriter;
 class QPoint;
+#include "textblock.h"
 #include "scdatamodel_global.h"
+#include "scitem.h"
 
 /**
 
@@ -46,7 +48,7 @@ class QPoint;
   */
 
 
-class SCDATAMODELSHARED_EXPORT  SCState : public QObject
+class SCDATAMODELSHARED_EXPORT  SCState : public SCItem
 {
     Q_OBJECT
 public:
@@ -54,6 +56,8 @@ public:
     SCState(const SCState& st);
     SCState( bool topState=false);
     ~SCState();
+
+    virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
 
     void setStateName(QString n);
     void addTransistion(SCTransition*);
@@ -108,6 +112,14 @@ public:
       */
     void writeSCVXML(QXmlStreamWriter & xmlWriter);
 
+    /**
+      * \fn getIDTextBlock
+      * \brief Returns a pointer to the ID TextBlock
+      * \param xmlWriter is the writer that writes the xml
+      *
+      */
+
+    TextBlock* getIDTextBlock();
 
     StateAttributes         attributes;
 
@@ -129,6 +141,10 @@ private:
 
 
     void initCommon();
+
+    //private data
+
+    TextBlock * _IdTextBlock;
 
 };
 

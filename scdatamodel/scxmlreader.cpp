@@ -28,6 +28,7 @@
 #include "sctransition.h"
 #include "scstate.h"
 
+#include <QDebug>
 
 SCXMLReader::SCXMLReader(): QThread(NULL), _reader(),_file(), _resultMessages()
 {
@@ -77,9 +78,7 @@ void SCXMLReader::readElement()
     bool enteredAStateElement = false;
     bool enteredATransistionElement = false;
     bool enteredATransistionPathElement = false;
-
-
-    emit enterElement();
+    bool elementAtEnd = true;
 
     if (_reader.name() == "scxml")
     {
@@ -105,7 +104,6 @@ void SCXMLReader::readElement()
         readState(kSTATE_TYPE_Final);
         enteredAStateElement = true;
     }
-
     else if (_reader.name() == "transition")
     {
         emit enterTransistionElement();
@@ -118,30 +116,40 @@ void SCXMLReader::readElement()
         readTransistionPath();
         enteredATransistionPathElement = true;
     }
+    else if (_reader.name() == "textblock")
+    {
+        qDebug() <<"reading TextBlockElement";
+        readTextBlockElement();
+        return; // textBlocks do not contain elements
+    }
     else if ( _reader.name() == "onentry")
         readOnEntry();
     else if ( _reader.name() == "onexit")
         readOnExit();
 
+
     _reader.readNext();
 
     while ( ! _reader.atEnd())
     {
-        if ( _reader.isEndElement())
+        if ( _reader.isEndElement()  )
         {
+            qDebug()<<"end of Element";
             _reader.readNext();
             break; // hit end of this tree
         }
+
         if ( _reader.isStartElement())
             readElement();
 
         _reader.readNext();
     }
 
-    emit leaveElement();
-
-
-    if (enteredAStateElement )       {emit leaveStateElement();}
+    if (enteredAStateElement )
+    {
+        qDebug()<<"leaving StateElement";
+        emit leaveStateElement();
+    }
     if (enteredATransistionElement ) {emit leaveTransistionElement();}
     if (enteredATransistionPathElement ) {emit leaveTransitionPathElement();}
 
@@ -191,6 +199,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
         // look for the Sate Attribute Name (id in SCXML)
         if ( XmlAttr.name() == "id")
         {
+            qDebug()<<"reader in state id = " + XmlAttr.value().toString();
             StateAttributes::StateName *  sa = new StateAttributes::StateName (0,"name", XmlAttr.value().toString() );
             stateAttributes->addItem( sa );
         }
@@ -249,13 +258,31 @@ void SCXMLReader::readTransistion()
 
 }
 
+
 void SCXMLReader::readTransistionPath()
 {
 
     QString data =_reader.attributes().value("d").toString();
 
     emit makeANewTransistionPath(data);
+}
 
+
+void SCXMLReader::readTextBlockElement()
+{
+
+    TextBlockAttributes * tb = new TextBlockAttributes(0,"TextBlockAttributes");
+
+    for (int i = 0; i < _reader.attributes().count(); i++)
+    {
+        QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
+        GenericAttribute * a  = new GenericAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+        tb->addItem( a );
+    }
+
+    QString data =_reader.readElementText();
+
+    emit makeANewTextBlockElement(data, tb);
 }
 
 void SCXMLReader::readFinal()

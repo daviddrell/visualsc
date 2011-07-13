@@ -24,7 +24,7 @@
 #include <QDebug>
 
 SCTransition::SCTransition(QObject * parent):
-        QObject(parent), attributes(this, "transition.attributes")
+        SCItem(parent), attributes(this, "transition.attributes")
 {
     /*
      event
@@ -68,6 +68,11 @@ QString SCTransition::getAttributeValue(QString key)
         return attr->asString();
     }
     else return QString();
+}
+
+IAttributeContainer * SCTransition::getAttributes()
+{
+    return & attributes;
 }
 
 void SCTransition::setAttributeValue(QString key, QString value)

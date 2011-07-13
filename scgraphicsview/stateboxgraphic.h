@@ -46,9 +46,7 @@ public:
     StateBoxGraphic(QGraphicsObject*parent, SCState * state);
     ~StateBoxGraphic();
 
-  //  QGraphicsTextItem _title;    ///< sample text to go in the title area.
-
-    SelectableTextBlock _title;    ///< sample text to go in the title area.
+    SelectableTextBlock TextItem;    ///<  text to go in the title area.
 
     void setGridSpace(int space);
     void setTitle(QString t);
@@ -56,7 +54,7 @@ public:
     QString getPositionAsString();
     QString getSizeAsString();
     void    getSize(QPoint& size);
-   void setHighlighted(bool);
+    void setHighlighted(bool);
 
 private:
 

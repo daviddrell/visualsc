@@ -32,7 +32,7 @@
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         SelectableBoxGraphic(parent),
-        _title(),
+        TextItem(parent,stateModel->getIDTextBlock()),
         _stateModel(stateModel)
 {
 
@@ -56,9 +56,9 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     handleAttributeChanged(position);
 
 
-    _title.setPos(25,10);
+    TextItem.setPos(25,10);
 
-    _title.setParentItem(this);
+    TextItem.setParentItem(this);
 
 
 }
@@ -80,7 +80,7 @@ void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
     if ( name )
     {
         this->setObjectName(name->asString()); // help debug tracing - id which object this is
-        _title.setPlainText(name->asString());
+        TextItem.setPlainText(name->asString());
     }
     else if ( size )
     {
@@ -111,7 +111,7 @@ void StateBoxGraphic::setHighlighted(bool on)
 
 void StateBoxGraphic::setTitle(QString t)
 {
-    _title.setPlainText(t);
+    TextItem.setPlainText(t);
 }
 
 

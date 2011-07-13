@@ -3,6 +3,8 @@
 
 #include <QGraphicsTextItem>
 #include "selectableboxgraphic.h"
+#include "textblock.h"
+#include "iattribute.h"
 
 /**
   * \class SelectableTextBlock
@@ -15,11 +17,19 @@
 
 class SelectableTextBlock : public SelectableBoxGraphic
 {
+    Q_OBJECT
+
 public:
-    SelectableTextBlock(QGraphicsObject *parent=NULL);
+    SelectableTextBlock(QGraphicsObject *parent=NULL,TextBlock *textBlockModel=NULL);
+    ~SelectableTextBlock();
 
     void setPlainText(QString text);
     virtual void setSize(QPoint size); ///< from base class
+
+
+private slots:
+
+    void handleAttributeChanged(IAttribute *attr);
 
 private:
 
@@ -33,6 +43,7 @@ private:
 
    QPoint _minSize;
 
+   TextBlock * _textBlockModel;
 };
 
 #endif // SELECTABLETEXTBLOCK_H

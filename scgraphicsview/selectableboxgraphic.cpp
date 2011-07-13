@@ -76,10 +76,6 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
     _corners[2] = NULL;
     _corners[3] = NULL;
 
-    _title.setPos(25,10);
-
-    _title.setParentItem(this);
-
     this->setAcceptHoverEvents(true);
 
 }

@@ -1,27 +1,77 @@
 #include "iattribute.h"
 #include "textblockattributes.h"
 #include <QStringList>
+#include "positionattribute.h"
+#include "sizeattribute.h"
+
+
+//************ Text **************
+
+TextAttribute::TextAttribute(QObject * parent, QString key, QString initValue) :
+        IAttribute(parent,key),
+        _text(initValue)
+{
+}
+
+
+TextAttribute::TextAttribute() : IAttribute()
+{}
+
+
+TextAttribute::TextAttribute(const TextAttribute& textAttribute):
+        IAttribute(textAttribute)
+{
+    _text = textAttribute._text;
+}
+
+
+TextAttribute& TextAttribute::operator=(const TextAttribute& textAttribute)
+{
+    IAttribute::operator =(textAttribute);
+
+    _text = textAttribute._text;
+    return *this;
+}
+
+
+TextAttribute::~TextAttribute()
+{}
+
+QString TextAttribute::asString()
+{
+    return _text;
+}
+
+void TextAttribute::setValue(const QString value)
+{
+    if ( _text != value)
+    {
+        _text = value;
+        emit changed(this);
+    }
+}
 
 //************ FontFamily **************
 
-FontFamily::FontFamily(QObject * parent, QString key, QString initValue) :
+FontFamilyAttribute::FontFamilyAttribute(QObject * parent, QString key, QString initValue) :
         IAttribute(parent,key),
         _family(initValue)
 {
 }
 
 
-FontFamily::FontFamily() : IAttribute()
+FontFamilyAttribute::FontFamilyAttribute() : IAttribute()
 {}
 
 
-FontFamily::FontFamily(const FontFamily& fontFamilyAttribute):
+FontFamilyAttribute::FontFamilyAttribute(const FontFamilyAttribute& fontFamilyAttribute):
         IAttribute(fontFamilyAttribute)
 {
     _family = fontFamilyAttribute._family;
 }
 
-FontFamily& FontFamily::operator=(const FontFamily& fontFamilyAttribute)
+
+FontFamilyAttribute& FontFamilyAttribute::operator=(const FontFamilyAttribute& fontFamilyAttribute)
 {
     IAttribute::operator =(fontFamilyAttribute);
 
@@ -30,15 +80,15 @@ FontFamily& FontFamily::operator=(const FontFamily& fontFamilyAttribute)
 }
 
 
-FontFamily::~FontFamily()
+FontFamilyAttribute::~FontFamilyAttribute()
 {}
 
-QString FontFamily::asString()
+QString FontFamilyAttribute::asString()
 {
     return _family;
 }
 
-void FontFamily::setValue(const QString value)
+void FontFamilyAttribute::setValue(const QString value)
 {
     if ( _family != value)
     {
@@ -51,21 +101,28 @@ void FontFamily::setValue(const QString value)
 //************ FontSize **************
 
 
-FontSize::FontSize(QObject * parent, QString key, int initValue) :
+FontSizeAttribute::FontSizeAttribute(QObject * parent, QString key, int initValue) :
         IAttribute(parent,key),
         _size(initValue)
 {
 }
 
 
-FontSize::FontSize(const  FontSize& fontSizeAttribute) : IAttribute(fontSizeAttribute)
+FontSizeAttribute::FontSizeAttribute(QObject * parent, QString key, QString initValue) :
+        IAttribute(parent,key),
+        _size()
+{
+    setValue(initValue);
+}
+
+FontSizeAttribute::FontSizeAttribute(const  FontSizeAttribute& fontSizeAttribute) : IAttribute(fontSizeAttribute)
 {
 
     _size = fontSizeAttribute._size;
 
 }
 
-FontSize& FontSize::operator=(const  FontSize& fontSizeAttribute)
+FontSizeAttribute& FontSizeAttribute::operator=(const  FontSizeAttribute& fontSizeAttribute)
 {
     IAttribute::operator =(fontSizeAttribute);
 
@@ -75,25 +132,25 @@ FontSize& FontSize::operator=(const  FontSize& fontSizeAttribute)
 }
 
 
-FontSize::FontSize() : IAttribute()
+FontSizeAttribute::FontSizeAttribute() : IAttribute()
 {}
 
 
-FontSize::~FontSize()
+FontSizeAttribute::~FontSizeAttribute()
 {}
 
-int FontSize::asInt()
+int FontSizeAttribute::asInt()
 {
     return _size;
 }
 
-QString FontSize::asString()
+QString FontSizeAttribute::asString()
 {
     QString sizeStr = QString::number(_size) ;
     return sizeStr;
 }
 
-void  FontSize::setValue(const QString v)
+void  FontSizeAttribute::setValue(const QString v)
 {
 
     bool ok = false;
@@ -112,7 +169,7 @@ void  FontSize::setValue(const QString v)
 
 }
 
-void  FontSize::setValue(const int s)
+void  FontSizeAttribute::setValue(const int s)
 {
     if ( _size != s)
     {
@@ -130,18 +187,18 @@ void  FontSize::setValue(const int s)
 
 
 
-FontColor::FontColor(QObject * parent, QString key, QColor initValue) :
+FontColorAttribute::FontColorAttribute(QObject * parent, QString key, QColor initValue) :
         IAttribute(parent,key),
         _color(initValue)
 {
 }
 
-FontColor::FontColor(const FontColor& fontColorAttribute): IAttribute(fontColorAttribute)
+FontColorAttribute::FontColorAttribute(const FontColorAttribute& fontColorAttribute): IAttribute(fontColorAttribute)
 {
     _color = fontColorAttribute._color;
 }
 
-FontColor& FontColor::operator=( const FontColor& fontColorAttribute)
+FontColorAttribute& FontColorAttribute::operator=( const FontColorAttribute& fontColorAttribute)
 {
     IAttribute::operator =(fontColorAttribute);
 
@@ -150,29 +207,32 @@ FontColor& FontColor::operator=( const FontColor& fontColorAttribute)
 }
 
 
-FontColor::FontColor() : IAttribute()
+FontColorAttribute::FontColorAttribute() : IAttribute()
 {}
 
 
-FontColor::~FontColor()
+FontColorAttribute::~FontColorAttribute()
 {}
 
-QColor FontColor::asQColor()
+QColor FontColorAttribute::asQColor()
 {
     return _color;
 }
 
-QString FontColor::asString()
+QString FontColorAttribute::asString()
 {
     int r=0,g=0,b=0,a=0;
     _color.getRgb(&r,&g,&b,&a);
-    QString color  = QString("#") + QString::number(r,(int)16).toUpper();
-    color.append( QString::number(g,(int)16).toUpper()) ;
-    color.append( QString::number(b,(int)16).toUpper()) ;
+    QString color  = QString("rgb(") + QString::number(r,(int)10).toUpper();
+    color.append(",");
+    color.append( QString::number(g,(int)10).toUpper()) ;
+    color.append(",");
+    color.append( QString::number(b,(int)10).toUpper()) ;
+    color.append(")");
     return color;
 }
 
-void  FontColor::setValue(const QString c)
+void  FontColorAttribute::setValue(const QString c)
 {
     bool ok = true;
     QString color = c;
@@ -219,7 +279,7 @@ void  FontColor::setValue(const QString c)
 }
 
 
-void  FontColor::setValue(const QColor color)
+void  FontColorAttribute::setValue(const QColor color)
 {
     if ( color != color )
     {
@@ -232,17 +292,22 @@ void  FontColor::setValue(const QColor color)
 
 //************ FontBold **************
 
-FontBold::FontBold(QObject * parent, QString key, bool initValue): IAttribute(parent,key)
+FontBoldAttribute::FontBoldAttribute(QObject * parent, QString key, bool initValue): IAttribute(parent,key)
 {
     _bold = initValue;
 }
 
-FontBold::FontBold(const FontBold & fontBoldAttribute): IAttribute(fontBoldAttribute)
+FontBoldAttribute::FontBoldAttribute(QObject * parent, QString key, QString initValue): IAttribute(parent,key)
+{
+    setValue(initValue);
+}
+
+FontBoldAttribute::FontBoldAttribute(const FontBoldAttribute & fontBoldAttribute): IAttribute(fontBoldAttribute)
 {
     _bold = fontBoldAttribute._bold;
 }
 
-FontBold& FontBold::operator =(const FontBold & fontBoldAttribute)
+FontBoldAttribute& FontBoldAttribute::operator =(const FontBoldAttribute & fontBoldAttribute)
 {
     IAttribute::operator =(fontBoldAttribute);
 
@@ -250,26 +315,26 @@ FontBold& FontBold::operator =(const FontBold & fontBoldAttribute)
     return *this;
 }
 
-FontBold::FontBold(): IAttribute()
+FontBoldAttribute::FontBoldAttribute(): IAttribute()
 {
 }
 
-FontBold::~FontBold()
+FontBoldAttribute::~FontBoldAttribute()
 {
 }
 
-QString FontBold::asString()
+QString FontBoldAttribute::asString()
 {
     return (_bold ? QString("true") : QString("false"));
 }
 
 
-bool FontBold::asBool()
+bool FontBoldAttribute::asBool()
 {
     return _bold ;
 }
 
-void FontBold::setValue(const QString bold)
+void FontBoldAttribute::setValue(const QString bold)
 {
     bool tempVal=false;
 
@@ -284,7 +349,7 @@ void FontBold::setValue(const QString bold)
 }
 
 
-void FontBold::setValue(const bool bold)
+void FontBoldAttribute::setValue(const bool bold)
 {
 
     if ( bold != _bold)
@@ -299,17 +364,23 @@ void FontBold::setValue(const bool bold)
 
 
 
-FontUnderline::FontUnderline(QObject * parent, QString key, bool initValue): IAttribute(parent,key)
+FontUnderlineAttribute::FontUnderlineAttribute(QObject * parent, QString key, bool initValue): IAttribute(parent,key)
 {
     _underline = initValue;
 }
 
-FontUnderline::FontUnderline(const FontUnderline & fontUnderlineAttribute) : IAttribute(fontUnderlineAttribute)
+
+FontUnderlineAttribute::FontUnderlineAttribute(QObject * parent, QString key, QString initValue): IAttribute(parent,key)
+{
+    setValue(initValue);
+}
+
+FontUnderlineAttribute::FontUnderlineAttribute(const FontUnderlineAttribute & fontUnderlineAttribute) : IAttribute(fontUnderlineAttribute)
 {
     _underline = fontUnderlineAttribute._underline;
 }
 
-FontUnderline& FontUnderline::operator =(const FontUnderline & fontUnderlineAttribute)
+FontUnderlineAttribute& FontUnderlineAttribute::operator =(const FontUnderlineAttribute & fontUnderlineAttribute)
 {
     IAttribute::operator =(fontUnderlineAttribute);
 
@@ -319,25 +390,25 @@ FontUnderline& FontUnderline::operator =(const FontUnderline & fontUnderlineAttr
 }
 
 
-FontUnderline::FontUnderline() : IAttribute()
+FontUnderlineAttribute::FontUnderlineAttribute() : IAttribute()
 {
 }
 
-FontUnderline::~FontUnderline()
+FontUnderlineAttribute::~FontUnderlineAttribute()
 {}
 
-QString FontUnderline::asString()
+QString FontUnderlineAttribute::asString()
 {
     return (_underline ? QString("true") : QString("false"));
 }
 
 
-bool FontUnderline::asBool()
+bool FontUnderlineAttribute::asBool()
 {
     return _underline ;
 }
 
-void FontUnderline::setValue(const QString underline)
+void FontUnderlineAttribute::setValue(const QString underline)
 {
     bool tempVal=false;
 
@@ -352,7 +423,7 @@ void FontUnderline::setValue(const QString underline)
 }
 
 
-void FontUnderline::setValue(const bool underline)
+void FontUnderlineAttribute::setValue(const bool underline)
 {
 
     if ( underline != _underline)
@@ -361,4 +432,135 @@ void FontUnderline::setValue(const bool underline)
         emit changed(this);
     }
 }
+
+
+
+
+
+
+TextBlockAttributes::TextBlockAttributes() :
+        IAttributeContainer()
+{
+}
+
+TextBlockAttributes::TextBlockAttributes(QObject * parent, QString key) :
+        IAttributeContainer(parent, key)
+{
+}
+
+TextBlockAttributes::TextBlockAttributes(const TextBlockAttributes& sa): IAttributeContainer(sa)
+{
+    setAttributes(sa);
+}
+
+TextBlockAttributes& TextBlockAttributes::operator=( TextBlockAttributes& sa )
+{
+    setAttributes(sa);
+    return *this;
+}
+
+
+TextBlockAttributes::~TextBlockAttributes()
+{ }
+
+
+
+void TextBlockAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
+{
+    // if the dest container has a matching key,
+    // update the value to be the source value.
+    // else, add the source to the container
+    //
+    // remove from the dest list any attributes that are not in the souce list
+
+    QMapIterator<QString,IAttribute*> i(sourceAttrList);
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+        IAttribute* sourceAttr = sourceAttrList.value(key)  ;
+        IAttribute* destAttr = this->value( key ) ;
+        if ( destAttr )
+        {
+            destAttr->setValue( sourceAttr->asString());
+        }
+        else
+        {
+            IAttribute* newAttr=NULL;
+
+            PositionAttribute *ps=NULL;
+            SizeAttribute *sz=NULL;
+            FontFamilyAttribute *ff=NULL;
+            FontSizeAttribute *fs=NULL;
+            FontColorAttribute *fc=NULL;
+            FontBoldAttribute *fb=NULL;
+            FontUnderlineAttribute *fu=NULL;
+
+            if ( ( ps = dynamic_cast<PositionAttribute *>(sourceAttr) ) != NULL )
+            {
+                PositionAttribute * newPs = new PositionAttribute (*ps);
+                addItem(newPs);
+                newAttr = newPs;
+            }
+            else if ( ( sz = dynamic_cast<SizeAttribute *>(sourceAttr) ) != NULL )
+            {
+                SizeAttribute * newSz = new SizeAttribute (*sz);
+                addItem(newSz);
+                newAttr = newSz;
+            }
+            else if ( (  ff = dynamic_cast<FontFamilyAttribute *>(sourceAttr) ) != NULL )
+            {
+                FontFamilyAttribute * f = new FontFamilyAttribute (*ff);
+                addItem(f);
+                newAttr = f;
+            }
+            else if ( (  fs = dynamic_cast<FontSizeAttribute *>(sourceAttr) ) != NULL )
+            {
+                FontSizeAttribute * f = new FontSizeAttribute (*fs);
+                addItem(f);
+                newAttr = f;
+            }
+            else if ( (  fc = dynamic_cast<FontColorAttribute *>(sourceAttr) ) != NULL )
+            {
+                FontColorAttribute * f = new FontColorAttribute (*fc);
+                addItem(f);
+                newAttr = f;
+            }
+            else if ( (  fb = dynamic_cast<FontBoldAttribute *>(sourceAttr) ) != NULL )
+            {
+                FontBoldAttribute * f = new FontBoldAttribute (*fb);
+                addItem(f);
+                newAttr = f;
+            }
+            else if ( (  fu = dynamic_cast<FontUnderlineAttribute *>(sourceAttr) ) != NULL )
+            {
+                FontUnderlineAttribute * f = new FontUnderlineAttribute (*fu);
+                addItem(f);
+                newAttr = f;
+            }
+
+            if ( newAttr ) emit attributeAdded(newAttr);
+        }
+    }
+
+    // now delete local attributes that are not contained in the source list
+
+   QMapIterator<QString,IAttribute*> j(sourceAttrList);
+
+    while (j.hasNext())
+    {
+        QString key  = j.next().key();
+
+        if ( !sourceAttrList.contains(key) )
+        {
+            IAttribute* attr = this->value(key);
+            this->remove(key);
+            emit attributeDeleted(attr);
+            delete attr;
+        }
+    }
+}
+
+
+
+
 

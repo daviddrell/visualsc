@@ -25,10 +25,13 @@ SOURCES += scdatamodel.cpp \
     iattribute.cpp \
     textblockattributes.cpp \
     sizeattribute.cpp \
-    positionattribute.cpp
+    positionattribute.cpp \
+    textblock.cpp \
+    idattribute.cpp \
+    scitem.cpp
 
 HEADERS += scdatamodel.h\
-        SCDataModel_global.h \
+    SCDataModel_global.h \
     transitionattributes.h \
     stateattributes.h \
     sctransition.h \
@@ -37,7 +40,10 @@ HEADERS += scdatamodel.h\
     iattribute.h \
     textblockattributes.h \
     sizeattribute.h \
-    positionattribute.h
+    positionattribute.h \
+    textblock.h \
+    idattribute.h \
+    scitem.h
 
 OTHER_FILES += \
     COPYING.txt

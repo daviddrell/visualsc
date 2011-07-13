@@ -27,16 +27,18 @@ SOURCES += scgraphicsview.cpp \
     stateboxgraphic.cpp \
     selectablelinesegmentgraphic.cpp \
     cornergrabber.cpp \
-    selectabletextblock.cpp \
-    selectableboxgraphic.cpp
+    selectableboxgraphic.cpp \
+    selectabletextblock.cpp
+
 
 HEADERS += scgraphicsview.h\
         scgraphicsview_global.h \ 
     stateboxgraphic.h \
     selectablelinesegmentgraphic.h \
     cornergrabber.h \
-    selectabletextblock.h \
-    selectableboxgraphic.h
+    selectableboxgraphic.h \
+    selectabletextblock.h
+
 
 OTHER_FILES += \
     COPYING.txt

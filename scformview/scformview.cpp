@@ -27,6 +27,7 @@
 #include <QVariant>
 #include "customtreewidgetitem.h"
 #include "stateselectionwindow.h"
+#include "textblock.h"
 
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         QMainWindow(parent, Qt::WindowStaysOnTopHint),
@@ -109,26 +110,31 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
 {
     if ( c != 1 ) return;
 
+    IAttributeContainer * attributes;
     IAttribute * attr;
 
     QString key = propertyTable->item(r,0)->text();
     QString value = propertyTable->item(r,1)->text();
 
-    SCState * state = dynamic_cast<SCState*>(_currentlySelected);
-    if ( state != NULL )
-    {
-        attr = state->attributes.value(key);
-    }
-    else
-    {
-        SCTransition * transition = dynamic_cast<SCTransition*>(_currentlySelected);
-        if ( transition == NULL) return;
-
-        attr = transition->attributes.value(key);
-    }
-
-
+    SCItem * item = dynamic_cast<SCItem*>(_currentlySelected);
+    attributes = item->getAttributes();
+    attr = attributes->value(key);
     attr->setValue(value);
+
+//    SCState * state = dynamic_cast<SCState*>(_currentlySelected);
+//    if ( state != NULL )
+//    {
+//        attr = state->attributes.value(key);
+//    }
+//    else
+//    {
+//        SCTransition * transition = dynamic_cast<SCTransition*>(_currentlySelected);
+//        if ( transition == NULL) return;
+
+//        attr = transition->attributes.value(key);
+//    }
+
+
 
 }
 
@@ -172,6 +178,7 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
 
         loadTree (item, transitions);
 
+
         // get all substates of this state
         QList<SCState*> subStates;
 
@@ -179,9 +186,30 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
 
         loadTree (item, subStates);
 
+        // get the state's text block
+        TextBlock  * textBlock = st->getIDTextBlock();
+        loadTree (item, textBlock);
+
     }
 
 }
+
+
+void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , TextBlock* textBlock)
+{
+
+    CustomTreeWidgetItem * item=0;
+
+    item = new CustomTreeWidgetItem(parentItem);
+    item->setData(textBlock);
+
+    QString text = textBlock->getText();
+    item->setText(0, text);
+
+    item->setIcon(0,QIcon(":/SCFormView/textblock.bmp"));
+
+}
+
 
 void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransition*> & transitions)
 {
@@ -211,19 +239,22 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransiti
 
 IAttributeContainer * SCFormView::getCurrentlySelectedAttributes()
 {
-    IAttributeContainer * attributes;
+    IAttributeContainer * attributes=NULL;
     SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
+    SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
+    TextBlock * textBlock  = dynamic_cast<TextBlock *>(  _currentlySelected );
+
     if ( st!= NULL)
     {
-        _currentlySelected = st;
         attributes =  & st->attributes;
     }
-    else
+    else if ( transition != NULL )
     {
-        SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
-        if ( transition == NULL) return NULL;
-        _currentlySelected = transition;
         attributes =  & transition->attributes;
+    }
+    else if (textBlock != NULL)
+    {
+        attributes = & textBlock->attributes;
     }
 
     return attributes;
@@ -235,6 +266,9 @@ QString SCFormView::getCurrentlySelectedTitle()
 
     IAttributeContainer * attributes;
     SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
+    SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
+    TextBlock * textBlock  = dynamic_cast<TextBlock *>(  _currentlySelected );
+
     if ( st!= NULL)
     {
         attributes =  & st->attributes;
@@ -242,33 +276,43 @@ QString SCFormView::getCurrentlySelectedTitle()
         title = attr->asString();
 
     }
-    else
+    else if (transition != NULL )
     {
-        SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
-        if ( transition == NULL) return QString("programming error getCurrentlySelectedTitle ");
         attributes =  & transition->attributes;
         IAttribute* attr = attributes->value("target")  ;
         title = attr->asString();
+    }
+    else if (  textBlock != NULL )
+    {
+        title = QString("TextBlock");
     }
 
     return title;
 }
 
+
+
 QString SCFormView::getCurrentlySelectedType()
 {
 
-
     SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
+    SCTransition * transition  = dynamic_cast<SCTransition *>(  _currentlySelected );
+    TextBlock * textBlock  = dynamic_cast<TextBlock *>(  _currentlySelected );
+
     if ( st!= NULL)
     {
         return QString("State");
     }
-    else
+    else if (transition != NULL )
     {
-        SCTransition * transition  = dynamic_cast<SCTransition *>(  _currentlySelected );
-        if ( transition == NULL) return QString("programming error getCurrentlySelectedType ");
         return QString("Transition");
     }
+    else if (  textBlock != NULL )
+    {
+        return QString("TextBlock");
+    }
+
+    return QString();
 }
 
 void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
@@ -306,7 +350,6 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
     // load the new attributes
 
     IAttributeContainer * attributes =  getCurrentlySelectedAttributes();
-
 
     disconnect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
 

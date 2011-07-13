@@ -27,10 +27,10 @@ public:
     QPointF asPointF() const;
 
     void    setValue(const QString position);
-    void    setValue(int w, int h);
+    void    setValue(int x, int y);
     void    setValue(const QPointF p);
 private :
-        QPointF _position;
+    QPointF _position;
 
 };
 

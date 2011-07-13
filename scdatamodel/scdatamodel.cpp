@@ -82,15 +82,15 @@ void SCDataModel::open(QString file)
 
     connect(&_reader, SIGNAL(done(bool, QStringList)), this, SLOT(handleReaderDone(bool, QStringList)));
 
-    connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::QueuedConnection);
-    connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()), Qt::QueuedConnection);
-    connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()), Qt::QueuedConnection);
+    connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()), Qt::DirectConnection);
 
-    connect(&_reader, SIGNAL(makeANewStateIDTextBlock(StateAttributes*)), this, SLOT(handleMakeANewStateIDTextBlock(StateAttributes*)), Qt::QueuedConnection);
+    connect(&_reader, SIGNAL(makeANewTextBlockElement(QString,TextBlockAttributes*)), this, SLOT(handleMakeANewTextBlock(QString,TextBlockAttributes*)), Qt::DirectConnection);
 
-    connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)), Qt::QueuedConnection);
-    connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::QueuedConnection);
-    connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::QueuedConnection);
+    connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
 
     _reader.readFile(file);
     _reader.start();
@@ -345,6 +345,21 @@ void SCDataModel::handleLeaveTransitionElement()
 
     emit newTransitionSignal(_currentTransition);
 
+}
+
+
+
+void SCDataModel::handleMakeANewTextBlock (QString text, TextBlockAttributes *attributes)
+{
+    if  ( _currentState == NULL ) return;
+
+    if (text.isEmpty())
+        text.append(" ");
+
+    TextBlock *textBlock = _currentState->getIDTextBlock();
+    IAttributeContainer *container = textBlock->getAttributes();
+    container->setAttributes(*attributes);
+    textBlock->setText(text);
 }
 
 
