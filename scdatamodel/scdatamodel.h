@@ -83,6 +83,10 @@ public:
     QObject * getItemByName(QString name);
     SCState* getTopState( );
 
+    static SCState *getAsState(QObject*);
+    static SCTransition *getAsTransition(QObject*);
+    static TextBlock *getAsTextBlock(QObject*);
+
     /** \fn insertNewState
       * \brief Creates and returns a pointer to a new state inserted in the provided parent state.
       */
@@ -122,9 +126,6 @@ private:
 
 
 //private methods
-
-
-
 
 };
 

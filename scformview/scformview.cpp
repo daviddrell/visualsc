@@ -121,21 +121,6 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
     attr = attributes->value(key);
     attr->setValue(value);
 
-//    SCState * state = dynamic_cast<SCState*>(_currentlySelected);
-//    if ( state != NULL )
-//    {
-//        attr = state->attributes.value(key);
-//    }
-//    else
-//    {
-//        SCTransition * transition = dynamic_cast<SCTransition*>(_currentlySelected);
-//        if ( transition == NULL) return;
-
-//        attr = transition->attributes.value(key);
-//    }
-
-
-
 }
 
 
@@ -334,6 +319,14 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
 
     selectedChartItem->setText(selectedItemTitle );
 
+    if (getCurrentlySelectedType() == "TextBlock" )
+    {
+        textToolBar->setEnabled(true);
+    }
+    else
+    {
+        textToolBar->setEnabled(false);
+    }
 
     // clear the tabel, delete the old table items
     for (int r =0; r <propertyTable->rowCount(); r++ )
@@ -613,7 +606,7 @@ void SCFormView::createActions()
     QPixmap pixmap(":/SCFormView/bold.png");
     boldAction->setIcon(QIcon(pixmap));
     boldAction->setShortcut(tr("Ctrl+B"));
-    connect(boldAction, SIGNAL(triggered()), this, SLOT(handleFontChange()));
+    connect(boldAction, SIGNAL(triggered()), this, SLOT(handleBoldChanged()));
 
     italicAction = new QAction(QIcon(":/SCFormView/italic.png"),   tr("Italic"), this);
     italicAction->setCheckable(true);
@@ -630,7 +623,21 @@ void SCFormView::createActions()
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 }
 
+void SCFormView::handleBoldChanged()
+{
+    TextBlock * tb = SCDataModel::getAsTextBlock(_currentlySelected);
+    if ( ! tb ) return;
 
+    IAttribute* attr = tb->attributes.value("font-bold")  ;
+
+    if ( ! attr ) return;
+
+    if ( boldAction->isChecked() )
+        attr->setValue("true");
+    else
+        attr->setValue("false");
+
+}
 
 void SCFormView::createMenus()
 {
@@ -715,6 +722,8 @@ void SCFormView::createToolbars()
     textToolBar->addAction(boldAction);
     textToolBar->addAction(italicAction);
     textToolBar->addAction(underlineAction);
+    textToolBar->setEnabled(false);
+
 
     colorToolBar = addToolBar(tr("Color"));
     colorToolBar->addWidget(fontColorToolButton);

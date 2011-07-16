@@ -94,6 +94,7 @@ private slots:
     void fillButtonTriggered();
     void lineButtonTriggered();
     void handleFontChange();
+    void handleBoldChanged();
 
     void about();
 
