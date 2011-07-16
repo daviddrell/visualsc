@@ -3,7 +3,7 @@
     <state id="State Machine" position="0,0" size="100,50">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
         <state id="Main" position="30,100" size="984,483">
-            <textblock font-bold="false" font-color="rgb(255,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
+            <textblock font-bold="true" font-color="rgb(0,0,255)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
             <state id="Main_initial" position="220,20" size="133,78">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                 <transition target="Test1">
