@@ -16,6 +16,8 @@ bin/*
 */moc_*
 */*.Debug
 */*.Release
+*.user
+*.user.*
 
 #logs and databases
 *.log
