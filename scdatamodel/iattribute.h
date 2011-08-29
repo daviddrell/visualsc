@@ -206,7 +206,17 @@ public:
 
     virtual QString key() ;
 
-    void addItem( IAttribute* attr);
+    /**
+      \fn addItem
+
+      \brief add an attribute.
+
+      If an attribute with the same key already exists in the container, do not add, but change
+      the value of the existing attribute to be the value of the new attribute.
+
+      \return if an attribute with the same key already exists, return false;
+      */
+    bool addItem( IAttribute* attr);
 
 
     /**

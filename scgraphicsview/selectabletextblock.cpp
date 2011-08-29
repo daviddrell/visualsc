@@ -26,43 +26,10 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,TextBlock *text
 
     setSize (_minSize);
 
-    TextAttribute * text = dynamic_cast<TextAttribute *> (  _textBlockModel->attributes.value("text"));
-    connect (text, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(text);
+    connect ( & _textBlockModel->attributes,SIGNAL(attributeAdded(IAttribute*)), SLOT(handleAttributeAdded(IAttribute*)) );
+    connect ( & _textBlockModel->attributes,SIGNAL(attributeDeleted(IAttribute*)), SLOT(handleAttributeDeleted(IAttribute*)) );
 
-
-    FontFamilyAttribute * ff = dynamic_cast<FontFamilyAttribute *> (  _textBlockModel->attributes.value("font-family"));
-    connect (ff, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(ff);
-
-
-    FontSizeAttribute * fs = dynamic_cast<FontSizeAttribute *> (  _textBlockModel->attributes.value("font-size"));
-    connect (fs, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(ff);
-
-
-    FontColorAttribute * fc = dynamic_cast<FontColorAttribute *> (  _textBlockModel->attributes.value("font-color"));
-    connect (fc, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(fc);
-
-
-    FontBoldAttribute * fb = dynamic_cast<FontBoldAttribute *> (  _textBlockModel->attributes.value("font-bold"));
-    connect (fb, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(fb);
-
-
-    FontUnderlineAttribute * fu = dynamic_cast<FontUnderlineAttribute *> (  _textBlockModel->attributes.value("font-underline"));
-    connect (fu, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(fu);
-
-
-    SizeAttribute * size = dynamic_cast<SizeAttribute *> (  _textBlockModel->attributes.value("size"));
-    connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(size);
-
-    PositionAttribute * position =dynamic_cast<PositionAttribute*> ( _textBlockModel->attributes.value("position"));
-    connect (position, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(position);
+    connectAttributes( & _textBlockModel->attributes);
 
 }
 
@@ -71,7 +38,76 @@ SelectableTextBlock::~SelectableTextBlock()
 {
 }
 
+void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)
+{
+    TextAttribute * text = dynamic_cast<TextAttribute *> (  attributes->value("text"));
+    if ( text )
+    {
+        connect (text, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        handleAttributeChanged(text);
+    }
 
+    FontFamilyAttribute * ff = dynamic_cast<FontFamilyAttribute *> (  attributes->value("font-family"));
+    if ( ff )
+    {
+        connect (ff, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        handleAttributeChanged(ff);
+    }
+
+
+    FontSizeAttribute * fs = dynamic_cast<FontSizeAttribute *> (  attributes->value("font-size"));
+    if ( fs )
+    {
+        connect (fs, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        handleAttributeChanged(ff);
+    }
+
+    FontColorAttribute * fc = dynamic_cast<FontColorAttribute *> (  attributes->value("font-color"));
+    if ( fc )
+    {
+        connect (fc, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        handleAttributeChanged(fc);
+    }
+
+
+    FontBoldAttribute * fb = dynamic_cast<FontBoldAttribute *> (  attributes->value("font-bold"));
+    if ( fb )
+    {
+        connect (fb, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        handleAttributeChanged(fb);
+    }
+
+    FontUnderlineAttribute * fu = dynamic_cast<FontUnderlineAttribute *> (  attributes->value("font-underline"));
+    if ( fu )
+    {
+        connect (fu, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        handleAttributeChanged(fu);
+    }
+
+    SizeAttribute * size = dynamic_cast<SizeAttribute *> (  attributes->value("size"));
+    if ( fs )
+    {
+        connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        handleAttributeChanged(size);
+    }
+
+    PositionAttribute * position =dynamic_cast<PositionAttribute*> ( attributes->value("position"));
+    if  (position)
+    {
+        connect (position, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        handleAttributeChanged(position);
+    }
+
+}
+
+void SelectableTextBlock::handleAttributeAdded(IAttribute *attr)
+{
+    handleAttributeChanged(attr);
+}
+
+void SelectableTextBlock::handleAttributeDeleted(IAttribute *attr)
+{
+}
 
 void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 {
@@ -79,7 +115,7 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 //    FontFamilyAttribute * ff     = dynamic_cast<FontFamilyAttribute *> ( attr);
 //    FontSizeAttribute * fs       = dynamic_cast<FontSizeAttribute *> ( attr);
     FontColorAttribute * fc      = dynamic_cast<FontColorAttribute *> ( attr);
-//    FontBoldAttribute * fb       = dynamic_cast<FontBoldAttribute *> ( attr);
+    FontBoldAttribute * fb       = dynamic_cast<FontBoldAttribute *> ( attr);
 //    FontUnderlineAttribute * fu  = dynamic_cast<FontUnderlineAttribute *> ( attr);
     SizeAttribute * size         = dynamic_cast<SizeAttribute *> ( attr);
     PositionAttribute * position = dynamic_cast<PositionAttribute*> (attr);
@@ -104,6 +140,24 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
     {
         QColor c = fc->asQColor();
         _textItem.setDefaultTextColor(c);
+    }
+    else if ( fb )
+    {
+
+        QFont font = _textItem.font();
+
+        _textItem.setFont(font);
+
+        if ( fb->asBool() )
+        {
+            font.setWeight( QFont::Bold );
+        }
+        else
+        {
+            font.setWeight( QFont::Normal);
+        }
+
+        _textItem.setFont(font);
     }
 
     QGraphicsItem *parent = this->parentItem();

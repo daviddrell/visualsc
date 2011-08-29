@@ -24,6 +24,8 @@
 #include "selectablelinesegmentgraphic.h"
 #include <QList>
 #include <QDebug>
+#include <QGLWidget>
+#include <QLabel>
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
         QWidget (parentWidget),
@@ -36,11 +38,22 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
+//    _view.setScene(& _scene);
+
+//    _view.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+
+//    _view.show();
+
+
+
+
+    // try using openGL
+
+    _view.setViewport( new QGLWidget (QGLFormat(QGL::SampleBuffers) ));
     _view.setScene(& _scene);
-
-    _view.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-
     _view.show();
+
+
 }
 
 QGraphicsView * SCGraphicsView::getQGraphicsView()

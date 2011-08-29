@@ -28,7 +28,7 @@
 #include "stateattributes.h"
 #include "stateboxgraphic.h"
 #include "selectablelinesegmentgraphic.h"
-
+#include "textformattoolbar.h"
 #include <QMap>
 
 /**

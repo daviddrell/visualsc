@@ -4,7 +4,7 @@
 #include "sizeattribute.h"
 
 
-TextBlock::TextBlock()
+TextBlock::TextBlock(): SCItem()
 {
     FontFamilyAttribute * ff = new FontFamilyAttribute(NULL,"font-family", "courier");
     attributes.addItem(ff);

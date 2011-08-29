@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/SCGraphicsView">
+        <file>bold.png</file>
+        <file>italic.png</file>
+    </qresource>
+</RCC>

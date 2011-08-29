@@ -60,7 +60,6 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     TextItem.setParentItem(this);
 
-
 }
 
 

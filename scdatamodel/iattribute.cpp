@@ -118,11 +118,21 @@ IAttributeContainer::~IAttributeContainer()
 
 QString IAttributeContainer::key() {return _containerName; }
 
-void IAttributeContainer::addItem( IAttribute* attr)
+bool IAttributeContainer::addItem( IAttribute* attr)
 {
-    QString k = attr->key();
-    this->insert(k, attr);
-    emit attributeAdded(attr);
+    if (  this->contains( attr->key() ) )
+    {
+        IAttribute * a = this->value( attr->key());
+        a->setValue( attr->asString());
+        return false;
+    }
+    else
+    {
+        QString k = attr->key();
+        this->insert(k, attr);
+        emit attributeAdded(attr);
+        return true;
+    }
 }
 
 /**

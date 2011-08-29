@@ -24,7 +24,7 @@
 #include <QMainWindow>
 #include "smproject.h"
 #include <QString>
-
+#include "textformattoolbar.h"
 
 class SCFormView;
 
@@ -49,6 +49,7 @@ private:
     QSettings *_settings;
     static QString _keyLastFilePath;
     SCFormView *_formEditorWindow;
+    TextFormatToolBar *_textFormatToolBar;
 
 private slots:
     void handleFileOpenClick();

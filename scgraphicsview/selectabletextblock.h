@@ -30,12 +30,14 @@ public:
 private slots:
 
     void handleAttributeChanged(IAttribute *attr);
+    void handleAttributeAdded(IAttribute *attr);
+    void handleAttributeDeleted(IAttribute *attr);
 
 private:
 
     // private methods
 
-
+   void connectAttributes(IAttributeContainer *attributes);
    virtual void graphicHasChanged(); ///< pure virtual in base SelectableBoxGraphic, subclass must implement this, used to record user changes back to the data model
 
    // private data

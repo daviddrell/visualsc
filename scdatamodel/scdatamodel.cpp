@@ -24,12 +24,32 @@
 #include <QMapIterator>
 
 SCDataModel::SCDataModel(QObject * parent) :
-        QObject (parent), _reader(), _writer(0), _level(0),_topLevel(0),
-        _currentState(NULL), _currentTransition(NULL),_topState(NULL)
+    QObject (parent), _reader(), _writer(0), _level(0),_topLevel(0),
+    _currentState(NULL), _currentTransition(NULL),_topState(NULL)
 {
 
     // TODO destructor
 }
+
+SCState * SCDataModel::getAsState(QObject*o)
+{
+    SCState * state = dynamic_cast<SCState*>(o);
+    return state;
+}
+
+SCTransition * SCDataModel::getAsTransition(QObject*o)
+{
+    SCTransition * v = dynamic_cast<SCTransition*>(o);
+    return v;
+}
+
+TextBlock * SCDataModel::getAsTextBlock(QObject*o)
+{
+    TextBlock * v = dynamic_cast<TextBlock*>(o);
+    return v;
+}
+
+
 
 
 
@@ -358,8 +378,27 @@ void SCDataModel::handleMakeANewTextBlock (QString text, TextBlockAttributes *at
 
     TextBlock *textBlock = _currentState->getIDTextBlock();
     IAttributeContainer *container = textBlock->getAttributes();
-    container->setAttributes(*attributes);
+
+    QMapIterator<QString,IAttribute*> i(*attributes);
+    while(i.hasNext())
+    {
+
+        i.next();
+        if ( i.key() == QString("font-bold") )
+        {
+            FontBoldAttribute * fb = new FontBoldAttribute( NULL,"font-bold", i.value()->asString());
+            bool added = container->addItem(fb);
+            if ( ! added )
+                delete fb;//if it was not added, then it was copied, don't need the original
+        }
+        else
+        {
+            GenericAttribute * a = new GenericAttribute(NULL, i.key(), i.value()->asString());
+        }
+    }
     textBlock->setText(text);
+
+    delete attributes;
 }
 
 

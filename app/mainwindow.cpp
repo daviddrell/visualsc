@@ -36,7 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
         ui(new Ui::MainWindow),
         _project(0),
         _settings(0),
-        _formEditorWindow(0)
+        _formEditorWindow(0),
+        _textFormatToolBar(NULL)
 {
     QCoreApplication::setOrganizationName("David W Drell");
     QCoreApplication::setOrganizationDomain("davidwdrell.net");
@@ -49,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect ( ui->actionSave, SIGNAL(triggered()), this, SLOT(handleFileSaveClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
 
+    _textFormatToolBar = new TextFormatToolBar();
+
+    this->addToolBar(_textFormatToolBar);
 
 }
 

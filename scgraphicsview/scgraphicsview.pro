@@ -6,7 +6,7 @@
 
 include (../visualsc.pri)
 
-QT       += core gui
+QT       += core gui opengl
 
 TARGET = scgraphicsview
 TEMPLATE = lib
@@ -28,7 +28,8 @@ SOURCES += scgraphicsview.cpp \
     selectablelinesegmentgraphic.cpp \
     cornergrabber.cpp \
     selectableboxgraphic.cpp \
-    selectabletextblock.cpp
+    selectabletextblock.cpp \
+    textformattoolbar.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -37,8 +38,12 @@ HEADERS += scgraphicsview.h\
     selectablelinesegmentgraphic.h \
     cornergrabber.h \
     selectableboxgraphic.h \
-    selectabletextblock.h
+    selectabletextblock.h \
+    textformattoolbar.h
 
 
 OTHER_FILES += \
     COPYING.txt
+
+RESOURCES += \
+    resources/scgraphicsview.qrc

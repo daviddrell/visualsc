@@ -21,17 +21,7 @@
     <item row="4" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLineEdit" name="lineEdit"/>
-      </item>
-      <item>
        <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label">
         <property name="text">
          <string>TextLabel</string>
         </property>
