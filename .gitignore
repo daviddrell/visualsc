@@ -1,0 +1,42 @@
+# Lines starting with '#' are considered comments.
+# Ignore any file named foo.txt.
+Make*
+# Ignore (generated) html files,
+*.html
+# except foo.html which is maintained by hand.
+!foo.html
+# Ignore objects and archives.
+*.[oa]
+*.com
+*.class
+*.dll
+*.exe
+*.so
+bin/*
+*/moc_*
+*/*.Debug
+*/*.Release
+*.user
+*.user.*
+
+#logs and databases
+*.log
+*.sql
+*.sqlite
+
+#os generated
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+
+#packages - unpack first
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+
