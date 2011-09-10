@@ -17,6 +17,7 @@
 
 class SCDATAMODELSHARED_EXPORT TextBlock : public SCItem
 {
+    Q_OBJECT
 
 public:
     TextBlock();
@@ -25,6 +26,9 @@ public:
     QString getText();
     void    setText(QString);
     void writeSCVXML(QXmlStreamWriter & sw);
+
+signals:
+     void textChanged();
 
 private:
 

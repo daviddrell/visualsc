@@ -34,18 +34,14 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
         _dm(dm),
         _mapStateToGraphic()
 {
+    _dm->setScene(& _scene);
 
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
 //    _view.setScene(& _scene);
-
 //    _view.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-
 //    _view.show();
-
-
-
 
     // try using openGL
 

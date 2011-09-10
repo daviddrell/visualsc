@@ -5,6 +5,7 @@
 #include "selectableboxgraphic.h"
 #include "textblock.h"
 #include "iattribute.h"
+class QKeyEvent;
 
 /**
   * \class SelectableTextBlock
@@ -23,12 +24,18 @@ public:
     SelectableTextBlock(QGraphicsObject *parent=NULL,TextBlock *textBlockModel=NULL);
     ~SelectableTextBlock();
 
-    void setPlainText(QString text);
+//    void setPlainText(QString text);
     virtual void setSize(QPoint size); ///< from base class
+
+
+protected:
+
+    void keyPressEvent ( QKeyEvent * event ); // [virtual protected]
 
 
 private slots:
 
+    void handleTextChanged();
     void handleAttributeChanged(IAttribute *attr);
     void handleAttributeAdded(IAttribute *attr);
     void handleAttributeDeleted(IAttribute *attr);

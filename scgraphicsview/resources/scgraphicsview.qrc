@@ -2,5 +2,6 @@
     <qresource prefix="/SCGraphicsView">
         <file>bold.png</file>
         <file>italic.png</file>
+        <file>indexcard.png</file>
     </qresource>
 </RCC>

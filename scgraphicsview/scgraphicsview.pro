@@ -29,7 +29,8 @@ SOURCES += scgraphicsview.cpp \
     cornergrabber.cpp \
     selectableboxgraphic.cpp \
     selectabletextblock.cpp \
-    textformattoolbar.cpp
+    textformattoolbar.cpp \
+    texteditbox.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -39,7 +40,8 @@ HEADERS += scgraphicsview.h\
     cornergrabber.h \
     selectableboxgraphic.h \
     selectabletextblock.h \
-    textformattoolbar.h
+    textformattoolbar.h \
+    texteditbox.h
 
 
 OTHER_FILES += \

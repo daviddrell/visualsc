@@ -78,7 +78,6 @@ void SCXMLReader::readElement()
     bool enteredAStateElement = false;
     bool enteredATransistionElement = false;
     bool enteredATransistionPathElement = false;
-    bool elementAtEnd = true;
 
     if (_reader.name() == "scxml")
     {

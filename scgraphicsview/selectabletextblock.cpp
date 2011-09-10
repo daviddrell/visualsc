@@ -2,7 +2,10 @@
 #include "positionattribute.h"
 #include "sizeattribute.h"
 #include <QDebug>
-
+#include <QKeyEvent>
+#include "texteditbox.h"
+#include "scdatamodel.h"
+#include <QGraphicsScene>
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,TextBlock *textBlockModel) :
         SelectableBoxGraphic(parent),
@@ -24,12 +27,17 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,TextBlock *text
 
     setFlags(QGraphicsItem::ItemClipsChildrenToShape);
 
+    setFlag(QGraphicsItem::ItemIsFocusable, true);
+
     setSize (_minSize);
 
+    connect ( _textBlockModel, SIGNAL(textChanged()), this, SLOT(handleTextChanged()), Qt::QueuedConnection);
     connect ( & _textBlockModel->attributes,SIGNAL(attributeAdded(IAttribute*)), SLOT(handleAttributeAdded(IAttribute*)) );
     connect ( & _textBlockModel->attributes,SIGNAL(attributeDeleted(IAttribute*)), SLOT(handleAttributeDeleted(IAttribute*)) );
 
     connectAttributes( & _textBlockModel->attributes);
+
+    _textItem.setPlainText( _textBlockModel->getText() );
 
 }
 
@@ -38,14 +46,22 @@ SelectableTextBlock::~SelectableTextBlock()
 {
 }
 
+void SelectableTextBlock::handleTextChanged()
+{
+    _textItem.setPlainText( _textBlockModel->getText() );
+}
+
+void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
+{
+    if(event->key() == Qt::Key_F4)
+    {
+        TextEditBox * editBox = new TextEditBox( _textBlockModel);
+        SCDataModel::singleton()->getScene()->addItem( editBox);
+    }
+}
+
 void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)
 {
-    TextAttribute * text = dynamic_cast<TextAttribute *> (  attributes->value("text"));
-    if ( text )
-    {
-        connect (text, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-        handleAttributeChanged(text);
-    }
 
     FontFamilyAttribute * ff = dynamic_cast<FontFamilyAttribute *> (  attributes->value("font-family"));
     if ( ff )
@@ -111,7 +127,6 @@ void SelectableTextBlock::handleAttributeDeleted(IAttribute *attr)
 
 void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 {
-    TextAttribute * text         = dynamic_cast<TextAttribute *> ( attr);
 //    FontFamilyAttribute * ff     = dynamic_cast<FontFamilyAttribute *> ( attr);
 //    FontSizeAttribute * fs       = dynamic_cast<FontSizeAttribute *> ( attr);
     FontColorAttribute * fc      = dynamic_cast<FontColorAttribute *> ( attr);
@@ -120,13 +135,7 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
     SizeAttribute * size         = dynamic_cast<SizeAttribute *> ( attr);
     PositionAttribute * position = dynamic_cast<PositionAttribute*> (attr);
 
-
-    if ( text )
-    {
-        this->setObjectName(text->asString()); // help debug tracing - id which object this is
-        _textItem.setPlainText(text->asString());
-    }
-    else if ( size )
+    if ( size )
     {
         QPoint pt = size->asPointF().toPoint();
         SelectableBoxGraphic::setSize(pt);
@@ -181,10 +190,10 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
  }
 
 
-void SelectableTextBlock::setPlainText(QString text)
-{
-    _textItem.setPlainText(text);
-}
+ //void SelectableTextBlock::setPlainText(QString text)
+ //{
+ //    _textItem.setPlainText(text);
+ //}
 
 
 void SelectableTextBlock::graphicHasChanged()

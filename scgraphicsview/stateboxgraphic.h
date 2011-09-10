@@ -49,7 +49,7 @@ public:
     SelectableTextBlock TextItem;    ///<  text to go in the title area.
 
     void setGridSpace(int space);
-    void setTitle(QString t);
+    //void setTitle(QString t);
     void setSize(QPoint size);
     QString getPositionAsString();
     QString getSizeAsString();

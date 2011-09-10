@@ -42,6 +42,7 @@ QString TextBlock::getText()
 void  TextBlock::setText(QString text)
 {
     _text = text;
+    emit textChanged();
 }
 
 

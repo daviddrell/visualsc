@@ -22,13 +22,13 @@
 #include <QGraphicsScene>
 #include <QList>
 #include <QFile>
-
-
 #include <QDebug>
 
 
 SMProject::SMProject(QWidget *parentWidget): QObject(parentWidget),
-        _file(), _dm(this),_graphicsView( parentWidget, & _dm)
+        _file(),
+        _dm(SCDataModel::singleton()),
+        _graphicsView( parentWidget,  _dm)
 {
 
 }
@@ -40,7 +40,7 @@ SMProject::~SMProject()
 
 SCDataModel * SMProject::getDM()
 {
-    return &_dm;
+    return _dm;
 }
 
 QGraphicsView * SMProject::getQGraphicsView()
@@ -50,14 +50,14 @@ QGraphicsView * SMProject::getQGraphicsView()
 
 void SMProject::initNewSM()
 {
-    _dm.initializeEmptyStateMachine();
+    _dm->initializeEmptyStateMachine();
 }
 
 void SMProject::readInputFile(QString file)
 {
-    connect(& _dm, SIGNAL(openCompleted(bool,QStringList)), this, SLOT(handleOpenCompleted(bool,QStringList)));
+    connect( _dm, SIGNAL(openCompleted(bool,QStringList)), this, SLOT(handleOpenCompleted(bool,QStringList)));
 
-    _dm.open(file);
+    _dm->open(file);
 
 }
 
@@ -70,7 +70,7 @@ void SMProject::handleOpenCompleted(bool result ,QStringList messages)
 void SMProject::save(QString fileName)
 {
     QString errorMsg;
-    _dm.save(fileName, errorMsg);
+    _dm->save(fileName, errorMsg);
 }
 
 

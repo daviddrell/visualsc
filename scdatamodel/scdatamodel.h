@@ -27,6 +27,7 @@
 #include <QList>
 #include "scxmlreader.h"
 #include <QXmlStreamWriter>
+class QGraphicsScene;
 
 /**
  \defgroup DataModel
@@ -68,7 +69,7 @@ class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 
 
 public:
-    SCDataModel(QObject * parent);
+    static SCDataModel * singleton();
 
     // direct interface
     void open(QString scxmlFile);
@@ -82,6 +83,8 @@ public:
     SCTransition * getTransitionByName(QString name);
     QObject * getItemByName(QString name);
     SCState* getTopState( );
+    void setScene(QGraphicsScene *scene);
+    QGraphicsScene * getScene();
 
     static SCState *getAsState(QObject*);
     static SCTransition *getAsTransition(QObject*);
@@ -123,9 +126,11 @@ private:
     SCState         *_currentState;
     SCTransition    *_currentTransition;
     SCState         *_topState;
+    QGraphicsScene * _scene;
 
 
 //private methods
+    SCDataModel(QObject * parent=NULL);
 
 };
 

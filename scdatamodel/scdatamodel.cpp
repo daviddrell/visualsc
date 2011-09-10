@@ -22,13 +22,40 @@
 #include <QFile>
 #include <QDebug>
 #include <QMapIterator>
+#include <QGraphicsScene>
 
 SCDataModel::SCDataModel(QObject * parent) :
-    QObject (parent), _reader(), _writer(0), _level(0),_topLevel(0),
-    _currentState(NULL), _currentTransition(NULL),_topState(NULL)
+    QObject (parent),
+    _reader(),
+    _writer(0),
+    _level(0),
+    _topLevel(0),
+    _currentState(NULL),
+    _currentTransition(NULL),
+    _topState(NULL),
+    _scene(0)
 {
 
-    // TODO destructor
+
+}
+
+SCDataModel * SCDataModel::singleton()
+{
+    static SCDataModel * instance=NULL;
+    if ( instance == NULL)
+        instance = new SCDataModel(NULL);
+
+    return instance;
+}
+
+void SCDataModel::setScene(QGraphicsScene *scene)
+{
+    _scene = scene;
+}
+
+QGraphicsScene * SCDataModel::getScene()
+{
+    return _scene;
 }
 
 SCState * SCDataModel::getAsState(QObject*o)
@@ -48,10 +75,6 @@ TextBlock * SCDataModel::getAsTextBlock(QObject*o)
     TextBlock * v = dynamic_cast<TextBlock*>(o);
     return v;
 }
-
-
-
-
 
 bool SCDataModel::save(QString fileName, QString& errorMessage)
 {
@@ -393,7 +416,7 @@ void SCDataModel::handleMakeANewTextBlock (QString text, TextBlockAttributes *at
         }
         else
         {
-            GenericAttribute * a = new GenericAttribute(NULL, i.key(), i.value()->asString());
+            //GenericAttribute * a = new GenericAttribute(NULL, i.key(), i.value()->asString());
         }
     }
     textBlock->setText(text);

@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scxml xmlns="http://www.w3.org/2005/07/scxml">
-    <state id="State Machine" position="0,0" size="100,50">
+    <state id="State Machine" position="0,0" size="1058,623">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
         <state id="Main" position="30,100" size="984,483">
-<<<<<<< HEAD
-            <textblock font-bold="false" font-color="rgb(255,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
-=======
-            <textblock font-bold="true" font-color="rgb(0,0,255)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
->>>>>>> github/master
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
             <state id="Main_initial" position="220,20" size="133,78">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                 <transition target="Test1">
@@ -114,7 +110,7 @@
                 <path d="m "/>
             </transition>
         </state>
-        <state id="final" position="50,-150" size="100,50">
+        <state id="final" position="340,20" size="100,50">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
         </state>
     </state>

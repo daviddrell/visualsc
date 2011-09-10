@@ -27,6 +27,7 @@
 #include "math.h"
 #include "scstate.h"
 #include <QTimer>
+#include "textblock.h"
 
 
 
@@ -79,7 +80,9 @@ void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
     if ( name )
     {
         this->setObjectName(name->asString()); // help debug tracing - id which object this is
-        TextItem.setPlainText(name->asString());
+        TextBlock * tb  = _stateModel->getIDTextBlock();
+        tb->setText(name->asString());
+        //TextItem.setPlainText(name->asString());
     }
     else if ( size )
     {
@@ -108,11 +111,10 @@ void StateBoxGraphic::setHighlighted(bool on)
 }
 
 
-void StateBoxGraphic::setTitle(QString t)
-{
-    TextItem.setPlainText(t);
-}
-
+//void StateBoxGraphic::setTitle(QString t)
+//{
+//    TextItem.setPlainText(t);
+//}
 
 
 QString StateBoxGraphic::getPositionAsString()
