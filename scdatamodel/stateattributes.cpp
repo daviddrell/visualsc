@@ -140,7 +140,7 @@ StateAttributes::StateName::~StateName()
     qRegisterMetaType<StateAttributes>("StateAttributes::StateName");
 }
 
-StateAttributes::StateName::StateName& StateAttributes::StateName::operator=( StateName& sa )
+StateAttributes::StateName& StateAttributes::StateName::operator=( StateName& sa )
 {
     _name = sa._name;
     return *this;
@@ -178,7 +178,7 @@ StateAttributes::StateString::~StateString()
 {
 }
 
-StateAttributes::StateString::StateString& StateAttributes::StateString::operator=( StateString& sa )
+StateAttributes::StateString& StateAttributes::StateString::operator=( StateString& sa )
 {
     _value = sa._value;
     return *this;

@@ -121,7 +121,7 @@ void SelectableTextBlock::handleAttributeAdded(IAttribute *attr)
     handleAttributeChanged(attr);
 }
 
-void SelectableTextBlock::handleAttributeDeleted(IAttribute *attr)
+void SelectableTextBlock::handleAttributeDeleted(IAttribute *)
 {
 }
 
