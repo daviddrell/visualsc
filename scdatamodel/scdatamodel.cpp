@@ -48,6 +48,20 @@ SCDataModel * SCDataModel::singleton()
     return instance;
 }
 
+void SCDataModel::logError(QString message)
+{
+    // TBD: put on a message list that can be displayed or or viewed in the application
+    //  also consider adding to the syslog (or make an equivalent for windows
+    qDebug()<<message;
+}
+
+void SCDataModel::logInfo(QString message)
+{
+    // TBD: put on a message list that can be displayed or or viewed in the application
+
+    qDebug()<<message;
+}
+
 void SCDataModel::setScene(QGraphicsScene *scene)
 {
     _scene = scene;

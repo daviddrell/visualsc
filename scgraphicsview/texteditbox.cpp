@@ -4,12 +4,18 @@
 
 TextEditBox::TextEditBox(TextBlock * textBlock) :
                 QGraphicsTextItem(this),
-                _textBlock(textBlock)
+                _textBlock(textBlock),
+                _button(new ButtonGraphic())
 {
+    _button->setNormalGraphic(":/SCGraphicsView/savefileicon_32_32.png");
+    _button->setHoveredGraphic(":/SCGraphicsView/savefileicon_32_32.png");
+    _button->setDepressedGraphic(":/SCGraphicsView/savefileicon_32_32.png");
+    _button->setParentItem(this);
+
     setTextInteractionFlags(Qt::TextEditorInteraction);
     setFlag(QGraphicsItem::ItemIsMovable, false );
 
-    setPos( this->pos().x()+50,this->pos().y()+50  );
+    setPos( this->pos().x()+50, this->pos().y()+50  );
 
     setPlainText(_textBlock->getText());
 

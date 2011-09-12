@@ -3,5 +3,6 @@
         <file>bold.png</file>
         <file>italic.png</file>
         <file>indexcard.png</file>
+        <file>savefileicon_32_32.png</file>
     </qresource>
 </RCC>

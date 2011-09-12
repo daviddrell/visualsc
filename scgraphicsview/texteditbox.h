@@ -5,6 +5,7 @@
 #include <QPainter>
 #include "textblock.h"
 #include "textblockattributes.h"
+#include "buttongraphic.h"
 
 class TextEditBox :  public QGraphicsTextItem
 {
@@ -23,6 +24,8 @@ private slots:
 
 private:
     TextBlock *_textBlock;
+    ButtonGraphic *_button;
+
     // QGraphicsTextItem _textItem;
 
 };

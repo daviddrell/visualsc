@@ -102,6 +102,9 @@ public:
       */
     SCTransition* insertNewTransition(SCState *source, QString event );
 
+    void logError(QString message);///< inform the user there was an error
+    void logInfo(QString message);///< inform the user of anything that is not an error such as progress, etc
+
 
 signals:
     void openCompleted(bool sucess, QStringList message);
