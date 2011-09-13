@@ -3,25 +3,40 @@
 #include <QImage>
 
 TextEditBox::TextEditBox(TextBlock * textBlock) :
-                QGraphicsTextItem(this),
-                _textBlock(textBlock),
-                _button(new ButtonGraphic())
+        QGraphicsObject(NULL),
+        _textBlock(textBlock),
+        _button(new ButtonGraphic()),
+        _textItem(new QGraphicsTextItem(this))
 {
-    _button->setNormalGraphic(":/SCGraphicsView/savefileicon_32_32.png");
-    _button->setHoveredGraphic(":/SCGraphicsView/savefileicon_32_32.png");
-    _button->setDepressedGraphic(":/SCGraphicsView/savefileicon_32_32.png");
+    this->setAcceptHoverEvents(true);
+    _button->setNormalGraphic(":/SCGraphicsView/savefileicon_16_16.png");
+    _button->setHoveredGraphic(":/SCGraphicsView/savefileicon_hovered_16_16.png");
+    _button->setDepressedGraphic(":/SCGraphicsView/savefileicon_depressed_16_16.png");
+
     _button->setParentItem(this);
 
-    setTextInteractionFlags(Qt::TextEditorInteraction);
-    setFlag(QGraphicsItem::ItemIsMovable, false );
+    _textItem->setPos(0,16);
+    _textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
+    _textItem->setFlag(QGraphicsItem::ItemIsMovable, false );
 
-    setPos( this->pos().x()+50, this->pos().y()+50  );
 
-    setPlainText(_textBlock->getText());
+    _textItem->setPlainText(_textBlock->getText());
 
-    this->setTextWidth(200);
+}
 
-    //connect (& _textItem, SIGNAL(scaleChanged()), this, SLOT(handleScaleChanged()));
+TextEditBox::~TextEditBox()
+{
+    delete _button;
+    delete _textItem;
+}
+
+QRectF TextEditBox::boundingRect() const
+{
+    QRectF r = _textItem->boundingRect();
+
+    QRectF myRect (0,0,r.width(),16+r.height());
+
+    return myRect;
 }
 
 void TextEditBox::paint ( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
@@ -32,14 +47,14 @@ void TextEditBox::paint ( QPainter * painter, const QStyleOptionGraphicsItem * o
 
     QBrush brush(QColor(253,255,147,200), Qt::SolidPattern);
     painter->fillRect(rect,brush);
-    QGraphicsTextItem::paint(painter,  option, widget);
+
 }
 
-void TextEditBox::keyPressEvent ( QKeyEvent *  event)
+void TextEditBox::keyPressEvent ( QKeyEvent *  )
 {
-    QGraphicsTextItem::keyPressEvent(event);
+    //QGraphicsTextItem::keyPressEvent(event);
 
-    qDebug()<<"keyPressEvent "  + QString::number(boundingRect().width()) + ", " + QString::number(boundingRect().height());
+    qDebug()<<"TextEditBox::keyPressEvent "  + QString::number(boundingRect().width()) + ", " + QString::number(boundingRect().height());
 
 
 }
