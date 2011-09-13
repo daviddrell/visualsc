@@ -20,7 +20,7 @@ PositionAttribute::PositionAttribute(QObject*  parent,QString key,QString s) :IA
 
 PositionAttribute::~PositionAttribute(){}
 
-PositionAttribute::PositionAttribute& PositionAttribute::operator=( PositionAttribute& sa )
+PositionAttribute& PositionAttribute::operator=( PositionAttribute& sa )
                                                                                         {
     _position = sa._position;
     return *this;

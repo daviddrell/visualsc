@@ -15,8 +15,8 @@ IDAttribute::IDAttribute(QObject*  parent,QString key,QString s) :IAttribute(par
 
 IDAttribute::~IDAttribute(){}
 
-IDAttribute::IDAttribute& IDAttribute::operator=( IDAttribute& sa )
-                                                {
+IDAttribute& IDAttribute::operator=( IDAttribute& sa )
+{
     _id = sa._id;
     return *this;
 }
