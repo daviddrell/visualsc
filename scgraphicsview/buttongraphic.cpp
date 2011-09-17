@@ -41,6 +41,7 @@ void ButtonGraphic::mouseReleaseEvent( QGraphicsSceneMouseEvent *  )
 {
     _mouseState = kNormal;
     update();
+    emit clicked();
 }
 
 

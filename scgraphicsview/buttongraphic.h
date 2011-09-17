@@ -26,9 +26,6 @@ public:
     virtual QRectF boundingRect() const;/// virtual from QGraphicsObject base
 
 signals:
-    void hovered();
-    void pressed();
-    void released();
     void clicked();
 
 

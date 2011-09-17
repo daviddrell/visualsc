@@ -2,7 +2,7 @@
 #include <QMapIterator>
 #include "positionattribute.h"
 #include "sizeattribute.h"
-
+#include <QDebug>
 
 TextBlock::TextBlock(): SCItem()
 {
@@ -41,8 +41,12 @@ QString TextBlock::getText()
 
 void  TextBlock::setText(QString text)
 {
-    _text = text;
-    emit textChanged();
+    if  ( text != _text)
+    {
+         _text = text;
+        this->setObjectName(text);
+        emit textChanged();
+    }
 }
 
 

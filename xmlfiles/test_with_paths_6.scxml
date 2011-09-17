@@ -4,7 +4,7 @@
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
         <state id="Main" position="30,100" size="984,483">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
-            <state id="Main_initial" position="220,20" size="133,78">
+            <state id=" kjshdfakjsfdh lakjsfd" position="220,20" size="133,78">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                 <transition target="Test1">
                     <path d="m 100 100 300 100 200 300 "/>
@@ -110,7 +110,7 @@
                 <path d="m "/>
             </transition>
         </state>
-        <state id="final" position="340,20" size="100,50">
+        <state id="final" position="340,20" size="151,78">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
         </state>
     </state>

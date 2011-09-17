@@ -21,18 +21,22 @@ public:
     void paint ( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget ) ;//virtual
     QRectF boundingRect() const;
 
+signals:
+    void saveButtonClicked(QString text);
+
 protected:
     void keyPressEvent ( QKeyEvent * event ); // [virtual protected]
 
 private slots:
-    void handleScaleChanged();
+    void handleSaveButtonClicked();
 
 private:
     TextBlock *_textBlock;
     ButtonGraphic *_button;
 
     QGraphicsTextItem * _textItem;
-
+    int                 _minWidth;
+    int                 _minHeight;
 };
 
 #endif // TEXTEDITBOX_H

@@ -30,7 +30,7 @@
 
 #include <QDebug>
 
-SCXMLReader::SCXMLReader(): QThread(NULL), _reader(),_file(), _resultMessages()
+SCXMLReader::SCXMLReader(): QObject(NULL), _reader(),_file(), _resultMessages()
 {
 
 }
@@ -115,10 +115,10 @@ void SCXMLReader::readElement()
         readTransistionPath();
         enteredATransistionPathElement = true;
     }
-    else if (_reader.name() == "textblock")
+    else if (_reader.name() == "id-textblock")
     {
-        qDebug() <<"reading TextBlockElement";
-        readTextBlockElement();
+        qDebug() <<"reading id-TextBlockElement";
+        readIDTextBlockElement();
         return; // textBlocks do not contain elements
     }
     else if ( _reader.name() == "onentry")
@@ -146,11 +146,19 @@ void SCXMLReader::readElement()
 
     if (enteredAStateElement )
     {
-        qDebug()<<"leaving StateElement";
+        qDebug()<< "leaveStateElement";
         emit leaveStateElement();
     }
-    if (enteredATransistionElement ) {emit leaveTransistionElement();}
-    if (enteredATransistionPathElement ) {emit leaveTransitionPathElement();}
+    if (enteredATransistionElement )
+    {
+        qDebug()<< "leaveTransistionElement";
+        emit leaveTransistionElement();
+    }
+    if (enteredATransistionPathElement )
+    {
+        qDebug()<< "leaveTransitionPathElement";
+        emit leaveTransitionPathElement();
+    }
 
 }
 
@@ -164,8 +172,6 @@ void SCXMLReader::readState(STATE_TYPE stateType)
     // delete it when its done.
 
     StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
-
-
 
     QString stateTypeStr;
     switch ( stateType)
@@ -263,12 +269,16 @@ void SCXMLReader::readTransistionPath()
 
     QString data =_reader.attributes().value("d").toString();
 
+    qDebug()<<"readTransistionPath = " + data;
+
     emit makeANewTransistionPath(data);
 }
 
 
-void SCXMLReader::readTextBlockElement()
+void SCXMLReader::readIDTextBlockElement()
 {
+
+    qDebug()<<"readIDTextBlockElement";
 
     TextBlockAttributes * tb = new TextBlockAttributes(0,"TextBlockAttributes");
 
@@ -279,9 +289,9 @@ void SCXMLReader::readTextBlockElement()
         tb->addItem( a );
     }
 
-    QString data =_reader.readElementText();
+   _reader.readElementText(); //-- id-textblock gets it text data from the state ID
 
-    emit makeANewTextBlockElement(data, tb);
+    emit makeANewIDTextBlockElement( tb);
 }
 
 void SCXMLReader::readFinal()

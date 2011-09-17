@@ -22,12 +22,12 @@
 #include <QXmlStreamWriter>
 #include "scstate.h"
 #include <QVariant>
-
+#include <QDebug>
 
 SCState::SCState(QObject *parent) :
     SCItem(parent),
     attributes(this, "stateAttributes"),
-    _IdTextBlock(NULL)
+    _IdTextBlock(new TextBlock())
 {
    initCommon();
 }
@@ -36,7 +36,7 @@ SCState::SCState(QObject *parent) :
 SCState::SCState(const SCState& st) :
     SCItem(st.parent()),
     attributes(st.attributes),
-    _IdTextBlock()
+    _IdTextBlock(new TextBlock())
 {
     initCommon();
 }
@@ -46,7 +46,7 @@ SCState::SCState(const SCState& st) :
 SCState::SCState( bool topState) :
     SCItem(NULL),
     attributes(this, "stateAttributes"),
-    _IdTextBlock()
+    _IdTextBlock(new TextBlock())
 {
     initCommon();
 
@@ -75,7 +75,7 @@ void SCState::initCommon()
 
         int childCount = parent->getStateCount();
 
-        defaultName = "sub_of_" +parentsName + "_" + QString::number(childCount);
+        defaultName = "sub_of_" + parentsName + "_" + QString::number(childCount);
     }
 
 
@@ -89,17 +89,29 @@ void SCState::initCommon()
 
     this->setObjectName(defaultName);// to support debug tracing
 
-    _IdTextBlock = new TextBlock();
     _IdTextBlock->setParent(this);
     _IdTextBlock->setText(name->asString());
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
+    connect (_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
 
+    qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
 }
 
 
 TextBlock* SCState::getIDTextBlock()
 {
     return  _IdTextBlock;
+}
+
+void SCState::handleTextBlockChanged()
+{
+    qDebug()<<"SCState::handleTextBlockChanged";
+    StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *>(attributes["name"]);
+  //  disconnect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
+    QString nameText = _IdTextBlock->getText();
+    this->setObjectName(nameText);
+    name->setValue(nameText);
+  //  connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
 }
 
 void SCState::handleNameChanged(IAttribute *name)

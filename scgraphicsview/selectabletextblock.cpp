@@ -56,8 +56,18 @@ void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
     if(event->key() == Qt::Key_F4)
     {
         TextEditBox * editBox = new TextEditBox( _textBlockModel);
+        connect (editBox, SIGNAL(saveButtonClicked(QString)), this, SLOT(handleEditBoxSavedText(QString)));
+        QPointF myPos = this->mapToScene( this->pos() );
         SCDataModel::singleton()->getScene()->addItem( editBox);
+        editBox->setPos( myPos.x(), myPos.y() +100 );
     }
+}
+
+void SelectableTextBlock::handleEditBoxSavedText(QString text)
+{
+    _textItem.setPlainText( text );
+    _textBlockModel->setText(text);
+
 }
 
 void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)

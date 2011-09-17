@@ -24,7 +24,7 @@
 #include <QString>
 #include <QStringList>
 #include <QXmlStreamReader>
-#include <QThread>
+#include <QObject>
 
 #include "stateattributes.h"
 #include "transitionattributes.h"
@@ -34,7 +34,7 @@ class StateData;
 
 #include "scdatamodel_global.h"
 
-class  SCDATAMODELSHARED_EXPORT  SCXMLReader : public QThread
+class  SCDATAMODELSHARED_EXPORT  SCXMLReader : public QObject
 {
     Q_OBJECT
 
@@ -56,7 +56,7 @@ signals:
      void enterTransitionPathElement();
      void leaveTransitionPathElement();
      void makeANewTransistionPath(QString path);
-     void makeANewTextBlockElement(QString text, TextBlockAttributes*);
+     void makeANewIDTextBlockElement( TextBlockAttributes*);
 
 
 
@@ -68,7 +68,7 @@ private:
     QString _file;
     QStringList _resultMessages;
 
-    void readTextBlockElement();
+    void readIDTextBlockElement();
     void readElement();
     void readState(STATE_TYPE t= kSTATE_TYPE_Normal);
     void readTransistion();

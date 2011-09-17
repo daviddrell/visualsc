@@ -143,14 +143,15 @@ void SCDataModel::open(QString file)
     connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()), Qt::DirectConnection);
     connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()), Qt::DirectConnection);
 
-    connect(&_reader, SIGNAL(makeANewTextBlockElement(QString,TextBlockAttributes*)), this, SLOT(handleMakeANewTextBlock(QString,TextBlockAttributes*)), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(makeANewIDTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewIDTextBlock(TextBlockAttributes*)), Qt::DirectConnection);
 
     connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)), Qt::DirectConnection);
     connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
 
     _reader.readFile(file);
-    _reader.start();
+    //_reader.start();
+    _reader.run();
 }
 
 
@@ -406,15 +407,16 @@ void SCDataModel::handleLeaveTransitionElement()
 
 
 
-void SCDataModel::handleMakeANewTextBlock (QString text, TextBlockAttributes *attributes)
+void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)
 {
     if  ( _currentState == NULL ) return;
 
-    if (text.isEmpty())
-        text.append(" ");
+    QString text = _currentState->attributes["name"]->asString();
 
     TextBlock *textBlock = _currentState->getIDTextBlock();
+    qDebug()<<" handleMakeANewIDTextBlock textBlock=" +QString::number((int)textBlock)+", current state= "+ _currentState->objectName();
     IAttributeContainer *container = textBlock->getAttributes();
+    textBlock->setText(text);
 
     QMapIterator<QString,IAttribute*> i(*attributes);
     while(i.hasNext())
@@ -433,7 +435,7 @@ void SCDataModel::handleMakeANewTextBlock (QString text, TextBlockAttributes *at
             //GenericAttribute * a = new GenericAttribute(NULL, i.key(), i.value()->asString());
         }
     }
-    textBlock->setText(text);
+
 
     delete attributes;
 }

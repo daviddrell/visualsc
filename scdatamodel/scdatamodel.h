@@ -119,7 +119,7 @@ private slots:
     void handleMakeANewTransitionPath(QString path);
     void handleTransitUp();
     void handleTransitDown();
-    void handleMakeANewTextBlock(QString text, TextBlockAttributes *attributes);
+    void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
 
 private:
     SCXMLReader     _reader;
