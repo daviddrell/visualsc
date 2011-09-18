@@ -3,11 +3,12 @@
 #include "scdatamodel.h"
 #include <QPainter>
 
-ButtonGraphic::ButtonGraphic():
+ButtonGraphic::ButtonGraphic(int x, int y):
         QGraphicsObject(NULL),
         _normalGraphic(NULL),
         _depressedGraphic(NULL)
 {
+    setPos(x,y);
     this->setAcceptHoverEvents(true);
     this->setFlag(QGraphicsItem::ItemIsFocusable, true);
 }
@@ -58,14 +59,16 @@ void ButtonGraphic::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     }
 
     if ( graphic)
+    {
         painter->drawPixmap(0,0,16,16,*graphic);
+    }
 }
 
 QRectF ButtonGraphic::boundingRect() const
 {
     QRect rect(
-            (qreal)this->pos().x(),
-            (qreal) this->pos().y(),
+            (qreal)0,
+            (qreal) 0,
             (qreal) 16.0,
             (qreal)16.0);
     return rect;
@@ -74,7 +77,7 @@ QRectF ButtonGraphic::boundingRect() const
 void ButtonGraphic::setNormalGraphic(QString source)
 {
     _normalGraphic = new QPixmap(source);
-    if (_normalGraphic == NULL )
+    if (_normalGraphic->isNull() )
     {
         QString err = "setNormalGraphic: error loading image[" + source +"] file";
         SCDataModel::singleton()->logError(err);
@@ -84,7 +87,7 @@ void ButtonGraphic::setNormalGraphic(QString source)
 void ButtonGraphic::setHoveredGraphic(QString source)
 {
     _hoveredGraphic = new QPixmap(source);
-    if (_hoveredGraphic == NULL )
+    if (_hoveredGraphic->isNull() )
     {
         QString err = "setHoveredGraphic: error loading image[" + source +"] file";
         SCDataModel::singleton()->logError(err);
@@ -94,7 +97,7 @@ void ButtonGraphic::setHoveredGraphic(QString source)
 void ButtonGraphic::setDepressedGraphic(QString source)
 {
     _depressedGraphic = new QPixmap(source);
-    if (_depressedGraphic == NULL )
+    if (_depressedGraphic->isNull()  )
     {
         QString err = "setDepressedGraphic: error loading image[" + source +"] file";
         SCDataModel::singleton()->logError(err);

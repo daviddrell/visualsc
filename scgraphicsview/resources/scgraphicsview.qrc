@@ -6,5 +6,8 @@
         <file>savefileicon_16_16.png</file>
         <file>savefileicon_depressed_16_16.png</file>
         <file>savefileicon_hovered_16_16.png</file>
+        <file>red_x_16_16.png</file>
+        <file>red_x_depressed_16_16.png</file>
+        <file>red_x_hovered_16_16.png</file>
     </qresource>
 </RCC>

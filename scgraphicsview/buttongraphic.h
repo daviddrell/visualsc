@@ -14,7 +14,7 @@ class ButtonGraphic : public QGraphicsObject
     Q_OBJECT
 
 public:
-    ButtonGraphic();
+    ButtonGraphic(int x, int y);
     ~ButtonGraphic();
 
     enum MouseState { kNormal, kHovered, kPressed};

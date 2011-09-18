@@ -6,6 +6,7 @@
 #include "textblock.h"
 #include "iattribute.h"
 class QKeyEvent;
+class QGraphicsSceneMouseEvent;
 
 /**
   * \class SelectableTextBlock
@@ -31,6 +32,7 @@ public:
 protected:
 
     void keyPressEvent ( QKeyEvent * event ); // [virtual protected]
+    void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
 
 
 private slots:

@@ -6,11 +6,13 @@
 #include "texteditbox.h"
 #include "scdatamodel.h"
 #include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,TextBlock *textBlockModel) :
         SelectableBoxGraphic(parent),
         _textItem(this),
-        _minSize(QPoint(100,50)),
+        _minSize(QPoint(50,25)),
         _textBlockModel(textBlockModel)
 {
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
@@ -51,8 +53,20 @@ void SelectableTextBlock::handleTextChanged()
     _textItem.setPlainText( _textBlockModel->getText() );
 }
 
+void SelectableTextBlock::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event )
+{
+    event->accept();
+    TextEditBox * editBox = new TextEditBox( _textBlockModel);
+    connect (editBox, SIGNAL(saveButtonClicked(QString)), this, SLOT(handleEditBoxSavedText(QString)));
+    QPointF myPos = this->mapToScene( this->pos() );
+    SCDataModel::singleton()->getScene()->addItem( editBox);
+    editBox->setPos( myPos.x(), myPos.y() +100 );
+
+}
+
 void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
 {
+    event->accept();
     if(event->key() == Qt::Key_F4)
     {
         TextEditBox * editBox = new TextEditBox( _textBlockModel);

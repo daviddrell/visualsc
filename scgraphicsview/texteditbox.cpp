@@ -5,18 +5,29 @@
 TextEditBox::TextEditBox(TextBlock * textBlock) :
         QGraphicsObject(NULL),
         _textBlock(textBlock),
-        _button(new ButtonGraphic()),
+        _SaveButton(new ButtonGraphic(0,0)),
+        _CancelButton(new ButtonGraphic(20,0)),
         _textItem(new QGraphicsTextItem(this)),
         _minWidth(200),
         _minHeight(200)
 {
     this->setAcceptHoverEvents(true);
-    _button->setNormalGraphic(":/SCGraphicsView/savefileicon_16_16.png");
-    _button->setHoveredGraphic(":/SCGraphicsView/savefileicon_hovered_16_16.png");
-    _button->setDepressedGraphic(":/SCGraphicsView/savefileicon_depressed_16_16.png");
+    _SaveButton->setNormalGraphic(":/SCGraphicsView/savefileicon_16_16.png");
+    _SaveButton->setHoveredGraphic(":/SCGraphicsView/savefileicon_hovered_16_16.png");
+    _SaveButton->setDepressedGraphic(":/SCGraphicsView/savefileicon_depressed_16_16.png");
 
-    _button->setParentItem(this);
-    connect(_button,SIGNAL(clicked()), this, SLOT(handleSaveButtonClicked()));
+    _SaveButton->setParentItem(this);
+    connect(_SaveButton,SIGNAL(clicked()), this, SLOT(handleSaveButtonClicked()));
+
+
+
+    _CancelButton->setNormalGraphic(":/SCGraphicsView/red_x_16_16.png");
+    _CancelButton->setHoveredGraphic(":/SCGraphicsView/red_x_hovered_16_16.png");
+    _CancelButton->setDepressedGraphic(":/SCGraphicsView/red_x_depressed_16_16.png");
+
+    _CancelButton->setParentItem(this);
+    connect(_CancelButton,SIGNAL(clicked()), this, SLOT(handleCancelButtonClicked()));
+
 
     _textItem->setPos(0,16);
     _textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -35,8 +46,14 @@ TextEditBox::TextEditBox(TextBlock * textBlock) :
 
 TextEditBox::~TextEditBox()
 {
-    delete _button;
+    delete _SaveButton;
     delete _textItem;
+}
+
+void TextEditBox::handleCancelButtonClicked()
+{
+    emit cancelButtonClicked();
+    this->deleteLater();
 }
 
 void TextEditBox::handleSaveButtonClicked()

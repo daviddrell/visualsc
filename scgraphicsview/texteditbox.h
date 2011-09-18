@@ -23,16 +23,19 @@ public:
 
 signals:
     void saveButtonClicked(QString text);
+    void cancelButtonClicked();
 
 protected:
     void keyPressEvent ( QKeyEvent * event ); // [virtual protected]
 
 private slots:
     void handleSaveButtonClicked();
+    void handleCancelButtonClicked();
 
 private:
     TextBlock *_textBlock;
-    ButtonGraphic *_button;
+    ButtonGraphic *_SaveButton;
+    ButtonGraphic *_CancelButton;
 
     QGraphicsTextItem * _textItem;
     int                 _minWidth;
