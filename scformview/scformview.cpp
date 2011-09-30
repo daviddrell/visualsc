@@ -172,7 +172,7 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
         loadTree (item, subStates);
 
         // get the state's text block
-        TextBlock  * textBlock = st->getIDTextBlock();
+        SCTextBlock  * textBlock = st->getIDTextBlock();
         loadTree (item, textBlock);
 
     }
@@ -180,7 +180,7 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
 }
 
 
-void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , TextBlock* textBlock)
+void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , SCTextBlock* textBlock)
 {
 
     CustomTreeWidgetItem * item=0;
@@ -227,7 +227,7 @@ IAttributeContainer * SCFormView::getCurrentlySelectedAttributes()
     IAttributeContainer * attributes=NULL;
     SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
     SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
-    TextBlock * textBlock  = dynamic_cast<TextBlock *>(  _currentlySelected );
+    SCTextBlock * textBlock  = dynamic_cast<SCTextBlock *>(  _currentlySelected );
 
     if ( st!= NULL)
     {
@@ -252,7 +252,7 @@ QString SCFormView::getCurrentlySelectedTitle()
     IAttributeContainer * attributes;
     SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
     SCTransition * transition = dynamic_cast<SCTransition *>(  _currentlySelected );
-    TextBlock * textBlock  = dynamic_cast<TextBlock *>(  _currentlySelected );
+    SCTextBlock * textBlock  = dynamic_cast<SCTextBlock *>(  _currentlySelected );
 
     if ( st!= NULL)
     {
@@ -282,7 +282,7 @@ QString SCFormView::getCurrentlySelectedType()
 
     SCState * st = dynamic_cast<SCState *>(  _currentlySelected );
     SCTransition * transition  = dynamic_cast<SCTransition *>(  _currentlySelected );
-    TextBlock * textBlock  = dynamic_cast<TextBlock *>(  _currentlySelected );
+    SCTextBlock * textBlock  = dynamic_cast<SCTextBlock *>(  _currentlySelected );
 
     if ( st!= NULL)
     {
@@ -625,7 +625,7 @@ void SCFormView::createActions()
 
 void SCFormView::handleBoldChanged()
 {
-    TextBlock * tb = SCDataModel::getAsTextBlock(_currentlySelected);
+    SCTextBlock * tb = SCDataModel::getAsTextBlock(_currentlySelected);
     if ( ! tb ) return;
 
     IAttribute* attr = tb->attributes.value("font-bold")  ;

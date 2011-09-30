@@ -8,12 +8,20 @@
 #include "buttongraphic.h"
 #include "QGraphicsTextItem"
 
+
+/**
+  * \class TextEditBox
+    \ingroup GraphicsView
+    \brief Provides a text editor for the user.
+    This class allows the user to edit text and includes save and abandon buttons.
+  */
+
 class TextEditBox :  public QGraphicsObject
 {
     Q_OBJECT
 
 public:
-    TextEditBox(TextBlock  *textBlock);
+    TextEditBox(SCTextBlock  *textBlock);
     ~TextEditBox();
 
     virtual void graphicHasChanged(); ///< subclass must implement this, used to record user changes back to the data model
@@ -33,7 +41,7 @@ private slots:
     void handleCancelButtonClicked();
 
 private:
-    TextBlock *_textBlock;
+    SCTextBlock *_textBlock;
     ButtonGraphic *_SaveButton;
     ButtonGraphic *_CancelButton;
 

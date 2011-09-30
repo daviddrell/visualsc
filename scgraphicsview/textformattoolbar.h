@@ -8,6 +8,9 @@
 #include <QFontComboBox>
 #include <QComboBox>
 
+/** this is going away
+  */
+
 class SCGRAPHICSVIEWSHARED_EXPORT TextFormatToolBar  : public QToolBar
 {
     Q_OBJECT

@@ -27,7 +27,7 @@
 SCState::SCState(QObject *parent) :
     SCItem(parent),
     attributes(this, "stateAttributes"),
-    _IdTextBlock(new TextBlock())
+    _IdTextBlock(new SCTextBlock())
 {
    initCommon();
 }
@@ -36,7 +36,7 @@ SCState::SCState(QObject *parent) :
 SCState::SCState(const SCState& st) :
     SCItem(st.parent()),
     attributes(st.attributes),
-    _IdTextBlock(new TextBlock())
+    _IdTextBlock(new SCTextBlock())
 {
     initCommon();
 }
@@ -46,7 +46,7 @@ SCState::SCState(const SCState& st) :
 SCState::SCState( bool topState) :
     SCItem(NULL),
     attributes(this, "stateAttributes"),
-    _IdTextBlock(new TextBlock())
+    _IdTextBlock(new SCTextBlock())
 {
     initCommon();
 
@@ -98,7 +98,7 @@ void SCState::initCommon()
 }
 
 
-TextBlock* SCState::getIDTextBlock()
+SCTextBlock* SCState::getIDTextBlock()
 {
     return  _IdTextBlock;
 }
@@ -304,7 +304,7 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
         if (st)
             st->writeSCVXML(sw);
 
-        TextBlock * tb = dynamic_cast<TextBlock*>(children()[i]);
+        SCTextBlock * tb = dynamic_cast<SCTextBlock*>(children()[i]);
         if (tb)
             tb->writeSCVXML(sw);
 

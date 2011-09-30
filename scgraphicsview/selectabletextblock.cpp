@@ -7,17 +7,18 @@
 #include "scdatamodel.h"
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QTextDocument>
 
-
-SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,TextBlock *textBlockModel) :
+SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent),
-        _textItem(this),
         _minSize(QPoint(50,25)),
+        _textItem(this, QRect(0,0, _minSize.x()-10, _minSize.y()-10)),
         _textBlockModel(textBlockModel)
 {
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
     _textItem.setFlag(QGraphicsItem::ItemIsMovable, false );
     _textItem.setPos( this->pos().x()+5,this->pos().y()+5  );
+
 
     setShowBoxLineStyle(SelectableBoxGraphic::kWhenSelected  );
 
@@ -208,16 +209,10 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
      if ( size.y() < _minSize.y())
          size.setY( _minSize.y());
 
+     _textItem.setBoundingRect(QRectF(0,0,size.x()-10, size.y()-10));
 
-     _textItem.setTextWidth(size.x());
      SelectableBoxGraphic::setSize(size);
  }
-
-
- //void SelectableTextBlock::setPlainText(QString text)
- //{
- //    _textItem.setPlainText(text);
- //}
 
 
 void SelectableTextBlock::graphicHasChanged()

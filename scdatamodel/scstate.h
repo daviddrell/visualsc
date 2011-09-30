@@ -119,7 +119,7 @@ public:
       *
       */
 
-    TextBlock* getIDTextBlock();
+    SCTextBlock* getIDTextBlock();
 
     StateAttributes         attributes;
 
@@ -145,7 +145,7 @@ private:
 
     //private data
 
-    TextBlock * _IdTextBlock;
+    SCTextBlock * _IdTextBlock;
 
 };
 

@@ -80,7 +80,7 @@ void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
     if ( name )
     {
         this->setObjectName(name->asString()); // help debug tracing - id which object this is
-        TextBlock * tb  = _stateModel->getIDTextBlock();
+        SCTextBlock * tb  = _stateModel->getIDTextBlock();
         tb->setText(name->asString());
         //TextItem.setPlainText(name->asString());
     }

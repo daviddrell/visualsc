@@ -165,17 +165,14 @@ void SelectableBoxGraphic::setSize(QPoint size)
  */
 void SelectableBoxGraphic::adjustDrawingSize(int x, int y)
 {
-    // call the virtual setSize() so that children can capture this and edit size before applying
-    //_width += x;
-    //_height += y;
 
     QPoint newSize  (_width + x, _height+y);
 
+    // call the virtual setSize() so that children can capture this and edit size before applying
     setSize (newSize);
 
     _drawingWidth =  _width - _XcornerGrabBuffer;
     _drawingHeight=  _height - _YcornerGrabBuffer;
-
 
 }
 
@@ -407,10 +404,12 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 void SelectableBoxGraphic::setCornerPositions()
 {
+
     _corners[0]->setPos(_drawingOrigenX, _drawingOrigenY);
     _corners[1]->setPos(_drawingWidth,  _drawingOrigenY);
     _corners[2]->setPos(_drawingWidth , _drawingHeight);
     _corners[3]->setPos(_drawingOrigenX, _drawingHeight);
+
 }
 
 QRectF SelectableBoxGraphic::boundingRect() const
@@ -498,10 +497,24 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
     }
 
 
-    QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
-    QPointF bottomRight2 ( _drawingWidth - shadowThickness, _drawingHeight - shadowThickness);
+    // draw outter layer box
+    // if shadowed box, draw inside, else draw on the outter edge
+    QRectF rect2;
 
-    QRectF rect2 (topLeft2, bottomRight2);
+    if ( _boxStyle == kSolidWithShadow )
+    {
+        QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
+        QPointF bottomRight2 ( _drawingWidth - shadowThickness, _drawingHeight - shadowThickness);
+
+        rect2 = QRectF (topLeft2, bottomRight2);
+    }
+    else
+    {
+        QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
+        QPointF bottomRight2 ( _drawingWidth, _drawingHeight);
+
+        rect2 = QRectF (topLeft2, bottomRight2);
+    }
 
     painter->drawRoundRect(rect2,10,10);
 

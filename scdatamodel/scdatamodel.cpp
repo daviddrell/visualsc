@@ -84,9 +84,9 @@ SCTransition * SCDataModel::getAsTransition(QObject*o)
     return v;
 }
 
-TextBlock * SCDataModel::getAsTextBlock(QObject*o)
+SCTextBlock * SCDataModel::getAsTextBlock(QObject*o)
 {
-    TextBlock * v = dynamic_cast<TextBlock*>(o);
+    SCTextBlock * v = dynamic_cast<SCTextBlock*>(o);
     return v;
 }
 
@@ -413,7 +413,7 @@ void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)
 
     QString text = _currentState->attributes["name"]->asString();
 
-    TextBlock *textBlock = _currentState->getIDTextBlock();
+    SCTextBlock *textBlock = _currentState->getIDTextBlock();
     qDebug()<<" handleMakeANewIDTextBlock textBlock=" +QString::number((int)textBlock)+", current state= "+ _currentState->objectName();
     IAttributeContainer *container = textBlock->getAttributes();
     textBlock->setText(text);

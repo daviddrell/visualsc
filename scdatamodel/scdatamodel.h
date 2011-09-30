@@ -88,7 +88,7 @@ public:
 
     static SCState *getAsState(QObject*);
     static SCTransition *getAsTransition(QObject*);
-    static TextBlock *getAsTextBlock(QObject*);
+    static SCTextBlock *getAsTextBlock(QObject*);
 
     /** \fn insertNewState
       * \brief Creates and returns a pointer to a new state inserted in the provided parent state.

@@ -31,7 +31,8 @@ SOURCES += scgraphicsview.cpp \
     selectabletextblock.cpp \
     textformattoolbar.cpp \
     texteditbox.cpp \
-    buttongraphic.cpp
+    buttongraphic.cpp \
+    maskedtextedit.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -43,7 +44,8 @@ HEADERS += scgraphicsview.h\
     selectabletextblock.h \
     textformattoolbar.h \
     texteditbox.h \
-    buttongraphic.h
+    buttongraphic.h \
+    maskedtextedit.h
 
 
 OTHER_FILES += \

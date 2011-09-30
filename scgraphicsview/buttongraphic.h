@@ -6,6 +6,8 @@ class QPixmap;
 
 /**
    \class ButtonGraphic
+   \ingroup GraphicsView
+   \brief Provides a clickable button with three graphics for three modes
 
 */
 

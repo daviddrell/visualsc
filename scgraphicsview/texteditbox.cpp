@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QImage>
 
-TextEditBox::TextEditBox(TextBlock * textBlock) :
+TextEditBox::TextEditBox(SCTextBlock * textBlock) :
         QGraphicsObject(NULL),
         _textBlock(textBlock),
         _SaveButton(new ButtonGraphic(0,0)),
@@ -19,15 +19,12 @@ TextEditBox::TextEditBox(TextBlock * textBlock) :
     _SaveButton->setParentItem(this);
     connect(_SaveButton,SIGNAL(clicked()), this, SLOT(handleSaveButtonClicked()));
 
-
-
     _CancelButton->setNormalGraphic(":/SCGraphicsView/red_x_16_16.png");
     _CancelButton->setHoveredGraphic(":/SCGraphicsView/red_x_hovered_16_16.png");
     _CancelButton->setDepressedGraphic(":/SCGraphicsView/red_x_depressed_16_16.png");
 
     _CancelButton->setParentItem(this);
     connect(_CancelButton,SIGNAL(clicked()), this, SLOT(handleCancelButtonClicked()));
-
 
     _textItem->setPos(0,16);
     _textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -80,7 +77,7 @@ QRectF TextEditBox::boundingRect() const
     return myRect;
 }
 
-void TextEditBox::paint ( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
+void TextEditBox::paint ( QPainter * painter, const QStyleOptionGraphicsItem * , QWidget *  )
 {
     QImage background(":/SCGraphicsView/indexcard.png");
     QRectF rect = boundingRect();

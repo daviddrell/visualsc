@@ -4,7 +4,7 @@
 #include "sizeattribute.h"
 #include <QDebug>
 
-TextBlock::TextBlock(): SCItem()
+SCTextBlock::SCTextBlock(): SCItem()
 {
     FontFamilyAttribute * ff = new FontFamilyAttribute(NULL,"font-family", "courier");
     attributes.addItem(ff);
@@ -29,17 +29,17 @@ TextBlock::TextBlock(): SCItem()
 
 }
 
-IAttributeContainer * TextBlock::getAttributes()
+IAttributeContainer * SCTextBlock::getAttributes()
 {
     return & attributes;
 }
 
-QString TextBlock::getText()
+QString SCTextBlock::getText()
 {
     return  _text;
 }
 
-void  TextBlock::setText(QString text)
+void  SCTextBlock::setText(QString text)
 {
     if  ( text != _text)
     {
@@ -50,7 +50,7 @@ void  TextBlock::setText(QString text)
 }
 
 
-void TextBlock::writeSCVXML(QXmlStreamWriter & sw)
+void SCTextBlock::writeSCVXML(QXmlStreamWriter & sw)
 {
     sw.writeStartElement(QString("textblock"));
 

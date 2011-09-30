@@ -7,20 +7,20 @@
 
 /**
 
-  \class   TextBlock
+  \class   SCTextBlock
   \ingroup DataModel
   \brief   The class represents a text-block in a state-chart Data-Model
 
-  A TextBlock only has attributes and text.
+  A SCTextBlock only has attributes and text.
 
 */
 
-class SCDATAMODELSHARED_EXPORT TextBlock : public SCItem
+class SCDATAMODELSHARED_EXPORT SCTextBlock : public SCItem
 {
     Q_OBJECT
 
 public:
-    TextBlock();
+    SCTextBlock();
     virtual IAttributeContainer * getAttributes(); // reimplemented from base SCItem
     TextBlockAttributes attributes;
     QString getText();
@@ -36,7 +36,7 @@ private:
 };
 
 
-Q_DECLARE_METATYPE (TextBlock*)
+Q_DECLARE_METATYPE (SCTextBlock*)
 
 
 #endif // TEXTBLOCK_H

@@ -58,7 +58,7 @@ public:
      enum {kMouseReleased=0, kMouseDown, kMouseMoving}; ///< define the mouse states
 
      enum PaintStyle {kBox, kCrossHair};
-     void setPaintStyle(PaintStyle s);/// set box or cross-hairs
+     void setPaintStyle(PaintStyle s);///< set box or cross-hairs
 
    virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
