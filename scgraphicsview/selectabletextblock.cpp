@@ -11,14 +11,16 @@
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent),
-        _minSize(QPoint(50,25)),
-        _textItem(this, QRect(0,0, _minSize.x()-10, _minSize.y()-10)),
+        _minSize(QPoint(100,50)),
+        _verticalTextMargin(10),
+        _horizontalTextMargin(10),
+        _textItem(this, QRect(0,0, _minSize.x()-_horizontalTextMargin, _minSize.y()-_verticalTextMargin)),
         _textBlockModel(textBlockModel)
 {
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
     _textItem.setFlag(QGraphicsItem::ItemIsMovable, false );
-    _textItem.setPos( this->pos().x()+5,this->pos().y()+5  );
-
+    QRectF viewArea = this->getUsableArea();
+    _textItem.setPos( viewArea.x() , viewArea.y() );
 
     setShowBoxLineStyle(SelectableBoxGraphic::kWhenSelected  );
 
@@ -32,15 +34,15 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
 
     setFlag(QGraphicsItem::ItemIsFocusable, true);
 
+    _textItem.setPlainText( _textBlockModel->getText() );
+
     setSize (_minSize);
 
     connect ( _textBlockModel, SIGNAL(textChanged()), this, SLOT(handleTextChanged()), Qt::QueuedConnection);
-    connect ( & _textBlockModel->attributes,SIGNAL(attributeAdded(IAttribute*)), SLOT(handleAttributeAdded(IAttribute*)) );
-    connect ( & _textBlockModel->attributes,SIGNAL(attributeDeleted(IAttribute*)), SLOT(handleAttributeDeleted(IAttribute*)) );
+    connect ( & _textBlockModel->attributes,SIGNAL(attributeAdded(IAttribute*)), SLOT(handleAttributeAdded(IAttribute*)), Qt::QueuedConnection );
+    connect ( & _textBlockModel->attributes,SIGNAL(attributeDeleted(IAttribute*)), SLOT(handleAttributeDeleted(IAttribute*)), Qt::QueuedConnection );
 
-    connectAttributes( & _textBlockModel->attributes);
-
-    _textItem.setPlainText( _textBlockModel->getText() );
+    connectAttributes( & _textBlockModel->attributes );
 
 }
 
@@ -209,9 +211,17 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
      if ( size.y() < _minSize.y())
          size.setY( _minSize.y());
 
-     _textItem.setBoundingRect(QRectF(0,0,size.x()-10, size.y()-10));
 
      SelectableBoxGraphic::setSize(size);
+
+     QRectF viewArea = getUsableArea();
+     int width = viewArea.width() - _horizontalTextMargin;
+     int height = viewArea.height() - _verticalTextMargin;
+
+     QRect bRect( 0,0 , width, height);
+     _textItem.setBoundingRect(bRect);
+
+     update();
  }
 
 

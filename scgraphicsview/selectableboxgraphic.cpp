@@ -418,6 +418,15 @@ QRectF SelectableBoxGraphic::boundingRect() const
 }
 
 
+QRectF SelectableBoxGraphic::getUsableArea()
+{
+    int x0 = _drawingOrigenX + 2;
+    int y0 = _drawingOrigenY + 2;
+    int width = _drawingWidth -2 ;
+    int height = _drawingHeight -2;
+
+    return QRectF(x0,y0, width, height);
+}
 
 void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {

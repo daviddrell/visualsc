@@ -67,6 +67,8 @@ private:
    // private data
 
    QPoint _minSize;
+   int           _verticalTextMargin;
+   int           _horizontalTextMargin;
    MaskedTextEdit _textItem;
 
    SCTextBlock * _textBlockModel;

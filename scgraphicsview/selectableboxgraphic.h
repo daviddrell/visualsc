@@ -61,6 +61,7 @@ public:
     void setDrawBoxLineStyle( DrawBoxLineStyle s);///< if drawing box, draw solid or dotted line
     void setBoxStyle (BoxStyle s); ///< set box style
     void setHoverLineThickness(int t);///< set line thickness when hovered
+    QRectF getUsableArea();///< returns a rect relative to the SelecableBoxGraphic that represents the inside margin, or usable area of the box.
 
 
 private:
