@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml">
+    <state id="State Machine" position="0,0" size="1058,623">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
+        <state id="final small to lower right" position="340,20" size="151,78">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="360,190" size="156,57"/>
+        </state>
+    </state>
+</scxml>

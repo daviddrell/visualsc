@@ -115,9 +115,9 @@ void SCXMLReader::readElement()
         readTransistionPath();
         enteredATransistionPathElement = true;
     }
-    else if (_reader.name() == "id-textblock")
+    else if (_reader.name() == "textblock")
     {
-        qDebug() <<"reading id-TextBlockElement";
+        qDebug() <<"reading TextBlockElement";
         readIDTextBlockElement();
         return; // textBlocks do not contain elements
     }

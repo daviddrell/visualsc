@@ -15,13 +15,15 @@ class  SCDATAMODELSHARED_EXPORT PositionAttribute:  public IAttribute
 public:
     PositionAttribute();
 
+    PositionAttribute(const PositionAttribute& pa);
+
     PositionAttribute(QObject*  parent,QString key,QPointF p);
 
     PositionAttribute(QObject*  parent,QString key,QString s);
 
     ~PositionAttribute();
 
-    PositionAttribute& operator=( PositionAttribute& sa );
+    PositionAttribute& operator=( PositionAttribute& pa );
 
     QString asString();
     QPointF asPointF() const;

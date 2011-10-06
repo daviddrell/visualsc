@@ -107,11 +107,11 @@ void SCState::handleTextBlockChanged()
 {
     qDebug()<<"SCState::handleTextBlockChanged";
     StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *>(attributes["name"]);
-  //  disconnect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
+
     QString nameText = _IdTextBlock->getText();
     this->setObjectName(nameText);
     name->setValue(nameText);
-  //  connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
+
 }
 
 void SCState::handleNameChanged(IAttribute *name)

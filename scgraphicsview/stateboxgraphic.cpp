@@ -111,20 +111,15 @@ void StateBoxGraphic::setHighlighted(bool on)
 }
 
 
-//void StateBoxGraphic::setTitle(QString t)
-//{
-//    TextItem.setPlainText(t);
-//}
-
-
 QString StateBoxGraphic::getPositionAsString()
 {
     return SelectableBoxGraphic::getPositionAsString();
 }
 
-void  StateBoxGraphic::getSize(QPoint& size)
+QPointF  StateBoxGraphic::getSize()
 {
-    SelectableBoxGraphic::getSize(size);
+    QPointF size = SelectableBoxGraphic::getSize();
+    return size;
 }
 
 QString StateBoxGraphic::getSizeAsString()
@@ -153,8 +148,8 @@ void StateBoxGraphic::graphicHasChanged ()
     {
         QPointF ps = this->pos();
         _stateModel->setPosition(ps);
-        QPoint sz;
-        this->getSize(sz);
+
+        QPointF sz =this->getSize();
         _stateModel->setSize(sz);
     }
 }

@@ -27,6 +27,7 @@ SCTextBlock::SCTextBlock(): SCItem()
     SizeAttribute * sa = new SizeAttribute(NULL, "size", QPointF(100,60) );
     attributes.addItem(sa);
 
+    connect(sa, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)));
 }
 
 IAttributeContainer * SCTextBlock::getAttributes()
@@ -47,6 +48,12 @@ void  SCTextBlock::setText(QString text)
         this->setObjectName(text);
         emit textChanged();
     }
+}
+
+
+void SCTextBlock::handleAttributeChanged(IAttribute *attr)
+{
+    qDebug()<<"SCTextBlock::handleAttributeChanged";
 }
 
 

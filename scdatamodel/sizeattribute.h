@@ -13,6 +13,7 @@ class  SCDATAMODELSHARED_EXPORT SizeAttribute: public IAttribute
 public:
 
     SizeAttribute();
+    SizeAttribute(const SizeAttribute& sizeAttribute);
     SizeAttribute(QObject*  parent, QString key, QPointF s);
     SizeAttribute(QObject*  parent, QString key, QString s);
 

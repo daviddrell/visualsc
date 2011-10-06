@@ -53,7 +53,7 @@ public:
     void setSize(QPoint size);
     QString getPositionAsString();
     QString getSizeAsString();
-    void getSize(QPoint& size);
+    QPointF getSize();
     void setHighlighted(bool);
 
 private:

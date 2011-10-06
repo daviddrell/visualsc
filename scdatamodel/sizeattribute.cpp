@@ -17,6 +17,12 @@ SizeAttribute::SizeAttribute(QObject*  parent, QString key, QString s):IAttribut
     setValue(s);
 }
 
+
+SizeAttribute::SizeAttribute(const SizeAttribute& sa):IAttribute(sa), _size(sa.asPointF())
+{
+    qRegisterMetaType<SizeAttribute>("SizeAttribute");
+}
+
 SizeAttribute::~SizeAttribute(){}
 
 

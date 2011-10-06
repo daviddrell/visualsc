@@ -134,7 +134,7 @@ public slots:
 
 private slots:
 
-     void handleNameChanged(IAttribute* name);
+     void handleNameChanged(IAttribute* name);     
      void handleTextBlockChanged();
 
 

@@ -129,10 +129,13 @@ QString SelectableBoxGraphic::getPositionAsString()
     return v;
 }
 
-void  SelectableBoxGraphic::getSize(QPoint& size)
+QPointF  SelectableBoxGraphic::getSize()
 {
+    QPointF size;
     size.setX(_width);
     size.setY(_height);
+
+    return size;
 }
 
 QString SelectableBoxGraphic::getSizeAsString()

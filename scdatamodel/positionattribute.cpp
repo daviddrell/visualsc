@@ -7,6 +7,11 @@ PositionAttribute::PositionAttribute() :IAttribute( ), _position()
     qRegisterMetaType<PositionAttribute>("PositionAttribute");
 }
 
+PositionAttribute::PositionAttribute(const PositionAttribute& pa) :IAttribute( pa), _position(pa.asPointF())
+{
+    qRegisterMetaType<PositionAttribute>("PositionAttribute");
+}
+
 PositionAttribute::PositionAttribute(QObject*  parent,QString key,QPointF p) :IAttribute(parent, key), _position(p)
 {
     qRegisterMetaType<PositionAttribute>("PositionAttribute");

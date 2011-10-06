@@ -36,7 +36,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
 
     _textItem.setPlainText( _textBlockModel->getText() );
 
-    setSize (_minSize);
+   // setSize (_minSize);
 
     connect ( _textBlockModel, SIGNAL(textChanged()), this, SLOT(handleTextChanged()), Qt::QueuedConnection);
     connect ( & _textBlockModel->attributes,SIGNAL(attributeAdded(IAttribute*)), SLOT(handleAttributeAdded(IAttribute*)), Qt::QueuedConnection );
@@ -165,11 +165,13 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
     if ( size )
     {
         QPoint pt = size->asPointF().toPoint();
-        SelectableBoxGraphic::setSize(pt);
+        qDebug()<<"SelectableTextBlock::handleAttributeChanged ("+  _textBlockModel->getText()+") setting size = (" +QString::number(pt.x())+","+QString::number(pt.y())+")";
+        this->setSize(pt);
     }
     else if ( position)
     {
         QPointF ps = position->asPointF();
+        qDebug()<<"SelectableTextBlock::handleAttributeChanged ("+  _textBlockModel->getText()+") setting position = (" +QString::number(ps.x())+","+QString::number(ps.y())+")";
         SelectableBoxGraphic::setPos(ps);
     }
     else if ( fc )
@@ -205,12 +207,11 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 
  void SelectableTextBlock::setSize(QPoint size)
  {
-     if ( size.x() < _minSize.x())
+     if ( size.manhattanLength()< 100)
+     {
          size.setX( _minSize.x());
-
-     if ( size.y() < _minSize.y())
          size.setY( _minSize.y());
-
+     }
 
      SelectableBoxGraphic::setSize(size);
 
@@ -227,6 +228,16 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 
 void SelectableTextBlock::graphicHasChanged()
 {
+
+    QPointF sz =this->getSize();
+
+    QPointF ps = this->pos();
+
+    SizeAttribute * size         = dynamic_cast<SizeAttribute *> ( _textBlockModel->attributes["size"]);
+    PositionAttribute * position = dynamic_cast<PositionAttribute*> (_textBlockModel->attributes["position"]);
+
+    size->setValue(sz);
+    position->setValue(ps);
 
 
 }

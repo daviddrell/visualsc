@@ -409,33 +409,17 @@ void SCDataModel::handleLeaveTransitionElement()
 
 void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)
 {
-    if  ( _currentState == NULL ) return;
+    if  ( _currentState == NULL )
+        return;
 
     QString text = _currentState->attributes["name"]->asString();
 
     SCTextBlock *textBlock = _currentState->getIDTextBlock();
     qDebug()<<" handleMakeANewIDTextBlock textBlock=" +QString::number((int)textBlock)+", current state= "+ _currentState->objectName();
-    IAttributeContainer *container = textBlock->getAttributes();
+
     textBlock->setText(text);
 
-    QMapIterator<QString,IAttribute*> i(*attributes);
-    while(i.hasNext())
-    {
-
-        i.next();
-        if ( i.key() == QString("font-bold") )
-        {
-            FontBoldAttribute * fb = new FontBoldAttribute( NULL,"font-bold", i.value()->asString());
-            bool added = container->addItem(fb);
-            if ( ! added )
-                delete fb;//if it was not added, then it was copied, don't need the original
-        }
-        else
-        {
-            //GenericAttribute * a = new GenericAttribute(NULL, i.key(), i.value()->asString());
-        }
-    }
-
+    textBlock->attributes.setAttributes(*attributes);
 
     delete attributes;
 }

@@ -27,6 +27,9 @@ public:
     void    setText(QString);
     void writeSCVXML(QXmlStreamWriter & sw);
 
+public slots:
+    void handleAttributeChanged(IAttribute *attr);
+
 signals:
      void textChanged();
 
