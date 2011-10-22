@@ -421,6 +421,16 @@ QRectF SelectableBoxGraphic::boundingRect() const
 }
 
 
+QPointF SelectableBoxGraphic::getVisibleCenter()
+{
+    QRectF area = getUsableArea();
+
+    double centerX = (area.x() + area.width())/2;
+    double centerY = (area.y() + area.height())/2;
+
+    return QPointF(centerX, centerY);
+}
+
 QRectF SelectableBoxGraphic::getUsableArea()
 {
     int x0 = _drawingOrigenX + 2;

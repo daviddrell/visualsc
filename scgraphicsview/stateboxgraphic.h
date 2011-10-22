@@ -56,10 +56,14 @@ public:
     QPointF getSize();
     void setHighlighted(bool);
 
+public slots:
+    void handleTransitionLineStartMoved(QPointF newPos);
+
 private:
 
 
     virtual void graphicHasChanged (); ///< implemented to receive updates from the SelectableBoxGraphic
+    virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
 
 
     // private slots
@@ -72,9 +76,16 @@ private slots:
 
 
 private:
+
     //private data
 
     SCState * _stateModel;
+
+    QPointF _diagLineStart;
+    QPointF _diagLineEnd;
+    bool    _diagLineDrawIt;
+    QPointF _intersection;
+
 };
 
 #endif // STATEBOX_H

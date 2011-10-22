@@ -160,6 +160,9 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
     transGraphic->setZValue( parentGraphic->zValue() + 1 );
     transGraphic->setParentItem(parentGraphic);
 
+    // connect the parent state-graphic's slots to the new transition graphic's signals
+
+    connect ( transGraphic, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
 }
 
 

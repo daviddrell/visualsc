@@ -54,6 +54,7 @@ public:
 signals:
     void selected();
     void unselected();
+    void startEndMoved(QPointF newPos);
 
 private:
 
@@ -65,8 +66,8 @@ private:
     int             _XcornerGrabBuffer;
     int             _YcornerGrabBuffer;
 
-    QPointF         _lineEnd_0;
-    QPointF         _lineEnd_1;
+    QPointF         _lineEnd_0; // visible starting end
+    QPointF         _lineEnd_1; // visible finishing end
     bool            _cornerGrabbed;
     CornerGrabber*  _corners[2];// 0,1  - starting at x=0,y=0
     QPolygonF       _selectRegion;

@@ -189,6 +189,7 @@ bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, Q
     if ( corner->getMouseState() == CornerGrabber::kMouseMoving )
     {
         createCustomPath(mevent->pos(), corner);
+        emit startEndMoved(  _lineEnd_0 );
 
         this->update();
     }

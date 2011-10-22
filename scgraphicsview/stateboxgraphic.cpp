@@ -34,7 +34,11 @@
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         SelectableBoxGraphic(parent),
         TextItem(parent,stateModel->getIDTextBlock()),
-        _stateModel(stateModel)
+        _stateModel(stateModel),
+        _diagLineStart(),
+        _diagLineEnd(),
+        _diagLineDrawIt(false),
+        _intersection()
 {
 
 
@@ -69,6 +73,117 @@ StateBoxGraphic::~StateBoxGraphic()
 
 }
 
+void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
+{
+
+    // draw a diag line from the newPos to the center of the box, blue dotted line
+
+    QGraphicsItem *child = dynamic_cast<QGraphicsItem *> ( QObject::sender());
+
+    QPointF cursorPos = mapFromItem(child, newPos);
+
+    _diagLineStart =  getVisibleCenter();
+    _diagLineEnd = mapFromItem(child, cursorPos);
+    _diagLineDrawIt = true;
+
+    // find the side which is closest to the newPos
+    QRectF box = getUsableArea();
+    double d[4];
+
+    /*
+
+     ----- 0 -----
+     |           |
+     |           |
+    3             1
+     |           |
+     |           |
+     ----- 2 -----
+
+     */
+
+    d[3] =  fabs(box.x() - cursorPos.x());
+    d[1] = fabs(box.width() - cursorPos.x());
+    d[0] = fabs(box.y() -  cursorPos.y());
+    d[2] = fabs(box.height() -  cursorPos.y());
+
+    double min = 9999999;
+    int closest = -1;
+    for(int i = 0; i < 4 ; i++)
+    {
+        if ( d[i] < min)
+        {
+            min = d[i];
+            closest = i;
+        }
+    }
+
+    // now project a point from the cursor position to the nearest point on the nearest line
+
+    switch ( closest )
+    {
+    case 0 :
+        {
+            double x = cursorPos.x() ;
+            if ( cursorPos.x() >= box.width()) x = box.width()-1;
+            if ( cursorPos.x() < box.x()) x = box.x();
+
+            _intersection.setX( x );
+            _intersection.setY( box.y() );
+        }
+        break;
+
+    case 1 :
+        {
+            double y =cursorPos.y() ;
+            if ( cursorPos.y() >= box.height()) y = box.height()-1;
+            if ( cursorPos.y() < box.y()) y = box.y();
+
+            _intersection.setX( box.width() );
+            _intersection.setY( y );
+        }
+        break;
+
+    case 2 :
+        {
+            double x=cursorPos.x() ;
+            if ( cursorPos.x() >= box.width()) x = box.width()-1;
+            if ( cursorPos.x() < box.x()) x = box.x();
+
+            _intersection.setX( x );
+            _intersection.setY( box.height() );
+        }
+        break;
+
+    case 3 :
+        {
+            double y =cursorPos.y() ;
+            if ( cursorPos.y() >= box.height()) y = box.height()-1;
+            if ( cursorPos.y() < box.y()) y = box.y();
+
+            _intersection.setX( box.x() );
+            _intersection.setY( y );
+        }
+        break;
+    }
+
+}
+
+void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    SelectableBoxGraphic::paint(painter, option, widget);
+
+    if ( _diagLineDrawIt )
+    {
+        QPen p;
+        p.setColor(Qt::blue);
+        p.setStyle(Qt::DotLine);
+        painter->setPen(p);
+        painter->drawLine(_diagLineStart, _diagLineEnd);
+
+        painter->drawEllipse(_intersection, 3,3);
+    }
+}
 
 void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
 {

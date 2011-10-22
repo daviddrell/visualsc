@@ -110,8 +110,8 @@
                 <path d="m "/>
             </transition>
         </state>
-        <state id="final" position="340,20" size="151,78">
-            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-160,-340" size="362,280"/>
+        <state id="final" position="350,20" size="151,78">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="40,10" size="62,48"/>
         </state>
     </state>
 </scxml>
