@@ -188,8 +188,17 @@ bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, Q
 
     if ( corner->getMouseState() == CornerGrabber::kMouseMoving )
     {
-        createCustomPath(mevent->pos(), corner);
-        emit startEndMoved(  _lineEnd_0 );
+
+        if ( corner == _corners[0])
+        {
+            // tell the state box graphic that owns this transition, so that it can detemine where to anchor the corner, it will
+            // call back into this class via setStartEndPosition()
+            emit startEndMoved( this->mapFromItem(corner, mevent->pos()));
+        }
+        else
+        {
+            createCustomPath(mevent->pos(), corner);
+        }
 
         this->update();
     }
@@ -247,6 +256,11 @@ void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, Corne
 
     setCornerPositions();
 
+}
+
+void SelectableLineSegmentGraphic::setStartEndPosition(QPointF position)
+{
+    createCustomPath( mapToItem(_corners[0], position), _corners[0])  ;
 }
 
 void SelectableLineSegmentGraphic::enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  )

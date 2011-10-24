@@ -28,7 +28,7 @@
 #include "scstate.h"
 #include <QTimer>
 #include "textblock.h"
-
+#include "selectablelinesegmentgraphic.h"
 
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
@@ -78,12 +78,12 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
     // draw a diag line from the newPos to the center of the box, blue dotted line
 
-    QGraphicsItem *child = dynamic_cast<QGraphicsItem *> ( QObject::sender());
+    SelectableLineSegmentGraphic *transition = dynamic_cast<SelectableLineSegmentGraphic *> ( QObject::sender());
 
-    QPointF cursorPos = mapFromItem(child, newPos);
+    QPointF cursorPos = mapFromItem(transition, newPos);
 
     _diagLineStart =  getVisibleCenter();
-    _diagLineEnd = mapFromItem(child, cursorPos);
+    _diagLineEnd = mapFromItem(transition, cursorPos);
     _diagLineDrawIt = true;
 
     // find the side which is closest to the newPos
@@ -167,12 +167,14 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
         break;
     }
 
+    transition->setStartEndPosition(this->mapToItem( transition, _intersection) );
 }
 
 void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     SelectableBoxGraphic::paint(painter, option, widget);
 
+#if 0  // debug stuff
     if ( _diagLineDrawIt )
     {
         QPen p;
@@ -183,6 +185,8 @@ void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem 
 
         painter->drawEllipse(_intersection, 3,3);
     }
+#endif
+
 }
 
 void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)

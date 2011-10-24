@@ -50,6 +50,7 @@ class SelectableLineSegmentGraphic : public QObject, public QGraphicsPolygonItem
 
 public:
     SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition );
+    void setStartEndPosition(QPointF position);
 
 signals:
     void selected();
