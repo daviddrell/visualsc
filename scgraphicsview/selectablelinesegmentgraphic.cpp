@@ -40,6 +40,8 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
         _selectRegion(),
         _transitionModel(transition)
 {
+    this->setFlag(QGraphicsItem::ItemIsMovable, false);
+
     _corners[0] = NULL;
     _corners[1] = NULL;
 
@@ -395,25 +397,26 @@ void SelectableLineSegmentGraphic::updateModel ()
 void SelectableLineSegmentGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
     event->setAccepted(true);
-    updateModel();
+   // updateModel();
 }
 
 
 // for supporting moving the box across the scene
 void SelectableLineSegmentGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
+    // no longer allow moving of line segements. only move ends of lines
     event->setAccepted(true);
-    _dragStart = event->pos();
+//    _dragStart = event->pos();
 }
 
 
 // for supporting moving the box across the scene
 void SelectableLineSegmentGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
-
-    QPointF location = this->pos();
-    location += (event->pos() - _dragStart);
-    this->setPos(location);
+    event->setAccepted(true);
+   // QPointF location = this->pos();
+  //  location += (event->pos() - _dragStart);
+   // this->setPos(location);
 }
 
 // remove the corner grabbers

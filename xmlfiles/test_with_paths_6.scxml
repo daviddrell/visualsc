@@ -2,36 +2,36 @@
 <scxml xmlns="http://www.w3.org/2005/07/scxml">
     <state id="State Machine" position="0,0" size="1058,623">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
-        <state id="Main" position="30,100" size="984,483">
+        <state id="Main" position="20,90" size="984,483">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
-            <state id=" kjshdfakjsfdh lakjsfd" position="220,20" size="133,78">
+            <state id=" kjshdfakjsfdh lakjsfd" position="220,20" size="126,90">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                 <transition target="Test1">
-                    <path d="m 100 100 300 100 200 300 "/>
+                    <path d="m 0 0 9 9 358 74 "/>
                 </transition>
             </state>
             <state id="Test1" position="560,90" size="402,315">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                 <transition target="Test1">
-                    <path d="m 100 100 100 100 85 313 "/>
+                    <path d="m 0 0 9 9 85 313 "/>
                 </transition>
                 <state id="Test1_initial" position="220,110" size="100,50">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                     <transition target="Test1Sub1">
-                        <path d="m 10 10 10 10 63 -154 "/>
+                        <path d="m 1 -1 8 10 10 -147 "/>
                     </transition>
                 </state>
                 <state id="Test1Sub1" position="60,100" size="100,50">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                     <transition target="Test1Sub2">
-                        <path d="m 10 10 10 10 116 -137 "/>
+                        <path d="m 0 0 9 9 116 -137 "/>
                     </transition>
                 </state>
                 <state id="Test1Sub2" position="120,40" size="100,50">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                 </state>
                 <transition target="Test2">
-                    <path d="m 10 10 10 10 127 -34 "/>
+                    <path d="m 1 -2 8 15 127 -34 "/>
                 </transition>
             </state>
             <state id="Test2" position="20,130" size="254,114">
@@ -70,27 +70,27 @@
                     </transition>
                 </state>
             </state>
-            <state id="Test4" position="300,140" size="285,103">
+            <state id="Test4" position="290,130" size="285,103">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                 <state id="Test4_initial" position="10,10" size="109,69">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                     <transition target="Test4Sub1">
-                        <path d="m 10 10 10 10 141 -35 "/>
+                        <path d="m 0 0 9 9 117 -113 "/>
                     </transition>
                 </state>
-                <state id="Test4Sub1" position="140,20" size="100,50">
+                <state id="Test4Sub1" position="121,16" size="119,54">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                     <transition target="Test5">
-                        <path d="m 10 10 10 10 69 -74 "/>
+                        <path d="m 0 1 9 8 69 -74 "/>
                     </transition>
                 </state>
             </state>
             <state id="Test5" position="280,270" size="275,173">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
-                <state id="Test5_initial" position="150,10" size="100,50">
+                <state id="Test5_initial" position="110,20" size="100,50">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
                     <transition target="Test5P">
-                        <path d="m 10 10 10 10 169 199 "/>
+                        <path d="m 0 0 9 9 271 234 "/>
                     </transition>
                 </state>
                 <state id="Test5PSub1" position="130,100" size="100,50">

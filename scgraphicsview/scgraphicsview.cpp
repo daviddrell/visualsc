@@ -110,7 +110,7 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
 {
      // create a transition graphic
 
-    SelectableLineSegmentGraphic * transGraphic  = 0;
+    TransitionGraphic * transGraphic  = 0;
 
 
     TransitionAttributes::TransitionPositionAttribute * pos =
@@ -127,28 +127,26 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
         position = pos->asQPointF();
     }
 
-    TransitionAttributes::TransitionPathAttribute * p =
-            dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
 
 
-    QList<QPointF> path = p->asQPointFList();
+//    TransitionAttributes::TransitionPathAttribute * p =
+//            dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
 
-    if (  path.count() < 2  )
-    {
+//    QList<QPointF> path = p->asQPointFList();
 
-        position = QPointF(10,10);
+//    if (  path.count() < 2  )
+//    {
+//        position = QPointF(10,10);
+//        transGraphic  = new SelectableLineSegmentGraphic(position,position, QPointF(position.x()  , position.y() + 15 ), t);
+//    }
+//    else if ( path.count() >= 2)
+//    {
 
-        transGraphic  = new SelectableLineSegmentGraphic(position,position, QPointF(position.x()  , position.y() + 15 ), t);
-    }
-    else if ( path.count() >= 2)
-    {
-
-        transGraphic  = new SelectableLineSegmentGraphic(path[0],
-                                                         path[0],
-                                                         path[1],
-                                                         t);
-
-    }
+//        transGraphic  = new SelectableLineSegmentGraphic(path[0],
+//                                                         path[0],
+//                                                         path[1],
+//                                                         t);
+//    }
 
 
     // get the parent state graphic
@@ -157,12 +155,10 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
 
     StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
 
-    transGraphic->setZValue( parentGraphic->zValue() + 1 );
-    transGraphic->setParentItem(parentGraphic);
+    transGraphic = new TransitionGraphic(parentGraphic,  t );
 
-    // connect the parent state-graphic's slots to the new transition graphic's signals
-
-    connect ( transGraphic, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
+   // transGraphic->setZValue( parentGraphic->zValue() + 1 );
+  //  transGraphic->setParentItem(parentGraphic);
 }
 
 

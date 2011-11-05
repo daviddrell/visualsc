@@ -27,7 +27,7 @@
 #include <QGraphicsView>
 #include "stateattributes.h"
 #include "stateboxgraphic.h"
-#include "selectablelinesegmentgraphic.h"
+#include "transitiongraphic.h"
 #include "textformattoolbar.h"
 #include <QMap>
 

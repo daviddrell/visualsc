@@ -32,7 +32,8 @@ SOURCES += scgraphicsview.cpp \
     textformattoolbar.cpp \
     texteditbox.cpp \
     buttongraphic.cpp \
-    maskedtextedit.cpp
+    maskedtextedit.cpp \
+    transitiongraphic.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -45,7 +46,8 @@ HEADERS += scgraphicsview.h\
     textformattoolbar.h \
     texteditbox.h \
     buttongraphic.h \
-    maskedtextedit.h
+    maskedtextedit.h \
+    transitiongraphic.h
 
 
 OTHER_FILES += \
