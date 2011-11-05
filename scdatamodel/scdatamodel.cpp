@@ -162,6 +162,46 @@ void SCDataModel::getStates(QList<SCState *>& list)
     return _topState->getStates(list);
 }
 
+bool SCDataModel::deleteItem(QObject * item)
+{
+
+    QList<SCState *> list;
+
+    list.append(_topState);
+
+    _topState->getAllStates(list);
+
+    for(int i =0; i < list.count(); i++)
+    {
+        SCState *st = list.at(i);
+        if ( item == st )
+        {
+            int i = list.indexOf(st);
+            list.removeAt(i);
+            delete st;
+            return true;
+        }
+    }
+
+    QList<SCTransition *> tlist;
+
+    _topState->getAllTransitions(tlist);
+
+    for(int i =0; i < tlist.count(); i++)
+    {
+        SCTransition *tr = tlist.at(i);
+        if ( tr == item)
+        {
+            int i = tlist.indexOf(tr);
+            tlist.removeAt(i);
+            delete tr;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 SCState* SCDataModel::insertNewState(SCState *parent)
 {

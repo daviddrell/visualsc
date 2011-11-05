@@ -29,12 +29,12 @@
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
         QWidget (parentWidget),
-        _scene(),
+        _scene(new QGraphicsScene(this)),
         _view(parentWidget),
         _dm(dm),
         _mapStateToGraphic()
 {
-    _dm->setScene(& _scene);
+    _dm->setScene( _scene);
 
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
@@ -46,10 +46,16 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     // try using openGL
 
     _view.setViewport( new QGLWidget (QGLFormat(QGL::SampleBuffers) ));
-    _view.setScene(& _scene);
+    _view.setScene( _scene);
     _view.show();
 
 
+}
+
+
+SCGraphicsView::~SCGraphicsView()
+{
+    delete _scene ;
 }
 
 QGraphicsView * SCGraphicsView::getQGraphicsView()
@@ -106,8 +112,50 @@ SCState * SCGraphicsView::lookUpTargetState(QString )
     return NULL;
 }
 
+void SCGraphicsView::handleTransitionGraphicDeleted(QObject *tg)
+{
+//    QMap<SCTransition*,SelectableLineSegmentGraphic *> _mapTransitionToGraphic;
+
+    SelectableLineSegmentGraphic* trans = (SelectableLineSegmentGraphic*) tg;
+
+    QMapIterator<SCTransition*,SelectableLineSegmentGraphic*> i(_mapTransitionToGraphic);
+    while (i.hasNext())
+    {
+        i.next();
+
+        if ( i.value() == trans)
+        {
+            _mapTransitionToGraphic.remove(i.key());
+        }
+    }
+}
+
+void SCGraphicsView::handleTransitionDeleted(QObject* tr)
+{
+    // use a direct cast because dynamic_cast<SCTransition*> will not result in a
+    // SCTransition because the SCTransition has already been destructed
+    // and we are getting the destructor signal on the base QObject clas
+
+    SCTransition * trans = (SCTransition *)tr;
+
+    QMapIterator<SCTransition*,SelectableLineSegmentGraphic*> i(_mapTransitionToGraphic);
+    while (i.hasNext())
+    {
+        i.next();
+
+        if ( i.key() == trans)
+        {
+            delete i.value(); //delete the transition graphic associated with this transition
+            _mapTransitionToGraphic.remove(i.key());
+        }
+    }
+
+}
+
 void SCGraphicsView::handleNewTransition (SCTransition *t)
 {
+    connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
+
      // create a transition graphic
 
     SelectableLineSegmentGraphic * transGraphic  = 0;
@@ -151,6 +199,9 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
     }
 
 
+    connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
+
+
     // get the parent state graphic
 
     SCState *parentState = dynamic_cast<SCState *>(t->parent());
@@ -160,14 +211,52 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
     transGraphic->setZValue( parentGraphic->zValue() + 1 );
     transGraphic->setParentItem(parentGraphic);
 
+    _mapTransitionToGraphic.insert(t, transGraphic);
+
     // connect the parent state-graphic's slots to the new transition graphic's signals
 
     connect ( transGraphic, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
 }
 
+void SCGraphicsView::handleStateDeleted(QObject *state)
+{
+    // use a direct cast because dynamic_cast<State*> will not result in a
+    // state because the state has already been destructed
+    // and we are getting the destructor signal on the base QObject clas
+
+    SCState * st = (SCState*)state;
+
+    QMapIterator<SCState*,StateBoxGraphic*> i(_mapStateToGraphic);
+    while (i.hasNext())
+    {
+        i.next();
+        if ( i.key() == st)
+        {
+            delete i.value();// delete the graphic and all its children
+            _mapStateToGraphic.remove(i.key());
+        }
+    }
+
+}
+
+
+void SCGraphicsView::handleStateGraphicDeleted(QObject *st)
+{
+    QMapIterator<SCState*,StateBoxGraphic*> i(_mapStateToGraphic);
+    while (i.hasNext())
+    {
+        i.next();
+
+        if ( i.value() == (StateBoxGraphic*)st)
+            _mapStateToGraphic.remove(i.key());
+    }
+}
+
 
 void SCGraphicsView::handleNewState (SCState *newState)
 {
+
+    connect(newState, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
 
     StateAttributes::StateString * type = dynamic_cast<StateAttributes::StateString *> ( newState->attributes.value("type"));
     if ( type != 0 && (type->asString() == "machine"))
@@ -191,6 +280,8 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     stateGraphic = new StateBoxGraphic( parentGraphic, newState);
 
+    connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
+
     // quick look up of graphics from state model references
 
     _mapStateToGraphic.insert(newState, stateGraphic);
@@ -198,7 +289,7 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     if ( ! parentGraphic )
     {
-        _scene.addItem(stateGraphic);
+        _scene->addItem(stateGraphic);
     }
 
     // make the parent bigger to hold this state

@@ -65,7 +65,7 @@ private:
 
     QString         _file;
     SCDataModel      *_dm;
-    SCGraphicsView   _graphicsView;
+    SCGraphicsView   * _graphicsView;
 
 
 

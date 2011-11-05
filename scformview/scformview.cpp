@@ -82,7 +82,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
     loadTree (NULL, states);
 }
 
-void SCFormView::handleNewTransition(SCTransition*)
+void SCFormView::handleNewTransition(SCTransition*t)
 {
     QList<SCState*> states;
     states.append( _dm->getTopState());
@@ -93,7 +93,7 @@ void SCFormView::handleNewTransition(SCTransition*)
 }
 
 
-void SCFormView::handleNewState(SCState*)
+void SCFormView::handleNewState(SCState*s)
 {
     // pass the loadTree function a list of top-level states and starting node
     // the top node (NULL) has only one top state
@@ -123,6 +123,46 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
 
 }
 
+void SCFormView::handleTextBlockDeleted(QObject *t)
+{
+    if ( t == _currentlySelected)
+        _currentlySelected = NULL;
+
+    QList<SCState*> states;
+    states.append( _dm->getTopState());
+
+    stateChartTreeView->clear();
+
+    loadTree (NULL, states);
+}
+
+
+void SCFormView::handleTransitionDeleted(QObject *t)
+{
+    if ( t == _currentlySelected)
+        _currentlySelected = NULL;
+
+    QList<SCState*> states;
+    states.append( _dm->getTopState());
+
+    stateChartTreeView->clear();
+
+    loadTree (NULL, states);
+}
+
+void SCFormView::handleStateDeleted(QObject *s)
+{
+    if ( s == _currentlySelected)
+        _currentlySelected = NULL;
+
+    QList<SCState*> states;
+    states.append( _dm->getTopState());
+
+    stateChartTreeView->clear();
+
+    loadTree (NULL, states);
+
+}
 
 // recursively walk through the state tree and build the tree view
 
@@ -136,6 +176,9 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
         SCState * st = states.at(i);
 
         if ( !  st ) continue;
+
+        connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
+
 
         CustomTreeWidgetItem * item=0;
 
@@ -185,6 +228,8 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , SCTextBlock* tex
 
     CustomTreeWidgetItem * item=0;
 
+    connect(textBlock, SIGNAL(destroyed(QObject*)), this, SLOT(handleTextBlockDeleted(QObject*)), Qt::QueuedConnection);
+
     item = new CustomTreeWidgetItem(parentItem);
     item->setData(textBlock);
 
@@ -206,6 +251,8 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransiti
         SCTransition * tr = transitions.at(i);
 
         if ( !  tr ) continue;
+
+        connect(tr, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)), Qt::QueuedConnection);
 
         CustomTreeWidgetItem * item=0;
 
@@ -415,9 +462,35 @@ void SCFormView::buttonGroupClicked(int )
 
 void SCFormView::deleteItem()
 {
+    QMessageBox msgBox;
+    QString itemType = getCurrentlySelectedType();
+    msgBox.setText("Confirm delete");
+    msgBox.setInformativeText("Are you sure you want to delete item: " + _currentlySelected->objectName() + " (" + itemType + ")");
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setWindowFlags( Qt::WindowStaysOnTopHint);
+    int ret = msgBox.exec();
 
+    switch (ret)
+    {
+    case QMessageBox::Ok:
+        deleteItem(_currentlySelected);
+        break;
+    case QMessageBox::Cancel:
+        // Cancel was clicked
+        break;
+    default:
+        // should never be reached
+        break;
+    }
 }
 
+void SCFormView::deleteItem(QObject * item)
+{
+
+    _dm->deleteItem(item);
+
+}
 
 void SCFormView::pointerGroupClicked(int)
 {
