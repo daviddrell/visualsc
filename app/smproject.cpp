@@ -28,7 +28,7 @@
 SMProject::SMProject(QWidget *parentWidget): QObject(parentWidget),
         _file(),
         _dm(SCDataModel::singleton()),
-        _graphicsView( parentWidget,  _dm)
+        _graphicsView( new SCGraphicsView(parentWidget,  _dm))
 {
 
 }
@@ -36,6 +36,7 @@ SMProject::SMProject(QWidget *parentWidget): QObject(parentWidget),
 SMProject::~SMProject()
 {
     close();
+    delete _graphicsView;
 }
 
 SCDataModel * SMProject::getDM()
@@ -45,7 +46,7 @@ SCDataModel * SMProject::getDM()
 
 QGraphicsView * SMProject::getQGraphicsView()
 {
-    return  _graphicsView.getQGraphicsView();
+    return  _graphicsView->getQGraphicsView();
 }
 
 void SMProject::initNewSM()

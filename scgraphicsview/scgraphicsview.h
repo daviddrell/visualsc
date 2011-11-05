@@ -52,6 +52,7 @@ class SCGRAPHICSVIEWSHARED_EXPORT SCGraphicsView : QWidget
 
 public:
     SCGraphicsView(QWidget *parent, SCDataModel * dm);
+    ~SCGraphicsView();
 
     QGraphicsView * getQGraphicsView();
 
@@ -61,15 +62,20 @@ private slots:
 
     void handleNewState(SCState * newState);
     void handleNewTransition(SCTransition*);
+    void handleStateDeleted(QObject *state);
+    void handleTransitionDeleted(QObject* tr);
+    void handleStateGraphicDeleted(QObject *sg);
+    void handleTransitionGraphicDeleted(QObject *tg);
 
 private:
 
     // private data
 
-    QGraphicsScene  _scene;
+    QGraphicsScene  *_scene;
     QGraphicsView   _view;
     SCDataModel    *_dm;
     QMap<SCState*,StateBoxGraphic*> _mapStateToGraphic;
+    QMap<SCTransition*,TransitionGraphic *> _mapTransitionToGraphic;
 
 
     //  private methods

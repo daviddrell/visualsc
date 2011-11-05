@@ -59,7 +59,7 @@ SCState::SCState( bool topState) :
 
 SCState::~SCState()
 {
-
+    delete _IdTextBlock;
 }
 
 void SCState::initCommon()

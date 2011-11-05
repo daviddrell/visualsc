@@ -85,6 +85,11 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
 }
 
 
+SelectableLineSegmentGraphic::~SelectableLineSegmentGraphic()
+{
+    if (_corners[0] != NULL) delete _corners[0];
+    if (_corners[1] != NULL) delete _corners[1];
+}
 
 void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
 {

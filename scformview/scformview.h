@@ -100,8 +100,10 @@ private slots:
 
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
     void handleNewTransition(SCTransition*);
+    void handleTransitionDeleted(QObject *);
+    void handleStateDeleted(QObject*);
     void handleNewState(SCState*);
-
+    void handleTextBlockDeleted(QObject*);
     void handlePropertyChanged(IAttribute * attr);
     void handlePropertyCellChanged(int, int);
     void handleStateSelectionWindowStateSelected(SCState *st, QString name);
@@ -124,6 +126,8 @@ private:
     void loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states);
     void loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransition*> & transitions);
     void loadTree ( CustomTreeWidgetItem * parentItem , SCTextBlock* textBlock);
+
+    void deleteItem(QObject * item);
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;

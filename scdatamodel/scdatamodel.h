@@ -77,6 +77,8 @@ public:
     bool save(QString scxmlFile, QString & message);
     void initializeEmptyStateMachine();
 
+    bool deleteItem(QObject * item);
+
     void getStates(QList<SCState *>& list);
     void getAllStates(QList<SCState *>& list);
     SCState* getStateByName(QString name);
