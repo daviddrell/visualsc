@@ -52,6 +52,7 @@ public:
     SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition );
     ~SelectableLineSegmentGraphic();
     void setStartEndPosition(QPointF position);
+    void setTerminator(bool);///< if true, this segment's end point is a terminator and should draw an arrow head
 
 signals:
     void selected();

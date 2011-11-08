@@ -265,6 +265,11 @@ void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, Corne
 
 }
 
+void SelectableLineSegmentGraphic::setTerminator(bool isTerm)
+{
+   // _corners[1]->drawAsArrowHead(isTerm);
+}
+
 void SelectableLineSegmentGraphic::setStartEndPosition(QPointF position)
 {
     createCustomPath( mapToItem(_corners[0], position), _corners[0])  ;

@@ -59,6 +59,10 @@ SCTransition::~SCTransition()
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
 }
 
+SCState *SCTransition::targetState()
+{
+    return _targetState;
+}
 
 QString SCTransition::getAttributeValue(QString key)
 {

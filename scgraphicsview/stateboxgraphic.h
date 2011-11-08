@@ -56,6 +56,7 @@ public:
     QPointF getSize();
     void setHighlighted(bool);
 
+
 public slots:
     void handleTransitionLineStartMoved(QPointF newPos);
 

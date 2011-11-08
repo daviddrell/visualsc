@@ -52,6 +52,8 @@ public:
     int  getMouseState(); ///< allows the owner to get the current mouse state
     QPointF getCenterPoint();
 
+    void drawAsArrowHead(bool drawArrow);
+
     qreal mouseDownX;
     qreal mouseDownY;
 
@@ -92,6 +94,7 @@ private:
     bool _placedOnASquare;
 
     PaintStyle _paintStyle;
+    bool       _drawAsArrow;
 
 };
 

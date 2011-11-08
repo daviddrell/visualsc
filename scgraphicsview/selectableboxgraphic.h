@@ -51,6 +51,7 @@ public:
     QString getPositionAsString();
     QString getSizeAsString();
     QPointF getSize();
+
     void    setHighlighted(bool);
 
     enum BoxStyle {kSolidWithShadow, kSolidNoShadow, kTransparent};
@@ -63,6 +64,8 @@ public:
     void setHoverLineThickness(int t);///< set line thickness when hovered
     QRectF getUsableArea();///< returns a rect relative to the SelecableBoxGraphic that represents the inside margin, or usable area of the box.
     QPointF getVisibleCenter();///< returns a point which is appears to be the center of the box (i.e. does not include drop shadow), may not be the center of boundingRect()
+    QPointF getSideCenterPointInSceneCoord(int side); ///< returns the center point on a given side, for anchoring a transition line in the middle of a side
+
 
 protected:
 

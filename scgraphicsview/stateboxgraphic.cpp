@@ -235,6 +235,8 @@ QString StateBoxGraphic::getPositionAsString()
     return SelectableBoxGraphic::getPositionAsString();
 }
 
+
+
 QPointF  StateBoxGraphic::getSize()
 {
     QPointF size = SelectableBoxGraphic::getSize();

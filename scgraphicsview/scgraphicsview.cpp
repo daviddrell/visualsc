@@ -93,28 +93,39 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
 }
 
 
-SCState * SCGraphicsView::lookUpTargetState(QString )
+StateBoxGraphic * SCGraphicsView::lookUpTargetStateGraphic(QString stateId )
+{
+    SCState * stateDM = lookUpTargetState(stateId);
+    if ( stateDM == NULL ) return NULL;
+
+    return _mapStateToGraphic[stateDM];
+
+}
+
+
+SCState * SCGraphicsView::lookUpTargetState(QString target )
 {
 
-//    QList<SCState *> states;
-//    _dm->getAllStates(states);
+    QList<SCState *> states;
+    _dm->getAllStates(states);
 
-//    QList<SCState *>::iterator i;
-//    for (i = states.begin(); i != states.end(); ++i)
-//    {
-//        SCState *st = *i;
-//        StateAttributes attr;
-//        st->getAttributes(attr);
-//        if (attr.name.asString() == target)
-//            return st;
-//    }
+    QList<SCState *>::iterator i;
+    for (i = states.begin(); i != states.end(); ++i)
+    {
+        SCState *st = *i;
+        StateAttributes * attr = dynamic_cast<StateAttributes * > (st->getAttributes());
+
+        if ( attr->value("name") == NULL ) return NULL;
+
+        if (attr->value("name")->asString() == target)
+            return st;
+    }
 
     return NULL;
 }
 
 void SCGraphicsView::handleTransitionGraphicDeleted(QObject *tg)
 {
-//    QMap<SCTransition*,TransitionGraphic *> _mapTransitionToGraphic;
 
     TransitionGraphic* trans = (TransitionGraphic*) tg;
 
@@ -175,16 +186,16 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
         position = pos->asQPointF();
     }
 
-
-
-
     // get the parent state graphic
 
     SCState *parentState = dynamic_cast<SCState *>(t->parent());
 
     StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
 
-    transGraphic = new TransitionGraphic(parentGraphic,  t );
+    TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
+    StateBoxGraphic * targetGraphic  = lookUpTargetStateGraphic( targetName->asString() );
+
+    transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t );
 
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
 

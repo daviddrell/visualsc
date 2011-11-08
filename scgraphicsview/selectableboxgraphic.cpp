@@ -441,6 +441,31 @@ QRectF SelectableBoxGraphic::getUsableArea()
     return QRectF(x0,y0, width, height);
 }
 
+
+QPointF SelectableBoxGraphic::getSideCenterPointInSceneCoord(int side)
+{
+    switch (side)
+    {
+    case 0:
+        return mapToScene( QPointF ( (_drawingOrigenX +  _drawingWidth)/2, _drawingOrigenY ));
+        break;
+
+    case 1:
+        return  mapToScene( QPointF ( _drawingWidth, (_drawingOrigenY + _drawingHeight)/2));
+        break;
+
+    case 2:
+        return  mapToScene( QPointF ( (_drawingOrigenX +  _drawingWidth)/2,  _drawingHeight));
+        break;
+
+    case 3:
+        return  mapToScene( QPointF ( _drawingOrigenX, (_drawingOrigenY + _drawingHeight)/2));
+        break;
+    }
+
+    return QPointF();
+}
+
 void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 

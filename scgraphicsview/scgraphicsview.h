@@ -83,6 +83,7 @@ private:
     void increaseSizeOfAllAncestors (SCState * state);
 
     SCState * lookUpTargetState(QString target);
+    StateBoxGraphic * lookUpTargetStateGraphic(QString stateId );
 
 
 };

@@ -57,6 +57,7 @@ public:
     void    setAttributeValue(QString key, QString value);
     QString getAttributeValue(QString key);
     void    writeSCVXML(QXmlStreamWriter & sw);
+    SCState *targetState();
 
      //public data members
 

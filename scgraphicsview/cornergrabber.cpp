@@ -32,8 +32,10 @@ CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnAS
     _corner(corner),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(placedOnASquare),
-    _paintStyle(kBox)
+    _paintStyle(kBox),
+    _drawAsArrow(false)
 {
+
     setParentItem(parent);
 
     _outterborderPen.setWidth(2);
@@ -111,8 +113,16 @@ void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 QRectF CornerGrabber::boundingRect() const
 {
 
-    QPointF topLeft (0-(_width/2), 0-(_height/2));
-    QPointF bottomRight ( _width/2 ,_height/2);
+//    QPointF topLeft (0-(_width/2), 0-(_height/2));
+//    QPointF bottomRight ( _width/2 ,_height/2);
+
+//    QRectF rect (topLeft, bottomRight);
+//    return rect;
+
+
+    int captureMargin = 12;
+    QPointF topLeft (0-(_width/2)-captureMargin, 0-(_height/2)-captureMargin);
+    QPointF bottomRight ( (_width/2)+captureMargin ,(_height/2)+captureMargin);
 
     QRectF rect (topLeft, bottomRight);
     return rect;
@@ -140,6 +150,10 @@ QPointF CornerGrabber::getCenterPoint()
 
 }
 
+void CornerGrabber::drawAsArrowHead(bool drawArrow)
+{
+    _drawAsArrow = drawArrow;
+}
 
 
 void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
