@@ -54,10 +54,14 @@ public:
     void setStartEndPosition(QPointF position);
     void setTerminator(bool);///< if true, this segment's end point is a terminator and should draw an arrow head
 
+    QPointF getStart();
+    QPointF getEnd();
+
 signals:
     void selected();
     void unselected();
     void startEndMoved(QPointF newPos);
+    void updateModel ();
 
 private:
 
@@ -81,7 +85,7 @@ private:
     // private methods
 
 
-    void updateModel ();
+   // void updateModel ();
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events

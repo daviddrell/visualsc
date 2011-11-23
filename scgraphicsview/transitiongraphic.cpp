@@ -14,9 +14,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     TransitionAttributes::TransitionPathAttribute * p =
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
 
-    QList<QPointF> path = p->asQPointFList();
+    QList<QPointF> pointList = p->asQPointFList();
 
-    if (  path.count() < 2 && targetGraphic != NULL )
+    if (  pointList.count() < 2 && targetGraphic != NULL )
     {
         // this path is new, anchor each end to the source and target states
         // find the orientation of the parent and target graphics to determine which sides to anchor to.
@@ -33,35 +33,34 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         segment->setParentItem(_parentStateGraphic);
         _lineSegments.append(segment);
         connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
+        connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
 
-        qDebug()<<"_parentStateGraphic->zValue() =" +QString::number(_parentStateGraphic->zValue());
-        qDebug()<<"_targetStateGraphic->zValue() =" +QString::number(_targetStateGraphic->zValue());
-
-        if ( _parentStateGraphic->zValue() > _targetStateGraphic->zValue())
-            segment->setZValue( _parentStateGraphic->zValue() +1 );
-        else
-            segment->setZValue( _targetStateGraphic->zValue() +1 );
 
         segment->setTerminator(true);
 
     }
-    else if ( path.count() >= 3 )
+    else if ( pointList.count() == 2 )
     {
 
-        SelectableLineSegmentGraphic * segment   = new SelectableLineSegmentGraphic(path[0], path[0], path[1], t);
+        SelectableLineSegmentGraphic * segment   = new SelectableLineSegmentGraphic(pointList[0], pointList[0], pointList[1], t);
         segment->setParentItem(parentGraphic);
         _lineSegments.append(segment);
 
         // connect the parent state-graphic's slots to the new transition graphic's signals
 
         connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
+        connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
 
-        for (int i = 2 ; i < path.count() - 1 ; i ++)
+    }
+    else
+    {
+        for (int i = 0 ; i < pointList.count() - 1 ; i ++)
         {
-            SelectableLineSegmentGraphic * segment   = new SelectableLineSegmentGraphic( path[i+0], path[i+0], path[i+1], t);
+            SelectableLineSegmentGraphic * segment   = new SelectableLineSegmentGraphic( pointList[i+0], pointList[i+0], pointList[i+1], t);
             segment->setParentItem(parentGraphic);
             _lineSegments.append(segment);
             connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
+            connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
         }
     }
 }
@@ -75,6 +74,41 @@ TransitionGraphic::~TransitionGraphic()
         delete ls;
     }
     _lineSegments.clear();
+}
+
+
+
+void TransitionGraphic::updateModel ()
+{
+
+    if ( _transitionDM )
+    {
+        if ( _lineSegments.count() < 1 ) return;
+
+        QList<QPointF> path;
+
+        path.append( _lineSegments[0]->getStart() );
+
+        if (_lineSegments.count() == 1 )
+        {
+            path.append( _lineSegments[0]->getEnd() );
+        }
+        else
+        {
+            for(int i = 1 ; i < _lineSegments.count(); i++)
+            {
+                path.append( _lineSegments[i]->getStart() );
+            }
+
+            path.append( _lineSegments[_lineSegments.count()-1]->getEnd() );
+        }
+
+
+        TransitionAttributes::TransitionPathAttribute * pathAttr = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (_transitionDM->attributes.value("path"));
+
+        pathAttr->setValue(path);
+
+    }
 }
 
 
@@ -115,10 +149,6 @@ void TransitionGraphic::getClosestSides(int* sourceSide, int* targetSide)
     }
 
 
-}
-
-void TransitionGraphic::handleTransitionLineStartMoved(QPointF)
-{
 }
 
 void TransitionGraphic::paint (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)

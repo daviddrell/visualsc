@@ -76,15 +76,19 @@ StateBoxGraphic::~StateBoxGraphic()
 void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 {
 
-    // draw a diag line from the newPos to the center of the box, blue dotted line
+    // this method keeps the starting position of a line snapped to the outter edge of the box
 
     SelectableLineSegmentGraphic *transition = dynamic_cast<SelectableLineSegmentGraphic *> ( QObject::sender());
 
     QPointF cursorPos = mapFromItem(transition, newPos);
 
+#if 0  // debug stuff
+    // draw a diag line from the newPos to the center of the box, blue dotted line
+
     _diagLineStart =  getVisibleCenter();
     _diagLineEnd = mapFromItem(transition, cursorPos);
     _diagLineDrawIt = true;
+#endif
 
     // find the side which is closest to the newPos
     QRectF box = getUsableArea();
@@ -120,13 +124,15 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
     // now project a point from the cursor position to the nearest point on the nearest line
 
+    int cornerGuard = 10;// keep line anchor off corners of box
+
     switch ( closest )
     {
     case 0 :
         {
             double x = cursorPos.x() ;
-            if ( cursorPos.x() >= box.width()) x = box.width()-1;
-            if ( cursorPos.x() < box.x()) x = box.x();
+            if ( cursorPos.x() >= box.width()-cornerGuard) x = box.width()-1-cornerGuard;
+            if ( cursorPos.x() < box.x()+cornerGuard) x = box.x()+cornerGuard;
 
             _intersection.setX( x );
             _intersection.setY( box.y() );
@@ -136,8 +142,8 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
     case 1 :
         {
             double y =cursorPos.y() ;
-            if ( cursorPos.y() >= box.height()) y = box.height()-1;
-            if ( cursorPos.y() < box.y()) y = box.y();
+            if ( cursorPos.y() >= box.height()-cornerGuard) y = box.height()-1-cornerGuard;
+            if ( cursorPos.y() < box.y()+cornerGuard) y = box.y()+cornerGuard;
 
             _intersection.setX( box.width() );
             _intersection.setY( y );
@@ -147,8 +153,8 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
     case 2 :
         {
             double x=cursorPos.x() ;
-            if ( cursorPos.x() >= box.width()) x = box.width()-1;
-            if ( cursorPos.x() < box.x()) x = box.x();
+            if ( cursorPos.x() >= box.width()-cornerGuard) x = box.width()-1-cornerGuard;
+            if ( cursorPos.x() < box.x()+cornerGuard) x = box.x()+cornerGuard;
 
             _intersection.setX( x );
             _intersection.setY( box.height() );
@@ -158,8 +164,8 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
     case 3 :
         {
             double y =cursorPos.y() ;
-            if ( cursorPos.y() >= box.height()) y = box.height()-1;
-            if ( cursorPos.y() < box.y()) y = box.y();
+            if ( cursorPos.y() >= box.height()-cornerGuard) y = box.height()-1-cornerGuard;
+            if ( cursorPos.y() < box.y()+cornerGuard) y = box.y()+cornerGuard;
 
             _intersection.setX( box.x() );
             _intersection.setY( y );
