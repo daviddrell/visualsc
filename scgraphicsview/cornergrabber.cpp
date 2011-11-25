@@ -19,7 +19,8 @@
 */
 
 #include "cornergrabber.h"
-
+#include "arrowheadgraphic.h"
+#include <QDebug>
 
 CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnASquare) :
     QGraphicsItem(parent),
@@ -33,11 +34,10 @@ CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnAS
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(placedOnASquare),
     _paintStyle(kBox),
-    _drawAsArrow(false)
+    _arrowAngle(0),
+    _arrowHead(NULL)
 {
-
     setParentItem(parent);
-
     _outterborderPen.setWidth(2);
     _outterborderPen.setColor(_outterborderColor);
 
@@ -47,6 +47,25 @@ CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnAS
 void CornerGrabber::setPaintStyle(PaintStyle s)
 {
     _paintStyle  = s;
+
+    if (s == kArrowHead )
+    {
+        if ( ! _arrowHead )
+        {
+            _arrowHead = new ArrowHeadGraphic(this);  
+            _arrowHead->setWidth(_width);
+            _arrowHead->setHeight(_height);
+            _arrowHead->setPos( - _width/2, - _height/2);
+        }
+    }
+    else
+    {
+        if ( _arrowHead )
+        {
+            delete _arrowHead;
+            _arrowHead = NULL;
+        }
+    }
     this->update();
 }
 
@@ -112,21 +131,12 @@ void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 QRectF CornerGrabber::boundingRect() const
 {
-
-//    QPointF topLeft (0-(_width/2), 0-(_height/2));
-//    QPointF bottomRight ( _width/2 ,_height/2);
-
-//    QRectF rect (topLeft, bottomRight);
-//    return rect;
-
-
     int captureMargin = 12;
     QPointF topLeft (0-(_width/2)-captureMargin, 0-(_height/2)-captureMargin);
     QPointF bottomRight ( (_width/2)+captureMargin ,(_height/2)+captureMargin);
 
     QRectF rect (topLeft, bottomRight);
     return rect;
-
 }
 
 QPointF CornerGrabber::getCenterPoint()
@@ -150,11 +160,10 @@ QPointF CornerGrabber::getCenterPoint()
 
 }
 
-void CornerGrabber::drawAsArrowHead(bool drawArrow)
+void CornerGrabber::setAngle(int angle)
 {
-    _drawAsArrow = drawArrow;
+    _arrowAngle = angle;
 }
-
 
 void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
@@ -184,7 +193,7 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
             painter->drawRect(rect);
         }
     }
-    else // kCrossHair
+    else  if (_paintStyle == kCrossHair)
     {
         painter->setPen( _outterborderColor );
 
@@ -193,6 +202,16 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->drawLine( QPointF(0,0), QPointF(0, (_height/2)) );
         painter->drawLine( QPointF(0,0), QPointF(-(_width/2) , 0) );
         painter->drawLine( QPointF(0,0), QPointF((_width/2) , 0) );
+    }
+    else  if (_paintStyle == kArrowHead)
+    {
+
+
+        _arrowHead->setRotation(_arrowAngle);
+
+        _arrowHead->setColor(  _outterborderColor );
+
+        _arrowHead->update();
     }
 
 }

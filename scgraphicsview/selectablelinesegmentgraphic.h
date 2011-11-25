@@ -79,7 +79,9 @@ private:
     CornerGrabber*  _corners[2];// 0,1  - starting at x=0,y=0
     QPolygonF       _selectRegion;
 
-     SCTransition*  _transitionModel;
+    SCTransition*  _transitionModel;
+
+    bool           _isTerminal;///< is this the last line segment in a transition graphic?
 
 
     // private methods
@@ -111,6 +113,10 @@ private slots:
     void handleAttributeChanged(IAttribute *attr);
 
 };
+
+
+
+
 
 
 #endif // SELECTABLELINESEGMENTGRAPHIC_H

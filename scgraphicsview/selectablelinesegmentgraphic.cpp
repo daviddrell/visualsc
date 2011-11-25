@@ -38,7 +38,8 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
         _lineEnd_1 ( this->mapFromParent(end)),
         _cornerGrabbed(false),
         _selectRegion(),
-        _transitionModel(transition)
+        _transitionModel(transition),
+        _isTerminal(false)
 {
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
 
@@ -275,9 +276,21 @@ QPointF SelectableLineSegmentGraphic::getEnd()
     return _lineEnd_1;
 }
 
+
+
 void SelectableLineSegmentGraphic::setTerminator(bool isTerm)
 {
-   // _corners[1]->drawAsArrowHead(isTerm);
+    _isTerminal = isTerm;
+
+    if (  _corners[1]== NULL )
+        return;
+
+    if ( _isTerminal )
+    {
+        _corners[1]->setPaintStyle(CornerGrabber::kArrowHead);
+    }
+    else
+        _corners[1]->setPaintStyle(CornerGrabber::kBox);
 }
 
 void SelectableLineSegmentGraphic::setStartEndPosition(QPointF position)
@@ -470,6 +483,14 @@ void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * 
 
     setCornerPositions();
 
+    if ( _isTerminal )
+    {
+        _corners[1]->setPaintStyle(CornerGrabber::kArrowHead);
+    }
+    else
+        _corners[1]->setPaintStyle(CornerGrabber::kBox);
+
+
     qDebug()<<"SelectableLineSegmentGraphic::hoverEnterEvent";
     emit selected();
 }
@@ -489,16 +510,43 @@ void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionG
 {
 
     // this paint will draw the bounding box for debugging:
- //   QGraphicsPolygonItem::paint(painter, i, w );
+    // QGraphicsPolygonItem::paint(painter, i, w );
 
     // draw the line
 
     _pen.setStyle(Qt::SolidLine);
     painter->setPen(_pen);
 
+    int k = 0;
+
     _pen.setColor(Qt::red);
     painter->drawLine(_lineEnd_0, _lineEnd_1);
 
+    double dy = _lineEnd_0.y() -_lineEnd_1.y();
+    qDebug()<< "dy = "  +  QString::number(dy);
+
+    double dx = _lineEnd_0.x() - _lineEnd_1.x();
+
+    if ( dx > 0)
+    {
+        k = 1;
+    }
+
+    qDebug()<< "dx = "  +  QString::number(dx);
+
+    double angle = (atan ( (dy) / ( dx) ) + ( k * 3.14159265)) * (180.0/3.14159265);
+
+    qDebug()<<"theta="+ QString::number(angle);
+
+    angle -= 45 ;
+
+    qDebug()<< "angle = "  +  QString::number(angle);
+
+    if ( _isTerminal && _corners[1] )
+    {
+        _corners[1]->setAngle(angle);
+        _corners[1]->update();
+    }
 }
 
 

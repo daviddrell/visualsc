@@ -33,7 +33,8 @@ SOURCES += scgraphicsview.cpp \
     texteditbox.cpp \
     buttongraphic.cpp \
     maskedtextedit.cpp \
-    transitiongraphic.cpp
+    transitiongraphic.cpp \
+    arrowheadgraphic.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -47,7 +48,8 @@ HEADERS += scgraphicsview.h\
     texteditbox.h \
     buttongraphic.h \
     maskedtextedit.h \
-    transitiongraphic.h
+    transitiongraphic.h \
+    arrowheadgraphic.h
 
 
 OTHER_FILES += \

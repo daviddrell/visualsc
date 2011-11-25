@@ -51,9 +51,13 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
         connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
 
+        segment->setTerminator(true);
+
     }
     else
     {
+        SelectableLineSegmentGraphic * lastSegment=NULL;
+
         for (int i = 0 ; i < pointList.count() - 1 ; i ++)
         {
             SelectableLineSegmentGraphic * segment   = new SelectableLineSegmentGraphic( pointList[i+0], pointList[i+0], pointList[i+1], t);
@@ -61,7 +65,12 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             _lineSegments.append(segment);
             connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
             connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
+
+            lastSegment = segment;
         }
+
+        lastSegment->setTerminator(true);
+
     }
 }
 

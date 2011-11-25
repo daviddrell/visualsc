@@ -32,6 +32,7 @@
 #include <QPen>
 #include <QPointF>
 
+class ArrowHeadGraphic;
 
 
 /**
@@ -47,22 +48,21 @@ class CornerGrabber : public QGraphicsItem
 public:
     explicit CornerGrabber(QGraphicsItem *parent = 0,  int corner=0, bool placedOnASquare=false);
 
+    void setAngle(int agle);///< set the rotation angle for corners which are drawn as arrowheads
     int  getCorner(); ///< allows the owner to find out which coner this is
     void setMouseState(int); ///< allows the owner to record the current mouse state
     int  getMouseState(); ///< allows the owner to get the current mouse state
     QPointF getCenterPoint();
 
-    void drawAsArrowHead(bool drawArrow);
-
     qreal mouseDownX;
     qreal mouseDownY;
 
-     enum {kMouseReleased=0, kMouseDown, kMouseMoving}; ///< define the mouse states
+    enum {kMouseReleased=0, kMouseDown, kMouseMoving}; ///< define the mouse states
 
-     enum PaintStyle {kBox, kCrossHair};
-     void setPaintStyle(PaintStyle s);///< set box or cross-hairs
+    enum PaintStyle {kBox, kCrossHair, kArrowHead};
+    void setPaintStyle(PaintStyle s);///< set box or cross-hairs
 
-   virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
+    virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
 private:
 
@@ -94,7 +94,8 @@ private:
     bool _placedOnASquare;
 
     PaintStyle _paintStyle;
-    bool       _drawAsArrow;
+    int        _arrowAngle;
+    ArrowHeadGraphic * _arrowHead;
 
 };
 
