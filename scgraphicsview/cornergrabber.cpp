@@ -56,6 +56,7 @@ void CornerGrabber::setPaintStyle(PaintStyle s)
             _arrowHead->setWidth(_width);
             _arrowHead->setHeight(_height);
             _arrowHead->setPos( - _width/2, - _height/2);
+            _arrowHead->setColor(Qt::red);
         }
     }
     else
@@ -205,11 +206,7 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
     }
     else  if (_paintStyle == kArrowHead)
     {
-
-
         _arrowHead->setRotation(_arrowAngle);
-
-        _arrowHead->setColor(  _outterborderColor );
 
         _arrowHead->update();
     }

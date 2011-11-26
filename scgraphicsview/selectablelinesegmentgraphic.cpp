@@ -43,16 +43,15 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
 {
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
 
-    _corners[0] = NULL;
-    _corners[1] = NULL;
+    this->setAcceptHoverEvents(true);
+
+
 
     this->setPos(position);
 
 
     _pen.setWidth(2);
     _pen.setColor(Qt::black);
-
-    this->setAcceptHoverEvents(true);
 
 
     QPointF p1  (_lineEnd_0.x() - _XcornerGrabBuffer, _lineEnd_0.y() - _YcornerGrabBuffer);
@@ -71,6 +70,15 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
 
     this->setPolygon(_selectRegion);
 
+    _corners[0] = new CornerGrabber(this,0, false);
+    _corners[1] = new CornerGrabber(this,1, false);
+
+    _corners[0]->installSceneEventFilter(this);
+    _corners[1]->installSceneEventFilter(this);
+
+   // _corners[0]->setVisible(false);
+   // _corners[1]->setVisible(false);
+
     TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> ( _transitionModel->attributes.value("target"));
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(name);
@@ -82,6 +90,8 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
     TransitionAttributes::TransitionPositionAttribute * tpos =dynamic_cast<TransitionAttributes::TransitionPositionAttribute*> ( _transitionModel->attributes.value("position"));
     connect (tpos, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(tpos);
+
+
 
 }
 
@@ -288,6 +298,9 @@ void SelectableLineSegmentGraphic::setTerminator(bool isTerm)
     if ( _isTerminal )
     {
         _corners[1]->setPaintStyle(CornerGrabber::kArrowHead);
+        _corners[1]->setVisible(true);
+
+        _corners[1]->installSceneEventFilter(this);
     }
     else
         _corners[1]->setPaintStyle(CornerGrabber::kBox);
@@ -457,16 +470,13 @@ void SelectableLineSegmentGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * e
 
 void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
-    _corners[0]->setParentItem(NULL);
-    _corners[1]->setParentItem(NULL);
+    _corners[0]->setVisible(false);
+    if ( _isTerminal )
+        _corners[1]->setVisible(true);
+    else
+     _corners[1]->setVisible(false);
 
-    delete _corners[0];
-    _corners[0]  = NULL;
 
-    delete _corners[1];
-    _corners[1]  = NULL;
-
-    qDebug()<<"SelectableLineSegmentGraphic::hoverLeaveEvent";
     emit unselected();
 }
 
@@ -475,8 +485,8 @@ void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * 
 
 void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
-    _corners[0] = new CornerGrabber(this,0, false);
-    _corners[1] = new CornerGrabber(this,1, false);
+    _corners[0]->setVisible(true);
+    _corners[1]->setVisible(true);
 
     _corners[0]->installSceneEventFilter(this);
     _corners[1]->installSceneEventFilter(this);
@@ -491,7 +501,6 @@ void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * 
         _corners[1]->setPaintStyle(CornerGrabber::kBox);
 
 
-    qDebug()<<"SelectableLineSegmentGraphic::hoverEnterEvent";
     emit selected();
 }
 
@@ -509,41 +518,32 @@ void SelectableLineSegmentGraphic::setCornerPositions()
 void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 
-    // this paint will draw the bounding box for debugging:
-    // QGraphicsPolygonItem::paint(painter, i, w );
-
     // draw the line
 
     _pen.setStyle(Qt::SolidLine);
     painter->setPen(_pen);
 
-    int k = 0;
-
     _pen.setColor(Qt::red);
     painter->drawLine(_lineEnd_0, _lineEnd_1);
 
-    double dy = _lineEnd_0.y() -_lineEnd_1.y();
-    qDebug()<< "dy = "  +  QString::number(dy);
-
-    double dx = _lineEnd_0.x() - _lineEnd_1.x();
-
-    if ( dx > 0)
-    {
-        k = 1;
-    }
-
-    qDebug()<< "dx = "  +  QString::number(dx);
-
-    double angle = (atan ( (dy) / ( dx) ) + ( k * 3.14159265)) * (180.0/3.14159265);
-
-    qDebug()<<"theta="+ QString::number(angle);
-
-    angle -= 45 ;
-
-    qDebug()<< "angle = "  +  QString::number(angle);
 
     if ( _isTerminal && _corners[1] )
     {
+        double dy = _lineEnd_0.y() -_lineEnd_1.y();
+
+        double dx = _lineEnd_0.x() - _lineEnd_1.x();
+
+        int k = 0;
+
+        if ( dx > 0)
+        {
+            k = 1;
+        }
+
+        double angle = (atan ( (dy) / ( dx) ) + ( k * 3.14159265)) * (180.0/3.14159265);
+
+        angle -= 45 ;
+
         _corners[1]->setAngle(angle);
         _corners[1]->update();
     }
