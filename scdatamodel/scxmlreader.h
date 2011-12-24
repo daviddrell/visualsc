@@ -43,6 +43,8 @@ public:
     void readFile(QString infile);
     virtual void run();
 
+    void getReadResult(bool &success, QStringList& message);
+
 signals:
      void done(bool result, QStringList message);
      void makeANewState(StateAttributes*);
@@ -76,6 +78,10 @@ private:
     void readFinal();
     void readOnEntry();
     void readOnExit();
+
+
+    //private data
+    bool _error;
 };
 
 #endif // SCXMLREADER_H

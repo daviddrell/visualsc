@@ -30,7 +30,7 @@
 
 #include <QDebug>
 
-SCXMLReader::SCXMLReader(): QObject(NULL), _reader(),_file(), _resultMessages()
+SCXMLReader::SCXMLReader(): QObject(NULL), _reader(),_file(), _resultMessages(), _error(false)
 {
 
 }
@@ -43,7 +43,6 @@ void SCXMLReader::readFile(QString infile)
 
 void SCXMLReader::run()
 {
-    bool error =false;
 
     QFile file(_file);
 
@@ -52,7 +51,7 @@ void SCXMLReader::run()
         _resultMessages   << QString("Error: Cannot read file ") << (_file)
                 << QString(": ") << (file.errorString());
 
-        error = true;
+        _error = true;
     }
 
     _reader.setDevice(&file);
@@ -69,7 +68,14 @@ void SCXMLReader::run()
 
     file.close();
 
-    emit done(error, _resultMessages);
+    emit done(_error, _resultMessages);
+}
+
+
+void SCXMLReader::getReadResult(bool &success, QStringList& message)
+{
+    success  = _error;
+    message = _resultMessages;
 }
 
 

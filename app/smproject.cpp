@@ -28,7 +28,8 @@
 SMProject::SMProject(QWidget *parentWidget): QObject(parentWidget),
         _file(),
         _dm(SCDataModel::singleton()),
-        _graphicsView( new SCGraphicsView(parentWidget,  _dm))
+        _graphicsView( NULL ),
+        _parentWidget(parentWidget)
 {
 
 }
@@ -36,7 +37,7 @@ SMProject::SMProject(QWidget *parentWidget): QObject(parentWidget),
 SMProject::~SMProject()
 {
     close();
-    delete _graphicsView;
+    if (_graphicsView) delete _graphicsView;
 }
 
 SCDataModel * SMProject::getDM()
@@ -46,6 +47,8 @@ SCDataModel * SMProject::getDM()
 
 QGraphicsView * SMProject::getQGraphicsView()
 {
+    if ( _graphicsView == NULL ) return NULL;
+
     return  _graphicsView->getQGraphicsView();
 }
 
@@ -59,12 +62,12 @@ void SMProject::readInputFile(QString file)
     connect( _dm, SIGNAL(openCompleted(bool,QStringList)), this, SLOT(handleOpenCompleted(bool,QStringList)));
 
     _dm->open(file);
-
 }
 
 
 void SMProject::handleOpenCompleted(bool result ,QStringList messages)
 {
+    _graphicsView = new SCGraphicsView(_parentWidget,  _dm);
     emit readInputFileCompleted ( result, messages);
 }
 

@@ -83,7 +83,6 @@ void MainWindow::handleFileOpenClick()
 
     _project = new SMProject(  ui->centralWidget );
 
-    ui->gridLayout->addWidget( _project->getQGraphicsView() );
 
 
     connect (_project, SIGNAL(readInputFileCompleted(bool,QStringList)), this, SLOT(handleReadInputFileDone(bool,QStringList)) );
@@ -103,6 +102,9 @@ void MainWindow::handleReadInputFileDone(bool ,QStringList)
     }
     _formEditorWindow = new SCFormView(0, _project->getDM());
     _formEditorWindow->show();
+
+    ui->gridLayout->addWidget( _project->getQGraphicsView() );
+
 
 }
 

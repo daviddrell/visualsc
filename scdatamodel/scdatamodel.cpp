@@ -137,8 +137,6 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
 void SCDataModel::open(QString file)
 {
 
-    connect(&_reader, SIGNAL(done(bool, QStringList)), this, SLOT(handleReaderDone(bool, QStringList)));
-
     connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::DirectConnection);
     connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()), Qt::DirectConnection);
     connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()), Qt::DirectConnection);
@@ -150,8 +148,92 @@ void SCDataModel::open(QString file)
     connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
 
     _reader.readFile(file);
-    //_reader.start();
+
     _reader.run();
+
+    bool ok;
+    QStringList messages;
+    _reader.getReadResult(ok, messages);
+
+    if ( ok )
+    {
+        // now for the second pass, connect all the transitions to the states in the state-path.
+        // the state-path is all of the state's which a transition must transit through on the path to its taget state.
+        //
+
+        connectTransitionsToStatePath();
+    }
+
+    emit openCompleted ( ok,  messages );
+
+}
+
+void SCDataModel::connectTransitionsToStatePath()
+{
+    QList<SCTransition *> tlist;
+
+    _topState->getAllTransitions(tlist);
+
+    for (int t = 0; t < tlist.count(); t++)
+    {
+        SCTransition* trans = tlist.at(t);
+
+        QString targetStr = trans->attributes["target"]->asString();;
+
+        SCState * targetState = _topState->getStateByName(targetStr);
+
+        if ( targetState )
+        {
+            makeTransitionConnections(targetState, trans);
+        }
+    }
+}
+
+
+
+void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition* trans)
+{
+    // work backwards from target state to its ancestors, from the transitions source state to its ancestors, until
+    // both have a common ancestor
+
+    targetState->addTransitionReference(trans, SCState::kDestination);
+
+    SCState * sourceState = dynamic_cast<SCState *> ( trans->parent());
+
+    SCState *sourceTreeNode=NULL;
+    SCState *targetTreeNode=NULL;
+
+    int sourceLevel =  sourceState->getLevel();
+    int targetLevel = targetState->getLevel();
+
+   // example: targetStateLevel = 1, sourceStateLevel = 3
+    while ( sourceLevel > targetLevel )
+    {
+        sourceTreeNode = sourceState->getParentState();
+        sourceTreeNode->addTransitionReference(trans, SCState::kTransitOut);
+        sourceLevel =  sourceTreeNode->getLevel();
+    }
+
+    // example: targetStateLevel = 3, sourceStateLevel = 1
+     while ( targetLevel >  sourceLevel)
+     {
+         targetTreeNode = targetState->getParentState();
+         targetTreeNode->addTransitionReference(trans, SCState::kTransitOut);
+         targetLevel =  targetTreeNode->getLevel();
+     }
+
+     // now targetLevel and sourceLevel should match
+
+    while ( sourceTreeNode != targetTreeNode )
+    {
+        targetTreeNode = targetState->getParentState();
+        targetTreeNode->addTransitionReference(trans, SCState::kTransitOut);
+        targetLevel =  targetTreeNode->getLevel();
+
+        sourceTreeNode = sourceState->getParentState();
+        sourceTreeNode->addTransitionReference(trans, SCState::kTransitOut);
+        sourceLevel =  sourceTreeNode->getLevel();
+    }
 }
 
 
@@ -309,6 +391,7 @@ void SCDataModel::initializeEmptyStateMachine()
 
     _topState = new SCState(true);
     _topState->attributes.setAttributes( *stateAttributes);
+    _topState->setLevel(_level);
 
 
     _currentState  = _topState;
@@ -332,6 +415,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         _topLevel = _level;
         state = new SCState(true);
         state->attributes.setAttributes( *sa);
+        state->setLevel(_level);
 
         _topState = state;
 
@@ -357,6 +441,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
     {
         state = new SCState(_currentState);
         state->attributes.setAttributes( *sa);
+        state->setLevel(_level);
 
         QString name ;
         if (! sa->contains("name"))
@@ -491,42 +576,4 @@ void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 
 }
 
-void SCDataModel::handleReaderDone(bool sucess, QStringList message)
-{
-
-    if ( ! _topState  )
-    {
-        emit openCompleted ( sucess, message);
-        return;
-    }
-
-    if ( ! sucess  )
-    {
-        emit openCompleted ( sucess, message);
-        return;
-    }
-
-    // connect transistions to target states
-
-    QList<SCTransition*> * masterTransistionList = new QList<SCTransition*>();
-
-
-    // first query all states for their originating transitions
-    // and make a master list
-    _topState->getAllTransitions(*masterTransistionList);
-
-
-    // second, pass the master list to all states/substates so they
-    // can look up themselves in the target fields and make the target
-    // connections
-
-    //_topState->makeTargetConnections( * masterTransistionList);
-
-    delete masterTransistionList;
-
-    message.append(QString("sucessfully linked transitions"));
-
-    emit openCompleted ( sucess, message);
-
-}
 

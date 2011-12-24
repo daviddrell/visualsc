@@ -39,16 +39,13 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
-//    _view.setScene(& _scene);
-//    _view.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-//    _view.show();
-
-    // try using openGL
+    //using openGL
 
     _view.setViewport( new QGLWidget (QGLFormat(QGL::SampleBuffers) ));
     _view.setScene( _scene);
     _view.show();
 
+    createGraph();
 
 }
 
@@ -57,6 +54,26 @@ SCGraphicsView::~SCGraphicsView()
 {
     delete _scene ;
 }
+
+void SCGraphicsView::createGraph()
+{
+    QList<SCState*> states;
+    _dm->getAllStates(states);
+
+    for(int s = 0; s < states.count(); s++)
+    {
+        handleNewState( states[s]);
+
+        QList<SCTransition*> transitions;
+        states[s]->getTransitions(transitions);
+
+        for(int t = 0; t < transitions.count(); t ++)
+        {
+            handleNewTransition(transitions[t]);
+        }
+    }
+}
+
 
 QGraphicsView * SCGraphicsView::getQGraphicsView()
 {

@@ -66,6 +66,7 @@ private:
     QString         _file;
     SCDataModel      *_dm;
     SCGraphicsView   * _graphicsView;
+    QWidget          * _parentWidget;
 
 
 

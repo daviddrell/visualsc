@@ -192,6 +192,22 @@ void SCState::makeTargetConnections(QList<SCTransition*> & transitionList)
 #endif
 
 
+void SCState::addTransitionReference(SCTransition* t, TransitionTransitDirection d)
+{
+    if ( d == kTransitOut)
+    {
+        _transitingTransitionsOut.append(t);
+    }
+    if ( d == kTransitIn)
+    {
+        _transitingTransitionsIn.append(t);
+    }
+    if ( d == kDestination)
+    {
+        _transitionsTerminatingHere.append(t);
+    }
+}
+
 void SCState::addTransistion(SCTransition * t)
 {
 
@@ -271,6 +287,44 @@ void SCState::getStates(QList<SCState *> & stateList)
     }
 }
 
+SCState* SCState::getStateByName(QString name)
+{
+    SCState *target=NULL;
+    for (int c = 0; c < this->children().count(); c++)
+    {
+        SCState* state = dynamic_cast< SCState*>(this->children()[c]);
+        if ( state )
+        {
+            if ( state->objectName() == name)
+                return state;
+            else
+            {
+                target = state->getStateByName(name);
+                if ( target != NULL)
+                    return target;
+            }
+        }
+    }
+
+    return target;
+}
+
+
+int SCState::getLevel()
+{
+    return _level;
+}
+
+void SCState::setLevel(int level)
+{
+    _level = level;
+}
+
+
+SCState * SCState::getParentState()
+{
+    return dynamic_cast<SCState*>(this->parent());
+}
 
 void SCState::getAllStates(QList<SCState *> & stateList)
 {

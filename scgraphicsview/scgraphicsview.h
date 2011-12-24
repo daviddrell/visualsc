@@ -84,6 +84,7 @@ private:
 
     SCState * lookUpTargetState(QString target);
     StateBoxGraphic * lookUpTargetStateGraphic(QString stateId );
+    void createGraph();
 
 
 };

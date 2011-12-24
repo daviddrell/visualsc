@@ -59,6 +59,9 @@ public:
 
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
 
+    enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };
+    void addTransitionReference(SCTransition*, TransitionTransitDirection );
+
     void setStateName(QString n);
     void addTransistion(SCTransition*);
     void addState(SCState *);
@@ -102,7 +105,38 @@ public:
       */
     void getAllStates(QList<SCState *> & stateList);
 
+    /**
+      * \fn getParentState
+      * \brief Returns the QObject parent, cast as a state, or NULL if parent is not a state or no parent
+      *
+      */
+    SCState * getParentState();
 
+
+
+    /**
+      * \fn getLevel
+      * \brief Top state machine is level 0. Each sub-state increments level.
+      *
+      */
+    int getLevel();
+
+    /**
+      * \fn setLevel
+      * \brief Top state machine is level 0. Each sub-state increments level.
+      *  The level should only be set by the state chart constructor.
+      */
+
+    void setLevel(int level);
+
+
+
+    /**
+      * \fn getStateByName
+      * \brief find descendant state by name
+      *
+      */
+    SCState* getStateByName(QString name);
 
     /**
       * \fn writeSCVXML
@@ -146,6 +180,12 @@ private:
     //private data
 
     SCTextBlock * _IdTextBlock;
+    QList<SCTransition*> _transitingTransitionsOut;
+    QList<SCTransition*> _transitingTransitionsIn;
+    QList<SCTransition*> _transitionsTerminatingHere;
+
+
+    int _level ; ///< distance from top state in terms of parent-child relationships
 
 };
 

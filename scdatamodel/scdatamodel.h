@@ -114,7 +114,7 @@ signals:
     void newTransitionSignal(SCTransition * newTransition);
 
 private slots:
-    void handleReaderDone(bool sucess, QStringList message);
+
     void handleMakeANewState(StateAttributes*);
     void handleMakeANewTransition(TransitionAttributes*);
     void handleLeaveTransitionElement();
@@ -136,7 +136,8 @@ private:
 
 //private methods
     SCDataModel(QObject * parent=NULL);
-
+    void connectTransitionsToStatePath();
+    void makeTransitionConnections(SCState * targetState, SCTransition* trans);
 };
 
 #endif // SCDATAMODEL_H
