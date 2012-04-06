@@ -94,7 +94,7 @@ void SCState::initCommon()
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
     connect (_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
 
-    qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
+
 }
 
 
@@ -335,6 +335,7 @@ void SCState::getAllStates(QList<SCState *> & stateList)
         if ( state )
         {
             stateList.append(  state );
+            qDebug()<<"getAllStates have state: " + state->attributes.value("name")->asString();
             state->getAllStates(stateList);
         }
     }

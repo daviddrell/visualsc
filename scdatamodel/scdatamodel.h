@@ -115,22 +115,15 @@ signals:
 
 private slots:
 
-    void handleMakeANewState(StateAttributes*);
-    void handleMakeANewTransition(TransitionAttributes*);
-    void handleLeaveTransitionElement();
-    void handleMakeANewTransitionPath(QString path);
-    void handleTransitUp();
-    void handleTransitDown();
-    void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
 
 private:
+    SCState         *_topState;
     SCXMLReader     _reader;
     QXmlStreamWriter *_writer;
     int              _level;
     int              _topLevel;
     SCState         *_currentState;
-    SCTransition    *_currentTransition;
-    SCState         *_topState;
+    SCTransition    *_currentTransition;   
     QGraphicsScene * _scene;
 
 
