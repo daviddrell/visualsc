@@ -39,6 +39,8 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
+    //using openGL
+
     _view.setViewport( new QGLWidget (QGLFormat(QGL::SampleBuffers) ));
     _view.setScene( _scene);
     _view.show();
@@ -60,8 +62,6 @@ void SCGraphicsView::createGraph()
 
     for(int s = 0; s < states.count(); s++)
     {
-        qDebug()<<"createGraph has state: " + states[s]->attributes.value("name")->asString();
-
         handleNewState( states[s]);
 
         QList<SCTransition*> transitions;
@@ -69,7 +69,7 @@ void SCGraphicsView::createGraph()
 
         for(int t = 0; t < transitions.count(); t ++)
         {
-            handleNewTransition(transitions.at(t));
+            handleNewTransition(transitions[t]);
         }
     }
 }

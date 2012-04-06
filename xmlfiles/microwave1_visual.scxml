@@ -1,25 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<state id="on_initial" position="90,100" size="183,104">
-    <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
-    <transition target="idle">
-        <path d="M "/>
-    </transition>
-</state>
-<state id="idle" position="150,-18" size="156,98">
-    <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
-    <transition target="cooking">
-        <path d="M "/>
-    </transition>
-    <transition target="cooking">
-        <path d="M 50 43 L 35 -65 "/>
-    </transition>
-</state>
-<state id="cooking" position="20,40" size="154,104">
-    <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
-    <transition target="idle">
-        <path d="M 50 43 L 35 -65 "/>
-    </transition>
-    <transition target="">
-        <path d="M "/>
-    </transition>
+<state id="State Machine" position="-57,-40" size="322,289">
+    <state id="off" position="110,30" size="100,50">
+        <transition target="on">
+            <path d="m "/>
+        </transition>
+    </state>
+    <state id="on" position="20,70" size="279,187">
+        <state id="on_initial" position="90,100" size="100,50">
+            <transition target="idle">
+                <path d="m "/>
+            </transition>
+        </state>
+        <transition target="off">
+            <path d="m "/>
+        </transition>
+        <transition target="off">
+            <path d="m "/>
+        </transition>
+        <state id="idle" position="150,30" size="100,50">
+            <transition target="cooking">
+                <path d="m "/>
+            </transition>
+            <transition target="cooking">
+                <path d="m "/>
+            </transition>
+        </state>
+        <state id="cooking" position="20,40" size="100,50">
+            <transition target="idle">
+                <path d="m "/>
+            </transition>
+            <transition target="">
+                <path d="m "/>
+            </transition>
+        </state>
+    </state>
 </state>

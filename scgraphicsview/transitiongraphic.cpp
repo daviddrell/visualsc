@@ -1,7 +1,6 @@
 #include "transitiongraphic.h"
 #include "scstate.h"
 #include <QDebug>
-#include "scdatamodel.h"
 
 TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t) :
     QGraphicsObject(NULL),
@@ -17,13 +16,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
     QList<QPointF> pointList = p->asQPointFList();
 
-    if ( targetGraphic == NULL )
-    {
-        SCDataModel::singleton()->logError("Error: cannot create transition graphic, no target graphic, trans=" + t->attributes.value("target")->asString());
-        return;
-    }
-
-    if (  pointList.count() < 2  )
+    if (  pointList.count() < 2 && targetGraphic != NULL )
     {
         // this path is new, anchor each end to the source and target states
         // find the orientation of the parent and target graphics to determine which sides to anchor to.

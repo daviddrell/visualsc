@@ -23,7 +23,7 @@
 
 #include <QString>
 #include <QStringList>
-#include "scstate.h"
+#include <QXmlStreamReader>
 #include <QObject>
 
 #include "stateattributes.h"
@@ -31,7 +31,6 @@
 #include "textblock.h"
 
 class StateData;
-class QDomElement;
 
 #include "scdatamodel_global.h"
 
@@ -40,7 +39,7 @@ class  SCDATAMODELSHARED_EXPORT  SCXMLReader : public QObject
     Q_OBJECT
 
 public:
-    SCXMLReader( SCState **topState);
+    SCXMLReader( );
     void readFile(QString infile);
     virtual void run();
 
@@ -48,6 +47,18 @@ public:
 
 signals:
      void done(bool result, QStringList message);
+     void makeANewState(StateAttributes*);
+     void enterStateElement();
+     void leaveStateElement();
+
+     void enterTransistionElement();
+     void leaveTransistionElement();
+     void makeANewTransistion(TransitionAttributes*);
+
+     void enterTransitionPathElement();
+     void leaveTransitionPathElement();
+     void makeANewTransistionPath(QString path);
+     void makeANewIDTextBlockElement( TextBlockAttributes*);
 
 
 
@@ -55,28 +66,22 @@ private:
 
     enum STATE_TYPE{kSTATE_TYPE_Normal=0, kSTATE_TYPE_Initial, kSTATE_TYPE_Final, kSTATE_TYPE_Machine};
 
-    void readIDTextBlockElement(QDomElement *);
-    void readElement(QDomElement *, int stateLevel=-1);
-    SCState* readState(QDomElement *, STATE_TYPE t= kSTATE_TYPE_Normal, int stateLevel=-1);
-    void readTransistion(QDomElement *e);
-    void readTransistionPath(QDomElement * e);
+    QXmlStreamReader _reader;
+    QString _file;
+    QStringList _resultMessages;
+
+    void readIDTextBlockElement();
+    void readElement();
+    void readState(STATE_TYPE t= kSTATE_TYPE_Normal);
+    void readTransistion();
+    void readTransistionPath();
     void readFinal();
     void readOnEntry();
     void readOnExit();
 
-    SCState* makeANewState(StateAttributes*, int stateLevel);
-    void makeANewTransistion(TransitionAttributes*);
-
 
     //private data
-
-    QXmlStreamReader   _reader;
-    QString            _file;
-    QStringList        _resultMessages;
-    SCState           *_currentState;
-    SCTransition      *_currentTransition;
-    bool               _error;
-    SCState           **_topState;
+    bool _error;
 };
 
 #endif // SCXMLREADER_H

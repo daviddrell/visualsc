@@ -56,7 +56,7 @@ SCTransition::SCTransition(QObject * parent):
 
 SCTransition::~SCTransition()
 {
-
+    qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
 }
 
 SCState *SCTransition::targetState()
