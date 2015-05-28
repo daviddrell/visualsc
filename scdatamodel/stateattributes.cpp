@@ -67,14 +67,14 @@ void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
         {
             IAttribute* newAttr=NULL;
 
-            StateAttributes::StateName *nm ;
+            StateName *nm ;
             PositionAttribute *ps;
             SizeAttribute *sz;
-             StateAttributes::StateString *str ;
+            StateString *str ;
 
-            if ( (  nm = dynamic_cast<StateAttributes::StateName *>(sourceAttr) ) != NULL )
+            if ( (  nm = dynamic_cast<StateName *>(sourceAttr) ) != NULL )
             {
-                StateAttributes::StateName * newNm = new StateAttributes::StateName (*nm);
+                StateName * newNm = new StateName (*nm);
                 addItem(newNm);
                 newAttr= newNm;
             }
@@ -90,9 +90,9 @@ void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
                 addItem(newSz);
                 newAttr = newSz;
             }
-            else if ( (  str = dynamic_cast<StateAttributes::StateString *>(sourceAttr) ) != NULL )
+            else if ( (  str = dynamic_cast<StateString *>(sourceAttr) ) != NULL )
             {
-                StateAttributes::StateString * newStr = new StateAttributes::StateString (*str);
+                StateString * newStr = new StateString (*str);
                 addItem(newStr);
                 newAttr = newStr;
             }
@@ -120,38 +120,46 @@ void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 }
 
 
+QString StateAttributes::asString()
+{
+    return QString();
+}
+
+void StateAttributes::setValue(const QString)
+{
+}
 
   //  NAME
 
 
 
-StateAttributes::StateName::StateName(QObject*  parent,QString key,QString n):IAttribute(parent, key),_name(n)
+StateName::StateName(QObject*  parent,QString key,QString n):IAttribute(parent, key),_name(n)
 {
-    qRegisterMetaType<StateAttributes>("StateAttributes::StateName");
+    qRegisterMetaType<StateAttributes>("StateName");
 }
 
-StateAttributes::StateName::StateName():IAttribute(),_name()
+StateName::StateName():IAttribute(),_name()
 {
-    qRegisterMetaType<StateAttributes>("StateAttributes::StateName");
+    qRegisterMetaType<StateAttributes>("StateName");
 }
 
-StateAttributes::StateName::~StateName()
+StateName::~StateName()
 {
-    qRegisterMetaType<StateAttributes>("StateAttributes::StateName");
+    qRegisterMetaType<StateAttributes>("StateName");
 }
 
-StateAttributes::StateName& StateAttributes::StateName::operator=( StateName& sa )
+StateName& StateName::operator=( StateName& sa )
 {
     _name = sa._name;
     return *this;
 }
 
-QString StateAttributes::StateName::asString()
+QString StateName::asString()
 {
     return _name;
 }
 
-void    StateAttributes::StateName::setValue(const QString name)
+void    StateName::setValue(const QString name)
 {
     if ( name != _name )
     {
@@ -166,32 +174,32 @@ void    StateAttributes::StateName::setValue(const QString name)
 // String
 
 
-StateAttributes::StateString::StateString(QObject*  parent,QString key,QString s) :IAttribute(parent, key), _value(s)
+StateString::StateString(QObject*  parent,QString key,QString s) :IAttribute(parent, key), _value(s)
 {
 }
 
-StateAttributes::StateString::StateString() :IAttribute(), _value()
+StateString::StateString() :IAttribute(), _value()
 {
 }
 
-StateAttributes::StateString::~StateString()
+StateString::~StateString()
 {
 }
 
-StateAttributes::StateString& StateAttributes::StateString::operator=( StateString& sa )
+StateString& StateString::operator=( StateString& sa )
 {
     _value = sa._value;
     return *this;
 }
 
 
-QString StateAttributes::StateString::asString()
+QString StateString::asString()
 {
     return _value;
 }
 
 
-void    StateAttributes::StateString::setValue(const QString value)
+void    StateString::setValue(const QString value)
 {
     _value= value;
 

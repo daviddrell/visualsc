@@ -52,9 +52,9 @@ class SCDATAMODELSHARED_EXPORT  SCState : public SCItem
 {
     Q_OBJECT
 public:
-    SCState(QObject *parent = 0);
+    SCState(QObject *parent);
     SCState(const SCState& st);
-    SCState( bool topState=false);
+    SCState(bool topState=false);
     ~SCState();
 
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base

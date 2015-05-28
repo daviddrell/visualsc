@@ -79,7 +79,7 @@ void SCState::initCommon()
     }
 
 
-    StateAttributes::StateName * name = new StateAttributes::StateName (this, "name",defaultName);
+    StateName * name = new StateName (this, "name",defaultName);
     SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
 
@@ -106,7 +106,7 @@ SCTextBlock* SCState::getIDTextBlock()
 void SCState::handleTextBlockChanged()
 {
     qDebug()<<"SCState::handleTextBlockChanged";
-    StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *>(attributes["name"]);
+    StateName * name = dynamic_cast<StateName *>(attributes["name"]);
 
     QString nameText = _IdTextBlock->getText();
     this->setObjectName(nameText);

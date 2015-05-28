@@ -109,7 +109,7 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     _writer->writeStartDocument();
 
     // the top level state should be of type 'machine', and is a special type of state element called 'scxml'
-    StateAttributes::StateString* type =  dynamic_cast<StateAttributes::StateString*> ( _topState->attributes.value("type"));
+    StateString* type =  dynamic_cast<StateString*> ( _topState->attributes.value("type"));
 
     if ( type  && ( type->asString() == "machine"))
     {
@@ -380,13 +380,13 @@ void SCDataModel::initializeEmptyStateMachine()
     _topLevel =_level = 0;
     StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
 
-    StateAttributes::StateString *  sa = new StateAttributes::StateString (0,"type","machine");
+    StateString *  sa = new StateString (0,"type","machine");
     stateAttributes->addItem( sa );
 
-    StateAttributes::StateString *nsp = new StateAttributes::StateString(NULL,"xmlns","http://www.w3.org/2005/07/scxml");
+    StateString *nsp = new StateString(NULL,"xmlns","http://www.w3.org/2005/07/scxml");
     stateAttributes->addItem(nsp);
 
-    StateAttributes::StateName *nm = new StateAttributes::StateName(NULL,"name", "State Machine");
+    StateName *nm = new StateName(NULL,"name", "Root Machine");
     stateAttributes->addItem(nm);
 
     _topState = new SCState(true);
@@ -425,7 +425,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         {
             name = "State Machine";
 
-            StateAttributes::StateName *nm = new StateAttributes::StateName(NULL,"name",name);
+            StateName *nm = new StateName(NULL,"name",name);
             state->attributes.addItem(nm);
         }
         else
@@ -460,7 +460,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
                 name = _currentState->objectName() + "_" + QString::number( _currentState->children().count() );
             }
 
-            StateAttributes::StateName *nm = new StateAttributes::StateName(NULL,"name",name);
+            StateName *nm = new StateName(NULL,"name",name);
             state->attributes.addItem(nm);
         }
         else

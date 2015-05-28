@@ -47,7 +47,11 @@ SCDataModel * SMProject::getDM()
 
 QGraphicsView * SMProject::getQGraphicsView()
 {
-    if ( _graphicsView == NULL ) return NULL;
+    if ( _graphicsView == NULL )
+    {
+        // this is new empty project as opposed to a projected loaded from a file
+        _graphicsView = new SCGraphicsView(_parentWidget,  _dm);
+    }
 
     return  _graphicsView->getQGraphicsView();
 }

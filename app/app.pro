@@ -8,7 +8,7 @@ include (../visualsc.pri)
 
 CONFIG += link_prl
 
-QT       += core gui
+QT       += core gui widgets
 
 TARGET = visualsc
 TEMPLATE = app
@@ -16,17 +16,17 @@ TEMPLATE = app
 QMAKE_CLEAN += visualsc
 
 INCLUDEPATH += ../scdatamodel
-win32:LIBS += $${LIB_PATH}/scdatamodel.dll
+win32:LIBS += $${LIB_PATH}/scdatamodel.lib
 unix:LIBS += -L$${LIB_PATH} -lscdatamodel
 
 
 INCLUDEPATH += ../scgraphicsview
-win32:LIBS += $${LIB_PATH}/scgraphicsview.dll
+win32:LIBS += $${LIB_PATH}/scgraphicsview.lib
 unix:LIBS += -L$${LIB_PATH} -lscgraphicsview
 
 
 INCLUDEPATH += ../scformview
-win32:LIBS += $${LIB_PATH}/scformview.dll
+win32:LIBS += $${LIB_PATH}/scformview.lib
 unix:LIBS += -L$${LIB_PATH} -lscformview
 
 SOURCES += \

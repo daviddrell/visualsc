@@ -41,7 +41,7 @@ QPointF PositionAttribute::asPointF() const
     return (_position);
 }
 
-void    PositionAttribute::setValue(const QString position)
+void PositionAttribute::setValue(const QString position)
 {
     QStringList sl = position.split(",");
     if ( sl.length() != 2)
@@ -58,7 +58,7 @@ void    PositionAttribute::setValue(const QString position)
     }
 }
 
-void    PositionAttribute::setValue(int w, int h)
+void PositionAttribute::setValue(int w, int h)
 {
     QPointF nPosition( w,  h);
 
@@ -69,7 +69,7 @@ void    PositionAttribute::setValue(int w, int h)
     }
 }
 
-void    PositionAttribute::setValue(const QPointF nPosition)
+void PositionAttribute::setValue(const QPointF nPosition)
 {
     if ( nPosition != _position )
     {

@@ -199,7 +199,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
         break;
     }
 
-    StateAttributes::StateString *  sa = new StateAttributes::StateString (0,"type", stateTypeStr );
+    StateString *  sa = new StateString (0,"type", stateTypeStr );
     stateAttributes->addItem( sa );
 
 
@@ -211,7 +211,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
         if ( XmlAttr.name() == "id")
         {
             qDebug()<<"reader in state id = " + XmlAttr.value().toString();
-            StateAttributes::StateName *  sa = new StateAttributes::StateName (0,"name", XmlAttr.value().toString() );
+            StateName *  sa = new StateName (0,"name", XmlAttr.value().toString() );
             stateAttributes->addItem( sa );
         }
         else if ( XmlAttr.name() == "size" )
@@ -226,7 +226,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
         }
         else // unknown attribute
         {
-            StateAttributes::StateString * sa  = new StateAttributes::StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+            StateString * sa  = new StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
             stateAttributes->addItem( sa );
         }
     }

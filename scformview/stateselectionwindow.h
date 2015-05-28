@@ -1,8 +1,13 @@
 #ifndef STATESELECTIONWINDOW_H
 #define STATESELECTIONWINDOW_H
-
-
+#include "scformview_global.h"
+#include <QtGlobal>
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/QMainWindow>
+#else
 #include <QMainWindow>
+#endif
+
 class SCDataModel;
 class SCState;
 class QVBoxLayout;
@@ -21,7 +26,7 @@ class QTreeWidgetItem;
   * \brief This widget is used to display a list of available states, so that the user can select a state as a transition target
   * \ingroup FormView
   */
-class StateSelectionWindow  : public QMainWindow
+class SCFORMVIEWSHARED_EXPORT StateSelectionWindow  : public QMainWindow
 {
     Q_OBJECT
 

@@ -21,10 +21,10 @@ public:
 
     SizeAttribute& operator=( SizeAttribute& sa );
 
-    QString asString();
+    virtual QString asString();
     QPointF asPointF() const;
 
-    void    setValue(QString size);
+    virtual  void setValue(const QString size);
     void    setValue(const int w,const int h);
     void    setValue(const QPointF s);
 private :

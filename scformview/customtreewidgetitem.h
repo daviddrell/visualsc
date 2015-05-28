@@ -17,11 +17,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-
 #ifndef CUSTOMTREEWIDGETITEM_H
 #define CUSTOMTREEWIDGETITEM_H
-
+#include "scformview_global.h"
 #include <QTreeWidgetItem>
 class QObject;
 
@@ -35,7 +33,7 @@ class QObject;
   *
   */
 
-class CustomTreeWidgetItem : public QTreeWidgetItem
+class SCFORMVIEWSHARED_EXPORT CustomTreeWidgetItem : public QTreeWidgetItem
 {
 public:
     CustomTreeWidgetItem(CustomTreeWidgetItem * parent=NULL);

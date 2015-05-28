@@ -71,9 +71,7 @@ private:
 
 private slots:
 
-
-    void handleAttributeChanged(IAttribute *attr);
-
+    void handleAttributeChanged(void *attr);
 
 
 private:

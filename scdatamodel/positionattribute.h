@@ -25,12 +25,12 @@ public:
 
     PositionAttribute& operator=( PositionAttribute& pa );
 
-    QString asString();
+    virtual QString asString();
     QPointF asPointF() const;
 
-    void    setValue(const QString position);
-    void    setValue(int x, int y);
-    void    setValue(const QPointF p);
+    virtual void setValue(const QString position);
+    void setValue(int x, int y);
+    void setValue(const QPointF p);
 private :
     QPointF _position;
 

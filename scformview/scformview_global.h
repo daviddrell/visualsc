@@ -1,0 +1,14 @@
+#ifndef SCFORMVIEW_GLOBAL_H
+#define SCFORMVIEW_GLOBAL_H
+
+
+#include <QtCore/qglobal.h>
+
+#if defined(SCFORMVIEWVIEW_LIBRARY)
+#  define SCFORMVIEWSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define SCFORMVIEWSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // SCFORMVIEW_GLOBAL_H
+

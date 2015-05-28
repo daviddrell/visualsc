@@ -44,7 +44,7 @@ QPointF SizeAttribute::asPointF() const
     return (_size);
 }
 
-void  SizeAttribute::setValue(QString size)
+void  SizeAttribute::setValue(const QString size)
 {
     QStringList sl = size.split(",");
     if ( sl.length() == 2)

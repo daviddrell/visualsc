@@ -8,6 +8,7 @@
 include (../visualsc.pri)
 
 QT       += gui
+QT       += widgets
 
 TARGET = scdatamodel
 TEMPLATE = lib

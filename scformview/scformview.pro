@@ -6,7 +6,7 @@
 
 include (../visualsc.pri)
 
-QT       += core gui
+QT       += core gui widgets
 
 TARGET = scformview
 TEMPLATE = lib
@@ -15,11 +15,11 @@ scgraphicsview.depends = scdatamodel
 
 $QMAKE_CLEAN += $$TARGET
 
-DEFINES += SCGRAPHICSVIEW_LIBRARY
+DEFINES += SCFORMVIEWVIEW_LIBRARY
 
 
 INCLUDEPATH += ../scdatamodel
-win32:LIBS += $${LIB_PATH}/scdatamodel.dll
+win32:LIBS += $${LIB_PATH}/scdatamodel.lib
 unix:LIBS += -L$${LIB_PATH} -lscdatamodel
 
 
@@ -42,7 +42,8 @@ OTHER_FILES += \
 HEADERS += \
     scformview.h \
     customtreewidgetitem.h \
-    stateselectionwindow.h
+    stateselectionwindow.h \
+    scformview_global.h
 
 SOURCES += \
     scformview.cpp \

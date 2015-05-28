@@ -19,21 +19,28 @@
 */
 
 #include "iattribute.h"
-
+#include <QMetaType>
 
 // IAttribute - a base class for attributes
 
 
 IAttribute::IAttribute() : QObject(), _key()
 {
+    qRegisterMetaType<IAttribute>("IAttribute");
+    qRegisterMetaType<IAttribute*>("IAttribute*");
+
 }
 
 IAttribute::IAttribute(QObject *parent, QString initkey) : QObject(parent), _key(initkey)
 {
+    qRegisterMetaType<IAttribute>("IAttribute");
+    qRegisterMetaType<IAttribute*>("IAttribute*");
 }
 
 IAttribute::IAttribute(const IAttribute& a) : QObject(a.parent()), _key(a.key())
 {
+    qRegisterMetaType<IAttribute>("IAttribute");
+    qRegisterMetaType<IAttribute*>("IAttribute*");
 }
 
 IAttribute& IAttribute::operator =(const IAttribute& a)
@@ -41,6 +48,15 @@ IAttribute& IAttribute::operator =(const IAttribute& a)
     QObject(a.parent());
     _key = a._key;
     return *this;
+}
+
+void IAttribute::setValue(const QString)
+{
+}
+
+QString IAttribute::asString()
+{
+    return QString();
 }
 
 QString IAttribute::key() const {return _key; }
@@ -89,6 +105,7 @@ IAttributeContainer::IAttributeContainer(QObject *parent, QString key) :
         QObject(parent), QMap<QString,IAttribute*>(),
         _containerName(key)
 {
+    qRegisterMetaType<IAttribute>("IAttribute");
 }
 
 IAttributeContainer::IAttributeContainer(const IAttributeContainer& c):
@@ -96,6 +113,7 @@ IAttributeContainer::IAttributeContainer(const IAttributeContainer& c):
         QMap<QString,IAttribute*>(c),
         _containerName(c._containerName)
 {
+    qRegisterMetaType<IAttribute>("IAttribute");
 }
 
 IAttributeContainer::IAttributeContainer():
@@ -103,6 +121,7 @@ IAttributeContainer::IAttributeContainer():
         QMap<QString,IAttribute*>(),
         _containerName()
 {
+    qRegisterMetaType<IAttribute>("IAttribute");
 }
 
 IAttributeContainer::~IAttributeContainer()

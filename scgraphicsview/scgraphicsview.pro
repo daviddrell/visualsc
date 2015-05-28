@@ -19,7 +19,7 @@ DEFINES += SCGRAPHICSVIEW_LIBRARY
 
 
 INCLUDEPATH += ../scdatamodel
-win32:LIBS += $${LIB_PATH}/scdatamodel.dll
+win32:LIBS += $${LIB_PATH}/scdatamodel.lib
 unix:LIBS += -L$${LIB_PATH} -lscdatamodel
 
 

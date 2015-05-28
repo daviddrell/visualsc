@@ -13,12 +13,14 @@ IDAttribute::IDAttribute(QObject*  parent,QString key,QString s) :IAttribute(par
     setValue(s);
 }
 
-IDAttribute::~IDAttribute(){}
-
 IDAttribute& IDAttribute::operator=( IDAttribute& sa )
 {
     _id = sa._id;
     return *this;
+}
+
+IDAttribute::~IDAttribute()
+{
 }
 
 QString IDAttribute::asString()

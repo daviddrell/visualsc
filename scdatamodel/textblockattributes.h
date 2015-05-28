@@ -20,6 +20,8 @@
   */
 class SCDATAMODELSHARED_EXPORT  TextAttribute :  public IAttribute
 {
+    Q_OBJECT
+
 public:
     TextAttribute(QObject * parent, QString key, QString initValue);
     TextAttribute(const TextAttribute& textAttribute);
@@ -41,6 +43,8 @@ private:
 
 class SCDATAMODELSHARED_EXPORT  FontFamilyAttribute :  public IAttribute
 {
+    Q_OBJECT
+
 public:
     FontFamilyAttribute(QObject * parent, QString key, QString initValue);
     FontFamilyAttribute(const FontFamilyAttribute& fontFamilyAttribute);
@@ -63,6 +67,8 @@ private:
 
 class SCDATAMODELSHARED_EXPORT  FontSizeAttribute :  public IAttribute
 {
+    Q_OBJECT
+
 public:
     FontSizeAttribute(QObject * parent, QString key, int initValue);
     FontSizeAttribute(QObject * parent, QString key, QString initValue);
@@ -85,6 +91,8 @@ private:
 
 class SCDATAMODELSHARED_EXPORT  FontColorAttribute :  public IAttribute
 {
+    Q_OBJECT
+
 public:
     FontColorAttribute(QObject * parent, QString key, QColor initValue);
     FontColorAttribute(const FontColorAttribute& fontColorAttribute );
@@ -102,8 +110,8 @@ public:
     rgb_number 	Specifies the text color with an rgb code (like "rgb(255,0,0)")
     */
 
-    virtual void    setValue(const QString color)  ;
-    void            setValue(const QColor color);
+    virtual void setValue(const QString color)  ;
+    void setValue(const QColor color);
 
 private:
 
@@ -112,6 +120,8 @@ private:
 
 class SCDATAMODELSHARED_EXPORT  FontBoldAttribute :  public IAttribute
 {
+    Q_OBJECT
+
 public:
     FontBoldAttribute(QObject * parent, QString key, bool initValue);
     FontBoldAttribute(QObject * parent, QString key, QString initValue);
@@ -124,8 +134,8 @@ public:
     virtual QString asString();
     bool asBool();
 
-    virtual void    setValue(const QString bold)  ;
-            void    setValue(const bool bold)  ;
+    virtual void setValue(const QString bold)  ;
+            void setValue(const bool bold)  ;
 
 private:
 
@@ -135,6 +145,8 @@ private:
 
 class SCDATAMODELSHARED_EXPORT  FontUnderlineAttribute :  public IAttribute
 {
+    Q_OBJECT
+
 public:
     FontUnderlineAttribute(QObject * parent, QString key, bool initValue);
     FontUnderlineAttribute(QObject * parent, QString key, QString initValue);
@@ -168,6 +180,8 @@ private:
 
 class  SCDATAMODELSHARED_EXPORT TextBlockAttributes: public IAttributeContainer
 {
+    Q_OBJECT
+
 public:
 
     TextBlockAttributes(QObject * parent, QString key);

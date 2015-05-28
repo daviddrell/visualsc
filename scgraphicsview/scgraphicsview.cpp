@@ -262,7 +262,7 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     connect(newState, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
 
-    StateAttributes::StateString * type = dynamic_cast<StateAttributes::StateString *> ( newState->attributes.value("type"));
+    StateString * type = dynamic_cast<StateString *> ( newState->attributes.value("type"));
     if ( type != 0 && (type->asString() == "machine"))
         return; // don't draw a picture for the top-level machine
 

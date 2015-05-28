@@ -40,6 +40,8 @@
 
 class  SCDATAMODELSHARED_EXPORT StateAttributes : public IAttributeContainer
 {
+    Q_OBJECT
+
 public:
     StateAttributes();
 
@@ -53,45 +55,50 @@ public:
 
     ~StateAttributes() ;
 
-
-    class SCDATAMODELSHARED_EXPORT StateName :  public IAttribute
-    {
-    public:
-
-        StateName(QObject*  parent,QString key,QString n);
-        StateName();
-        ~StateName();
-
-        StateName& operator=( StateName& sa );
-
-        QString asString();
-        void    setValue(const QString name);
-
-    private :
-            QString _name;
-    };
-
-
-
-    class  SCDATAMODELSHARED_EXPORT StateString:  public IAttribute
-    {
-    public:
-        StateString(QObject*  parent,QString key,QString s);
-        StateString() ;
-        ~StateString() ;
-
-        StateString& operator=( StateString& sa );
-
-        QString asString();
-
-        void    setValue(const QString value);
-
-        private :
-            QString _value;
-
-    };
+    virtual QString asString();
+    virtual void setValue(const QString);
 
 };
 
+class SCDATAMODELSHARED_EXPORT StateName :  public IAttribute
+{
+    Q_OBJECT
+
+public:
+
+    StateName(QObject*  parent,QString key,QString n);
+    StateName();
+    ~StateName();
+
+    StateName& operator=( StateName& sa );
+
+    QString asString();
+    void    setValue(const QString name);
+
+private :
+    QString _name;
+};
+
+
+
+class  SCDATAMODELSHARED_EXPORT StateString:  public IAttribute
+{
+    Q_OBJECT
+
+public:
+    StateString(QObject*  parent,QString key,QString s);
+    StateString() ;
+    ~StateString() ;
+
+    StateString& operator=( StateString& sa );
+
+    QString asString();
+
+    void    setValue(const QString value);
+
+private :
+    QString _value;
+
+};
 
 #endif // STATEATTRIBUTES_H

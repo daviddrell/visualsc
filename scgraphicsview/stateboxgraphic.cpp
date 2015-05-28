@@ -48,7 +48,8 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     setDrawBoxLineStyle  ( SelectableBoxGraphic::kDrawSolid );
     setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
 
-    StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *> ( _stateModel->attributes.value("name"));
+    /*
+    StateName * name = dynamic_cast<StateName *> ( _stateModel->attributes.value("name"));
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(name);
 
@@ -59,7 +60,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     PositionAttribute * position =dynamic_cast<PositionAttribute*> ( _stateModel->attributes.value("position"));
     connect (position, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(position);
-
+*/
 
     TextItem.setPos(25,10);
 
@@ -78,7 +79,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
     // this method keeps the starting position of a line snapped to the outter edge of the box
 
-    SelectableLineSegmentGraphic *transition = dynamic_cast<SelectableLineSegmentGraphic *> ( QObject::sender());
+    SelectableLineSegmentGraphic *transition = dynamic_cast<SelectableLineSegmentGraphic *> (QObject::sender());
 
     QPointF cursorPos = mapFromItem(transition, newPos);
 
@@ -195,12 +196,14 @@ void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem 
 
 }
 
-void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
-{
-    StateAttributes::StateName * name = dynamic_cast<StateAttributes::StateName *> (attr);
-    SizeAttribute * size = dynamic_cast<SizeAttribute *> ( attr);
-    PositionAttribute * position =dynamic_cast<PositionAttribute*> (attr);
 
+
+void StateBoxGraphic::handleAttributeChanged(void *attr)
+{
+
+    StateName * name = dynamic_cast<StateName *> ((IAttribute*)attr);
+    SizeAttribute * size = dynamic_cast<SizeAttribute *> ( (IAttribute*)attr);
+    PositionAttribute * position =dynamic_cast<PositionAttribute*> ((IAttribute*)attr);
 
     if ( name )
     {
@@ -225,6 +228,7 @@ void StateBoxGraphic::handleAttributeChanged(IAttribute *attr)
         parent->update();
     else
         this->update();
+
 }
 
 

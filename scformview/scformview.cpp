@@ -19,7 +19,8 @@
 */
 
 #include "scformview.h"
-
+#include <QHBoxLayout>
+#include <QTableWidget>
 #include <QVariant>
 #include <QtGui>
 #include <QLabel>
@@ -28,6 +29,13 @@
 #include "customtreewidgetitem.h"
 #include "stateselectionwindow.h"
 #include "textblock.h"
+#include <QToolBar>
+#include <QMessageBox>
+#include <QAction>
+#include <QMenuBar>
+#include <QFontComboBox>
+#include <QToolButton>
+#include <QButtonGroup>
 
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         QMainWindow(parent, Qt::WindowStaysOnTopHint),
@@ -36,10 +44,8 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
 {
 
     createActions();
-
     createMenus();
     createToolbars();
-
 
     // central widget and outter layout
 
@@ -61,17 +67,14 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
     selectedChartItem = new QLabel();
     vlayout->addWidget( selectedChartItem);
 
-
     //  property table
 
     propertyTable = new QTableWidget();
     propertyTable->setColumnCount(2);
     vlayout->addWidget( propertyTable );
 
-
     setWindowTitle(tr("State Chart Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
-
 
     QList<SCState*> states;
     states.append( _dm->getTopState());
@@ -84,6 +87,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
 
 void SCFormView::handleNewTransition(SCTransition*t)
 {
+    (void)t;
     QList<SCState*> states;
     states.append( _dm->getTopState());
 
@@ -95,6 +99,7 @@ void SCFormView::handleNewTransition(SCTransition*t)
 
 void SCFormView::handleNewState(SCState*s)
 {
+    (void)s;
     // pass the loadTree function a list of top-level states and starting node
     // the top node (NULL) has only one top state
     QList<SCState*> states;

@@ -22,7 +22,7 @@
 #ifndef SCFORMVIEW_H
 #define SCFORMVIEW_H
 
-
+#include "scformview_global.h"
 #include <QMainWindow>
 #include "scdatamodel.h"
 #include <QList>
@@ -67,7 +67,7 @@ QT_END_NAMESPACE
   * \ingroup FormView
   */
 
-class SCFormView : public QMainWindow
+class SCFORMVIEWSHARED_EXPORT SCFormView : public QMainWindow
 {
     Q_OBJECT
 public:

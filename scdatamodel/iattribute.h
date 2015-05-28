@@ -96,7 +96,7 @@
 /**
  * \class IAttribute
  *
- * \brief This is the base abstract class for state and transition attributes.
+ * \brief This is the base  class for state and transition attributes.
  *
  * \ingroup Attributes
  * \ingroup DataModel
@@ -132,15 +132,8 @@ public:
 
     IAttribute& operator=(const IAttribute& a);
 
-//    enum AttributeType {
-//        aType_Name,
-//        aType_Position,
-//        aType_Size,
-//        aType_Path
-//    };
-
-    virtual QString asString()=0;
-    virtual void setValue(const QString value)  = 0 ;
+    virtual QString asString();
+    virtual void setValue(const QString value) ;
     virtual QString key() const;
 
 signals:
@@ -244,5 +237,11 @@ private:
 
 
 };
+
+Q_DECLARE_METATYPE(IAttribute)
+Q_DECLARE_METATYPE(IAttribute*)
+
+Q_DECLARE_OPAQUE_POINTER(IAttribute*)
+
 
 #endif // IATTRIBUTE_H
