@@ -113,6 +113,7 @@ private:
     IAttributeContainer * getCurrentlySelectedAttributes();
     QString               getCurrentlySelectedTitle();
     QString               getCurrentlySelectedType();
+    QObject*              getNeighborState(QObject*s);
 
     void createToolBox();
     void createActions();

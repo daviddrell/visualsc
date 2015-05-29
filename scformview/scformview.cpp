@@ -155,10 +155,32 @@ void SCFormView::handleTransitionDeleted(QObject *t)
     loadTree (NULL, states);
 }
 
+QObject* SCFormView::getNeighborState(QObject*s)
+{
+    QObject *prev=0;
+
+    QList<SCState*> states;
+    _dm->getAllStates(states);
+    int c = states.count();
+
+    for(int i = 0; i < c; i++)
+    {
+        SCState * st = states.at(i);
+        if ( s == st)
+            return prev;
+        prev = st;
+    }
+
+    return prev;
+}
+
 void SCFormView::handleStateDeleted(QObject *s)
 {
     if ( s == _currentlySelected)
-        _currentlySelected = NULL;
+    {
+        // find a neighbor state to select after this one is gone
+        _currentlySelected = getNeighborState(s);
+    }
 
     QList<SCState*> states;
     states.append( _dm->getTopState());
@@ -190,6 +212,7 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
         if (parentItem == 0)
         {
             item = new CustomTreeWidgetItem();
+            item->setExpanded(true);
             stateChartTreeView->addTopLevelItem((QTreeWidgetItem*)item);
         }
         else
@@ -225,6 +248,24 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
 
     }
 
+    // now re-selete the previously selected item
+    if ( parentItem)
+    {
+        QTreeWidgetItemIterator it(parentItem);
+        while (*it)
+        {
+            CustomTreeWidgetItem *customItem = dynamic_cast<CustomTreeWidgetItem*>(*it);
+            if (customItem==0)break;
+            if ( customItem->data() == _currentlySelected)
+            {
+                customItem->setSelected(true);
+                handleTreeViewItemClicked(customItem,0);
+                break;
+            }
+            ++it;
+        }
+        parentItem->setExpanded(true);
+    }
 }
 
 
@@ -391,7 +432,6 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
 
     propertyTable->clear();
 
-
     // load the new attributes
 
     IAttributeContainer * attributes =  getCurrentlySelectedAttributes();
@@ -423,7 +463,6 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
 
     // watch for user changes to the attributes
     connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
-
 
 }
 
