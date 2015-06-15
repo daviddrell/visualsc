@@ -511,12 +511,10 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
 
         QRectF rect (topLeft, bottomRight);
 
-        painter->drawRoundRect(rect,10,10); // corner radius of 25 pixels
+        painter->drawRoundRect(rect,25,25); // corner radius of 25 pixels
     }
 
-
     // draw the top box, the visible one
-
 
     if ( _isHighlighted )
         _pen.setColor(Qt::red);
@@ -563,7 +561,7 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
         rect2 = QRectF (topLeft2, bottomRight2);
     }
 
-    painter->drawRoundRect(rect2,10,10);
+    painter->drawRoundRect(rect2,25,25);
 
 }
 

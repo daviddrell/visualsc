@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <QGLWidget>
 #include <QLabel>
+#include <QMessageBox>
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
         QWidget (parentWidget),
@@ -186,44 +187,35 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
 
 void SCGraphicsView::handleNewTransition (SCTransition *t)
 {
+    // get the parent state graphic
+    SCState *parentState = dynamic_cast<SCState *>(t->parent());
+    StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
+    if ( parentGraphic == NULL)
+    {
+        // no parent graphic means the user is adding a transition to the root machine
+        QMessageBox msgBox;
+        msgBox.setText("cannot add a transition from the root machine");
+        msgBox.exec();
+        return;
+    }
+
     connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
 
      // create a transition graphic
-
     TransitionGraphic * transGraphic  = 0;
-
-
     TransitionAttributes::TransitionPositionAttribute * pos =
             dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> (  t->attributes.value("position"));
-
     QPointF position(0,0);
-
     if ( pos == 0 )
-    {
         qDebug()<< "pos returned null in SCGraphicsView::handleNewTransition";
-    }
     else
-    {
         position = pos->asQPointF();
-    }
-
-    // get the parent state graphic
-
-    SCState *parentState = dynamic_cast<SCState *>(t->parent());
-
-    StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
 
     TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
     StateBoxGraphic * targetGraphic  = lookUpTargetStateGraphic( targetName->asString() );
-
     transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t );
-
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
-
-
     _mapTransitionToGraphic.insert(t, transGraphic);
-
-
 }
 
 void SCGraphicsView::handleStateDeleted(QObject *state)

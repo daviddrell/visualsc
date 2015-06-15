@@ -551,8 +551,15 @@ void SCFormView::bringToFront()
 void SCFormView::insertTransition()
 {
     SCState * st = dynamic_cast<SCState *> (_currentlySelected);
-
     if ( st == NULL ) return;
+
+    if ( st->parent() == NULL)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("cannot add state from root machine");
+        msgBox.exec();
+        return;
+    }
 
     // need to force the user to select a target state for this new transition
 
