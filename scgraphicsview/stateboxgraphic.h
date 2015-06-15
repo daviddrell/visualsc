@@ -50,7 +50,7 @@ public:
 
     void setGridSpace(int space);
     //void setTitle(QString t);
-    void setSize(QPoint size);
+    void setSize(QPointF size);
     QString getPositionAsString();
     QString getSizeAsString();
     QPointF getSize();

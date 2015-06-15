@@ -46,7 +46,7 @@ public:
     SelectableBoxGraphic(QGraphicsObject*parent);
     ~SelectableBoxGraphic();
 
-    virtual void setSize(QPoint size); ///< set the size of this object
+    virtual void setSize(QPointF size); ///< set the size of this object
     void    increaseWidth(int inc);
     QString getPositionAsString();
     QString getSizeAsString();

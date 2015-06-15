@@ -144,7 +144,7 @@ QString SelectableBoxGraphic::getSizeAsString()
 }
 
 
-void SelectableBoxGraphic::setSize(QPoint size)
+void SelectableBoxGraphic::setSize(QPointF size)
 {
     _width = size.x();
     _height = size.y();

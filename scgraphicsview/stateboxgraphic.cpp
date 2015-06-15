@@ -259,14 +259,13 @@ QString StateBoxGraphic::getSizeAsString()
 }
 
 
-void StateBoxGraphic::setSize(QPoint size)
+void StateBoxGraphic::setSize(QPointF size)
 {
     return SelectableBoxGraphic::setSize(size);
 
     if ( _stateModel )
     {
-        QPointF sizePointF =  QPointF ( size.x(),size.y() );
-        _stateModel->setSize (sizePointF );
+        _stateModel->setSize (size );
     }
 }
 

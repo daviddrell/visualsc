@@ -88,22 +88,26 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
     if ( parentState )
     {
         StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
+        StateBoxGraphic * childGraphic =   _mapStateToGraphic[state];
 
         if ( parentGraphic )
         {
-            // has the size been set on the parent?
-//            if ( ! parentState->hasBeenSized() )
-//            {
-//                // make sure the parent is big enough to hold all the states
+            // is the parent bigger than the new child?
+            // make sure the parent is big enough to hold all the states
 
-//                QPoint sz;
-//                parentGraphic->getSize(sz);
-//                sz.setX( sz.x() + 120 );
-//                parentGraphic->setSize( sz );
-
-//            }
-
-//            increaseSizeOfAllAncestors (parentState);
+            QPointF parentSize = parentGraphic->getSize();
+            QPointF childSize = childGraphic->getSize();
+            if ( childSize.x() >= parentSize.x() )
+            {
+                parentSize.setX( parentSize.x() * 1.2 );
+                parentGraphic->setSize( parentSize );
+            }
+            if ( childSize.y() >= parentSize.y() )
+            {
+                parentSize.setY( parentSize.y() * 1.2 );
+                parentGraphic->setSize( parentSize );
+            }
+            increaseSizeOfAllAncestors (parentState);
         }
     }
 
@@ -279,7 +283,7 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     // after the reference has been set through the construction
     // of the stateboxgraphic, the graphic and the model
-    // will be linked internally. e.g. setting the size off the graphic
+    // will be linked internally. e.g. setting the size of the graphic
     // will set the size of the model and vice versa
 
     stateGraphic = new StateBoxGraphic( parentGraphic, newState);
