@@ -163,7 +163,7 @@ QPointF CornerGrabber::getCenterPoint()
 
 void CornerGrabber::setAngle(int angle)
 {
-    _arrowAngle = angle;
+    _arrowAngle = angle - 45; // subtract 45 because of how we draw it
 }
 
 void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -206,6 +206,8 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
     }
     else  if (_paintStyle == kArrowHead)
     {
+        qDebug()<< "setting arrowhead angle: " << _arrowAngle;
+
         _arrowHead->setRotation(_arrowAngle);
 
         _arrowHead->update();

@@ -25,7 +25,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         int targetSide=0;
 
         getClosestSides( & sourceSide, & targetSide);
-
         QPointF sourceAnchor = _parentStateGraphic->mapFromScene( _parentStateGraphic->getSideCenterPointInSceneCoord(sourceSide));
         QPointF targetAnchor = _parentStateGraphic->mapFromScene( _targetStateGraphic->getSideCenterPointInSceneCoord(targetSide));
 
@@ -34,7 +33,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _lineSegments.append(segment);
         connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
         connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
-
 
         segment->setTerminator(true);
 

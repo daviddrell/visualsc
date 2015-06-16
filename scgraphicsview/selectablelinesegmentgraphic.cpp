@@ -299,7 +299,6 @@ void SelectableLineSegmentGraphic::setTerminator(bool isTerm)
     {
         _corners[1]->setPaintStyle(CornerGrabber::kArrowHead);
         _corners[1]->setVisible(true);
-
         _corners[1]->installSceneEventFilter(this);
     }
     else
@@ -529,20 +528,32 @@ void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionG
 
     if ( _isTerminal && _corners[1] )
     {
-        double dy = _lineEnd_0.y() -_lineEnd_1.y();
+        double dy = _lineEnd_1.y() -_lineEnd_0.y();
+        double dx = _lineEnd_1.x() - _lineEnd_0.x();
+        int quadrant =0;
 
-        double dx = _lineEnd_0.x() - _lineEnd_1.x();
+        qDebug()<< "initial values dx = " << dx << ", dy = " << dy ;
 
-        int k = 0;
 
-        if ( dx > 0)
+        //double angle = (atan ( (dy) / ( dx) ) + ( k * 3.14159265)) * (180.0/3.14159265);
+
+        if ( dx < 0 && dy >= 0  )
         {
-            k = 1;
+            quadrant = 1;
+            dx *= -1;
+        }
+        else if ( dx < 0 && dy < 0  )
+        {
+            quadrant = 2;
+            dx *= -1;
         }
 
-        double angle = (atan ( (dy) / ( dx) ) + ( k * 3.14159265)) * (180.0/3.14159265);
+        double angle = atan ( (dy) / ( dx) )  * (180.0/3.14159265);
 
-        angle -= 45 ;
+        if ( quadrant == 1 )
+            angle = 180 - angle  ;
+        else if ( quadrant == 2 )
+            angle = -180 -angle;
 
         _corners[1]->setAngle(angle);
         _corners[1]->update();
