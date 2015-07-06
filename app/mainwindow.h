@@ -42,6 +42,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void keyPressEvent(QKeyEvent * e);
+
 private:
     Ui::MainWindow *ui;
 
@@ -50,6 +52,9 @@ private:
     static QString _keyLastFilePath;
     SCFormView *_formEditorWindow;
     TextFormatToolBar *_textFormatToolBar;
+
+
+
 
 private slots:
     void handleFileOpenClick();

@@ -34,6 +34,9 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
         _view(parentWidget),
         _dm(dm),
         _mapStateToGraphic()
+       // KeyController
+      //key controller class
+
 {
     _dm->setScene( _scene);
 
@@ -279,12 +282,24 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // will set the size of the model and vice versa
 
     stateGraphic = new StateBoxGraphic( parentGraphic, newState);
-
+    stateGraphic->setObjectName(newState->objectName());
+    //stateGraphic->setPos(newState->attributes.value("position"));
+    //stateGraphic->setSize(newState->attributes.value("size"));
     connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 
     // quick look up of graphics from state model references
 
     _mapStateToGraphic.insert(newState, stateGraphic);
+
+
+
+    // load size and position from state model
+    PositionAttribute * position = dynamic_cast<PositionAttribute*> (newState->attributes.value("position"));
+    stateGraphic->setPos(position->asPointF());
+    //qDebug() << "pos : " << position->asString();
+
+    SizeAttribute * size = dynamic_cast<SizeAttribute*> (newState->attributes.value("size"));
+    stateGraphic->setSize(size->asPointF());
 
 
     if ( ! parentGraphic )

@@ -443,6 +443,11 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         state->attributes.setAttributes( *sa);
         state->setLevel(_level);
 
+
+        /*PositionAttribute * position =dynamic_cast<PositionAttribute*> ((IAttribute*)state->attributes.value("position"));
+        QPointF ps = position->asPointF();
+        state->setPosition(ps);
+*/
         QString name ;
         if (! sa->contains("name"))
         {

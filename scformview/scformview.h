@@ -27,6 +27,7 @@
 #include "scdatamodel.h"
 #include <QList>
 #include <QModelIndex>
+#include <QSignalMapper>
 
 class StateSelectionWindow;
 
@@ -108,9 +109,11 @@ private slots:
     void handlePropertyCellChanged(int, int);
     void handleStateSelectionWindowStateSelected(SCState *st, QString name);
 
+    void setSelectedTreeItem(QObject *);
 private:
 
     IAttributeContainer * getCurrentlySelectedAttributes();
+    IAttributeContainer * getPreviouslySelectedAttributes();
     QString               getCurrentlySelectedTitle();
     QString               getCurrentlySelectedType();
     QObject*              getNeighborState(QObject*s);
@@ -129,7 +132,8 @@ private:
     void loadTree ( CustomTreeWidgetItem * parentItem , SCTextBlock* textBlock);
 
     void deleteItem(QObject * item);
-
+    void setAttributeConnections(IAttributeContainer * atts, bool shouldConnect);
+    void clearPropertyTable();
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;
     QLabel         *selectedChartItem;
@@ -177,7 +181,10 @@ private:
 
     SCDataModel * _dm;
     QObject     * _currentlySelected;
+    QObject     * _previouslySelected;
     StateSelectionWindow * _targetStateSelectionWindow;
+
+
 
 
 };

@@ -3,6 +3,7 @@
 
 #include "textblockattributes.h"
 #include <QXmlStreamWriter>
+//#include "scstate.h"
 #include "scitem.h"
 
 /**
@@ -21,6 +22,7 @@ class SCDATAMODELSHARED_EXPORT SCTextBlock : public SCItem
 
 public:
     SCTextBlock();
+    //SCTextBlock(const SCState& st);
     virtual IAttributeContainer * getAttributes(); // reimplemented from base SCItem
     TextBlockAttributes attributes;
     QString getText();

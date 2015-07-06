@@ -1,0 +1,4 @@
+7/2/15
+
+fixed open file to use attributes size and position before display on SCGraphicsView
+found an unwanted bug relating to moving objects. When a tree form object is selected and another object is manipulated, the size and position variables for the tree object are also changed in the state model.

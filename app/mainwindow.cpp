@@ -24,6 +24,8 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QSettings>
+#include <QDebug>
+#include <QKeyEvent>
 #include "scformview.h"
 
 
@@ -61,6 +63,11 @@ MainWindow::~MainWindow()
     delete _settings;
     delete _project;
     delete ui;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *e)
+{
+    qDebug() << "You have pressed: " << e->text();
 }
 
 void MainWindow::handleFileOpenClick()

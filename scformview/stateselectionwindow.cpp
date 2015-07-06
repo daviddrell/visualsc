@@ -4,7 +4,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
-
 #include <QLabel>
 
 StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
@@ -116,6 +115,7 @@ void StateSelectionWindow::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int 
 
     CustomTreeWidgetItem * item = dynamic_cast<CustomTreeWidgetItem*>(qitem);
 
+    //SCFormView::setSelectedTreeItem(item->data());
     _currentlySelected =  item->data();
 
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);

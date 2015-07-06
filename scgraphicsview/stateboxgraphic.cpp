@@ -180,6 +180,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     SelectableBoxGraphic::paint(painter, option, widget);
+    //qDebug() << " object name: " << this->objectName()<< " object position: "<<this->getPositionAsString();
 
 #if 0  // debug stuff
     if ( _diagLineDrawIt )
@@ -278,6 +279,7 @@ void StateBoxGraphic::graphicHasChanged ()
     {
         QPointF ps = this->pos();
         _stateModel->setPosition(ps);
+        //qDebug()<<"graphicsHasChanged: "<<_stateModel->objectName() << " position: " << this->pos();
 
         QPointF sz =this->getSize();
         _stateModel->setSize(sz);

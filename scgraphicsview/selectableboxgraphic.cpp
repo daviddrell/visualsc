@@ -328,7 +328,10 @@ void SelectableBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event 
     QPointF location = this->pos();
     location.setX( ( static_cast<int>(location.x()) / _gridSpace) * _gridSpace );
     location.setY( ( static_cast<int>(location.y()) / _gridSpace) * _gridSpace );
+
     this->setPos(location);
+
+    //qDebug() << "MOUSE RELEASE : " << this->pos() << "";
 
     graphicHasChanged();
 }

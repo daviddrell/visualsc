@@ -7,6 +7,40 @@
 SCTextBlock::SCTextBlock(): SCItem()
 {
     FontFamilyAttribute * ff = new FontFamilyAttribute(NULL,"font-family", "courier");
+    ff->setParent(this);
+    attributes.addItem(ff);
+
+    FontSizeAttribute * fs = new FontSizeAttribute(NULL,"font-size",8);
+    fs->setParent(this);
+    attributes.addItem(fs);
+
+    FontColorAttribute * fc = new FontColorAttribute(NULL,"font-color", Qt::black);
+    fc->setParent(this);
+    attributes.addItem(fc);
+
+    FontBoldAttribute * fb = new FontBoldAttribute(NULL,"font-bold",false);
+    fb->setParent(this);
+    attributes.addItem(fb);
+
+    FontUnderlineAttribute * fu = new FontUnderlineAttribute(NULL,"font-underline", false);
+    fu->setParent(this);
+    attributes.addItem(fu);
+
+    PositionAttribute* pa = new PositionAttribute(NULL, "position", QPointF(10,10));
+    pa->setParent(this);
+    attributes.addItem(pa);
+
+    SizeAttribute * sa = new SizeAttribute(NULL, "size", QPointF(100,60) );
+    sa->setParent(this);
+    attributes.addItem(sa);
+
+
+    connect(sa, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)));
+}
+/*
+SCTextBlock::SCTextBlock(const SCState& st): SCItem(st.parent())
+{
+    FontFamilyAttribute * ff = new FontFamilyAttribute(NULL,"font-family", "courier");
     attributes.addItem(ff);
 
     FontSizeAttribute * fs = new FontSizeAttribute(NULL,"font-size",8);
@@ -29,7 +63,7 @@ SCTextBlock::SCTextBlock(): SCItem()
 
     connect(sa, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)));
 }
-
+*/
 IAttributeContainer * SCTextBlock::getAttributes()
 {
     return & attributes;
@@ -53,7 +87,7 @@ void  SCTextBlock::setText(QString text)
 
 void SCTextBlock::handleAttributeChanged(IAttribute *attr)
 {
-    qDebug()<<"SCTextBlock::handleAttributeChanged";
+    qDebug()<<"SCTextBlock::handleAttributeChanged "<<attr->asString();
 }
 
 
