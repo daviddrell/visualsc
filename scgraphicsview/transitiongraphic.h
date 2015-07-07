@@ -8,6 +8,7 @@
 #include "stateboxgraphic.h"
 #include "keycontroller.h"
 #include "elbowgrabber.h"
+#include "mousecontroller.h"
 
 class ElbowGrabber;
 
@@ -16,10 +17,14 @@ class TransitionGraphic : public QGraphicsObject
     Q_OBJECT
 
 public:
-    explicit TransitionGraphic( StateBoxGraphic *parentState, StateBoxGraphic *targetState, SCTransition *t, KeyController * keys);
+    explicit TransitionGraphic( StateBoxGraphic *parentState, StateBoxGraphic *targetState, SCTransition *t, KeyController * keys, MouseController* mouse);
     void printInfo();
     StateBoxGraphic* parentItemAsStateBoxGraphic();
     ~TransitionGraphic();
+    void setCurrentlyHoveredSegment(SelectableLineSegmentGraphic* seg);
+    void clearCurrentlyHoveredSegment();
+    bool isCurrentlyHovered();
+    SelectableLineSegmentGraphic* getCurrentlyHoveredSegment();
 
 signals:
 
@@ -46,6 +51,8 @@ private :
     //StateBoxGraphic *_parentStateGraphic;
     StateBoxGraphic *_targetStateGraphic;
     KeyController * _keyController;
+    MouseController* _mouseController;
+    SelectableLineSegmentGraphic* _hovered;
 
    // virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 

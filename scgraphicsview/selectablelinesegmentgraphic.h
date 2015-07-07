@@ -58,8 +58,12 @@ public:
     void setStartEndPosition(QPointF position);
     void setTerminator(bool);///< if true, this segment's end point is a terminator and should draw an arrow head
 
+    void printInfo();
+
     QPointF getStart();
     QPointF getEnd();
+
+    TransitionGraphic* parentItemAsTransitionGraphic();
 
 signals:
     void selected();

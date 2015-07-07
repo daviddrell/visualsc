@@ -82,12 +82,12 @@ bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
         QKeyEvent *key = static_cast<QKeyEvent*>(e);
         _keyController->keyInput(key);
     }
-    else if(e->type()==QEvent::GraphicsSceneMouseMove)
+    else if(e->type()==QEvent::GraphicsSceneMouseMove)  // track mouse movement in mouse controller
     {
         //qDebug()<<"mouse moved in event filter";
         QGraphicsSceneMouseEvent* qgs = static_cast<QGraphicsSceneMouseEvent*>(e);
         _mouseController->mouseInput(qgs);
-        //_mouseController->printPos();
+        _mouseController->printPos();
     }
     return false;
 }
@@ -256,7 +256,7 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
     TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
     //TODO fix target state
     StateBoxGraphic * targetGraphic  = lookUpTargetStateGraphic( targetName->asString() );
-    transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController);
+    transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController,_mouseController);
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
     _mapTransitionToGraphic.insert(t, transGraphic);
 }

@@ -14,9 +14,57 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
     _placedOnASquare(false),
     _paintStyle(kBox),
     _arrowAngle(0),
-    _arrowHead(NULL)
+    _arrowHead(NULL),
+    _start(NULL),
+    _end(NULL)
 {
-    this->setParent(parentGraphic);
+    this->setParentItem(parentGraphic);
+    _outterborderPen.setWidth(2);
+    _outterborderPen.setColor(_outterborderColor);
+    this->setAcceptHoverEvents(true);
+}
+
+ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, SelectableLineSegmentGraphic* start, SelectableLineSegmentGraphic* end):
+
+    mouseDownX(0),
+    mouseDownY(0),
+    _outterborderColor(Qt::black),
+    _outterborderPen(),
+    _width(6),
+    _height(6),
+    _corner(0),
+    _mouseButtonState(kMouseReleased),
+    _placedOnASquare(false),
+    _paintStyle(kBox),
+    _arrowAngle(0),
+    _arrowHead(NULL),
+    _start(NULL),
+    _end(NULL)
+{
+    this->setParentItem(parentGraphic);
+    _outterborderPen.setWidth(2);
+    _outterborderPen.setColor(_outterborderColor);
+    this->setAcceptHoverEvents(true);
+}
+
+ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, SelectableLineSegmentGraphic* start, SelectableLineSegmentGraphic* end, int x, int y):
+    mouseDownX(0),
+    mouseDownY(0),
+    _outterborderColor(Qt::black),
+    _outterborderPen(),
+    _width(6),
+    _height(6),
+    _corner(0),
+    _mouseButtonState(kMouseReleased),
+    _placedOnASquare(false),
+    _paintStyle(kBox),
+    _arrowAngle(0),
+    _arrowHead(NULL),
+    _start(start),
+    _end(end)
+
+{
+    this->setParentItem(parentGraphic);
     _outterborderPen.setWidth(2);
     _outterborderPen.setColor(_outterborderColor);
     this->setAcceptHoverEvents(true);
@@ -104,13 +152,15 @@ void ElbowGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
     _outterborderColor = Qt::black;
-    this->update(0,0,_width,_height);
+   // this->update(0,0,_width,_height);
+    this->update();
 }
 
 void ElbowGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
     _outterborderColor = Qt::red;
-    this->update(0,0,_width,_height);
+//    this->update(0,0,_width,_height);
+    this->update();
 }
 
 QRectF ElbowGrabber::boundingRect() const

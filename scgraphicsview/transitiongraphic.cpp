@@ -2,13 +2,14 @@
 #include "scstate.h"
 #include <QDebug>
 
-TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys) :
+TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys, MouseController* mouse) :
     QGraphicsObject(NULL),
     _transitionDM(t),
     _lineSegments(),
     _elbows(),
     _targetStateGraphic(targetGraphic),
-    _keyController(keys)
+    _keyController(keys),
+    _mouseController(mouse)
 {
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
     this->setParentItem(parentGraphic);
@@ -132,7 +133,28 @@ TransitionGraphic::~TransitionGraphic()
     _elbows.clear();
 }
 
+/**
+ * @brief setCurrentlyHoveredSegment
+ */
+void TransitionGraphic::setCurrentlyHoveredSegment(SelectableLineSegmentGraphic* seg)
+{
+    _hovered = seg;
+}
 
+void TransitionGraphic::clearCurrentlyHoveredSegment()
+{
+    _hovered = NULL;
+}
+
+bool TransitionGraphic::isCurrentlyHovered()
+{
+    return (_hovered!=NULL);
+}
+
+SelectableLineSegmentGraphic* TransitionGraphic::getCurrentlyHoveredSegment()
+{
+    return _hovered;
+}
 
 /**
  * @brief TransitionGraphic::printInfo
@@ -149,13 +171,17 @@ void TransitionGraphic::printInfo(void)
 
 
 /**
- * @brief createNewElbow
- * create a new elbow on the currently hovered line segment.
+ * @brief TransitionGraphic::createNewElbow
+ * create a new elbow on the currently hovered line segment, based on where the mouse is currently
  * a new line segment and elbow grabber object is created and added to the transition graphic
  */
 void TransitionGraphic::createNewElbow()
 {
-
+    //_hovered->printInfo();
+    ElbowGrabber* elb = new ElbowGrabber(this);
+    elb->setPaintStyle(ElbowGrabber::kBox);
+    elb->setPos(_mouseController->getX(),_mouseController->getY());
+    _elbows.append(elb);
 }
 
 
@@ -164,7 +190,7 @@ void TransitionGraphic::handleKeyPressEvent(int key)
    // qDebug() << "Transition Graphic Key Press: " << key;
     if(key==Qt::Key_N)
     {
-        qDebug() << "Creating New Elbow at pos: ";
+        //qDebug() << "Creating New Elbow at pos: ";
         this->createNewElbow();
     }
 }

@@ -3,6 +3,8 @@
 #include <QPoint>
 #include <QDebug>
 
+//#define MOUSE_DEBUG
+
 MouseController::MouseController() :
     _xPos(0),
     _yPos(0)
@@ -28,7 +30,9 @@ int MouseController::getY()
 
 void MouseController::printPos()
 {
+#ifdef MOUSE_DEBUG
     qDebug() << "Mouse Pos (" << _xPos << ", " << _yPos<<")";
+#endif
 }
 
 QPoint* MouseController::getPoint()

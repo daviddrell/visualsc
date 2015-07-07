@@ -184,7 +184,7 @@ bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, Q
             corner->mouseDownX= scenePosition.x();
 
             _cornerGrabbed = true;
-
+            qDebug() << "Corner Position: " << corner->mouseDownX<<" ," << corner->mouseDownY;
         }
         break;
 
@@ -423,6 +423,10 @@ void SelectableLineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX
 
 }
 
+void SelectableLineSegmentGraphic::printInfo()
+{
+    qDebug() << "Sel Line Seg info: Corner[0]" << this->_corners[0]->x() << ", " << this->_corners[0]->y();
+}
 
 //void SelectableLineSegmentGraphic::updateModel ()
 //{
@@ -478,6 +482,10 @@ void SelectableLineSegmentGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * e
 void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
     //qDebug() << "leaving Hover";
+
+    // clear parent's currently hovered object
+    this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredSegment();
+
     // disconnect the key controller and the transition graphic key press handler
     disconnect(_keyController, SIGNAL(keyPressed(int)), _parentGraphic, SLOT(handleKeyPressEvent(int)));
     _corners[0]->setVisible(false);
@@ -496,6 +504,10 @@ void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * 
 void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
     //qDebug() << "Entering Hover";
+
+    // set parent's currently hovered object to this line segment
+    this->parentItemAsTransitionGraphic()->setCurrentlyHoveredSegment(this);
+
     // connect the key controller to this transition graphic
     connect(_keyController, SIGNAL(keyPressed(int)), _parentGraphic, SLOT(handleKeyPressEvent(int)));
 
@@ -528,7 +540,10 @@ void SelectableLineSegmentGraphic::setCornerPositions()
 
 }
 
-
+TransitionGraphic* SelectableLineSegmentGraphic::parentItemAsTransitionGraphic()
+{
+    return static_cast<TransitionGraphic*>(this->parentItem());
+}
 
 void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {

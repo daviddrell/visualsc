@@ -3,6 +3,7 @@
 
 #include <QGraphicsItem>
 #include "transitiongraphic.h"
+#include "selectablelinesegmentgraphic.h"
 
 class TransitionGraphic;
 
@@ -10,7 +11,9 @@ class ElbowGrabber : public QGraphicsItem, public QObject
 {
 
 public:
-    explicit ElbowGrabber(TransitionGraphic* parentGraphic);
+    ElbowGrabber(TransitionGraphic* parentGraphic);
+    ElbowGrabber(TransitionGraphic *parentGraphic, SelectableLineSegmentGraphic* start, SelectableLineSegmentGraphic* end);
+    ElbowGrabber(TransitionGraphic *parentGraphic, SelectableLineSegmentGraphic* start, SelectableLineSegmentGraphic* end, int x, int y);
     ~ElbowGrabber();
     void setAngle(int agle);///< set the rotation angle for corners which are drawn as arrowheads
     int  getCorner(); ///< allows the owner to find out which coner this is
@@ -61,6 +64,8 @@ private:
     int        _arrowAngle;
     ArrowHeadGraphic * _arrowHead;
 
+    SelectableLineSegmentGraphic* _start;
+    SelectableLineSegmentGraphic* _end;
 };
 
 #endif // ELBOWGRABBER_H
