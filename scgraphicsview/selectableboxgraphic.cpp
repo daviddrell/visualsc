@@ -30,6 +30,7 @@
 #include "math.h"
 #include "scstate.h"
 #include <QTimer>
+#include <QKeyEvent>
 
 /**
   *  This box can be re-sized and it can be moved. For moving, we capture
@@ -77,7 +78,7 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
     _corners[3] = NULL;
 
     this->setAcceptHoverEvents(true);
-
+    //this->installEventFilter(this);
 }
 
 

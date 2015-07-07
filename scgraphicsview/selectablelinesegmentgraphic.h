@@ -32,6 +32,10 @@
 #include "cornergrabber.h"
 #include <QGraphicsPolygonItem>
 #include <QPainterPath>
+#include "keycontroller.h"
+//#include "transitiongraphic.h"
+
+class TransitionGraphic;
 class SCTransition;
 class IAttribute;
 
@@ -49,7 +53,7 @@ class SelectableLineSegmentGraphic : public QObject, public QGraphicsPolygonItem
     Q_OBJECT
 
 public:
-    SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition );
+    SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition, TransitionGraphic* parentGraphic, KeyController* keys );
     ~SelectableLineSegmentGraphic();
     void setStartEndPosition(QPointF position);
     void setTerminator(bool);///< if true, this segment's end point is a terminator and should draw an arrow head
@@ -81,7 +85,11 @@ private:
 
     SCTransition*  _transitionModel;
 
+    TransitionGraphic* _parentGraphic;
+
     bool           _isTerminal;///< is this the last line segment in a transition graphic?
+
+    KeyController*  _keys;  // key controller passed from transition graphic
 
 
     // private methods

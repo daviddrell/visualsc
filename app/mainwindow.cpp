@@ -65,11 +65,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *e)
-{
-    qDebug() << "You have pressed: " << e->text();
-}
-
 void MainWindow::handleFileOpenClick()
 {
     QString prevFilePath=QDir::homePath();

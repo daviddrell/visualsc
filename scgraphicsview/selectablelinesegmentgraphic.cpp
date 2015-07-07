@@ -23,11 +23,15 @@
 
 #include "sctransition.h"
 #include "transitionattributes.h"
+#include "keycontroller.h"
+#include "transitiongraphic.h"
+
 
 #include <QDebug>
 
 
-SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition ):
+
+SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition, TransitionGraphic* parentGraphic,KeyController * keys ):
         QGraphicsPolygonItem(),
         _pen(),
         _dragStart(0,0),
@@ -39,7 +43,9 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
         _cornerGrabbed(false),
         _selectRegion(),
         _transitionModel(transition),
-        _isTerminal(false)
+        _isTerminal(false),
+        _parentGraphic(parentGraphic),
+        _keys(keys)
 {
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
 
@@ -151,8 +157,9 @@ void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
   */
 bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event )
 {
-    //qDebug() << " QEvent == " + QString::number(event->type());
-
+    static int count=0;
+    //qDebug() << " QEvent == " + QString::number(event->type()) << " " << count++;
+//qDebug() << "QGraphicsItem Scene Event " << watched->
     CornerGrabber * corner = dynamic_cast<CornerGrabber *>(watched);
     if ( corner == NULL) return false; // not expected to get here
 
@@ -469,6 +476,9 @@ void SelectableLineSegmentGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * e
 
 void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
+    //qDebug() << "leaving Hover";
+    // disconnect the key controller and the transition graphic key press handler
+    disconnect(_keys, SIGNAL(keyPressed(int)), _parentGraphic, SLOT(handleKeyPressEvent(int)));
     _corners[0]->setVisible(false);
     if ( _isTerminal )
         _corners[1]->setVisible(true);
@@ -484,6 +494,11 @@ void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * 
 
 void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
+    //qDebug() << "Entering Hover";
+    // connect the key controller to this transition graphic
+    connect(_keys, SIGNAL(keyPressed(int)), _parentGraphic, SLOT(handleKeyPressEvent(int)));
+
+
     _corners[0]->setVisible(true);
     _corners[1]->setVisible(true);
 
@@ -500,7 +515,7 @@ void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * 
         _corners[1]->setPaintStyle(CornerGrabber::kBox);
 
 
-    emit selected();
+    emit selected(); 
 }
 
 void SelectableLineSegmentGraphic::setCornerPositions()
@@ -532,7 +547,7 @@ void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionG
         double dx = _lineEnd_1.x() - _lineEnd_0.x();
         int quadrant =0;
 
-        qDebug()<< "initial values dx = " << dx << ", dy = " << dy ;
+        //qDebug()<< "initial values dx = " << dx << ", dy = " << dy ;
 
 
         //double angle = (atan ( (dy) / ( dx) ) + ( k * 3.14159265)) * (180.0/3.14159265);

@@ -34,7 +34,8 @@ SOURCES += scgraphicsview.cpp \
     buttongraphic.cpp \
     maskedtextedit.cpp \
     transitiongraphic.cpp \
-    arrowheadgraphic.cpp
+    arrowheadgraphic.cpp \
+    keycontroller.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -49,7 +50,8 @@ HEADERS += scgraphicsview.h\
     buttongraphic.h \
     maskedtextedit.h \
     transitiongraphic.h \
-    arrowheadgraphic.h
+    arrowheadgraphic.h \
+    keycontroller.h
 
 
 OTHER_FILES += \

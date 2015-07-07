@@ -22,23 +22,26 @@
 #include "sctransition.h"
 #include "transitionattributes.h"
 #include "selectablelinesegmentgraphic.h"
+#include "keycontroller.h"
 #include <QList>
 #include <QDebug>
 #include <QGLWidget>
 #include <QLabel>
 #include <QMessageBox>
+#include <QKeyEvent>
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
-        QWidget (parentWidget),
-        _scene(new QGraphicsScene(this)),
-        _view(parentWidget),
-        _dm(dm),
-        _mapStateToGraphic()
-       // KeyController
-      //key controller class
+    QWidget (parentWidget),
+    _scene(new QGraphicsScene(this)),
+    _view(parentWidget),
+    _dm(dm),
+    _mapStateToGraphic(),
+    _keys(new KeyController())
+
 
 {
     _dm->setScene( _scene);
+    // initialize key controller
 
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
@@ -51,12 +54,32 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
 
     createGraph();
 
-}
+    _scene->installEventFilter(this);
+    //this->setMouseTracking(true);
 
+
+
+}
 
 SCGraphicsView::~SCGraphicsView()
 {
     delete _scene ;
+}
+
+bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
+{
+    // scene captures key presses in KeyController Object
+    // the key controller object is passed to the transition graphic and its segmented lines
+    // segmented lines that are hovered will connect to the transition graphic's handle key event
+    if(e->type()==QEvent::KeyPress)
+    {
+        //qWarning()<<"The bad guy which steals the keyevent is "<<o;
+        //qWarning()<<"the focus item is "<< _scene->focusItem();
+        //qDebug()<< "Key Press SCGraphicsView: " << _keys->getLastKeyEvent();
+        QKeyEvent *key = static_cast<QKeyEvent*>(e);
+        _keys->keyInput(key);
+    }
+    return false;
 }
 
 void SCGraphicsView::createGraph()
@@ -215,8 +238,9 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
         position = pos->asQPointF();
 
     TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
+    //TODO fix target state
     StateBoxGraphic * targetGraphic  = lookUpTargetStateGraphic( targetName->asString() );
-    transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t );
+    transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keys);
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
     _mapTransitionToGraphic.insert(t, transGraphic);
 }

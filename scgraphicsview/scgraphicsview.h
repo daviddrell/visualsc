@@ -23,6 +23,7 @@
 
 #include "scgraphicsview_global.h"
 #include "scdatamodel.h"
+#include "keycontroller.h"
 #include <QObject>
 #include <QGraphicsView>
 #include "stateattributes.h"
@@ -76,7 +77,7 @@ private:
     SCDataModel    *_dm;
     QMap<SCState*,StateBoxGraphic*> _mapStateToGraphic;
     QMap<SCTransition*,TransitionGraphic *> _mapTransitionToGraphic;
-
+    KeyController *_keys;
 
     //  private methods
 
@@ -86,6 +87,7 @@ private:
     StateBoxGraphic * lookUpTargetStateGraphic(QString stateId );
     void createGraph();
 
+    bool eventFilter(QObject* o, QEvent* e);
 
 };
 

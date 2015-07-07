@@ -74,6 +74,12 @@ StateBoxGraphic::~StateBoxGraphic()
 
 }
 
+/**
+ * @brief StateBoxGraphic::handleTransitionLineStartMoved
+ * @param newPos
+ * Connected to signal startEndMoved for QPoints in transition graphics.
+ * will readjust the position of the source point of the transition arrow to be anchored to its starting state
+ */
 void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 {
 

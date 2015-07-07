@@ -206,7 +206,7 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
     }
     else  if (_paintStyle == kArrowHead)
     {
-        qDebug()<< "setting arrowhead angle: " << _arrowAngle;
+       // qDebug()<< "setting arrowhead angle: " << _arrowAngle;
 
         _arrowHead->setRotation(_arrowAngle);
 
