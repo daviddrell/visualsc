@@ -23,12 +23,14 @@
 #include "transitionattributes.h"
 #include "selectablelinesegmentgraphic.h"
 #include "keycontroller.h"
+#include "mousecontroller.h"
 #include <QList>
 #include <QDebug>
 #include <QGLWidget>
 #include <QLabel>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QGraphicsSceneMouseEvent>
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     QWidget (parentWidget),
@@ -36,7 +38,8 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     _view(parentWidget),
     _dm(dm),
     _mapStateToGraphic(),
-    _keys(new KeyController())
+    _keyController(new KeyController()),
+    _mouseController(new MouseController())
 
 
 {
@@ -75,11 +78,24 @@ bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
     {
         //qWarning()<<"The bad guy which steals the keyevent is "<<o;
         //qWarning()<<"the focus item is "<< _scene->focusItem();
-        //qDebug()<< "Key Press SCGraphicsView: " << _keys->getLastKeyEvent();
+        //qDebug()<< "Key Press SCGraphicsView: " << _keyController->getLastKeyEvent();
         QKeyEvent *key = static_cast<QKeyEvent*>(e);
-        _keys->keyInput(key);
+        _keyController->keyInput(key);
+    }
+    else if(e->type()==QEvent::GraphicsSceneMouseMove)
+    {
+        //qDebug()<<"mouse moved in event filter";
+        QGraphicsSceneMouseEvent* qgs = static_cast<QGraphicsSceneMouseEvent*>(e);
+        _mouseController->mouseInput(qgs);
+        //_mouseController->printPos();
     }
     return false;
+}
+
+// for supporting moving the box across the scene
+void SCGraphicsView::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
+{
+    qDebug()<<"mouse moved in moveEvent";
 }
 
 void SCGraphicsView::createGraph()
@@ -240,7 +256,7 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
     TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
     //TODO fix target state
     StateBoxGraphic * targetGraphic  = lookUpTargetStateGraphic( targetName->asString() );
-    transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keys);
+    transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController);
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
     _mapTransitionToGraphic.insert(t, transGraphic);
 }

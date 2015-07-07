@@ -35,7 +35,9 @@ SOURCES += scgraphicsview.cpp \
     maskedtextedit.cpp \
     transitiongraphic.cpp \
     arrowheadgraphic.cpp \
-    keycontroller.cpp
+    keycontroller.cpp \
+    elbowgrabber.cpp \
+    mousecontroller.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -51,7 +53,9 @@ HEADERS += scgraphicsview.h\
     maskedtextedit.h \
     transitiongraphic.h \
     arrowheadgraphic.h \
-    keycontroller.h
+    keycontroller.h \
+    elbowgrabber.h \
+    mousecontroller.h
 
 
 OTHER_FILES += \

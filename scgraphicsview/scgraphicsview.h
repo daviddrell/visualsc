@@ -30,6 +30,7 @@
 #include "stateboxgraphic.h"
 #include "transitiongraphic.h"
 #include "textformattoolbar.h"
+#include "mousecontroller.h"
 #include <QMap>
 
 /**
@@ -77,7 +78,8 @@ private:
     SCDataModel    *_dm;
     QMap<SCState*,StateBoxGraphic*> _mapStateToGraphic;
     QMap<SCTransition*,TransitionGraphic *> _mapTransitionToGraphic;
-    KeyController *_keys;
+    KeyController *_keyController;
+    MouseController* _mouseController;
 
     //  private methods
 
@@ -88,6 +90,8 @@ private:
     void createGraph();
 
     bool eventFilter(QObject* o, QEvent* e);
+    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+
 
 };
 

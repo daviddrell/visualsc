@@ -7,6 +7,9 @@
 #include <QList>
 #include "stateboxgraphic.h"
 #include "keycontroller.h"
+#include "elbowgrabber.h"
+
+class ElbowGrabber;
 
 class TransitionGraphic : public QGraphicsObject
 {
@@ -15,6 +18,7 @@ class TransitionGraphic : public QGraphicsObject
 public:
     explicit TransitionGraphic( StateBoxGraphic *parentState, StateBoxGraphic *targetState, SCTransition *t, KeyController * keys);
     void printInfo();
+    StateBoxGraphic* parentItemAsStateBoxGraphic();
     ~TransitionGraphic();
 
 signals:
@@ -27,8 +31,8 @@ public slots:
 protected:
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
     QRectF boundingRect() const;
-    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
-    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+   // virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+    //virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
 
 private :
@@ -36,17 +40,19 @@ private :
         // private methods
     void getClosestSides(int* sourceSide, int* targetSide);
     // private data
-    SCTransition  * _transitionDM;
+    SCTransition  * _transitionDM;  // data model for the transition object
     QList<SelectableLineSegmentGraphic *>  _lineSegments;
-    StateBoxGraphic *_parentStateGraphic;
+    QList<ElbowGrabber *> _elbows;
+    //StateBoxGraphic *_parentStateGraphic;
     StateBoxGraphic *_targetStateGraphic;
-    KeyController * _keys;
+    KeyController * _keyController;
 
    // virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
 
 private slots:
     void handleKeyPressEvent(int key);
+    void createNewElbow();
 
 };
 

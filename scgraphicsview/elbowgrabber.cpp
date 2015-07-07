@@ -1,50 +1,33 @@
-/*
-    visualsc - Visual State Chart Editing for SCXML State Engines
-    Copyright (C) 2011  David W. Drell (david@davidwdrell.net) and
-    Contributing Authors:
-
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-#include "cornergrabber.h"
+#include "elbowgrabber.h"
+#include "transitiongraphic.h"
 #include "arrowheadgraphic.h"
-#include <QDebug>
 
-CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnASquare) :
-    QGraphicsItem(parent),
+ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
     mouseDownX(0),
     mouseDownY(0),
     _outterborderColor(Qt::black),
     _outterborderPen(),
     _width(6),
     _height(6),
-    _corner(corner),
+    _corner(0),
     _mouseButtonState(kMouseReleased),
-    _placedOnASquare(placedOnASquare),
+    _placedOnASquare(false),
     _paintStyle(kBox),
     _arrowAngle(0),
     _arrowHead(NULL)
 {
-   this->setParentItem(parent);
+    this->setParent(parentGraphic);
     _outterborderPen.setWidth(2);
     _outterborderPen.setColor(_outterborderColor);
-
-   this->setAcceptHoverEvents(true);
+    this->setAcceptHoverEvents(true);
 }
 
-void CornerGrabber::setPaintStyle(PaintStyle s)
+ElbowGrabber::~ElbowGrabber()
+{
+
+}
+
+void ElbowGrabber::setPaintStyle(PaintStyle s)
 {
     _paintStyle  = s;
 
@@ -52,7 +35,7 @@ void CornerGrabber::setPaintStyle(PaintStyle s)
     {
         if ( ! _arrowHead )
         {
-            _arrowHead = new ArrowHeadGraphic(this);  
+            _arrowHead = new ArrowHeadGraphic(this);
             _arrowHead->setWidth(_width);
             _arrowHead->setHeight(_height);
             _arrowHead->setPos( - _width/2, - _height/2);
@@ -70,17 +53,17 @@ void CornerGrabber::setPaintStyle(PaintStyle s)
     this->update();
 }
 
-void CornerGrabber::setMouseState(int s)
+void ElbowGrabber::setMouseState(int s)
 {
     _mouseButtonState = s;
 }
 
-int CornerGrabber::getMouseState()
+int ElbowGrabber::getMouseState()
 {
     return _mouseButtonState;
 }
 
-int CornerGrabber::getCorner()
+int ElbowGrabber::getCorner()
 {
     return _corner;
 }
@@ -89,27 +72,27 @@ int CornerGrabber::getCorner()
 // we have to implement the mouse events to keep the linker happy,
 // but just set accepted to false since are not actually handling them
 
-void CornerGrabber::mouseMoveEvent(QGraphicsSceneDragDropEvent *event)
+void ElbowGrabber::mouseMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
     event->setAccepted(false);
 }
 
-void CornerGrabber::mousePressEvent(QGraphicsSceneDragDropEvent *event)
+void ElbowGrabber::mousePressEvent(QGraphicsSceneDragDropEvent *event)
 {
     event->setAccepted(false);
 }
 
-void CornerGrabber::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
+void ElbowGrabber::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
     event->setAccepted(true);
 }
 
-void CornerGrabber::mousePressEvent ( QGraphicsSceneMouseEvent * event )
+void ElbowGrabber::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
     event->setAccepted(false);
 }
 
-void CornerGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
+void ElbowGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
     event->setAccepted(false);
 }
@@ -118,19 +101,19 @@ void CornerGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 // change the color on hover events to indicate to the use the object has
 // been captured by the mouse
 
-void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
+void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
     _outterborderColor = Qt::black;
     this->update(0,0,_width,_height);
 }
 
-void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
+void ElbowGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
     _outterborderColor = Qt::red;
     this->update(0,0,_width,_height);
 }
 
-QRectF CornerGrabber::boundingRect() const
+QRectF ElbowGrabber::boundingRect() const
 {
     int captureMargin = 12;
     QPointF topLeft (0-(_width/2)-captureMargin, 0-(_height/2)-captureMargin);
@@ -140,7 +123,7 @@ QRectF CornerGrabber::boundingRect() const
     return rect;
 }
 
-QPointF CornerGrabber::getCenterPoint()
+QPointF ElbowGrabber::getCenterPoint()
 {
 
      if (_placedOnASquare)
@@ -161,12 +144,12 @@ QPointF CornerGrabber::getCenterPoint()
 
 }
 
-void CornerGrabber::setAngle(int angle)
+void ElbowGrabber::setAngle(int angle)
 {
     _arrowAngle = angle - 45; // subtract 45 because of how we draw it
 }
 
-void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void ElbowGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 
     if ( _paintStyle == kBox)

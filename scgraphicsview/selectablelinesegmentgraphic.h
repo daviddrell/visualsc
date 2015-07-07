@@ -89,7 +89,7 @@ private:
 
     bool           _isTerminal;///< is this the last line segment in a transition graphic?
 
-    KeyController*  _keys;  // key controller passed from transition graphic
+    KeyController*  _keyController;  // key controller passed from transition graphic
 
 
     // private methods
