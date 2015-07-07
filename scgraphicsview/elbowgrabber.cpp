@@ -2,6 +2,12 @@
 #include "transitiongraphic.h"
 #include "arrowheadgraphic.h"
 
+#define DEFAULT_PAINT_STYLE kBox
+#define DEFAULT_WIDTH  2
+//#define DEFAULT_OUTTER_BORDER_COLOR Qt::black
+#define DEFAULT_OUTTER_BORDER_WIDTH 6
+#define DEFAULT_OUTTER_BORDER_HEIGHT 6
+
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
     mouseDownX(0),
     mouseDownY(0),
@@ -12,7 +18,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
     _corner(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
-    _paintStyle(kBox),
+    _paintStyle(DEFAULT_PAINT_STYLE),
     _arrowAngle(0),
     _arrowHead(NULL),
     _start(NULL),
@@ -35,14 +41,14 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, SelectableLineSegme
     _corner(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
-    _paintStyle(kBox),
+    _paintStyle(DEFAULT_PAINT_STYLE),
     _arrowAngle(0),
     _arrowHead(NULL),
     _start(NULL),
     _end(NULL)
 {
     this->setParentItem(parentGraphic);
-    _outterborderPen.setWidth(2);
+    _outterborderPen.setWidth(DEFAULT_WIDTH);
     _outterborderPen.setColor(_outterborderColor);
     this->setAcceptHoverEvents(true);
 }
@@ -57,7 +63,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, SelectableLineSegme
     _corner(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
-    _paintStyle(kBox),
+    _paintStyle(DEFAULT_PAINT_STYLE),
     _arrowAngle(0),
     _arrowHead(NULL),
     _start(start),
@@ -151,14 +157,15 @@ void ElbowGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
-    _outterborderColor = Qt::black;
+
+    _outterborderColor = Qt::red;
    // this->update(0,0,_width,_height);
     this->update();
 }
 
 void ElbowGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
-    _outterborderColor = Qt::red;
+     _outterborderColor = Qt::black;
 //    this->update(0,0,_width,_height);
     this->update();
 }

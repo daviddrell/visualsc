@@ -120,13 +120,14 @@ void CornerGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
-    _outterborderColor = Qt::black;
+
+    _outterborderColor = Qt::red;
     this->update(0,0,_width,_height);
 }
 
 void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
-    _outterborderColor = Qt::red;
+    _outterborderColor = Qt::black;
     this->update(0,0,_width,_height);
 }
 

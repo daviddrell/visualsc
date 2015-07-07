@@ -6,6 +6,7 @@
 #include "selectablelinesegmentgraphic.h"
 
 class TransitionGraphic;
+class SelectableLineSegmentGraphic;
 
 class ElbowGrabber : public QGraphicsItem, public QObject
 {

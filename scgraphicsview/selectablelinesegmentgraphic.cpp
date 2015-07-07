@@ -79,13 +79,23 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
     _corners[0] = new CornerGrabber(this,0, false);
     _corners[1] = new CornerGrabber(this,1, false);
 
-    qDebug() << "installing corner scenes";
+
+
+   // qDebug() << "installing corner scenes";
     _corners[0]->installSceneEventFilter(this);
     _corners[1]->installSceneEventFilter(this);
 
-   // _corners[0]->setVisible(false);
-   // _corners[1]->setVisible(false);
+    _corners[0]->setVisible(false);
+    _corners[1]->setVisible(false);
 
+    /*
+    _elbows[0] = new ElbowGrabber(this);
+    _elbows[1] = new ElbowGrabber(this);
+
+    _elbows[0]->installSceneEventFilter(this);
+    _elbows[1]->installSceneEventFilter(this);
+
+    */
     TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> ( _transitionModel->attributes.value("target"));
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(name);
@@ -488,6 +498,11 @@ void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * 
 
     // disconnect the key controller and the transition graphic key press handler
     disconnect(_keyController, SIGNAL(keyPressed(int)), _parentGraphic, SLOT(handleKeyPressEvent(int)));
+
+
+    // make the corner and elbows invisible
+    //this->parentItemAsTransitionGraphic()->setGrabbersVisible(false);
+
     _corners[0]->setVisible(false);
     if ( _isTerminal )
         _corners[1]->setVisible(true);
@@ -511,6 +526,9 @@ void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * 
     // connect the key controller to this transition graphic
     connect(_keyController, SIGNAL(keyPressed(int)), _parentGraphic, SLOT(handleKeyPressEvent(int)));
 
+
+    // make the corner and elbows visible
+    //this->parentItemAsTransitionGraphic()->setGrabbersVisible(true);
 
     _corners[0]->setVisible(true);
     _corners[1]->setVisible(true);

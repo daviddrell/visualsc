@@ -25,7 +25,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
     if(pointList.count() < 2 && targetGraphic != NULL )
     {
-        qDebug() << "1";
+
         // this path is new, anchor each end to the source and target states
         // find the orientation of the parent and target graphics to determine which sides to anchor to.
 
@@ -50,7 +50,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     }
     else if ( pointList.count() == 2 )      // straight line from start to end state
     {
-qDebug() << "2";
+
 
 
         SelectableLineSegmentGraphic * segment   = new SelectableLineSegmentGraphic(pointList[0], pointList[0], pointList[1], t, this,_keyController);
@@ -68,7 +68,7 @@ qDebug() << "2";
     }
     else
     {
-qDebug() << "3";
+
         SelectableLineSegmentGraphic * lastSegment=NULL;
 
         for (int i = 0 ; i < pointList.count() - 1 ; i ++)
@@ -89,7 +89,17 @@ qDebug() << "3";
      //printInfo();
 }
 
-
+/**
+ * @brief TransitionGraphic::setGrabbersVisible
+ * @param visible
+ * calls setVisible for all elbows in the transition graphic to the bool value
+ */
+void TransitionGraphic::setGrabbersVisible(bool visible)
+{
+    //TODO move corner grabbers from line segment to higher level transition graphic
+    for(int i = 0; i < _elbows.count(); i++)
+        _elbows.at(i)->setVisible(visible);
+}
 
 /**
  * @brief TransitionGraphic::parentItemAsStateBoxGraphic
@@ -180,11 +190,18 @@ void TransitionGraphic::createNewElbow()
     //_hovered->printInfo();
     ElbowGrabber* elb = new ElbowGrabber(this);
     elb->setPaintStyle(ElbowGrabber::kBox);
-    elb->setPos(_mouseController->getX(),_mouseController->getY());
+    //elb->setPos(this->_mouseController->getX(),_mouseController->getY());
+
+    elb->setPos(this->mapFromScene(this->_mouseController->getX(),_mouseController->getY()));    // maps the scene based mouse coordinates to create a new elbow at the cursor location
+
     _elbows.append(elb);
 }
 
-
+/**
+ * @brief TransitionGraphic::handleKeyPressEvent
+ * @param key
+ * connection made when a line segment of this transition graphic is hovered
+ */
 void TransitionGraphic::handleKeyPressEvent(int key)
 {
    // qDebug() << "Transition Graphic Key Press: " << key;
@@ -201,8 +218,8 @@ void TransitionGraphic::handleKeyPressEvent(int key)
  * converts
  */
 void TransitionGraphic::updateModel()
-{
-
+{ //TODO Update this for elbowgrabbers
+/*
     if ( _transitionDM )                                 // check if the data model for this transition exists
     {
         if ( _lineSegments.count() < 1 ) return;        // no line segments
@@ -230,6 +247,7 @@ void TransitionGraphic::updateModel()
         pathAttr->setValue(path);   // update the path values of _transitionDM, the data model object for this transition
 
     }
+    */
 }
 
 

@@ -34,6 +34,7 @@
 #include <QPainterPath>
 #include "keycontroller.h"
 //#include "transitiongraphic.h"
+#include "elbowgrabber.h"
 
 class TransitionGraphic;
 class SCTransition;
@@ -85,6 +86,7 @@ private:
     QPointF         _lineEnd_1; // visible finishing end
     bool            _cornerGrabbed;
     CornerGrabber*  _corners[2];// 0,1  - starting at x=0,y=0
+    //ElbowGrabber*   _elbows[2];
     QPolygonF       _selectRegion;
 
     SCTransition*  _transitionModel;

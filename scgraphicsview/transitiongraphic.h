@@ -11,6 +11,7 @@
 #include "mousecontroller.h"
 
 class ElbowGrabber;
+class SelectableLineSegmentGraphic;
 
 class TransitionGraphic : public QGraphicsObject
 {
@@ -25,6 +26,7 @@ public:
     void clearCurrentlyHoveredSegment();
     bool isCurrentlyHovered();
     SelectableLineSegmentGraphic* getCurrentlyHoveredSegment();
+    void setGrabbersVisible(bool visible);
 
 signals:
 
