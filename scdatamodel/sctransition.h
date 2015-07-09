@@ -68,8 +68,8 @@ signals:
     void unselected();
 
 private slots:
-    void handleLineSelected();
-    void handleLineUnSelected();
+    //void handleLineSelected();
+   //void handleLineUnSelected();
 
 private:
 

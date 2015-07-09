@@ -29,7 +29,6 @@
 #include <QPainter>
 #include <QPen>
 #include <QPointF>
-#include "cornergrabber.h"
 #include <QGraphicsPolygonItem>
 #include <QPainterPath>
 #include "keycontroller.h"
@@ -39,7 +38,7 @@
 class TransitionGraphic;
 class SCTransition;
 class IAttribute;
-
+class ElbowGrabber;
 
 /**
   * \class SelectableLineSegmentGraphic
@@ -55,16 +54,25 @@ class SelectableLineSegmentGraphic : public QObject, public QGraphicsPolygonItem
 
 public:
     SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition, TransitionGraphic* parentGraphic, KeyController* keys );
+    SelectableLineSegmentGraphic(ElbowGrabber* startPoint, ElbowGrabber* endPoint, SCTransition* transition, TransitionGraphic* parentGraphic, KeyController* keys );
     ~SelectableLineSegmentGraphic();
     void setStartEndPosition(QPointF position);
     void setTerminator(bool);///< if true, this segment's end point is a terminator and should draw an arrow head
 
     void printInfo();
 
+    //TODO check if these needs to be moved to transition graphic
+    void enclosePathInSceneCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
+    void setCornerPositions();
+
     QPointF getStart();
     QPointF getEnd();
 
     TransitionGraphic* parentItemAsTransitionGraphic();
+    ElbowGrabber* getElbow(int);
+
+    void createCustomPath(QPointF mouseLocation, ElbowGrabber*);
+
 
 signals:
     void selected();
@@ -82,11 +90,14 @@ private:
     int             _XcornerGrabBuffer;
     int             _YcornerGrabBuffer;
 
-    QPointF         _lineEnd_0; // visible starting end
-    QPointF         _lineEnd_1; // visible finishing end
+    //QPointF         _lineEnd_0; // visible starting end
+    //QPointF         _lineEnd_1; // visible finishing end
+
+
+
     bool            _cornerGrabbed;
-    CornerGrabber*  _corners[2];// 0,1  - starting at x=0,y=0
-    //ElbowGrabber*   _elbows[2];
+    //ElbowGrabber*  _corners[2];// 0,1  - starting at x=0,y=0
+    ElbowGrabber*   _elbows[2];
     QPolygonF       _selectRegion;
 
     SCTransition*  _transitionModel;
@@ -115,11 +126,10 @@ private:
     virtual void mousePressEvent(QGraphicsSceneDragDropEvent *event);
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
-    void setCornerPositions();
 
-    void createCustomPath(QPointF mouseLocation, CornerGrabber*);
 
-    void enclosePathInSceneCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
+
+
     void enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
 
 private slots:

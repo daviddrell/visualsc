@@ -88,7 +88,7 @@ void SCTransition::setAttributeValue(QString key, QString value)
     }
 }
 
-
+/*
 void SCTransition::handleLineSelected()
 {
     emit selected();
@@ -97,7 +97,7 @@ void SCTransition::handleLineSelected()
 void SCTransition::handleLineUnSelected()
 {
     emit unselected();
-}
+}*/
 
 
 void SCTransition::writeSCVXML(QXmlStreamWriter & sw)

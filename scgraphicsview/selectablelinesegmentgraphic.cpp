@@ -38,56 +38,56 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
         _cornerDragStart(0,0),
         _XcornerGrabBuffer(10),
         _YcornerGrabBuffer(10),
-        _lineEnd_0 ( this->mapFromParent(start)),
-        _lineEnd_1 ( this->mapFromParent(end)),
         _cornerGrabbed(false),
         _selectRegion(),
         _transitionModel(transition),
         _isTerminal(false),
         _parentGraphic(parentGraphic),
         _keyController(keys)
+
+      //_lineEnd_0 ( this->mapFromParent(start)),
+      //_lineEnd_1 ( this->mapFromParent(end)),
 {
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
-
-    this->setAcceptHoverEvents(true);
-
+    //this->setAcceptHoverEvents(true);
     this->setParentItem(parentGraphic);
-
     this->setPos(position);
 
 
     _pen.setWidth(2);
     _pen.setColor(Qt::black);
 
+//TODO maybe, might not use this constructor anymore
+    QPointF p1  (_elbows[0]->x() - _XcornerGrabBuffer, _elbows[0]->y() - _YcornerGrabBuffer);
+    QPointF p2  (_elbows[0]->x() + _XcornerGrabBuffer, _elbows[0]->y() - _YcornerGrabBuffer);
+    QPointF p3  (_elbows[0]->x() + _XcornerGrabBuffer, _elbows[0]->y() + _YcornerGrabBuffer);
+    QPointF p4  (_elbows[0]->x() - _XcornerGrabBuffer, _elbows[0]->y() + _YcornerGrabBuffer);
 
-    QPointF p1  (_lineEnd_0.x() - _XcornerGrabBuffer, _lineEnd_0.y() - _YcornerGrabBuffer);
-    QPointF p2  (_lineEnd_0.x() + _XcornerGrabBuffer, _lineEnd_0.y() - _YcornerGrabBuffer);
-    QPointF p3  (_lineEnd_0.x() + _XcornerGrabBuffer, _lineEnd_0.y() + _YcornerGrabBuffer);
-    QPointF p4  (_lineEnd_0.x() - _XcornerGrabBuffer, _lineEnd_0.y() + _YcornerGrabBuffer);
 
-
-    QPointF p5  (_lineEnd_1.x() - _XcornerGrabBuffer, _lineEnd_1.y() - _YcornerGrabBuffer);
-    QPointF p6  (_lineEnd_1.x() + _XcornerGrabBuffer, _lineEnd_1.y() - _YcornerGrabBuffer);
-    QPointF p7  (_lineEnd_1.x() + _XcornerGrabBuffer, _lineEnd_1.y() + _YcornerGrabBuffer);
-    QPointF p8  (_lineEnd_1.x() - _XcornerGrabBuffer, _lineEnd_1.y() + _YcornerGrabBuffer);
+    QPointF p5  (_elbows[1]->x() - _XcornerGrabBuffer, _elbows[1]->y() - _YcornerGrabBuffer);
+    QPointF p6  (_elbows[1]->x() + _XcornerGrabBuffer, _elbows[1]->y() - _YcornerGrabBuffer);
+    QPointF p7  (_elbows[1]->x() + _XcornerGrabBuffer, _elbows[1]->y() + _YcornerGrabBuffer);
+    QPointF p8  (_elbows[1]->x() - _XcornerGrabBuffer, _elbows[1]->y() + _YcornerGrabBuffer);
 
 
     _selectRegion << p1 << p2  << p5 << p6 << p7 << p8 << p3 << p4 << p1;
 
     this->setPolygon(_selectRegion);
 
-    _corners[0] = new CornerGrabber(this,0, false);
-    _corners[1] = new CornerGrabber(this,1, false);
+    //TODO
+    /*
+    _elbows[0] = new ElbowGrabber(this,0, false);
+    _elbows[1] = new ElbowGrabber(this,1, false);
 
 
 
    // qDebug() << "installing corner scenes";
-    _corners[0]->installSceneEventFilter(this);
-    _corners[1]->installSceneEventFilter(this);
+    _elbows[0]->installSceneEventFilter(this);
+    _elbows[1]->installSceneEventFilter(this);
 
-    _corners[0]->setVisible(false);
-    _corners[1]->setVisible(false);
-
+    _elbows[0]->setVisible(false);
+    _elbows[1]->setVisible(false);
+*/
     /*
     _elbows[0] = new ElbowGrabber(this);
     _elbows[1] = new ElbowGrabber(this);
@@ -96,6 +96,8 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
     _elbows[1]->installSceneEventFilter(this);
 
     */
+    //TODO Check if this is needed
+    /*
     TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> ( _transitionModel->attributes.value("target"));
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(name);
@@ -107,7 +109,96 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
     TransitionAttributes::TransitionPositionAttribute * tpos =dynamic_cast<TransitionAttributes::TransitionPositionAttribute*> ( _transitionModel->attributes.value("position"));
     connect (tpos, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
     handleAttributeChanged(tpos);
+*/
 
+
+}
+
+
+SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(ElbowGrabber* startPoint, ElbowGrabber* endPoint, SCTransition* transition, TransitionGraphic* parentGraphic,KeyController * keys ):
+        QGraphicsPolygonItem(),
+        _pen(),
+        _dragStart(0,0),
+        _cornerDragStart(0,0),
+        _XcornerGrabBuffer(10),
+        _YcornerGrabBuffer(10),
+       // _lineEnd_0 ( this->mapFromParent(start)),
+       // _lineEnd_1 ( this->mapFromParent(end)),
+        _cornerGrabbed(false),
+        _selectRegion(),
+        _transitionModel(transition),
+        _isTerminal(false),
+        _parentGraphic(parentGraphic),
+        _keyController(keys)
+{
+    _elbows[0] = startPoint;
+    _elbows[1] = endPoint;
+
+    this->setFlag(QGraphicsItem::ItemIsMovable, false);
+    //this->setAcceptHoverEvents(true);
+    this->setParentItem(parentGraphic);
+
+    // TODO Bug: The line segment's position works as if the first elbow were its parent even though its not.
+    this->setPos(startPoint->pos());
+    //this->setPos(0,0);
+
+    //qDebug() << "selec Parent: " << parentGraphic << " pos: "<< this->pos();
+    //this->setPos(0,0);
+
+    _pen.setWidth(2);
+    _pen.setColor(Qt::black);
+
+    QPointF p1  (_elbows[0]->x()- _XcornerGrabBuffer, _elbows[0]->y() - _YcornerGrabBuffer);
+    QPointF p2  (_elbows[0]->x() + _XcornerGrabBuffer, _elbows[0]->y() - _YcornerGrabBuffer);
+    QPointF p3  (_elbows[0]->x() + _XcornerGrabBuffer, _elbows[0]->y() + _YcornerGrabBuffer);
+    QPointF p4  (_elbows[0]->x() - _XcornerGrabBuffer, _elbows[0]->y() + _YcornerGrabBuffer);
+
+
+    QPointF p5  (_elbows[1]->x() - _XcornerGrabBuffer, _elbows[1]->y() - _YcornerGrabBuffer);
+    QPointF p6  (_elbows[1]->x() + _XcornerGrabBuffer, _elbows[1]->y() - _YcornerGrabBuffer);
+    QPointF p7  (_elbows[1]->x() + _XcornerGrabBuffer, _elbows[1]->y() + _YcornerGrabBuffer);
+    QPointF p8  (_elbows[1]->x() - _XcornerGrabBuffer, _elbows[1]->y() + _YcornerGrabBuffer);
+
+    _selectRegion << p1 << p2  << p5 << p6 << p7 << p8 << p3 << p4 << p1;
+
+    this->setPolygon(_selectRegion);
+
+    //TODO
+    /*
+    _elbows[0] = new ElbowGrabber(this,0, false);
+    _elbows[1] = new ElbowGrabber(this,1, false);
+
+
+
+   // qDebug() << "installing corner scenes";
+    _elbows[0]->installSceneEventFilter(this);
+    _elbows[1]->installSceneEventFilter(this);
+
+    _elbows[0]->setVisible(false);
+    _elbows[1]->setVisible(false);
+*/
+    /*
+    _elbows[0] = new ElbowGrabber(this);
+    _elbows[1] = new ElbowGrabber(this);
+
+    _elbows[0]->installSceneEventFilter(this);
+    _elbows[1]->installSceneEventFilter(this);
+
+    */
+    //TODO Check if this is needed
+    /*
+    TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> ( _transitionModel->attributes.value("target"));
+    connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(name);
+
+    TransitionAttributes::TransitionPathAttribute * path = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  _transitionModel->attributes.value("path"));
+    connect (path, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(path);
+
+    TransitionAttributes::TransitionPositionAttribute * tpos =dynamic_cast<TransitionAttributes::TransitionPositionAttribute*> ( _transitionModel->attributes.value("position"));
+    connect (tpos, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+    handleAttributeChanged(tpos);
+*/
 
 
 }
@@ -115,8 +206,11 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
 
 SelectableLineSegmentGraphic::~SelectableLineSegmentGraphic()
 {
-    if (_corners[0] != NULL) delete _corners[0];
-    if (_corners[1] != NULL) delete _corners[1];
+    //TODO
+
+   // if (_elbows[0] != NULL) delete _elbows[0];
+    // if (_elbows[1] != NULL) delete _elbows[1];
+
 }
 
 void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
@@ -138,16 +232,20 @@ void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
     }
     else if ( path )
     {
+        qDebug() << "handle Attribute changed";
         QList<QPointF> pts = path->asQPointFList();
         if ( pts.count() < 3) return;
         setPos(pts[0]);
-        _lineEnd_0 = pts[1];
-        _lineEnd_1 = pts[2];
+        //_lineEnd_0 = pts[1];
+        //_lineEnd_1 = pts[2];
 
-        enclosePathInItemCoordiates(_lineEnd_0.x(), _lineEnd_0.y(), _lineEnd_1.x(), _lineEnd_1.y()  );
+        _elbows[0]->setPos(pts[1]);
+        _elbows[1]->setPos(pts[2]);
+
+        enclosePathInItemCoordiates(_elbows[0]->x(), _elbows[0]->y(), _elbows[1]->x(), _elbows[1]->y()  );
 
         qDebug()<<"transition attr changed, path: " + QString(
-                QString::number (_lineEnd_0.x()) +" " + QString::number ( _lineEnd_0.y()) +" " +  QString::number (_lineEnd_1.x()) +" " + QString::number ( _lineEnd_1.y())
+                QString::number (_elbows[0]->x()) +" " + QString::number ( _elbows[0]->y()) +" " +  QString::number (_elbows[1]->x()) +" " + QString::number ( _elbows[1]->y())
                 );
 
 
@@ -166,12 +264,14 @@ void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
   * event.  A dynamic_cast is used to determine if the event type is one of the events
   * we are interrested in.
   */
+
 bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event )
 {
+    /*
     static int count=0;
-    //qDebug() << " QEvent == " + QString::number(event->type()) << " " << count++;
+    qDebug() << "SLSG SceneEventFilter QEvent == " + QString::number(event->type()) << " " << count++;
 //qDebug() << "QGraphicsItem Scene Event " << watched->
-    CornerGrabber * corner = dynamic_cast<CornerGrabber *>(watched);
+    ElbowGrabber * corner = dynamic_cast<ElbowGrabber *>(watched);
     if ( corner == NULL) return false; // not expected to get here
 
     QGraphicsSceneMouseEvent * mevent = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
@@ -187,7 +287,8 @@ bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, Q
         // if the mouse went down, record the x,y coords of the press, record it inside the corner object
     case QEvent::GraphicsSceneMousePress:
         {
-            corner->setMouseState(CornerGrabber::kMouseDown);
+        qDebug() << "mouse press";
+            corner->setMouseState(ElbowGrabber::kMouseDown);
 
             QPointF scenePosition =  corner->mapToScene(mevent->pos());
             corner->mouseDownY = scenePosition.y();
@@ -201,7 +302,8 @@ bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, Q
 
     case QEvent::GraphicsSceneMouseRelease:
         {
-            corner->setMouseState(CornerGrabber::kMouseReleased);
+        qDebug() << "mouse release";
+            corner->setMouseState(ElbowGrabber::kMouseReleased);
             _cornerGrabbed = false;
             updateModel();
         }
@@ -210,7 +312,8 @@ bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, Q
 
     case QEvent::GraphicsSceneMouseMove:
         {
-            corner->setMouseState(CornerGrabber::kMouseMoving );
+       //     qDebug() << "mouse moving";
+            corner->setMouseState(ElbowGrabber::kMouseMoving );
         }
         break;
 
@@ -222,31 +325,35 @@ bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, Q
     }
 
 
-    if ( corner->getMouseState() == CornerGrabber::kMouseMoving )
+    if ( corner->getMouseState() == ElbowGrabber::kMouseMoving )
     {
+//TODO
 
-        if ( corner == _corners[0])
+        if ( corner == _elbows[0])
         {
             // tell the state box graphic that owns this transition, so that it can detemine where to anchor the corner, it will
             // call back into this class via setStartEndPosition()
-            emit startEndMoved( this->mapFromItem(corner, mevent->pos()));
+            //emit startEndMoved( this->mapFromItem(corner, mevent->pos()));
+            qDebug() << "START END MOVED MUST BE REMOVED IF YOU SEE THIS";
         }
         else
         {
-            createCustomPath(mevent->pos(), corner);
+            //createCustomPath(mevent->pos(), corner);
+            qDebug() << "START END MOVED MUST BE REMOVED IF YOU SEE THIS";
         }
 
         this->update();
-    }
 
+    }
+*/
     return true;// true => do not send event to watched - we are finished with this event
+
 }
 
 
-
-
-void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, CornerGrabber* corner)
-{
+//FUNCTION NOT CURRENTLY USED IN UPDATE ELBOW
+void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, ElbowGrabber* corner)
+{//TODO
 
     qreal lineEndX = 0;
     qreal lineEndY = 0;
@@ -260,20 +367,20 @@ void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, Corne
     mouseX = scenePosition.x();
 
     // which corner needs to get moved?
-    if ( corner == _corners[0])
+    if ( corner == _elbows[0])  // source elbow
     {
 
-        lineStartY =  mouseY;
+        lineStartY =  mouseY;   // start at mouse
         lineStartX =  mouseX;
 
-        lineEndY = this->mapToScene( _corners[1]->getCenterPoint()).y();
-        lineEndX = this->mapToScene( _corners[1]->getCenterPoint()).x();
+        lineEndY = this->mapToScene( _elbows[1]->getCenterPoint()).y(); // end at second elbow
+        lineEndX = this->mapToScene( _elbows[1]->getCenterPoint()).x();
 
     }
     else
     {
-        lineStartY = this->mapToScene( _corners[0]->getCenterPoint()).y();
-        lineStartX = this->mapToScene( _corners[0]->getCenterPoint()).x();
+        lineStartY = this->mapToScene( _elbows[0]->getCenterPoint()).y();
+        lineStartX = this->mapToScene( _elbows[0]->getCenterPoint()).x();
 
         lineEndY =  mouseY;
         lineEndX =  mouseX;
@@ -281,52 +388,67 @@ void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, Corne
     }
 
 
-    _lineEnd_0.setX(  mapFromScene(lineStartX, lineStartY).x()  );
-    _lineEnd_0.setY(  mapFromScene(lineStartX, lineStartY).y() );
 
 
-    _lineEnd_1.setX(  mapFromScene(lineEndX,lineEndY ).x()  );
-    _lineEnd_1.setY(  mapFromScene(lineEndX,lineEndY ).y());
+    _elbows[0]->setX(  mapFromScene(lineStartX, lineStartY).x()  );
+    _elbows[0]->setY(  mapFromScene(lineStartX, lineStartY).y() );
+
+
+    _elbows[1]->setX(  mapFromScene(lineEndX,lineEndY ).x()  );
+    _elbows[1]->setY(  mapFromScene(lineEndX,lineEndY ).y());
 
     enclosePathInSceneCoordiates(lineStartX, lineStartY,  lineEndX, lineEndY  );
 
-    setCornerPositions();
+     setCornerPositions();
+
+}
+
+
+ElbowGrabber* SelectableLineSegmentGraphic::getElbow(int index)
+{
+    return _elbows[index];
 
 }
 
 QPointF SelectableLineSegmentGraphic::getStart()
 {
-    return _lineEnd_0;
+   return _elbows[0]->pos();
+    // return _lineEnd_0;
 }
 
 QPointF SelectableLineSegmentGraphic::getEnd()
 {
-    return _lineEnd_1;
+    return _elbows[1]->pos();
+    //return _lineEnd_1;
 }
 
 
 
 void SelectableLineSegmentGraphic::setTerminator(bool isTerm)
 {
+    //TODO
     _isTerminal = isTerm;
 
-    if (  _corners[1]== NULL )
+    if (  _elbows[1]== NULL )
         return;
 
     if ( _isTerminal )
     {
-        _corners[1]->setPaintStyle(CornerGrabber::kArrowHead);
-        _corners[1]->setVisible(true);
-        _corners[1]->installSceneEventFilter(this);
+        _elbows[1]->setPaintStyle(ElbowGrabber::kArrowHead);
+        _elbows[1]->setVisible(true);
+        //_elbows[1]->installSceneEventFilter(this);
     }
     else
-        _corners[1]->setPaintStyle(CornerGrabber::kBox);
+        _elbows[1]->setPaintStyle(ElbowGrabber::kBox);
+
 }
 
 void SelectableLineSegmentGraphic::setStartEndPosition(QPointF position)
 {
+    //TODO
     // allows the line start to snap to the outter edge of a box
-    createCustomPath( mapToItem(_corners[0], position), _corners[0])  ;
+    createCustomPath( mapToItem(_elbows[0], position), _elbows[0])  ;
+    qDebug() << "setstartendposition should have been called %%%";
 }
 
 void SelectableLineSegmentGraphic::enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  )
@@ -435,7 +557,8 @@ void SelectableLineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX
 
 void SelectableLineSegmentGraphic::printInfo()
 {
-    qDebug() << "Sel Line Seg info: Corner[0]" << this->_corners[0]->x() << ", " << this->_corners[0]->y();
+    //TODO
+    //qDebug() << "Sel Line Seg info: Corner[0]" << this->_elbows[0]->x() << ", " << this->_elbows[0]->y();
 }
 
 //void SelectableLineSegmentGraphic::updateModel ()
@@ -503,11 +626,12 @@ void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * 
     // make the corner and elbows invisible
     //this->parentItemAsTransitionGraphic()->setGrabbersVisible(false);
 
-    _corners[0]->setVisible(false);
+
+    _elbows[0]->setVisible(false);
     if ( _isTerminal )
-        _corners[1]->setVisible(true);
+        _elbows[1]->setVisible(true);
     else
-     _corners[1]->setVisible(false);
+     _elbows[1]->setVisible(false);
 
 
     emit unselected();
@@ -518,7 +642,7 @@ void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * 
 
 void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
-    //qDebug() << "Entering Hover";
+    qDebug() << "SelectableLineSegment HoverEnterEvent";
 
     // set parent's currently hovered object to this line segment
     this->parentItemAsTransitionGraphic()->setCurrentlyHoveredSegment(this);
@@ -529,21 +653,23 @@ void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * 
 
     // make the corner and elbows visible
     //this->parentItemAsTransitionGraphic()->setGrabbersVisible(true);
+//TODO
 
-    _corners[0]->setVisible(true);
-    _corners[1]->setVisible(true);
+    _elbows[0]->setVisible(true);
+    _elbows[1]->setVisible(true);
 
-    _corners[0]->installSceneEventFilter(this);
-    _corners[1]->installSceneEventFilter(this);
+//    _elbows[0]->installSceneEventFilter(this);
+//    _elbows[1]->installSceneEventFilter(this);
 
     setCornerPositions();
 
+
     if ( _isTerminal )
     {
-        _corners[1]->setPaintStyle(CornerGrabber::kArrowHead);
+        _elbows[1]->setPaintStyle(ElbowGrabber::kArrowHead);
     }
     else
-        _corners[1]->setPaintStyle(CornerGrabber::kBox);
+        _elbows[1]->setPaintStyle(ElbowGrabber::kBox);
 
 
     emit selected(); 
@@ -551,11 +677,11 @@ void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * 
 
 void SelectableLineSegmentGraphic::setCornerPositions()
 {
-    if ( _corners[0] == NULL || _corners[1] == NULL )return;
+    qDebug() << "set corner positions";
+    if ( _elbows[0] == NULL || _elbows[1] == NULL )return;
 
-    _corners[0]->setPos(_lineEnd_0.x(), _lineEnd_0.y()  );
-    _corners[1]->setPos(_lineEnd_1.x(), _lineEnd_1.y()  );
-
+    _elbows[0]->setPos(_elbows[0]->x(), _elbows[0]->y()  );
+    _elbows[1]->setPos(_elbows[1]->x(), _elbows[1]->y()  );
 }
 
 TransitionGraphic* SelectableLineSegmentGraphic::parentItemAsTransitionGraphic()
@@ -567,18 +693,18 @@ void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionG
 {
 
     // draw the line
-
     _pen.setStyle(Qt::SolidLine);
     painter->setPen(_pen);
 
     _pen.setColor(Qt::red);
-    painter->drawLine(_lineEnd_0, _lineEnd_1);
+    //painter->drawLine(_lineEnd_0, _lineEnd_1);
+    painter->drawLine(_elbows[0]->pos(), _elbows[1]->pos());
 
-
-    if ( _isTerminal && _corners[1] )
+    // if this is the terminal line segment, then redraw the arrow head with correct angles
+    if ( _isTerminal && _elbows[1] )
     {
-        double dy = _lineEnd_1.y() -_lineEnd_0.y();
-        double dx = _lineEnd_1.x() - _lineEnd_0.x();
+        double dy = _elbows[1]->y() -_elbows[0]->y();
+        double dx = _elbows[1]->x() - _elbows[0]->x();
         int quadrant =0;
 
         //qDebug()<< "initial values dx = " << dx << ", dy = " << dy ;
@@ -604,9 +730,10 @@ void SelectableLineSegmentGraphic::paint (QPainter *painter, const QStyleOptionG
         else if ( quadrant == 2 )
             angle = -180 -angle;
 
-        _corners[1]->setAngle(angle);
-        _corners[1]->update();
+        _elbows[1]->setAngle(angle);
+        _elbows[1]->update();
     }
+
 }
 
 

@@ -2,6 +2,7 @@
 #include <QPixmap>
 #include "scdatamodel.h"
 #include <QPainter>
+#include <QDebug>
 
 ButtonGraphic::ButtonGraphic(int x, int y):
         QGraphicsObject(NULL),
@@ -22,6 +23,7 @@ ButtonGraphic::~ButtonGraphic()
 
 void ButtonGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent *  )
 {
+    qDebug() << "ButtonGraphic HoverEnterEvent";
     _mouseState = kHovered;
     update();
 }

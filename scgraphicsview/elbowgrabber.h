@@ -3,21 +3,24 @@
 
 #include <QGraphicsItem>
 #include "transitiongraphic.h"
-#include "selectablelinesegmentgraphic.h"
+#include "LineSegmentGraphic.h"
 
+class ArrowHeadGraphic;
 class TransitionGraphic;
-class SelectableLineSegmentGraphic;
+class LineSegmentGraphic;
 
-class ElbowGrabber : public QGraphicsItem, public QObject
+class ElbowGrabber : public QObject ,  public QGraphicsItem
 {
+    Q_OBJECT
 
 public:
     ElbowGrabber(TransitionGraphic* parentGraphic);
-    ElbowGrabber(TransitionGraphic *parentGraphic, SelectableLineSegmentGraphic* start, SelectableLineSegmentGraphic* end);
-    ElbowGrabber(TransitionGraphic *parentGraphic, SelectableLineSegmentGraphic* start, SelectableLineSegmentGraphic* end, int x, int y);
+    ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point);
+    ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic* segmentOne, LineSegmentGraphic* segmentTwo);
+    ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic* segmentOne, LineSegmentGraphic* segmentTwo, int x, int y);
     ~ElbowGrabber();
     void setAngle(int agle);///< set the rotation angle for corners which are drawn as arrowheads
-    int  getCorner(); ///< allows the owner to find out which coner this is
+    int  getCorner(); ///< allows the owner to find out which corner this is
     void setMouseState(int); ///< allows the owner to record the current mouse state
     int  getMouseState(); ///< allows the owner to get the current mouse state
     QPointF getCenterPoint();
@@ -31,6 +34,17 @@ public:
     void setPaintStyle(PaintStyle s);///< set box or cross-hairs
 
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
+
+    void setSegmentOne(LineSegmentGraphic*);
+    void setSegmentTwo(LineSegmentGraphic*);
+
+    LineSegmentGraphic* getSegment(int);
+
+    bool isAnchor();
+    void setAnchor(bool);
+
+signals:
+    void anchorMoved(QPointF newPos);
 
 private:
 
@@ -61,12 +75,13 @@ private:
     int _mouseButtonState;
     bool _placedOnASquare;
 
+    bool _anchor;
+
     PaintStyle _paintStyle;
     int        _arrowAngle;
-    ArrowHeadGraphic * _arrowHead;
+    ArrowHeadGraphic* _arrowHead;
 
-    SelectableLineSegmentGraphic* _start;
-    SelectableLineSegmentGraphic* _end;
+    LineSegmentGraphic* _segments[2];
 };
 
 #endif // ELBOWGRABBER_H

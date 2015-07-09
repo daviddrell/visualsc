@@ -9,9 +9,11 @@
 #include "keycontroller.h"
 #include "elbowgrabber.h"
 #include "mousecontroller.h"
+#include "linesegmentgraphic.h"
 
 class ElbowGrabber;
 class SelectableLineSegmentGraphic;
+class LineSegmentGraphic;
 
 class TransitionGraphic : public QGraphicsObject
 {
@@ -28,7 +30,10 @@ public:
     SelectableLineSegmentGraphic* getCurrentlyHoveredSegment();
     void setGrabbersVisible(bool visible);
 
+
 signals:
+  // void startEndMoved(QPointF newPos);
+  // void anchorMoved(QPointF newPos);
 
 public slots:
     void updateModel ();
@@ -45,18 +50,23 @@ protected:
 private :
 
         // private methods
+    void updateElbow(QPointF newPos, ElbowGrabber* elbow);
     void getClosestSides(int* sourceSide, int* targetSide);
+    void createCustomPath(QPointF mouseLocation, ElbowGrabber*);
+
     // private data
     SCTransition  * _transitionDM;  // data model for the transition object
-    QList<SelectableLineSegmentGraphic *>  _lineSegments;
+    //QList<SelectableLineSegmentGraphic *>  _lineSegments;
+    QList<LineSegmentGraphic *> _lineSegments;
     QList<ElbowGrabber *> _elbows;
+    ElbowGrabber*   _anchors[2];
     //StateBoxGraphic *_parentStateGraphic;
     StateBoxGraphic *_targetStateGraphic;
     KeyController * _keyController;
     MouseController* _mouseController;
     SelectableLineSegmentGraphic* _hovered;
 
-   // virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
+    virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
 
 private slots:

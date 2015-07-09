@@ -77,23 +77,29 @@ StateBoxGraphic::~StateBoxGraphic()
 /**
  * @brief StateBoxGraphic::handleTransitionLineStartMoved
  * @param newPos
- * Connected to signal startEndMoved for QPoints in transition graphics.
+ * Connected to a source elbow's signal anchorMoved in transition graphics.
  * will readjust the position of the source point of the transition arrow to be anchored to its starting state
+ *
+ *
  */
 void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 {
+    qDebug() << "handle transition line start moved";
 
     // this method keeps the starting position of a line snapped to the outter edge of the box
 
-    SelectableLineSegmentGraphic *transition = dynamic_cast<SelectableLineSegmentGraphic *> (QObject::sender());
+    //SelectableLineSegmentGraphic *transition = dynamic_cast<SelectableLineSegmentGraphic *> (QObject::sender());
 
-    QPointF cursorPos = mapFromItem(transition, newPos);
+    ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
+
+    //QPointF cursorPos = mapFromItem(elbow, newPos);
+    QPointF cursorPos = newPos;
 
 #if 0  // debug stuff
     // draw a diag line from the newPos to the center of the box, blue dotted line
 
     _diagLineStart =  getVisibleCenter();
-    _diagLineEnd = mapFromItem(transition, cursorPos);
+    _diagLineEnd = mapFromItem(elbow, cursorPos);
     _diagLineDrawIt = true;
 #endif
 
@@ -113,7 +119,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
      */
 
-    d[3] =  fabs(box.x() - cursorPos.x());
+    d[3] = fabs(box.x() - cursorPos.x());
     d[1] = fabs(box.width() - cursorPos.x());
     d[0] = fabs(box.y() -  cursorPos.y());
     d[2] = fabs(box.height() -  cursorPos.y());
@@ -180,8 +186,28 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
         break;
     }
 
-    transition->setStartEndPosition(this->mapToItem( transition, _intersection) );
+    //transition->setStartEndPosition(this->mapToItem( transition, _intersection) );
+
+    /*
+    SelectableLineSegmentGraphic* transition = elbow->getSegment(0);
+    if(transition)
+    {
+       transition->setStartEndPosition(this->mapToItem( transition, _intersection) );
+       // change the elbow's coordinates to the specified x and y
+       //elbow->setPos(transition->getStart());
+    }
+    transition = elbow->getSegment(1);
+    if(transition)
+    {
+       transition->setStartEndPosition(this->mapToItem( transition, _intersection) );
+       //elbow->setPos(transition->getStart());
+    }
+    */
+    elbow->setPos(_intersection);
+
 }
+
+
 
 void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

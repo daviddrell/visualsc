@@ -13,81 +13,158 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 {
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
     this->setParentItem(parentGraphic);
+    //this->acceptHoverEvents();
     //this->setParent(targetGraphic);
 
     TransitionAttributes::TransitionPathAttribute * p =
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
 
     QList<QPointF> pointList = p->asQPointFList();
+    qDebug() << "Printing Point List of size: " <<pointList.count();
+    for(int i = 0; i < pointList.count();i++)
+        qDebug() << pointList.at(i);
 
 
-
-
-    if(pointList.count() < 2 && targetGraphic != NULL )
+    if(1)   // load the point list and create the elbows and line segments
     {
+        // add every point as an elbow
+        for(int i = 0; i < pointList.count(); i++)
+        {
+            ElbowGrabber* elb;
+            elb = new ElbowGrabber(this, pointList.at(i));
+            elb->installSceneEventFilter(this);                 // transition graphic will handle elbow events
+            elb->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
 
-        // this path is new, anchor each end to the source and target states
-        // find the orientation of the parent and target graphics to determine which sides to anchor to.
-
-        int sourceSide=0;
-        int targetSide=0;
-
-        getClosestSides( & sourceSide, & targetSide);
-        QPointF sourceAnchor = this->parentItem()->mapFromScene(this->parentItemAsStateBoxGraphic()->getSideCenterPointInSceneCoord(sourceSide));
-        QPointF targetAnchor = this->parentItemAsStateBoxGraphic()->mapFromScene( _targetStateGraphic->getSideCenterPointInSceneCoord(targetSide));
-
-        SelectableLineSegmentGraphic * segment  = new SelectableLineSegmentGraphic(sourceAnchor,sourceAnchor, targetAnchor, t,this,_keyController);
-        segment->setParentItem(this);
-        //segment->acceptHoverEvents();
-        segment->installSceneEventFilter(this);
-
-        _lineSegments.append(segment);
-        connect(segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF))); // if the start point moved, then update
-        connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));     // update the transition's datamodel if the segment is changed
-
-        segment->setTerminator(true);
-
-    }
-    else if ( pointList.count() == 2 )      // straight line from start to end state
-    {
+            _elbows.append(elb);
+        }
 
 
+        // create a line segment in between every elbow
+        for(int i = 0; i < _elbows.count()-1; i++)
+        {
+            ElbowGrabber* elbOne = _elbows.at(i);
+            ElbowGrabber* elbTwo = _elbows.at(i+1);
 
-        SelectableLineSegmentGraphic * segment   = new SelectableLineSegmentGraphic(pointList[0], pointList[0], pointList[1], t, this,_keyController);
-        segment->setParentItem(this);
-       // segment->setParent(parentGraphic);
-        _lineSegments.append(segment);
+            //SelectableLineSegmentGraphic * segment = new SelectableLineSegmentGraphic(elbOne, elbTwo,t, this,_keyController);
+            LineSegmentGraphic* segment = new LineSegmentGraphic(elbOne, elbTwo, this, _keyController);
+            //segment->acceptHoverEvents();
+            //segment->installSceneEventFilter(this);
 
-        // connect the parent state-graphic's slots to the new transition graphic's signals
+           // connect(segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
+           // connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
 
-        connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
-        connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
+            if(i==0){
+                elbOne->setSegmentOne(NULL);
+                elbOne->setSegmentTwo(segment);
+            }
+            else if(i==_elbows.count()-2){
 
-        segment->setTerminator(true);
+                elbTwo->setSegmentOne(segment);
+                elbTwo->setSegmentTwo(NULL);
+            }
+            else
+            {
+                elbOne->setSegmentTwo(segment);
+                elbTwo->setSegmentOne(segment);
+            }
+
+
+
+
+            //elbOne->setVisible(false);
+           // elbOne->setVisible(false);
+
+
+            _lineSegments.append(segment);
+
+        }
+
+        // anchors
+
+        _anchors[0] = _elbows.at(0);                    //anchors will be the saved as the first and last points following a path from the start to end states
+        _anchors[1] = _elbows.at(_elbows.count()-1);
+        _lineSegments.at(_lineSegments.count()-1)->setTerminal(true); // set the last segment as the terminator
+        _anchors[1]->setPaintStyle(ElbowGrabber::kArrowHead);   // set the end of the transition to an arrowhead
+
+        _anchors[0]->setAnchor(true);
+        _anchors[1]->setAnchor(true);
+        connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+
+
+
 
     }
     else
-    {
-
-        SelectableLineSegmentGraphic * lastSegment=NULL;
-
-        for (int i = 0 ; i < pointList.count() - 1 ; i ++)
+    {/*
+        if(pointList.count() < 2 && targetGraphic != NULL )
         {
-            SelectableLineSegmentGraphic * segment   = new SelectableLineSegmentGraphic( pointList[i+0], pointList[i+0], pointList[i+1], t, this,_keyController);
+
+            // this path is new, anchor each end to the source and target states
+            // find the orientation of the parent and target graphics to determine which sides to anchor to.
+
+            int sourceSide=0;
+            int targetSide=0;
+
+            getClosestSides( & sourceSide, & targetSide);
+            QPointF sourceAnchor = this->parentItem()->mapFromScene(this->parentItemAsStateBoxGraphic()->getSideCenterPointInSceneCoord(sourceSide));
+            QPointF targetAnchor = _targetStateGraphic->mapFromScene( _targetStateGraphic->getSideCenterPointInSceneCoord(targetSide));
+            _anchors[0]->setPos(sourceAnchor);
+            _anchors[1]->setPos(targetAnchor);
+
+            LineSegmentGraphic * segment  = new LineSegmentGraphic(sourceAnchor,sourceAnchor, targetAnchor, t,this,_keyController);
             segment->setParentItem(this);
+            segment->setAcceptHoverEvents(true);
+            //segment->acceptHoverEvents();
+            //segment->installSceneEventFilter(this);
+
             _lineSegments.append(segment);
-            connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
+            connect(segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF))); // if the start point moved, then update
+            connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));     // update the transition's datamodel if the segment is changed
+
+            segment->setTerminator(true);
+
+        }
+        else if ( pointList.count() == 2 )      // straight line from start to end state
+        {
+
+            LineSegmentGraphic * segment   = new LineSegmentGraphic(pointList[0], pointList[0], pointList[1], t, this,_keyController);
+            segment->setParentItem(this);
+           // segment->setParent(parentGraphic);
+            _lineSegments.append(segment);
+
+            // connect the parent state-graphic's slots to the new transition graphic's signals
+
+            connect(segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
             connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
 
-            lastSegment = segment;
+            segment->setTerminator(true);
         }
+        else
+        {
 
-        lastSegment->setTerminator(true);
+            LineSegmentGraphic * lastSegment=NULL;
 
+            for (int i = 0 ; i < pointList.count() - 1 ; i ++)
+            {
+               LineSegmentGraphic * segment   = new LineSegmentGraphic( pointList[i+0], pointList[i+0], pointList[i+1], t, this,_keyController);
+                segment->setParentItem(this);
+                _lineSegments.append(segment);
+                connect ( segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
+                connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
+
+                lastSegment = segment;
+            }
+
+            lastSegment->setTerminator(true);
+
+        }
+        */
     }
 
      //printInfo();
 }
+
+
 
 /**
  * @brief TransitionGraphic::setGrabbersVisible
@@ -110,28 +187,128 @@ StateBoxGraphic* TransitionGraphic::parentItemAsStateBoxGraphic()
     return static_cast<StateBoxGraphic*>(this->parentItem());
 }
 
-/*bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event )
+void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
 {
+    //elbow->setPos(newPos);
+
+    // check if this elbow is an anchor
+    if(elbow->isAnchor())
+    {
+       // qDebug() << "selected elbow is an anchor";
+        // this elbow is an anchor, so we need to lock it to its parent state box graphic
+        if(elbow==_elbows[0])
+        {
+           // qDebug() << "selected elbow is the source elbow\n";
+            //QPointF mouse(x,y);
+            //emit elbow->anchorMoved(mouse);
+
+            emit elbow->anchorMoved(newPos);
+        }
+        else
+        {
+            elbow->setPos(newPos);
+        }
+    }
+    // change the elbow's coordinates to the specified x and y
+    else
+        elbow->setPos(newPos);
+}
+
+/**
+ * @brief TransitionGraphic::sceneEventFilter
+ * @param watched   object that caused the event
+ * @param event     action (mouse)
+ * @return
+ *
+ * The scene event filter of transition graphic will update(change coordinates/redraw) the child elbow that was manipulated in the graphics view
+ * and subsequently update the datamodel by calling TransitionGraphic::updateModel() when the mouse is released
+ *
+ */
+bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event )
+{
+    // qDebug() << "transition graphic scene event filter";
+    // qDebug() << " QEvent == " + QString::number(event->type()) << " " << count++;
+    // qDebug() << "QGraphicsItem Scene Event " << watched->
+    ElbowGrabber * elbow = dynamic_cast<ElbowGrabber *>(watched);
+    if ( elbow == NULL) return false; // not expected to get here
+
+    QGraphicsSceneMouseEvent * mevent = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+    if ( mevent == NULL)
+    {
+        // this is not one of the mouse events we are interrested in
+        return false;
+    }
+
+
     switch (event->type() )
     {
-    case QEvent::GraphicsSceneMouseMove:
+        // if the mouse went down, record the x,y coords of the press, record it inside the corner object
+    case QEvent::GraphicsSceneMousePress:
         {
-        qDebug() << "Hello ";
+        //qDebug() << "mouse press";
+            elbow->setMouseState(ElbowGrabber::kMouseDown);
+
+            QPointF scenePosition =  elbow->mapToScene(mevent->pos());
+            elbow->mouseDownY = scenePosition.y();
+            elbow->mouseDownX = scenePosition.x();
+
+            //_cornerGrabbed = true;
+            qDebug() << "Corner Position: " << elbow->mouseDownX<<" ," << elbow->mouseDownY;
         }
         break;
+
+
+    case QEvent::GraphicsSceneMouseRelease:
+        {
+            //qDebug() << "mouse release";
+            //_cornerGrabbed = false;
+
+            elbow->setMouseState(ElbowGrabber::kMouseReleased);
+            updateModel();                  // update the datamodel for this path
+        }
+        break;
+
+
+    case QEvent::GraphicsSceneMouseMove:
+        {
+       //     qDebug() << "mouse moving";
+            elbow->setMouseState(ElbowGrabber::kMouseMoving );
+        }
+        break;
+
+
     default:
         // we dont care about the rest of the events
         return false;
         break;
     }
 
-}*/
+
+    if ( elbow->getMouseState() == ElbowGrabber::kMouseMoving )
+    {
+        this->updateElbow(this->mapFromItem(elbow, mevent->pos()), elbow);
+        //this->update();
+    }
+
+    return true;// true => do not send event to watched - we are finished with this event
+
+}
+
+
+void TransitionGraphic::createCustomPath(QPointF mouseLocation, ElbowGrabber* elbow)
+{//TODO
+
+    // update all line segments connected to this elbow
+
+    qDebug() << "Elbow position: " << elbow->x() << ", "<< elbow->y();
+
+}
 
 TransitionGraphic::~TransitionGraphic()
 {
     for(int i=0;i < _lineSegments.count(); i++)
     {
-        SelectableLineSegmentGraphic * ls =_lineSegments.at(i);
+        LineSegmentGraphic * ls =_lineSegments.at(i);
         delete ls;
     }
     _lineSegments.clear();
@@ -175,11 +352,6 @@ void TransitionGraphic::printInfo(void)
     qDebug() << "Transition graphic from: " << this->parentItemAsStateBoxGraphic()->objectName() << " to: " << _targetStateGraphic->objectName();
 }
 
-
-// create the corner grabbers
-
-
-
 /**
  * @brief TransitionGraphic::createNewElbow
  * create a new elbow on the currently hovered line segment, based on where the mouse is currently
@@ -190,9 +362,8 @@ void TransitionGraphic::createNewElbow()
     //_hovered->printInfo();
     ElbowGrabber* elb = new ElbowGrabber(this);
     elb->setPaintStyle(ElbowGrabber::kBox);
+    elb->setPos(this->mapFromScene(_mouseController->getX(),_mouseController->getY()));    // maps the scene based mouse coordinates to create a new elbow at the cursor location
     //elb->setPos(this->_mouseController->getX(),_mouseController->getY());
-
-    elb->setPos(this->mapFromScene(this->_mouseController->getX(),_mouseController->getY()));    // maps the scene based mouse coordinates to create a new elbow at the cursor location
 
     _elbows.append(elb);
 }
@@ -218,37 +389,21 @@ void TransitionGraphic::handleKeyPressEvent(int key)
  * converts
  */
 void TransitionGraphic::updateModel()
-{ //TODO Update this for elbowgrabbers
-/*
+{
+
     if ( _transitionDM )                                 // check if the data model for this transition exists
     {
-        if ( _lineSegments.count() < 1 ) return;        // no line segments
-
+        // use elbows to create the path attribute
         QList<QPointF> path;
-
-        path.append( _lineSegments[0]->getStart() );    // add the first point
-
-        if (_lineSegments.count() == 1 )                // one line segment, only a start and end point
-            path.append( _lineSegments[0]->getEnd() );
-
-        else
-        {
-            for(int i = 1 ; i < _lineSegments.count(); i++)
-            {
-                path.append( _lineSegments[i]->getStart() );    // add each line segment's start
-            }
-
-            path.append( _lineSegments[_lineSegments.count()-1]->getEnd() );    // add the last line segment's end
-        }
-
+        for( int  i = 0; i < _elbows.count(); i++)
+            path.append(_elbows.at(i)->pos());
 
         TransitionAttributes::TransitionPathAttribute * pathAttr = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (_transitionDM->attributes.value("path"));
 
         pathAttr->setValue(path);   // update the path values of _transitionDM, the data model object for this transition
-
     }
-    */
 }
+
 
 
 void TransitionGraphic::getClosestSides(int* sourceSide, int* targetSide)
