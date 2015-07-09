@@ -5,6 +5,9 @@
 #include "elbowgrabber.h"
 #include "transitiongraphic.h"
 
+#define CORNER_GRAB_BUFFER 5
+
+
 class ElbowGrabber;
 class TransitionGraphic;
 
@@ -16,6 +19,12 @@ public:
     ~LineSegmentGraphic();
     void setTerminal(bool);
 
+    void enclosePathInSceneCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
+    void enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
+    void enclosePathInCoordindates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
+    void enclosePathInElbows();
+
+
 private:
     KeyController*  _keyController;
     ElbowGrabber*   _elbows[2];
@@ -24,8 +33,9 @@ private:
 
     QPen            _pen;
 
-
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
+    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
 };
 

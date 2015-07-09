@@ -11,6 +11,14 @@
 #include "mousecontroller.h"
 #include "linesegmentgraphic.h"
 
+#define TRANSITION_DEFAULT_COLOR Qt::blue
+#define TRANSITION_HOVER_COLOR Qt::red
+#define TRANSITION_DEFAULT_LINE_STYLE Qt::SolidLine
+#define TRANSITION_HOVER_LINE_STYLE Qt::DashLine
+#define TRANSITION_DEFAULT_WIDTH 2
+#define TRANSITION_HOVER_WIDTH 3
+
+
 class ElbowGrabber;
 class SelectableLineSegmentGraphic;
 class LineSegmentGraphic;
@@ -51,6 +59,7 @@ private :
 
         // private methods
     void updateElbow(QPointF newPos, ElbowGrabber* elbow);
+    void updateLineSegments(ElbowGrabber* elbow);
     void getClosestSides(int* sourceSide, int* targetSide);
     void createCustomPath(QPointF mouseLocation, ElbowGrabber*);
 

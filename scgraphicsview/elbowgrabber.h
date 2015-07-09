@@ -5,6 +5,14 @@
 #include "transitiongraphic.h"
 #include "LineSegmentGraphic.h"
 
+#define ELBOW_DEFAULT_WIDTH 2
+#define ELBOW_HOVER_WIDTH 3
+#define ELBOW_DEFAULT_PAINT_STYLE kBox
+#define DEFAULT_OUTTER_BORDER_WIDTH 6
+#define DEFAULT_OUTTER_BORDER_HEIGHT 6
+#define ELBOW_ARROWHEAD_DEFAULT_WIDTH 6;
+#define ELBOW_ARROWHEAD_HOVER_WIDTH 8;
+
 class ArrowHeadGraphic;
 class TransitionGraphic;
 class LineSegmentGraphic;
@@ -34,6 +42,8 @@ public:
     void setPaintStyle(PaintStyle s);///< set box or cross-hairs
 
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
+
+
 
     void setSegmentOne(LineSegmentGraphic*);
     void setSegmentTwo(LineSegmentGraphic*);

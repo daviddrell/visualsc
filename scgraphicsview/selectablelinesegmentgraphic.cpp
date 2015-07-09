@@ -70,7 +70,7 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
     QPointF p8  (_elbows[1]->x() - _XcornerGrabBuffer, _elbows[1]->y() + _YcornerGrabBuffer);
 
 
-    _selectRegion << p1 << p2  << p5 << p6 << p7 << p8 << p3 << p4 << p1;
+    _selectRegion << p1 << p2 << p5 << p6 << p7 << p8 << p3 << p4 << p1;
 
     this->setPolygon(_selectRegion);
 
@@ -242,7 +242,7 @@ void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
         _elbows[0]->setPos(pts[1]);
         _elbows[1]->setPos(pts[2]);
 
-        enclosePathInItemCoordiates(_elbows[0]->x(), _elbows[0]->y(), _elbows[1]->x(), _elbows[1]->y()  );
+        enclosePathInItemCoordiates(_elbows[0]->x(), _elbows[0]->y(), _elbows[1]->x(), _elbows[1]->y());
 
         qDebug()<<"transition attr changed, path: " + QString(
                 QString::number (_elbows[0]->x()) +" " + QString::number ( _elbows[0]->y()) +" " +  QString::number (_elbows[1]->x()) +" " + QString::number ( _elbows[1]->y())

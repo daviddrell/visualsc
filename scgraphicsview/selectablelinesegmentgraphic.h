@@ -61,7 +61,6 @@ public:
 
     void printInfo();
 
-    //TODO check if these needs to be moved to transition graphic
     void enclosePathInSceneCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
     void setCornerPositions();
 

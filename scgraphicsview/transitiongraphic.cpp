@@ -47,20 +47,23 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
             //SelectableLineSegmentGraphic * segment = new SelectableLineSegmentGraphic(elbOne, elbTwo,t, this,_keyController);
             LineSegmentGraphic* segment = new LineSegmentGraphic(elbOne, elbTwo, this, _keyController);
-            //segment->acceptHoverEvents();
+            segment->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
             //segment->installSceneEventFilter(this);
 
            // connect(segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
            // connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
 
-            if(i==0){
-                elbOne->setSegmentOne(NULL);
-                elbOne->setSegmentTwo(segment);
-            }
-            else if(i==_elbows.count()-2){
+            if(i==0 || i== _elbows.count()-2)
+            {
+                if(i==0){
+                    elbOne->setSegmentOne(NULL);
+                    elbOne->setSegmentTwo(segment);
+                }
+                if(i==_elbows.count()-2){
 
-                elbTwo->setSegmentOne(segment);
-                elbTwo->setSegmentTwo(NULL);
+                    elbTwo->setSegmentOne(segment);
+                    elbTwo->setSegmentTwo(NULL);
+                }
             }
             else
             {
@@ -212,6 +215,34 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
     // change the elbow's coordinates to the specified x and y
     else
         elbow->setPos(newPos);
+
+    // update the polygon of the segments
+    updateLineSegments(elbow);
+}
+
+/**
+ * @brief TransitionGraphic::updateLineSegments
+ * @param elbow
+ *
+ * called from update elbow
+ * updates the position and polygon of the line segments linked to an elbow
+ */
+void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
+{
+    LineSegmentGraphic* one = elbow->getSegment(0);
+    if(one) // check if object exists
+    {
+        // update start and end?
+        one->enclosePathInElbows();
+        qDebug() << "updated one";
+    }
+    LineSegmentGraphic* two = elbow->getSegment(1);
+    if(two) // check if object exists
+    {
+        // update start and end?
+        two->enclosePathInElbows();
+        qDebug() << "updated two";
+    }
 }
 
 /**

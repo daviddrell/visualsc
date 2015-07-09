@@ -3,44 +3,44 @@
 #include "arrowheadgraphic.h"
 #include <QDebug>
 
-#define DEFAULT_PAINT_STYLE kBox
-#define DEFAULT_WIDTH  2
-//#define DEFAULT_OUTTER_BORDER_COLOR Qt::black
-#define DEFAULT_OUTTER_BORDER_WIDTH 6
-#define DEFAULT_OUTTER_BORDER_HEIGHT 6
+
+//TODO Clean up and make kboxs bolden
 
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
     mouseDownX(0),
     mouseDownY(0),
-    _outterborderColor(Qt::black),
+    _outterborderColor(TRANSITION_DEFAULT_COLOR),
     _outterborderPen(),
     _width(6),
     _height(6),
     _corner(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
-    _paintStyle(DEFAULT_PAINT_STYLE),
+    _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
     _arrowAngle(0),
     _arrowHead(NULL),
     _anchor(false)
 {
     this->setParentItem(parentGraphic);
-    _outterborderPen.setWidth(2);
+    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
     _outterborderPen.setColor(_outterborderColor);
     //this->setAcceptHoverEvents(true);
+
+    _segments[0] = NULL;
+    _segments[1] = NULL;
 }
 
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
     mouseDownX(0),
     mouseDownY(0),
-    _outterborderColor(Qt::black),
+    _outterborderColor(TRANSITION_DEFAULT_COLOR),
     _outterborderPen(),
     _width(6),
     _height(6),
     _corner(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
-    _paintStyle(DEFAULT_PAINT_STYLE),
+    _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
     _arrowAngle(0),
     _arrowHead(NULL),
     _anchor(false)
@@ -51,30 +51,33 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
    // this->setPos(0,0);
    // qDebug() << "Elbow Parent: " << parentGraphic << " pos: "<< this->pos();
 
-    _outterborderPen.setWidth(2);
+    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
     _outterborderPen.setColor(_outterborderColor);
     //this->setAcceptHoverEvents(true);
+
+    _segments[0] = NULL;
+    _segments[1] = NULL;
 }
 
 ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic* segmentOne, LineSegmentGraphic* segmentTwo):
 
     mouseDownX(0),
     mouseDownY(0),
-    _outterborderColor(Qt::black),
+    _outterborderColor(ELBOW_DEFAULT_PAINT_STYLE),
     _outterborderPen(),
     _width(6),
     _height(6),
     _corner(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
-    _paintStyle(DEFAULT_PAINT_STYLE),
+    _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
     _arrowAngle(0),
     _arrowHead(NULL),
     _anchor(false)
 {
     this->setParentItem(parentGraphic);
-    _outterborderPen.setWidth(DEFAULT_WIDTH);
-    _outterborderPen.setColor(_outterborderColor);
+    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
+    _outterborderPen.setColor(ELBOW_DEFAULT_PAINT_STYLE);
     //this->setAcceptHoverEvents(true);
     _segments[0] = segmentOne;
     _segments[1] = segmentTwo;
@@ -83,14 +86,14 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic*
 ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic* segmentOne, LineSegmentGraphic* segmentTwo, int x, int y):
     mouseDownX(0),
     mouseDownY(0),
-    _outterborderColor(Qt::black),
+    _outterborderColor(TRANSITION_DEFAULT_COLOR),
     _outterborderPen(),
     _width(6),
     _height(6),
     _corner(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
-    _paintStyle(DEFAULT_PAINT_STYLE),
+    _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
     _arrowAngle(0),
     _arrowHead(NULL),
     _anchor(false)
@@ -145,7 +148,7 @@ void ElbowGrabber::setPaintStyle(PaintStyle s)
             _arrowHead->setWidth(_width);
             _arrowHead->setHeight(_height);
             _arrowHead->setPos( - _width/2, - _height/2);
-            _arrowHead->setColor(Qt::red);
+            _arrowHead->setColor(TRANSITION_DEFAULT_COLOR);
         }
     }
     else
@@ -209,15 +212,24 @@ void ElbowGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
-    _outterborderColor = Qt::black;
-    this->update(0,0,_width,_height);
+    _outterborderColor = TRANSITION_DEFAULT_COLOR;
+    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
+    _outterborderPen.setColor(TRANSITION_DEFAULT_COLOR);
+    _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+    _height = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+    //this->update(0,0,_width,_height);
 }
 
 void ElbowGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
-    qDebug() << "ElbowGrabber HoverEnterEvent";
-    _outterborderColor = Qt::red;
-    this->update(0,0,_width,_height);
+   // qDebug() << "ElbowGrabber HoverEnterEvent";
+    _outterborderColor = TRANSITION_HOVER_COLOR;
+    _outterborderPen.setWidth(ELBOW_HOVER_WIDTH);
+    _outterborderPen.setColor(TRANSITION_HOVER_COLOR);
+    _width = ELBOW_ARROWHEAD_HOVER_WIDTH;
+    _height = ELBOW_ARROWHEAD_HOVER_WIDTH;
+    //_outterborderPen.setStyle();
+    //this->update(0,0,_width,_height);
 }
 
 QRectF ElbowGrabber::boundingRect() const
@@ -299,7 +311,10 @@ void ElbowGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, Q
        // qDebug()<< "setting arrowhead angle: " << _arrowAngle;
 
         _arrowHead->setRotation(_arrowAngle);
-
+        _arrowHead->setColor(_outterborderPen.color());
+        _arrowHead->setWidth(_width);
+        _arrowHead->setHeight(_height);
+        _arrowHead->setPos( - _width/2, - _height/2);
         _arrowHead->update();
     }
 
