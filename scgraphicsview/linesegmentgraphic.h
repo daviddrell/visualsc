@@ -23,7 +23,9 @@ public:
     void enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
     void enclosePathInCoordindates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
     void enclosePathInElbows();
-
+    ElbowGrabber* getElbow(int i);
+    TransitionGraphic* parentItemAsTransitionGraphic();
+    void setElbowAt(int index, ElbowGrabber* elb);
 
 private:
     KeyController*  _keyController;

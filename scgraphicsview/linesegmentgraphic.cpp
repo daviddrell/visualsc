@@ -17,24 +17,7 @@ LineSegmentGraphic::LineSegmentGraphic(ElbowGrabber *startPoint, ElbowGrabber *e
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
     _pen.setColor(TRANSITION_DEFAULT_COLOR);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
-/*
-    QPointF p1  (_elbows[0]->x() - 10, _elbows[0]->y() - 10);
-    QPointF p2  (_elbows[0]->x() + 10, _elbows[0]->y() - 10);
-    QPointF p3  (_elbows[0]->x() + 10, _elbows[0]->y() + 10);
-    QPointF p4  (_elbows[0]->x() - 10, _elbows[0]->y() + 10);
 
-
-    QPointF p5  (_elbows[1]->x() - 10, _elbows[1]->y() - 10);
-    QPointF p6  (_elbows[1]->x() + 10, _elbows[1]->y() - 10);
-    QPointF p7  (_elbows[1]->x() + 10, _elbows[1]->y() + 10);
-    QPointF p8  (_elbows[1]->x() - 10, _elbows[1]->y() + 10);
-
-
-    _selectRegion << p1 << p2  << p5 << p6 << p7 << p8 << p3 << p4 << p1;
-
-    this->setPolygon(_selectRegion);*/
-
-    //enclosePathInItemCoordiates(_elbows[0]->x(), _elbows[0]->y(), _elbows[1]->x(), _elbows[1]->y());
     enclosePathInElbows();
 }
 
@@ -48,21 +31,58 @@ LineSegmentGraphic::~LineSegmentGraphic()
 
 }
 
+void LineSegmentGraphic::setElbowAt(int index, ElbowGrabber *elb)
+{
+    _elbows[index] = elb;
+}
+
+ElbowGrabber* LineSegmentGraphic::getElbow(int index)
+{
+    return _elbows[index];
+}
+
+
+TransitionGraphic* LineSegmentGraphic::parentItemAsTransitionGraphic()
+{
+    return static_cast<TransitionGraphic*>(this->parentItem());
+}
+
 void LineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
+
+    // set parent's currently hovered object to this line segment
+     this->parentItemAsTransitionGraphic()->setCurrentlyHoveredSegment(this);
+
+    // connect the key controller to this transition graphic
+    connect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleKeyPressEvent(int)));
+
+
     _pen.setWidth(TRANSITION_HOVER_WIDTH);
     _pen.setColor(TRANSITION_HOVER_COLOR);
     _pen.setStyle(TRANSITION_HOVER_LINE_STYLE);
+
+
 
 }
 
 void LineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
+
+    // clear parent's currently hovered object
+    this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredSegment();
+
+    // connect the key controller to this transition graphic
+    disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleKeyPressEvent(int)));
+
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
     _pen.setColor(TRANSITION_DEFAULT_COLOR);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
 }
 
+/**
+ * @brief LineSegmentGraphic::enclosePathInElbows
+ * called by a line segment to remake its polygon based on its elbows' positions
+ */
 void LineSegmentGraphic::enclosePathInElbows()
 {
     this->enclosePathInCoordindates(_elbows[0]->getCenterPoint().x(), _elbows[0]->getCenterPoint().y(), _elbows[1]->getCenterPoint().x(), _elbows[1]->getCenterPoint().y());
@@ -83,6 +103,15 @@ void LineSegmentGraphic::enclosePathInItemCoordiates(qreal lineStartX,qreal line
 
 }
 
+/**
+ * @brief LineSegmentGraphic::enclosePathInCoordindates
+ * @param lineStartX
+ * @param lineStartY
+ * @param lineEndX
+ * @param lineEndY
+ * creates a "Z-BOX" polygon for this line segment based on the two points given
+ * a Z-Box is a path of lines that creates a 3d rectangular prism, allowing for hover detection regardless of the given coordinates
+ */
 void LineSegmentGraphic::enclosePathInCoordindates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  )
 {
     QPointF p1(  QPointF(lineStartX  - CORNER_GRAB_BUFFER, lineStartY - CORNER_GRAB_BUFFER));
@@ -98,6 +127,8 @@ void LineSegmentGraphic::enclosePathInCoordindates(qreal lineStartX,qreal lineSt
     _selectRegion.clear();
     //_selectRegion << p1 << p2 << p5 << p6 << p7 << p8 << p3 << p4 << p1;
     //_selectRegion << p1 << p5 << p6 << p2 << p3 << p7 << p8 << p4 << p1;
+
+    //connect the Z-Box
     _selectRegion << p1 << p5 << p6 << p2 << p3 << p7 << p8 << p4 << p1 << p2 << p4 << p3 << p5 << p8 << p6 << p7 << p1;
     this->setPolygon(_selectRegion);
 }

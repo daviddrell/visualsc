@@ -407,7 +407,6 @@ void SelectableLineSegmentGraphic::createCustomPath(QPointF mouseLocation, Elbow
 ElbowGrabber* SelectableLineSegmentGraphic::getElbow(int index)
 {
     return _elbows[index];
-
 }
 
 QPointF SelectableLineSegmentGraphic::getStart()
@@ -617,7 +616,7 @@ void SelectableLineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * 
     //qDebug() << "leaving Hover";
 
     // clear parent's currently hovered object
-    this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredSegment();
+    //this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredSegment();
 
     // disconnect the key controller and the transition graphic key press handler
     disconnect(_keyController, SIGNAL(keyPressed(int)), _parentGraphic, SLOT(handleKeyPressEvent(int)));
@@ -645,7 +644,7 @@ void SelectableLineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * 
     qDebug() << "SelectableLineSegment HoverEnterEvent";
 
     // set parent's currently hovered object to this line segment
-    this->parentItemAsTransitionGraphic()->setCurrentlyHoveredSegment(this);
+    //this->parentItemAsTransitionGraphic()->setCurrentlyHoveredSegment(this);
 
     // connect the key controller to this transition graphic
     connect(_keyController, SIGNAL(keyPressed(int)), _parentGraphic, SLOT(handleKeyPressEvent(int)));

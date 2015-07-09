@@ -20,7 +20,6 @@
 
 
 class ElbowGrabber;
-class SelectableLineSegmentGraphic;
 class LineSegmentGraphic;
 
 class TransitionGraphic : public QGraphicsObject
@@ -32,10 +31,10 @@ public:
     void printInfo();
     StateBoxGraphic* parentItemAsStateBoxGraphic();
     ~TransitionGraphic();
-    void setCurrentlyHoveredSegment(SelectableLineSegmentGraphic* seg);
+    void setCurrentlyHoveredSegment(LineSegmentGraphic* seg);
     void clearCurrentlyHoveredSegment();
     bool isCurrentlyHovered();
-    SelectableLineSegmentGraphic* getCurrentlyHoveredSegment();
+    LineSegmentGraphic* getCurrentlyHoveredSegment();
     void setGrabbersVisible(bool visible);
 
 
@@ -73,7 +72,7 @@ private :
     StateBoxGraphic *_targetStateGraphic;
     KeyController * _keyController;
     MouseController* _mouseController;
-    SelectableLineSegmentGraphic* _hovered;
+    LineSegmentGraphic* _hovered;
 
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 

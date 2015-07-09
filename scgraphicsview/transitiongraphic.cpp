@@ -354,7 +354,7 @@ TransitionGraphic::~TransitionGraphic()
 /**
  * @brief setCurrentlyHoveredSegment
  */
-void TransitionGraphic::setCurrentlyHoveredSegment(SelectableLineSegmentGraphic* seg)
+void TransitionGraphic::setCurrentlyHoveredSegment(LineSegmentGraphic* seg)
 {
     _hovered = seg;
 }
@@ -369,7 +369,7 @@ bool TransitionGraphic::isCurrentlyHovered()
     return (_hovered!=NULL);
 }
 
-SelectableLineSegmentGraphic* TransitionGraphic::getCurrentlyHoveredSegment()
+LineSegmentGraphic* TransitionGraphic::getCurrentlyHoveredSegment()
 {
     return _hovered;
 }
@@ -391,12 +391,40 @@ void TransitionGraphic::printInfo(void)
 void TransitionGraphic::createNewElbow()
 {
     //_hovered->printInfo();
-    ElbowGrabber* elb = new ElbowGrabber(this);
-    elb->setPaintStyle(ElbowGrabber::kBox);
-    elb->setPos(this->mapFromScene(_mouseController->getX(),_mouseController->getY()));    // maps the scene based mouse coordinates to create a new elbow at the cursor location
+    ElbowGrabber* elbMid = new ElbowGrabber(this);
+    elbMid->installSceneEventFilter(this);
+    elbMid->setAcceptHoverEvents(true);
+    elbMid->setPos(this->mapFromScene(_mouseController->getX(),_mouseController->getY()));    // maps the scene based mouse coordinates to create a new elbow at the cursor location
     //elb->setPos(this->_mouseController->getX(),_mouseController->getY());
 
-    _elbows.append(elb);
+
+    LineSegmentGraphic* splitLine = this->getCurrentlyHoveredSegment();  // segment that is being split
+    ElbowGrabber* elbEnd = splitLine->getElbow(1);
+
+    // update the split line's end elbow to the new one
+    splitLine->setElbowAt(1, elbMid);
+
+    // create the new line segment that starts from the new elbow and goes to the old end
+    LineSegmentGraphic* newLine = new LineSegmentGraphic(elbMid, elbEnd, this, _keyController);
+    newLine->setAcceptHoverEvents(true);
+
+
+    // update the old elbows sockets
+    //  start       mid        end
+    // [  A x]----[x B y]----[y C  ]
+    elbEnd->setSegmentOne(newLine);
+    elbMid->setSegmentOne(splitLine);
+    elbMid->setSegmentTwo(newLine);
+
+    _elbows.insert(_elbows.indexOf(elbEnd), elbMid);    // insert the new elbow before the end elbow
+
+
+
+
+    if(_lineSegments.count()==1)
+        _lineSegments.append(newLine);
+    else
+        _lineSegments.insert(_lineSegments.indexOf(splitLine)+1,newLine);
 }
 
 /**
@@ -406,10 +434,10 @@ void TransitionGraphic::createNewElbow()
  */
 void TransitionGraphic::handleKeyPressEvent(int key)
 {
-   // qDebug() << "Transition Graphic Key Press: " << key;
+    qDebug() << "Transition Graphic Key Press: " << key;
     if(key==Qt::Key_N)
     {
-        //qDebug() << "Creating New Elbow at pos: ";
+        qDebug() << "Creating New Elbow at pos: ";
         this->createNewElbow();
     }
 }
