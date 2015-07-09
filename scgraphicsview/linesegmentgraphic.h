@@ -17,7 +17,7 @@ public:
     LineSegmentGraphic();
     LineSegmentGraphic(ElbowGrabber* startPoint, ElbowGrabber* endPoint, TransitionGraphic* parentGraphic, KeyController* keys);
     ~LineSegmentGraphic();
-    void setTerminal(bool);
+  //  void setTerminal(bool);
 
     void enclosePathInSceneCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
     void enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
@@ -31,7 +31,7 @@ private:
     KeyController*  _keyController;
     ElbowGrabber*   _elbows[2];
     QPolygonF       _selectRegion;
-    bool            _isTerminal;
+    //bool            _isTerminal;
 
     QPen            _pen;
 

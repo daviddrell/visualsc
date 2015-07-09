@@ -84,7 +84,7 @@ StateBoxGraphic::~StateBoxGraphic()
  */
 void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 {
-    qDebug() << "handle transition line start moved";
+    //qDebug() << "handle transition line start moved";
 
     // this method keeps the starting position of a line snapped to the outter edge of the box
 

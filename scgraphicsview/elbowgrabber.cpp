@@ -6,30 +6,6 @@
 
 //TODO Clean up and make kboxs bolden
 
-ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
-    mouseDownX(0),
-    mouseDownY(0),
-    _outterborderColor(TRANSITION_DEFAULT_COLOR),
-    _outterborderPen(),
-    _width(6),
-    _height(6),
-    _corner(0),
-    _mouseButtonState(kMouseReleased),
-    _placedOnASquare(false),
-    _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
-    _arrowAngle(0),
-    _arrowHead(NULL),
-    _anchor(false)
-{
-    this->setParentItem(parentGraphic);
-    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
-    _outterborderPen.setColor(_outterborderColor);
-    //this->setAcceptHoverEvents(true);
-
-    _segments[0] = NULL;
-    _segments[1] = NULL;
-}
-
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
     mouseDownX(0),
     mouseDownY(0),
@@ -43,7 +19,8 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
     _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
     _arrowAngle(0),
     _arrowHead(NULL),
-    _anchor(false)
+    _anchor(false),
+    _terminator(false)
 {
 
     this->setParentItem(parentGraphic);
@@ -59,52 +36,6 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
     _segments[1] = NULL;
 }
 
-ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic* segmentOne, LineSegmentGraphic* segmentTwo):
-
-    mouseDownX(0),
-    mouseDownY(0),
-    _outterborderColor(ELBOW_DEFAULT_PAINT_STYLE),
-    _outterborderPen(),
-    _width(6),
-    _height(6),
-    _corner(0),
-    _mouseButtonState(kMouseReleased),
-    _placedOnASquare(false),
-    _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
-    _arrowAngle(0),
-    _arrowHead(NULL),
-    _anchor(false)
-{
-    this->setParentItem(parentGraphic);
-    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
-    _outterborderPen.setColor(ELBOW_DEFAULT_PAINT_STYLE);
-    //this->setAcceptHoverEvents(true);
-    _segments[0] = segmentOne;
-    _segments[1] = segmentTwo;
-}
-
-ElbowGrabber::ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic* segmentOne, LineSegmentGraphic* segmentTwo, int x, int y):
-    mouseDownX(0),
-    mouseDownY(0),
-    _outterborderColor(TRANSITION_DEFAULT_COLOR),
-    _outterborderPen(),
-    _width(6),
-    _height(6),
-    _corner(0),
-    _mouseButtonState(kMouseReleased),
-    _placedOnASquare(false),
-    _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
-    _arrowAngle(0),
-    _arrowHead(NULL),
-    _anchor(false)
-{
-    this->setParentItem(parentGraphic);
-    _outterborderPen.setWidth(2);
-    _outterborderPen.setColor(_outterborderColor);
-    //this->setAcceptHoverEvents(true);
-    _segments[0] = segmentOne;
-    _segments[1] = segmentTwo;
-}
 bool ElbowGrabber::isAnchor()
 {
 
@@ -119,6 +50,16 @@ void ElbowGrabber::setAnchor(bool isAnchor)
 ElbowGrabber::~ElbowGrabber()
 {
 
+}
+
+bool ElbowGrabber::isTerminal()
+{
+    return _terminator;
+}
+
+void ElbowGrabber::setTerminal(bool isTerminal)
+{
+    _terminator = isTerminal;
 }
 
 void ElbowGrabber::setSegmentOne(LineSegmentGraphic* segOne)
@@ -268,9 +209,46 @@ void ElbowGrabber::setAngle(int angle)
     _arrowAngle = angle - 45; // subtract 45 because of how we draw it
 }
 
+void ElbowGrabber::updateArrowHead()
+{
+    // if this is the terminal line segment, then redraw the arrow head with correct angles
+    if ( _terminator )
+    {
+        ElbowGrabber* sisterElbow = this->getSegment(0)->getElbow(0); // a terminator elbow only has one socketed line
+        double dy =  this->y() - sisterElbow->y();
+        double dx =  this->x() - sisterElbow->x();
+        int quadrant =0;
+
+        //qDebug()<< "initial values dx = " << dx << ", dy = " << dy ;
+
+
+        //double angle = (atan ( (dy) / ( dx) ) + ( k * 3.14159265)) * (180.0/3.14159265);
+
+        if ( dx < 0 && dy >= 0  )
+        {
+            quadrant = 1;
+            dx *= -1;
+        }
+        else if ( dx < 0 && dy < 0  )
+        {
+            quadrant = 2;
+            dx *= -1;
+        }
+
+        double angle = atan ( (dy) / ( dx) )  * (180.0/3.14159265);
+
+        if ( quadrant == 1 )
+            angle = 180 - angle  ;
+        else if ( quadrant == 2 )
+            angle = -180 -angle;
+
+        this->setAngle(angle);
+        this->update();
+    }
+}
+
 void ElbowGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-
     if ( _paintStyle == kBox)
     {
         // fill the box with solid color, use sharp corners
@@ -309,7 +287,7 @@ void ElbowGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, Q
     else  if (_paintStyle == kArrowHead)
     {
        // qDebug()<< "setting arrowhead angle: " << _arrowAngle;
-
+        updateArrowHead();
         _arrowHead->setRotation(_arrowAngle);
         _arrowHead->setColor(_outterborderPen.color());
         _arrowHead->setWidth(_width);

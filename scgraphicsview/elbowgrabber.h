@@ -22,10 +22,7 @@ class ElbowGrabber : public QObject ,  public QGraphicsItem
     Q_OBJECT
 
 public:
-    ElbowGrabber(TransitionGraphic* parentGraphic);
     ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point);
-    ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic* segmentOne, LineSegmentGraphic* segmentTwo);
-    ElbowGrabber(TransitionGraphic *parentGraphic, LineSegmentGraphic* segmentOne, LineSegmentGraphic* segmentTwo, int x, int y);
     ~ElbowGrabber();
     void setAngle(int agle);///< set the rotation angle for corners which are drawn as arrowheads
     int  getCorner(); ///< allows the owner to find out which corner this is
@@ -53,6 +50,10 @@ public:
     bool isAnchor();
     void setAnchor(bool);
 
+    bool isTerminal();
+    void setTerminal(bool);
+
+
 signals:
     void anchorMoved(QPointF newPos);
 
@@ -74,6 +75,8 @@ private:
     virtual void mousePressEvent(QGraphicsSceneDragDropEvent *event);
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
+    void updateArrowHead();
+
     QColor _outterborderColor; ///< the hover event handlers will toggle this between red and black
     QPen _outterborderPen; ///< the pen is used to paint the red/black border
 
@@ -89,8 +92,10 @@ private:
 
     PaintStyle _paintStyle;
     int        _arrowAngle;
-    ArrowHeadGraphic* _arrowHead;
 
+    bool _terminator;
+
+    ArrowHeadGraphic* _arrowHead;
     LineSegmentGraphic* _segments[2];
 };
 

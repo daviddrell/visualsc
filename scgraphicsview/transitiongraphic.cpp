@@ -86,12 +86,15 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
         _anchors[0] = _elbows.at(0);                    //anchors will be the saved as the first and last points following a path from the start to end states
         _anchors[1] = _elbows.at(_elbows.count()-1);
-        _lineSegments.at(_lineSegments.count()-1)->setTerminal(true); // set the last segment as the terminator
+        //_lineSegments.at(_lineSegments.count()-1)->setTerminal(true); // set the last segment as the terminator
+        _anchors[1]->setTerminal(true);                         // set the last elbow grabber as the terminator
         _anchors[1]->setPaintStyle(ElbowGrabber::kArrowHead);   // set the end of the transition to an arrowhead
 
         _anchors[0]->setAnchor(true);
         _anchors[1]->setAnchor(true);
         connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+        qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
+        connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
 
 
 
@@ -197,9 +200,10 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
     // check if this elbow is an anchor
     if(elbow->isAnchor())
     {
+        emit elbow->anchorMoved(newPos);
        // qDebug() << "selected elbow is an anchor";
         // this elbow is an anchor, so we need to lock it to its parent state box graphic
-        if(elbow==_elbows[0])
+        /*if(elbow ==_elbows[0])
         {
            // qDebug() << "selected elbow is the source elbow\n";
             //QPointF mouse(x,y);
@@ -211,6 +215,7 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
         {
             elbow->setPos(newPos);
         }
+        */
     }
     // change the elbow's coordinates to the specified x and y
     else
@@ -234,14 +239,14 @@ void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
     {
         // update start and end?
         one->enclosePathInElbows();
-        qDebug() << "updated one";
+        //qDebug() << "updated one";
     }
     LineSegmentGraphic* two = elbow->getSegment(1);
     if(two) // check if object exists
     {
         // update start and end?
         two->enclosePathInElbows();
-        qDebug() << "updated two";
+        //qDebug() << "updated two";
     }
 }
 
@@ -391,10 +396,10 @@ void TransitionGraphic::printInfo(void)
 void TransitionGraphic::createNewElbow()
 {
     //_hovered->printInfo();
-    ElbowGrabber* elbMid = new ElbowGrabber(this);
+    ElbowGrabber* elbMid = new ElbowGrabber(this, this->mapFromScene(_mouseController->getX(),_mouseController->getY()));  // maps the scene based mouse coordinates to create a new elbow at the cursor location
     elbMid->installSceneEventFilter(this);
     elbMid->setAcceptHoverEvents(true);
-    elbMid->setPos(this->mapFromScene(_mouseController->getX(),_mouseController->getY()));    // maps the scene based mouse coordinates to create a new elbow at the cursor location
+
     //elb->setPos(this->_mouseController->getX(),_mouseController->getY());
 
 
@@ -416,15 +421,18 @@ void TransitionGraphic::createNewElbow()
     elbMid->setSegmentOne(splitLine);
     elbMid->setSegmentTwo(newLine);
 
+    // keep the elbow placements in order
     _elbows.insert(_elbows.indexOf(elbEnd), elbMid);    // insert the new elbow before the end elbow
 
 
 
-
-    if(_lineSegments.count()==1)
+    // keep the line segments in order
+   /* if(_lineSegments.count()==1)
         _lineSegments.append(newLine);
     else
-        _lineSegments.insert(_lineSegments.indexOf(splitLine)+1,newLine);
+        _lineSegments.insert(_lineSegments.indexOf(splitLine)+1,newLine);*/
+
+    _lineSegments.append(newLine);
 }
 
 /**

@@ -107,19 +107,13 @@ void SCGraphicsView::createGraph()
     QList<SCState*> states;
     _dm->getAllStates(states);
 
+    // first load all states
     for(int s = 0; s < states.count(); s++)
     {
         handleNewState( states[s]);
-/*
-        QList<SCTransition*> transitions;
-        states[s]->getTransitions(transitions);
-
-        for(int t = 0; t < transitions.count(); t ++)
-        {
-            handleNewTransition(transitions[t]);
-        }
-        */
     }
+    
+    // load all transitions
     for(int i = 0; i< states.count(); i++)
     {
         QList<SCTransition*> transitions;
