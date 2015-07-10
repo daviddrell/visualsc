@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #define DEFAULT_FILE "C:/visualsc/bin/debug/az2.scxml";
 
-#define AUTO_LOAD_FILE
+//#define AUTO_LOAD_FILE
 
 #ifdef AUTO_LOAD_FILE
     QString fileName =DEFAULT_FILE;
