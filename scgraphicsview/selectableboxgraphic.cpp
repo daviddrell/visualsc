@@ -31,6 +31,9 @@
 #include "scstate.h"
 #include <QTimer>
 #include <QKeyEvent>
+#include "stateboxgraphic.h"
+
+class StateBoxGraphic;
 
 /**
   *  This box can be re-sized and it can be moved. For moving, we capture
@@ -295,25 +298,30 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         deltaWidth *= (-1);
         deltaHeight *= (-1);
 
+        double newXpos, newYpos;
+        QPointF old(this->pos());
+
         if ( corner->getCorner() == 0 )
         {
-            int newXpos = this->pos().x() + deltaWidth;
-            int newYpos = this->pos().y() + deltaHeight;
+             newXpos = this->pos().x() + deltaWidth;
+             newYpos = this->pos().y() + deltaHeight;
             this->setPos(newXpos, newYpos);
         }
         else   if ( corner->getCorner() == 1 )
         {
-            int newYpos = this->pos().y() + deltaHeight;
+            newYpos = this->pos().y() + deltaHeight;
             this->setPos(this->pos().x(), newYpos);
         }
         else   if ( corner->getCorner() == 3 )
         {
-            int newXpos = this->pos().x() + deltaWidth;
+            newXpos = this->pos().x() + deltaWidth;
             this->setPos(newXpos,this->pos().y());
         }
-
+        QPointF difference;
+        difference.setX(old.x() - pos().x());
+        difference.setX(old.y() - pos().y());
         setCornerPositions();
-
+        emit stateBoxMoved(difference);    // linked to transition graphic. connect witten in scgraphicsview.cpp
         this->update();
     }
 
@@ -327,12 +335,14 @@ void SelectableBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event 
 {
     event->setAccepted(true);
     QPointF location = this->pos();
-    location.setX( ( static_cast<int>(location.x()) / _gridSpace) * _gridSpace );
-    location.setY( ( static_cast<int>(location.y()) / _gridSpace) * _gridSpace );
+    location.setX( ( static_cast<qreal>(location.x()) / _gridSpace) * _gridSpace );
+    location.setY( ( static_cast<qreal>(location.y()) / _gridSpace) * _gridSpace );
 
     this->setPos(location);
 
     //qDebug() << "MOUSE RELEASE : " << this->pos() << "";
+   // emit stateBoxMoved(this->pos());
+
 
     graphicHasChanged();
 }
@@ -352,7 +362,9 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     QPointF newPos = event->pos() ;
     QPointF location = this->pos();
     location += (newPos - _dragStart);
-
+    QPointF test = newPos-_dragStart;
+    qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
+    emit stateBoxMoved(newPos- _dragStart);
     this->setPos(location);
 }
 

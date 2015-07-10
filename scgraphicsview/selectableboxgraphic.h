@@ -40,7 +40,7 @@ class IAttribute;
 class SelectableBoxGraphic :  public QGraphicsObject
 {
 
-
+Q_OBJECT
 public:
 
     SelectableBoxGraphic(QGraphicsObject*parent);
@@ -66,7 +66,12 @@ public:
     QPointF getVisibleCenter();///< returns a point which is appears to be the center of the box (i.e. does not include drop shadow), may not be the center of boundingRect()
     QPointF getSideCenterPointInSceneCoord(int side); ///< returns the center point on a given side, for anchoring a transition line in the middle of a side
 
+
     //bool eventFilter(QObject *, QEvent *);
+
+signals:
+    void stateBoxMoved(QPointF);
+
 protected:
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event

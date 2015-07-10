@@ -247,7 +247,7 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
 //TODO move terminal and arrow head paint to elbowgrabber
 void LineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    #define SHOW_HOVER_BOXES
+//    #define SHOW_HOVER_BOXES
     painter->setPen(_pen);
 
 #ifndef SHOW_HOVER_BOXES

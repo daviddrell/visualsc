@@ -560,7 +560,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
    StateBoxGraphic* parentState =  elbow->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic();
    QPointF test(_intersection.x() - parentState->x(), _intersection.y()-parentState->y());
    //QPointF test = mapFromParent(_intersection);
-    qDebug() << "Intersection:\t" << _intersection << "\nMouse:\t\t" << cursorPos << "\ntest:\t\t" <<test << "\nbox:\t\t" << parentState->pos();
+  // qDebug() << "Intersection:\t" << _intersection << "\nMouse:\t\t" << cursorPos << "\ntest:\t\t" <<test << "\nbox:\t\t" << parentState->pos();
   // elbow->setPos(_intersection);
    elbow->setPos(test);
 }

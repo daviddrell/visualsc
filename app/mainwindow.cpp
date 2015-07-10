@@ -75,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 */
 
-#define DEFAULT_FILE "C:/visualsc/bin/debug/az.scxml";
+#define DEFAULT_FILE "C:/visualsc/bin/debug/az2.scxml";
 
 #define AUTO_LOAD_FILE
 

@@ -23,6 +23,7 @@
 #include "transitionattributes.h"
 #include "selectablelinesegmentgraphic.h"
 #include "keycontroller.h"
+#include "selectableboxgraphic.h"
 #include "mousecontroller.h"
 #include <QList>
 #include <QDebug>
@@ -281,6 +282,11 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
     qDebug() << "target Graphic is set " << targetGraphic->objectName();
     transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController,_mouseController);
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
+
+
+    // create the connection to automatically move transition graphic anchors when state graphics are moved.
+    connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleStateGraphicMoved(QPointF)));
+    connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
     _mapTransitionToGraphic.insert(t, transGraphic);
 }
 
