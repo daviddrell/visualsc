@@ -93,7 +93,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
     ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
 
     //QPointF cursorPos = mapFromItem(elbow, newPos);
-    QPointF cursorPos = newPos;
+    QPointF cursorPos = mapFromScene(newPos);
 
 #if 0  // debug stuff
     // draw a diag line from the newPos to the center of the box, blue dotted line
@@ -282,7 +282,13 @@ int StateBoxGraphic::findNearestWall(QRectF box, QPointF point)
     return getSmallest(wallDist, 4);
 }
 
-
+/**
+ * @brief StateBoxGraphic::handleTransitionLineEndMoved
+ * @param newPos scene scope location of the mouse and where to move the ElbowGrabber
+ *
+ * This function is connected to terminal anchors in transition graphic and is called in
+ * place of a regular setPos to snap the elbow to its anchored state.
+ */
 void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 {
     // this method keeps the starting position of a line snapped to the outter edge of the box
@@ -292,19 +298,8 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
     ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
 
 
-    QPointF cursorPos = (newPos);
-   // QPointF cursorPos =
+    QPointF cursorPos = (newPos);   // keep the cursor in scene scope
 
-   //QPointF cursorPos = newPos;
-  //  qDebug() << "the cursorPos is: " << cursorPos.x() << ", " << cursorPos.y();
-
-#if 0  // debug stuff
-    // draw a diag line from the newPos to the center of the box, blue dotted line
-
-    _diagLineStart =  getVisibleCenter();
-    _diagLineEnd = mapFromItem(elbow, cursorPos);
-    _diagLineDrawIt = true;
-#endif
 
     // find the side which is closest to the newPos
     QRectF box = getUsableArea();

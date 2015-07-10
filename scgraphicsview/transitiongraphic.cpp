@@ -193,6 +193,14 @@ StateBoxGraphic* TransitionGraphic::parentItemAsStateBoxGraphic()
     return static_cast<StateBoxGraphic*>(this->parentItem());
 }
 
+/**
+ * @brief TransitionGraphic::updateElbow
+ * @param newPos coordinates of the new position to move the mouse, given in scene scope
+ * @param elbow elbow being manipulated
+ * Called from the transition graphics scene event filter if a mouse press then mouse move was detected.
+ * this function wlil update the elbow positions on the gui and then update the model once the mouse is released
+ * additionally, anchor elbows will snap to the edges of their connected states
+ */
 void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
 {
     //elbow->setPos(newPos);
@@ -205,7 +213,7 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
             emit elbow->anchorMoved(newPos);
         }
         else
-            emit elbow->anchorMoved(newPos);
+            emit elbow->anchorMoved((newPos));
        // qDebug() << "selected elbow is an anchor";
         // this elbow is an anchor, so we need to lock it to its parent state box graphic
         /*if(elbow ==_elbows[0])
@@ -224,7 +232,7 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
     }
     // change the elbow's coordinates to the specified x and y
     else
-        elbow->setPos(newPos);
+        elbow->setPos(mapFromScene(newPos));
 
     // update the polygon of the segments
     updateLineSegments(elbow);
