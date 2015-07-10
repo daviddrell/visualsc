@@ -30,6 +30,32 @@ class SCState;
 class IAttribute;
 
 
+/*
+
+ ----- 0 -----
+ |           |
+ |           |
+3             1
+ |           |
+ |           |
+ ----- 2 -----
+
+ */
+
+enum WallFace{
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+};
+
+enum WallCorners{
+    NORTHWEST,
+    NORTHEAST,
+    SOUTHEAST,
+    SOUTHWEST,
+    WallCornersLength
+};
 
 /**
   * \class StateBoxGraphic
@@ -63,6 +89,8 @@ public slots:
 
 private:
 
+    double xDistance(QPointF, QPointF);
+    double yDistance(QPointF, QPointF);
     double distance(QPointF,QPointF);
     double distance(qreal,qreal,qreal,qreal);
     int getSmallest(double*, int);

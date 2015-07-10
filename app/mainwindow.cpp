@@ -75,7 +75,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 */
 
-    QString fileName ="C:/visualsc/bin/debug/az.scxml";
+#define DEFAULT_FILE "C:/visualsc/bin/debug/az.scxml";
+
+#define AUTO_LOAD_FILE
+
+#ifdef AUTO_LOAD_FILE
+    QString fileName =DEFAULT_FILE;
     _settings->setValue(_keyLastFilePath, fileName);
 
 
@@ -87,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _project->readInputFile(fileName);
 
-
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -109,8 +114,6 @@ void MainWindow::handleFileOpenClick()
 
     fileName = QFileDialog::getOpenFileName(this,
                                             tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
-
-        qDebug() << "%%% filename : " <<fileName;
 
     _settings->setValue(_keyLastFilePath, fileName);
 

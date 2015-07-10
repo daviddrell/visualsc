@@ -207,6 +207,16 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
 }
 
+double StateBoxGraphic::yDistance(QPointF q1, QPointF q2)
+{
+    return fabs(q1.y()-q2.y());
+}
+
+double StateBoxGraphic::xDistance(QPointF q1, QPointF q2)
+{
+    return fabs(q1.x()-q2.x());
+}
+
 double StateBoxGraphic::distance(QPointF q1, QPointF q2)
 {
     return distance(q1.x(),q1.y(),q2.x(),q2.y());
@@ -234,6 +244,14 @@ int StateBoxGraphic::getSmallest(double* ar, int len)
     return index;
 }
 
+/**
+ * @brief StateBoxGraphic::findNearestWall
+ * @param box
+ * @param point
+ * @return 0 for top wall, 1 for east wall, 2 for south wall, and 3 for west wall
+ *
+ * Determine which wall of a rectangle a point is closest to and returns 0-3
+ */
 int StateBoxGraphic::findNearestWall(QRectF box, QPointF point)
 {
 
@@ -245,16 +263,78 @@ int StateBoxGraphic::findNearestWall(QRectF box, QPointF point)
     qreal hmid = box.height()/2.0;
 
     QPointF NW(box.x(),box.y());
-    QPointF N(box.x()+wmid,box.y());
+
     QPointF NE(box.x()+w,box.y());
 
-    QPointF E(box.x()+w,box.y()+hmid);
     QPointF SE(box.x()+w,box.y()+h);
 
-    QPointF S(box.x() + wmid, box.y()+h);
     QPointF SW(box.x(),box.y()+h);
 
+    /*
+    QPointF N(box.x()+wmid,box.y());
+    QPointF E(box.x()+w,box.y()+hmid);
+    QPointF S(box.x() + wmid, box.y()+h);
     QPointF W(box.x(),box.y()+hmid);
+    */
+
+
+    double distToCorners[4];
+    distToCorners[NORTHWEST] = distance(point, NW);
+    distToCorners[NORTHEAST] = distance(point, NE);
+    distToCorners[SOUTHEAST] = distance(point, SE);
+    distToCorners[SOUTHWEST] = distance(point, SW);
+
+    double x,y;
+
+    // find the corner this point is closest to. Once we know this, we select the closer of the two walls that make up that corner.
+
+
+    switch(getSmallest(distToCorners, WallCornersLength))
+    {
+    case NORTHWEST: // the closest corner is the northwest corner. check the north and west walls.
+        x = xDistance(point,NW);
+        y = yDistance(point,NW);
+
+        if(x < y)
+            return WEST;
+        else
+            return NORTH;
+
+    case NORTHEAST:
+        x = xDistance(point, NE);
+        y = yDistance(point, NE);
+
+        if(x < y)
+            return EAST;
+        else
+            return NORTH;
+
+    case SOUTHEAST:
+
+        x = xDistance(point, SE);
+        y = yDistance(point, SE);
+
+        if(x < y)
+            return EAST;
+        else
+            return SOUTH;
+
+    case SOUTHWEST:
+        x = xDistance(point, SW);
+        y = yDistance(point, SW);
+
+        if(x < y)
+            return WEST;
+        else
+            return SOUTH;
+
+    default:
+        break;
+
+    }
+
+/*
+
 
     double d[8];
 
@@ -274,12 +354,16 @@ int StateBoxGraphic::findNearestWall(QRectF box, QPointF point)
     wallDist[2] = d[4] + d[5] + d[6];
     wallDist[3] = d[6] + d[7] + d[0];
 
-    /*for(int i = 0; i < 4;i++)
+
+
+
+    for(int i = 0; i < 4;i++)
     {
         qDebug() << "wallDist["<<i<<"] = " << wallDist[i];
-    }*/
+    }
 
     return getSmallest(wallDist, 4);
+    */
 }
 
 /**
@@ -353,28 +437,65 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
     int cornerGuard = 10;// keep line anchor off corners of box
     QRectF adjustedBox(mts.x(), mts.y(), box.width(), box.height());
     closest = findNearestWall(adjustedBox, cursorPos);
+
+    QPointF* corners[4];
+    corners[NORTHWEST] = new QPointF(adjustedBox.x(),adjustedBox.y());
+    corners[NORTHEAST] = new QPointF(adjustedBox.x()+adjustedBox.width(), adjustedBox.y());
+    corners[SOUTHEAST] = new QPointF(adjustedBox.x()+adjustedBox.width(),adjustedBox.y()+adjustedBox.height());
+    corners[SOUTHWEST] = new QPointF(adjustedBox.x(),adjustedBox.y()+adjustedBox.height());
+    qreal x = 0;
+    qreal y = 0;
     switch(closest)
-    {
-        case 0:
-        _intersection.setX(mts.x()+box.width()/2);
-        _intersection.setY(mts.y());
+    {    
+    case NORTH: //northwest and northeast
+        x = cursorPos.x();
+        y = adjustedBox.y();
+        if(x >= corners[NORTHEAST]->x())  x = corners[NORTHEAST]->x();
+        if(x < corners[NORTHWEST]->x())  x = corners[NORTHWEST]->x();
+
+
+
         break;
-    case 1:
-        _intersection.setX(mts.x()+box.width());
-        _intersection.setY(mts.y()+box.height()/2);
+
+    case EAST: // northeast and southeast corners
+
+        x = adjustedBox.x() + adjustedBox.width();
+        y = cursorPos.y();
+
+        if(y >= corners[SOUTHEAST]->y()) y = corners[SOUTHEAST]->y();
+        if(y < corners[NORTHEAST]->y()) y = corners[NORTHEAST]->y();
+
         break;
-    case 2:
-        _intersection.setX(mts.x()+box.width()/2);
-        _intersection.setY(mts.y()+box.height());
+    case SOUTH: //southwest and southeast
+
+        x = cursorPos.x();
+        y = adjustedBox.y() + adjustedBox.height();
+
+        if(x >= corners[SOUTHEAST]->x())  x = corners[SOUTHEAST]->x();
+        if(x < corners[SOUTHWEST]->x())  x = corners[SOUTHWEST]->x();
+
         break;
-case 3:
-        _intersection.setX(mts.x());
-        _intersection.setY(mts.y()+box.height()/2);
+
+    case WEST: //northwest and southwest corners
+
+        x = adjustedBox.x();
+        y = cursorPos.y();
+
+        if(y >= corners[SOUTHWEST]->y()) y = corners[SOUTHWEST]->y();
+        if(y < corners[NORTHWEST]->y()) y = corners[NORTHWEST]->y();
+
+
         break;
     default:
+
+
         break;
 
     }
+
+
+    _intersection.setX(x);
+    _intersection.setY(y);
 
 /*
     switch ( closest )

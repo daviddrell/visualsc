@@ -157,6 +157,16 @@ void ElbowGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 // change the color on hover events to indicate to the use the object has
 // been captured by the mouse
 
+void ElbowGrabber::forceHoverEnterEvent()
+{
+    this->hoverEnterEvent(NULL);
+}
+
+void ElbowGrabber::forceHoverLeaveEvent()
+{
+    this->hoverLeaveEvent(NULL);
+}
+
 void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
     _outterborderColor = TRANSITION_DEFAULT_COLOR;

@@ -26,6 +26,9 @@ public:
     ElbowGrabber* getElbow(int i);
     TransitionGraphic* parentItemAsTransitionGraphic();
     void setElbowAt(int index, ElbowGrabber* elb);
+    void forceHoverLeaveEvent();
+    void setHovered(bool);
+    bool isHovered();
 
 private:
     KeyController*  _keyController;
@@ -34,10 +37,13 @@ private:
     //bool            _isTerminal;
 
     QPen            _pen;
+    bool            _isHovered;
 
-    virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
     virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+
+    virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
+
 
 };
 

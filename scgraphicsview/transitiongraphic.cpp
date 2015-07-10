@@ -33,7 +33,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             ElbowGrabber* elb;
             elb = new ElbowGrabber(this, pointList.at(i));
             elb->installSceneEventFilter(this);                 // transition graphic will handle elbow events
-            elb->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
+           // elb->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
 
             _elbows.append(elb);
         }
@@ -303,6 +303,20 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
             //_cornerGrabbed = true;
             qDebug() << "Corner Position: " << elbow->mouseDownX<<" ," << elbow->mouseDownY;
+
+            LineSegmentGraphic* segOne = elbow->getSegment(0);
+            LineSegmentGraphic* segTwo = elbow->getSegment(1);
+            if(segOne && segOne->isHovered())
+            {
+
+                segOne->forceHoverLeaveEvent();
+            }
+            if(segTwo && segTwo->isHovered())
+            {
+
+                segTwo->forceHoverLeaveEvent();
+            }
+            elbow->forceHoverEnterEvent();
         }
         break;
 
@@ -314,6 +328,15 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
             elbow->setMouseState(ElbowGrabber::kMouseReleased);
             updateModel();                  // update the datamodel for this path
+
+
+            elbow->forceHoverLeaveEvent();
+            LineSegmentGraphic* segOne = elbow->getSegment(0);
+            LineSegmentGraphic* segTwo = elbow->getSegment(1);
+           /* if(segOne)
+                segOne->setAcceptHoverEvents(true);
+            if(segTwo)
+                segTwo->setAcceptHoverEvents(true);*/
         }
         break;
 

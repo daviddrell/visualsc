@@ -40,7 +40,8 @@ public:
 
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
-
+    void forceHoverEnterEvent();
+    void forceHoverLeaveEvent();
 
     void setSegmentOne(LineSegmentGraphic*);
     void setSegmentTwo(LineSegmentGraphic*);

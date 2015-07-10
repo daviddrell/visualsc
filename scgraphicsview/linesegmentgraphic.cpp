@@ -7,7 +7,8 @@ LineSegmentGraphic::LineSegmentGraphic()
 }
 
 LineSegmentGraphic::LineSegmentGraphic(ElbowGrabber *startPoint, ElbowGrabber *endPoint, TransitionGraphic *parentGraphic, KeyController *keys):
-    _keyController(keys)
+    _keyController(keys),
+    _isHovered(false)
 {
     this->setParentItem(parentGraphic);
     _elbows[0] = startPoint;
@@ -42,9 +43,25 @@ TransitionGraphic* LineSegmentGraphic::parentItemAsTransitionGraphic()
     return static_cast<TransitionGraphic*>(this->parentItem());
 }
 
+void LineSegmentGraphic::setHovered(bool hovered)
+{
+    _isHovered = hovered;
+}
+
+bool LineSegmentGraphic::isHovered()
+{
+    return _isHovered;
+}
+
+void LineSegmentGraphic::forceHoverLeaveEvent()
+{
+    this->hoverLeaveEvent(NULL);
+}
+
 void LineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
 
+    _isHovered = true;
     // set parent's currently hovered object to this line segment
      this->parentItemAsTransitionGraphic()->setCurrentlyHoveredSegment(this);
 
@@ -62,7 +79,7 @@ void LineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 void LineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
-
+    _isHovered = false;
     // clear parent's currently hovered object
     this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredSegment();
 
@@ -230,7 +247,7 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
 //TODO move terminal and arrow head paint to elbowgrabber
 void LineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    //#define SHOW_HOVER_BOXES
+    #define SHOW_HOVER_BOXES
     painter->setPen(_pen);
 
 #ifndef SHOW_HOVER_BOXES
