@@ -75,7 +75,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
     propertyTable->setColumnCount(2);
     vlayout->addWidget( propertyTable );
 
-    setWindowTitle(tr("State Chart Editor"));
+    setWindowTitle(tr("State Chart Tree Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
 
     QList<SCState*> states;

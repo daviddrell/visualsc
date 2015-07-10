@@ -1,6 +1,6 @@
 /*
     visualsc - Visual State Chart Editing for SCXML State Engines
-    Copyright (C) 2011  David W. Drell (david@davidwdrell.net) and
+    Copyright (C) 2011  David W. Drell (david@davidwdrell.net) and`
     Contributing Authors:
 
 
@@ -138,7 +138,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
     // now project a point from the cursor position to the nearest point on the nearest line
 
     int cornerGuard = 10;// keep line anchor off corners of box
-
+    closest = findNearestWall(box, cursorPos);
     switch ( closest )
     {
     case 0 :
@@ -207,6 +207,247 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
 }
 
+double StateBoxGraphic::distance(QPointF q1, QPointF q2)
+{
+    return distance(q1.x(),q1.y(),q2.x(),q2.y());
+}
+
+double StateBoxGraphic::distance(qreal x1, qreal y1, qreal x2, qreal y2)
+{
+    qreal a = x1-x2;
+    qreal b = y1-y2;
+    return sqrt((a*a)+(b*b));
+}
+
+int StateBoxGraphic::getSmallest(double* ar, int len)
+{
+    int min = std::numeric_limits<int>::max();
+    int index = 0;
+    for(int i = 0; i < len; i++)
+    {
+        if(ar[i] < min)
+        {
+            min = ar[i];
+            index = i;
+        }
+    }
+    return index;
+}
+
+int StateBoxGraphic::findNearestWall(QRectF box, QPointF point)
+{
+
+
+    qreal w = box.width();
+    qreal wmid = box.width()/2.0;
+
+    qreal h = box.height();
+    qreal hmid = box.height()/2.0;
+
+    QPointF NW(box.x(),box.y());
+    QPointF N(box.x()+wmid,box.y());
+    QPointF NE(box.x()+w,box.y());
+
+    QPointF E(box.x()+w,box.y()+hmid);
+    QPointF SE(box.x()+w,box.y()+h);
+
+    QPointF S(box.x() + wmid, box.y()+h);
+    QPointF SW(box.x(),box.y()+h);
+
+    QPointF W(box.x(),box.y()+hmid);
+
+    double d[8];
+
+    d[0] = distance(point, NW);
+    d[1] = distance(point, N);
+    d[2] = distance(point, NE);
+    d[3] = distance(point, E);
+    d[4] = distance(point, SE);
+    d[5] = distance(point, S);
+    d[6] = distance(point, SW);
+    d[7] = distance(point, W);
+
+    double wallDist[4];
+
+    wallDist[0] = d[0] + d[1] + d[2];
+    wallDist[1] = d[2] + d[3] + d[4];
+    wallDist[2] = d[4] + d[5] + d[6];
+    wallDist[3] = d[6] + d[7] + d[0];
+
+    /*for(int i = 0; i < 4;i++)
+    {
+        qDebug() << "wallDist["<<i<<"] = " << wallDist[i];
+    }*/
+
+    return getSmallest(wallDist, 4);
+}
+
+
+void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
+{
+    // this method keeps the starting position of a line snapped to the outter edge of the box
+
+    //SelectableLineSegmentGraphic *transition = dynamic_cast<SelectableLineSegmentGraphic *> (QObject::sender());
+
+    ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
+
+
+    QPointF cursorPos = (newPos);
+   // QPointF cursorPos =
+
+   //QPointF cursorPos = newPos;
+  //  qDebug() << "the cursorPos is: " << cursorPos.x() << ", " << cursorPos.y();
+
+#if 0  // debug stuff
+    // draw a diag line from the newPos to the center of the box, blue dotted line
+
+    _diagLineStart =  getVisibleCenter();
+    _diagLineEnd = mapFromItem(elbow, cursorPos);
+    _diagLineDrawIt = true;
+#endif
+
+    // find the side which is closest to the newPos
+    QRectF box = getUsableArea();
+    double d[4];
+
+    /*
+
+     ----- 0 -----
+     |           |
+     |           |
+    3             1
+     |           |
+     |           |
+     ----- 2 -----
+
+     */
+
+   // qDebug() << "the box pos is " << box.x() << ", " << box.y();
+    QPointF dur(box.x(),box.y());
+    QPointF mts = mapToScene(dur);
+
+
+  //  qDebug() << "the map to scene box pos is " <<mts.x()<< ", " <<mts.y() ;
+
+
+    d[3] = fabs(mts.x() - cursorPos.x());
+    d[1] = fabs(mts.x() + box.width() - cursorPos.x());
+    d[0] = fabs(mts.y() - cursorPos.y());
+    d[2] = fabs(mts.y() + box.height() -  cursorPos.y());
+
+    double min = 99999999 ;
+    int closest = -1;
+    for(int i = 0; i < 4 ; i++)
+    {
+
+        if ( d[i] < min)
+        {
+            min = d[i];
+            closest = i;
+            //qDebug() << "d[" <<i<<"] = " << d[i] << "is smallest";
+        }
+        else
+        {
+            //qDebug() << "d[" <<i<<"] = " << d[i];
+        }
+    }
+    qDebug() << "";
+
+    // now project a point from the cursor position to the nearest point on the nearest line
+
+    int cornerGuard = 10;// keep line anchor off corners of box
+    QRectF adjustedBox(mts.x(), mts.y(), box.width(), box.height());
+    closest = findNearestWall(adjustedBox, cursorPos);
+    switch(closest)
+    {
+        case 0:
+        _intersection.setX(mts.x()+box.width()/2);
+        _intersection.setY(mts.y());
+        break;
+    case 1:
+        _intersection.setX(mts.x()+box.width());
+        _intersection.setY(mts.y()+box.height()/2);
+        break;
+    case 2:
+        _intersection.setX(mts.x()+box.width()/2);
+        _intersection.setY(mts.y()+box.height());
+        break;
+case 3:
+        _intersection.setX(mts.x());
+        _intersection.setY(mts.y()+box.height()/2);
+        break;
+    default:
+        break;
+
+    }
+
+/*
+    switch ( closest )
+    {
+    case 0 :
+        {
+        qDebug() << "case 0 north";
+            double x = cursorPos.x() ;
+            if ( cursorPos.x() >= box.width()-cornerGuard) x = box.width()-1-cornerGuard;
+            else if ( cursorPos.x() < mts.x()+cornerGuard) x = mts.x()+cornerGuard;
+
+            _intersection.setX( x );
+            _intersection.setY( mts.y() );
+        }
+        break;
+
+    case 1 :
+        {
+        qDebug() << "case 1 east";
+            double y =cursorPos.y() ;
+            if ( cursorPos.y() >= box.height()-cornerGuard) y = box.height()-1-cornerGuard;
+            else if ( cursorPos.y() < mts.y()+cornerGuard) y = mts.y()+cornerGuard;
+
+            _intersection.setX( box.width() );
+            _intersection.setY( y );
+        }
+        break;
+
+    case 2 :
+        {
+        qDebug() << "case 2 south";
+            double x=cursorPos.x() ;
+            if ( cursorPos.x() >= box.width()-cornerGuard) x = box.width()-1-cornerGuard;
+            if ( cursorPos.x() < mts.x()+cornerGuard) x = mts.x()+cornerGuard;
+
+            _intersection.setX( x );
+            _intersection.setY( box.height() );
+        }
+        break;
+
+    case 3 :
+        {
+        qDebug() << "case 3 west";
+            double y =cursorPos.y() ;
+            if ( cursorPos.y() >= box.height()-cornerGuard) y = box.height()-1-cornerGuard;
+            if ( cursorPos.y() < mts.y()+cornerGuard) y = mts.y()+cornerGuard;
+
+            _intersection.setX( mts.x() );
+            _intersection.setY( y );
+        }
+        break;
+    }
+*/
+
+    // update the elbow to the intersection
+   // elbow->setZValue(500);
+    //elbow->setPos(elbow->mapFromParent(( mapToItem(this, (_intersection)))));
+    //elbow->setPos( elbow->parentItem()->mapToItem(this, _intersection)   );
+   // elbow->setPos(elbow->mapToItem(this,_intersection));
+    //QPointF test(_intersection.x()-elbow->parentAsTransitionGraphic()->parentAsStaetBoxGraphic()->
+      //           ,_intersection.y()-elbow->parentAsTransitionGraphic()->parentAsStaetBoxGraphic()->y());
+   StateBoxGraphic* parentState =  elbow->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic();
+   QPointF test(_intersection.x() - parentState->x(), _intersection.y()-parentState->y());
+   //QPointF test = mapFromParent(_intersection);
+    qDebug() << "Intersection:\t" << _intersection << "\nMouse:\t\t" << cursorPos << "\ntest:\t\t" <<test << "\nbox:\t\t" << parentState->pos();
+  // elbow->setPos(_intersection);
+   elbow->setPos(test);
+}
 
 
 void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

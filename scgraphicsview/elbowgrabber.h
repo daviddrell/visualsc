@@ -53,6 +53,8 @@ public:
     bool isTerminal();
     void setTerminal(bool);
 
+    TransitionGraphic* parentAsTransitionGraphic();
+
 
 signals:
     void anchorMoved(QPointF newPos);

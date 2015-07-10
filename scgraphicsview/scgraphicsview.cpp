@@ -107,19 +107,13 @@ void SCGraphicsView::createGraph()
     QList<SCState*> states;
     _dm->getAllStates(states);
 
+    // first load all states
     for(int s = 0; s < states.count(); s++)
     {
         handleNewState( states[s]);
-/*
-        QList<SCTransition*> transitions;
-        states[s]->getTransitions(transitions);
-
-        for(int t = 0; t < transitions.count(); t ++)
-        {
-            handleNewTransition(transitions[t]);
-        }
-        */
     }
+
+    // load all transitions
     for(int i = 0; i< states.count(); i++)
     {
         QList<SCTransition*> transitions;
@@ -327,7 +321,7 @@ void SCGraphicsView::handleStateGraphicDeleted(QObject *st)
 
 void SCGraphicsView::handleNewState (SCState *newState)
 {
-
+    static int zVal = 0;
     connect(newState, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
 
     StateString * type = dynamic_cast<StateString *> ( newState->attributes.value("type"));
@@ -351,6 +345,9 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // will set the size of the model and vice versa
 
     stateGraphic = new StateBoxGraphic( parentGraphic, newState);
+
+    stateGraphic->setZValue(zVal--);
+
     stateGraphic->setObjectName(newState->objectName());
     //stateGraphic->setPos(newState->attributes.value("position"));
     //stateGraphic->setSize(newState->attributes.value("size"));
@@ -358,7 +355,7 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     // quick look up of graphics from state model references
 
-    qDebug() << "inserting new state into mapstate to graphic : " << newState->objectName();
+   // qDebug() << "inserting new state into mapstate to graphic : " << newState->objectName();
     _mapStateToGraphic.insert(newState, stateGraphic);
 
 

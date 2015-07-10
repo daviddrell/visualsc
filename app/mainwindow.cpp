@@ -56,6 +56,38 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->addToolBar(_textFormatToolBar);
 
+    this->setWindowTitle("Visual State Chart Editor");
+
+
+/*
+    _project = new SMProject(  ui->centralWidget );
+
+    _project->initNewSM();
+
+    _project->setObjectName("TEST");
+
+    ui->gridLayout->addWidget( _project->getQGraphicsView() );
+
+
+
+   _formEditorWindow = new SCFormView(0, _project->getDM());
+   _formEditorWindow->show();
+
+*/
+
+    QString fileName ="C:/visualsc/bin/debug/az.scxml";
+    _settings->setValue(_keyLastFilePath, fileName);
+
+
+    _project = new SMProject(  ui->centralWidget );
+
+
+
+    connect (_project, SIGNAL(readInputFileCompleted(bool,QStringList)), this, SLOT(handleReadInputFileDone(bool,QStringList)) );
+
+    _project->readInputFile(fileName);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -78,7 +110,7 @@ void MainWindow::handleFileOpenClick()
     fileName = QFileDialog::getOpenFileName(this,
                                             tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
 
-
+        qDebug() << "%%% filename : " <<fileName;
 
     _settings->setValue(_keyLastFilePath, fileName);
 

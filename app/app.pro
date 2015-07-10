@@ -45,4 +45,8 @@ OTHER_FILES += \
     design.pptx \ 
     COPYING.txt
 
+RC_FILE = myapp.rc
+
+
 RESOURCES +=
+

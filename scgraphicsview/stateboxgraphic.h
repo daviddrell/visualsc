@@ -59,10 +59,14 @@ public:
 
 public slots:
     void handleTransitionLineStartMoved(QPointF newPos);
+    void handleTransitionLineEndMoved(QPointF newPos);
 
 private:
 
-
+    double distance(QPointF,QPointF);
+    double distance(qreal,qreal,qreal,qreal);
+    int getSmallest(double*, int);
+    int findNearestWall(QRectF,QPointF);
     virtual void graphicHasChanged (); ///< implemented to receive updates from the SelectableBoxGraphic
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
 

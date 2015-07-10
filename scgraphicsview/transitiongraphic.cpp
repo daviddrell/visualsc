@@ -94,7 +94,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _anchors[1]->setAnchor(true);
         connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
         qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
-        connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+        connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
 
 
 
@@ -200,7 +200,12 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
     // check if this elbow is an anchor
     if(elbow->isAnchor())
     {
-        emit elbow->anchorMoved(newPos);
+        if(elbow->isTerminal())
+        {
+            emit elbow->anchorMoved(newPos);
+        }
+        else
+            emit elbow->anchorMoved(newPos);
        // qDebug() << "selected elbow is an anchor";
         // this elbow is an anchor, so we need to lock it to its parent state box graphic
         /*if(elbow ==_elbows[0])
@@ -322,7 +327,8 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
     if ( elbow->getMouseState() == ElbowGrabber::kMouseMoving )
     {
-        this->updateElbow(this->mapFromItem(elbow, mevent->pos()), elbow);
+        this->updateElbow(elbow->mapToScene(mevent->pos()),elbow);
+        //this->updateElbow(this->mapFromItem(elbow, mevent->pos()), elbow);
         //this->update();
     }
 

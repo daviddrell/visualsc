@@ -24,6 +24,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
 {
 
     this->setParentItem(parentGraphic);
+
     this->setPos(point);
    // this->setPos(0,0);
    // qDebug() << "Elbow Parent: " << parentGraphic << " pos: "<< this->pos();
@@ -75,6 +76,11 @@ void ElbowGrabber::setSegmentTwo(LineSegmentGraphic* segTwo)
 LineSegmentGraphic* ElbowGrabber::getSegment(int index)
 {
     return _segments[index];
+}
+
+TransitionGraphic* ElbowGrabber::parentAsTransitionGraphic()
+{
+    return static_cast<TransitionGraphic*>(this->parentItem());
 }
 
 void ElbowGrabber::setPaintStyle(PaintStyle s)
