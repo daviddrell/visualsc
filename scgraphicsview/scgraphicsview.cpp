@@ -177,16 +177,22 @@ StateBoxGraphic * SCGraphicsView::lookUpTargetStateGraphic(QString stateId )
     if ( stateDM == NULL ) return NULL;
 
 
-    qDebug()<< "The target state graphic was found. "<< stateDM->objectName();
+    //qDebug()<< "The target state graphic was found. "<< stateDM->objectName();
     StateBoxGraphic* ret = _mapStateToGraphic.find(stateDM).value();
-    qDebug() << "did we find anything? " << ret->objectName();
+    //qDebug() << "did we find anything? " << ret->objectName();
 
     return _mapStateToGraphic.find(stateDM).value();
 
 
 }
 
-
+/**
+ * @brief SCGraphicsView::lookUpTargetState
+ * @param target
+ * @return
+ *
+ * returns the SCState from the data model by its name found in the "name" attribute
+ */
 SCState* SCGraphicsView::lookUpTargetState(QString target )
 {
 
@@ -206,7 +212,7 @@ SCState* SCGraphicsView::lookUpTargetState(QString target )
 
 
         if(target.compare(attr->value("name")->asString()) == 0){
-            qDebug() << "target state found ! $$$ " << target << " vs " << attr->value("name")->asString();
+            //qDebug() << "target state found ! $$$ " << target << " vs " << attr->value("name")->asString();
             return st;
         }
     }

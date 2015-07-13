@@ -22,6 +22,7 @@ class ElbowGrabber : public QObject ,  public QGraphicsItem
     Q_OBJECT
 
 public:
+    ElbowGrabber(TransitionGraphic* parentGraphic);
     ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point);
     ~ElbowGrabber();
     void setAngle(int agle);///< set the rotation angle for corners which are drawn as arrowheads
@@ -58,7 +59,7 @@ public:
 
 
 signals:
-    void anchorMoved(QPointF newPos);
+    void anchorMoved(QPointF newPos);   // signal the stateboxgraphic parent and target that the anchors need updating, newPos given in scene scope
 
 private:
 

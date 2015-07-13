@@ -4,7 +4,34 @@
 #include <QDebug>
 
 
-//TODO Clean up and make kboxs bolden
+
+ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
+    mouseDownX(0),
+    mouseDownY(0),
+    _outterborderColor(TRANSITION_DEFAULT_COLOR),
+    _outterborderPen(),
+    _width(6),
+    _height(6),
+    _corner(0),
+    _mouseButtonState(kMouseReleased),
+    _placedOnASquare(false),
+    _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
+    _arrowAngle(0),
+    _arrowHead(NULL),
+    _anchor(false),
+    _terminator(false)
+{
+
+    this->setParentItem(parentGraphic);
+   // qDebug() << "Elbow Parent: " << parentGraphic << " pos: "<< this->pos();
+
+    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
+    _outterborderPen.setColor(_outterborderColor);
+    //this->setAcceptHoverEvents(true);
+
+    _segments[0] = NULL;
+    _segments[1] = NULL;
+}
 
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
     mouseDownX(0),

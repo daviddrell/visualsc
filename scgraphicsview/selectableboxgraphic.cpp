@@ -359,14 +359,20 @@ void SelectableBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 
 
 // for supporting moving the box across the scene
+/**
+ * @brief SelectableBoxGraphic::mouseMoveEvent
+ * @param event
+ */
 void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
     QPointF newPos = event->pos() ;
     QPointF location = this->pos();
-    location += (newPos - _dragStart);
-    QPointF test = newPos-_dragStart;
-    qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
-    emit stateBoxMoved(newPos- _dragStart);
+    QPointF diff = newPos -_dragStart;
+    location += diff;
+
+    //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
+
+    emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
     this->setPos(location);
 }
 
@@ -439,15 +445,20 @@ QRectF SelectableBoxGraphic::boundingRect() const
     return QRectF(0,0,_width,_height);
 }
 
-
+/**
+ * @brief SelectableBoxGraphic::getVisibleCenter
+ * @return
+ *
+ * get the scene coordinates of the center of the box
+ */
 QPointF SelectableBoxGraphic::getVisibleCenter()
 {
     QRectF area = getUsableArea();
 
-    double centerX = (area.x() + area.width())/2;
-    double centerY = (area.y() + area.height())/2;
+    double centerX = ((area.x() + area.width())/2.0);
+    double centerY = ((area.y() + area.height())/2.0);
 
-    return QPointF(centerX, centerY);
+    return mapToScene(QPointF(centerX, centerY));
 }
 
 QRectF SelectableBoxGraphic::getUsableArea()
@@ -470,11 +481,11 @@ QPointF SelectableBoxGraphic::getSideCenterPointInSceneCoord(int side)
         break;
 
     case 1:
-        return  mapToScene( QPointF ( _drawingWidth, (_drawingOrigenY + _drawingHeight)/2));
+        return  mapToScene( QPointF ( _drawingOrigenX +_drawingWidth, (_drawingOrigenY + _drawingHeight)/2));
         break;
 
     case 2:
-        return  mapToScene( QPointF ( (_drawingOrigenX +  _drawingWidth)/2,  _drawingHeight));
+        return  mapToScene( QPointF ( (_drawingOrigenX +  _drawingWidth)/2,_drawingOrigenY +  _drawingHeight));
         break;
 
     case 3:
