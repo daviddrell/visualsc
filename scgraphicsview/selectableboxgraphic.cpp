@@ -363,6 +363,26 @@ int SelectableBoxGraphic::getHoveredCorner()
     return -1;  // no corner is hovered.
 }
 
+/**
+ * @brief SelectableBoxGraphic::getAllChildren
+ * @param stateList
+ *
+ * this recursive function adds all the children states and grandchildren states recursively into the Given QList
+ */
+void SelectableBoxGraphic::getAllChildren(QList<SelectableBoxGraphic*> &stateList)
+{
+    qDebug() << "children items "<< this->childItems().count();
+    for(int i = 0; i < this->childItems().count(); i++)
+    {
+        SelectableBoxGraphic* state = dynamic_cast<SelectableBoxGraphic*>(this->childItems()[i]);
+        if(state)
+        {
+            stateList.append(state);
+            state->getAllChildren(stateList);
+        }
+    }
+}
+
 // for supporting moving the box across the scene
 void SelectableBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
@@ -405,8 +425,15 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 
     emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
+    QList<SelectableBoxGraphic*> children;
+    this->getAllChildren(children);
 
-
+    // also emit statebox moved for all children
+    for(int i = 0; i < children.size();i++)
+    {
+        qDebug() << "i " << children.at(i)->objectName();
+        emit children.at(i)->stateBoxMoved(diff);
+    }
 
     this->setPos(location);
 }
