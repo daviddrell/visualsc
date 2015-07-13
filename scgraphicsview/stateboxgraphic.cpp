@@ -360,9 +360,10 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 
      */
 
-   // qDebug() << "the box pos is " << box.x() << ", " << box.y();
-    QPointF boxTopLeft(box.x(),box.y());
+   // qDebug() << "the box pos is " << box.topLeft();
+    QPointF boxTopLeft(box.topLeft());
     QPointF boxInScene = mapToScene(boxTopLeft);
+    qDebug() << "the box in the scene is " << boxInScene;
     QRectF adjustedBox(boxInScene.x(), boxInScene.y(), box.width(), box.height());
     int closest = findNearestWall(adjustedBox, cursorPos);
 
@@ -425,9 +426,28 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 
    // update the elbow to the intersection
    // elbow->setZValue(500);
+    /*
+   qDebug() << "intersection: " << _intersection;
    StateBoxGraphic* parentState =  elbow->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic();
-   QPointF test(_intersection.x() - parentState->x(), _intersection.y()-parentState->y());
-   elbow->setPos(test);
+   QPointF parentOffset = (parentState->pos());
+   //QPointF test(_intersection.x() -(parentState->x()), _intersection.y()-(parentState->y()));
+   QPointF test(_intersection - parentOffset);
+   qDebug() << "test: " << test;
+   elbow->setPos(test);*/
+
+
+    // this is how to handle snapping children states of one state to any other state outside of its parent
+    StateBoxGraphic* parentState = elbow->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic();       // find the next highest parent of this state
+    QPointF parentOffset = (parentState->pos());                                                            // add its position to the total offset
+    while(parentState->parentItem())                                // while this parent still has parents, continue adding each next higher level state's offset
+    {
+        parentState = dynamic_cast<StateBoxGraphic*>(parentState->parentItem());
+        parentOffset+=parentState->pos();
+    }
+
+    QPointF test(_intersection - parentOffset);             // modify the intersection by the total offset
+    // qDebug() << "test: " << test;
+    elbow->setPos(test);                                    // set the elbow's position
 }
 
 

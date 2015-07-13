@@ -362,7 +362,7 @@ void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF ne
     qreal scaleY = newHeight/oldHeight;
 
 
-    qDebug() << "handleParentStateGraphicResized: x, y: " << scaleX << ", "<<scaleY;
+    //qDebug() << "handleParentStateGraphicResized: x, y: " << scaleX << ", "<<scaleY;
     //_anchors[0]->setPos(_anchors[0]->pos()-point);
     //_anchors[0]->setPos(_anchors[0]->pos()*scale);
 
@@ -393,8 +393,8 @@ void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF ne
     QPointF nmtsTL = mapToScene(newBox.topLeft());
   //  qDebug() << "old xy: " << oldBox.x()<< ", " << oldBox.y();
 //qDebug() << "new xy: " << newBox.x()<< ", " << newBox.y();
-qDebug() << "old "<<mtsTL;
-qDebug() << "new "<<nmtsTL;
+//qDebug() << "old "<<mtsTL;
+//qDebug() << "new "<<nmtsTL;
 QPointF diff = mtsTL - nmtsTL;
 qreal dx = diff.x();
 qreal dy = diff.y();
@@ -413,14 +413,46 @@ qreal dy = diff.y();
         break;
     }
 
- _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()+dy));
-   // _anchors[0]->setPos(QPointF(_anchors[0]->x()*scaleX, _anchors[0]->y()*scaleY));
+
+    // make other elbows stay in place
+    for(int i = 1 ; i < _elbows.count();i++)
+    {
+        _elbows[i]->setPos(QPointF(_elbows[i]->x()+dx, _elbows[i]->y()+dy));
+    }
+// _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()+dy));
+
 }
 
-void TransitionGraphic::handleTargetStateGraphicResized(qreal scaleX, qreal scaleY)
+void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF newBox)
 {
-   // qDebug() << "handleTargetStateGraphicResized: " << scale;
-    _anchors[1]->setPos(_anchors[1]->pos()*scaleX);
+    qDebug() << "handleTargetStateGraphicResized: ";
+    int buffer = 12;
+    qreal newWidth = newBox.width()-buffer;
+    qreal newHeight = newBox.height()-buffer;
+    qreal oldWidth = oldBox.width()-buffer;
+    qreal oldHeight = oldBox.height()-buffer;
+    qreal scaleX = newWidth/oldWidth;
+    qreal scaleY = newHeight/oldHeight;
+
+    QPointF mtsTL = mapToScene(oldBox.topLeft());
+    QPointF nmtsTL = mapToScene(newBox.topLeft());
+  //  qDebug() << "old xy: " << oldBox.x()<< ", " << oldBox.y();
+//qDebug() << "new xy: " << newBox.x()<< ", " << newBox.y();
+//qDebug() << "old "<<mtsTL;
+//qDebug() << "new "<<nmtsTL;
+QPointF diff = mtsTL - nmtsTL;
+qreal dx = diff.x();
+qreal dy = diff.y();
+
+    _anchors[1]->setPos(QPointF((_anchors[1]->x()-dx), _anchors[1]->y()-dy));
+QPointF anchmts = mapToScene(_anchors[1]->pos());
+QPointF anchOnBox = _targetStateGraphic->mapFromScene(anchmts);
+anchOnBox.setX(anchOnBox.x() * scaleX);
+anchOnBox.setY(anchOnBox.y() * scaleY);
+
+   // _anchors[1]->setPos(this->mapFromScene(mapToScene(anchOnBox)));
+
+
 }
 
 /**
