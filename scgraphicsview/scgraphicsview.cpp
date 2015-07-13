@@ -166,7 +166,11 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
 
 }
 
-
+/**
+ * @brief SCGraphicsView::lookUpTargetStateGraphic
+ * @param stateId   string of the statebox's name
+ * @return the statebox graphic whose name is is the passed parameter
+ */
 StateBoxGraphic * SCGraphicsView::lookUpTargetStateGraphic(QString stateId )
 {
     SCState * stateDM = lookUpTargetState(stateId);
@@ -249,7 +253,13 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
 
 }
 
-void SCGraphicsView::handleNewTransition (SCTransition *t)
+/**
+ * @brief SCGraphicsView::handleNewTransition
+ * @param t
+ *
+ * Creation of a new transition graphic from the user creating a new transition or a transition being loaded in from the scxml file.
+ */
+void SCGraphicsView::handleNewTransition (SCTransition * t)
 {
     // get the parent state graphic
     SCState *parentState = dynamic_cast<SCState *>(t->parent());
@@ -263,6 +273,7 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
         return;
     }
 
+    // if the transition is deleted, then call the handleTransitionDeleted function in SCGraphicsView
     connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
 
      // create a transition graphic
@@ -276,20 +287,33 @@ void SCGraphicsView::handleNewTransition (SCTransition *t)
         position = pos->asQPointF();
 
     TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
-    //TODO fix target state
     StateBoxGraphic * targetGraphic  = lookUpTargetStateGraphic( targetName->asString() );
-    qDebug() << "target Graphic look up: " << targetName->asString();
-    qDebug() << "target Graphic is set " << targetGraphic->objectName();
+ //   qDebug() << "target Graphic look up: " << targetName->asString();
+ //   qDebug() << "target Graphic is set " << targetGraphic->objectName();
     transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController,_mouseController);
+
+
+    // when this transition graphic is deleted, call handleTransitionGraphicDeleted
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
 
-
-    // create the connection to automatically move transition graphic anchors when state graphics are moved.
-    connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleStateGraphicMoved(QPointF)));
+    // create the connection to automatically move anchor elbows when state graphics are moved.
+    connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
+
+    // create the connect to automatically move anchor elbows when state graphics are moved.
+    connect(parentGraphic, SIGNAL(stateBoxResized(QPointF)),transGraphic, SLOT(handleParentStateGraphicResized(QPointF)));
+    connect(targetGraphic, SIGNAL(stateBoxResized(QPointF)),transGraphic, SLOT(handleTargetStateGraphicResized(QPointF)));
+
+    // add the transitiongraphic to the map of transition graphics
     _mapTransitionToGraphic.insert(t, transGraphic);
 }
 
+/**
+ * @brief SCGraphicsView::handleStateDeleted
+ * @param state
+ *
+ * If a state is deleted in the tree view, also remove it from the graphicsview
+ */
 void SCGraphicsView::handleStateDeleted(QObject *state)
 {
     // use a direct cast because dynamic_cast<State*> will not result in a

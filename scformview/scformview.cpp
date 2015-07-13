@@ -117,7 +117,8 @@ void SCFormView::handleNewState(SCState*s)
 void SCFormView :: setSelectedTreeItem(QObject * q){
     _previouslySelected = _currentlySelected;
     _currentlySelected = q;
-    qDebug() << "updated the tree items: " << _previouslySelected << " + " << _currentlySelected;
+    // TODO check this if its null first then do some default protocol if null
+//    qDebug() << "updated the tree items: " << _previouslySelected << " + " << _currentlySelected;
 }
 
 void SCFormView::handlePropertyCellChanged(int r, int c)

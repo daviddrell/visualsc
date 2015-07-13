@@ -58,7 +58,7 @@ public:
     enum ShowBoxStyle { kAlways, kWhenSelected};
     enum DrawBoxLineStyle { kDrawSolid, kDrawDotted};
 
-    void setShowBoxLineStyle(ShowBoxStyle s );///< show box allways, or only when selected
+    void setShowBoxLineStyle(ShowBoxStyle s );///< show box always, or only when selected
     void setDrawBoxLineStyle( DrawBoxLineStyle s);///< if drawing box, draw solid or dotted line
     void setBoxStyle (BoxStyle s); ///< set box style
     void setHoverLineThickness(int t);///< set line thickness when hovered
@@ -70,7 +70,8 @@ public:
     //bool eventFilter(QObject *, QEvent *);
 
 signals:
-    void stateBoxMoved(QPointF);
+    void stateBoxMoved(QPointF);    // this signal activates when the statebox graphic is moved or resized to alert the transition graphic to be updated as to remained anchored to its target state. Although the sink anchor is still a child of the source state graphic, it should behave like a child of its target state.
+    void stateBoxResized(QPointF);
 
 protected:
 

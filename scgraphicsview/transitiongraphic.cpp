@@ -12,8 +12,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _mouseController(mouse)
 {
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
-    this->setParentItem(parentGraphic);
-    //this->acceptHoverEvents();
+    this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
+    //this->acceptHoverEvents();            // a Transition graphic has no dimensions, its invididual elbows and line segments will have hover events
     //this->setParent(targetGraphic);
 
     TransitionAttributes::TransitionPathAttribute * p =
@@ -25,6 +25,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         qDebug() << pointList.at(i);
 
 
+    // populate the transition graphic with elbows.
+    // if this is a new transition graphic, then create two elbows
+    // otherwise this is a transition graphic being loaded in, so add elbows according to its path list
     if(pointList.count() < 2 && targetGraphic != NULL )
     {
         int sourceSide=0;
@@ -53,20 +56,20 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         segment->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
 
 
-                _anchors[0]->setSegmentOne(NULL);
-                _anchors[0]->setSegmentTwo(segment);
+        _anchors[0]->setSegmentOne(NULL);
+        _anchors[0]->setSegmentTwo(segment);
 
-                _anchors[1]->setSegmentOne(segment);
-                _anchors[1]->setSegmentTwo(NULL);
+        _anchors[1]->setSegmentOne(segment);
+        _anchors[1]->setSegmentTwo(NULL);
 
-                _anchors[1]->setTerminal(true);                         // set the last elbow grabber as the terminator
-                _anchors[1]->setPaintStyle(ElbowGrabber::kArrowHead);   // set the end of the transition to an arrowhead
+        _anchors[1]->setTerminal(true);                         // set the last elbow grabber as the terminator
+        _anchors[1]->setPaintStyle(ElbowGrabber::kArrowHead);   // set the end of the transition to an arrowhead
 
-                _anchors[0]->setAnchor(true);
-                _anchors[1]->setAnchor(true);
-                connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
-                qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
-                connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+        _anchors[0]->setAnchor(true);
+        _anchors[1]->setAnchor(true);
+        connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+        qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
+        connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
 
 
 
@@ -101,7 +104,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         */
 
     }
-
     else // load the point list and create the elbows and line segments
     {
         // add every point as an elbow
@@ -122,27 +124,26 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             ElbowGrabber* elbOne = _elbows.at(i);
             ElbowGrabber* elbTwo = _elbows.at(i+1);
 
-            //SelectableLineSegmentGraphic * segment = new SelectableLineSegmentGraphic(elbOne, elbTwo,t, this,_keyController);
             LineSegmentGraphic* segment = new LineSegmentGraphic(elbOne, elbTwo, this, _keyController);
-            segment->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
+            segment->setAcceptHoverEvents(true);                    // allow the line segment to be hovered
             //segment->installSceneEventFilter(this);
 
            // connect(segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
            // connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
 
-            if(i==0 || i== _elbows.count()-2)
+
+            if(i==0 || i== _elbows.count()-2)   // anchor elbows at the end and beginning
             {
-                if(i==0){
+                if(i==0){                       // source anchor
                     elbOne->setSegmentOne(NULL);
                     elbOne->setSegmentTwo(segment);
                 }
-                if(i==_elbows.count()-2){
-
+                if(i==_elbows.count()-2){      // sink anchor
                     elbTwo->setSegmentOne(segment);
                     elbTwo->setSegmentTwo(NULL);
                 }
             }
-            else
+            else                                // standard elbow that connects two line segments
             {
                 elbOne->setSegmentTwo(segment);
                 elbTwo->setSegmentOne(segment);
@@ -150,12 +151,12 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
 
 
-
+            // make the elbows invisible by default
             //elbOne->setVisible(false);
-           // elbOne->setVisible(false);
+            //elbOne->setVisible(false);
 
 
-            _lineSegments.append(segment);
+            _lineSegments.append(segment);  // add the line segments
 
         }
 
@@ -447,6 +448,16 @@ TransitionGraphic::~TransitionGraphic()
     _elbows.clear();
 }
 
+void TransitionGraphic::handleParentStateGraphicResized(QPointF point)
+{
+    qDebug() << "handleParentStateGraphicResized: " << point;
+}
+
+void TransitionGraphic::handleTargetStateGraphicResized(QPointF point)
+{
+    qDebug() << "handleTargetStateGraphicResized: " << point;
+}
+
 /**
  * @brief TransitionGraphic::handleStateGraphicMoved
  * @param point
@@ -460,12 +471,12 @@ TransitionGraphic::~TransitionGraphic()
  *
  * this function is called when the parent state is moved
  */
-void TransitionGraphic::handleStateGraphicMoved(QPointF point)
+void TransitionGraphic::handleParentStateGraphicMoved(QPointF point)
 {
 
     // point will be the coorindate of the statebox after it moved.
   //  QPointF difference =
-   // qDebug()<<"the source state graphic has moved. must update the transition anchor";
+    qDebug()<<"the source state graphic has moved. must update the transition anchor" << point;
 
 
     // point will be the difference.
@@ -495,7 +506,7 @@ void TransitionGraphic::handleTargetStateGraphicMoved(QPointF point)
 
     // point will be the coorindate of the statebox after it moved.
   //  QPointF difference =
-   // qDebug()<<"the source state graphic has moved. must update the transition anchor";
+    qDebug()<<"the target state graphic has moved. must update the transition anchor" << point;
 
 
     // point will be the difference.

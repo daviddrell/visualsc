@@ -321,7 +321,9 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         difference.setX(old.x() - pos().x());
         difference.setX(old.y() - pos().y());
         setCornerPositions();
-        emit stateBoxMoved(difference);    // linked to transition graphic. connect witten in scgraphicsview.cpp
+        //emit stateBoxMoved(difference);    // linked to transition graphic. connect witten in scgraphicsview.cpp
+
+        emit stateBoxResized(difference);
         this->update();
     }
 

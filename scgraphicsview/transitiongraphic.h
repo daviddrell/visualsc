@@ -44,8 +44,11 @@ signals:
 
 public slots:
     void updateModel ();
-    void handleStateGraphicMoved(QPointF);
+    void handleParentStateGraphicMoved(QPointF);
     void handleTargetStateGraphicMoved(QPointF);
+    void handleParentStateGraphicResized(QPointF);
+    void handleTargetStateGraphicResized(QPointF);
+
 
 
 protected:

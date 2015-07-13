@@ -89,6 +89,7 @@ public slots:
 
 private:
 
+    QRectF* getBufferedBoxRect(qreal buffer,qreal offset);
     double xDistance(QPointF, QPointF);
     double yDistance(QPointF, QPointF);
     double distance(QPointF,QPointF);
