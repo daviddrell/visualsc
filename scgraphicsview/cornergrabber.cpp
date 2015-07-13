@@ -35,7 +35,8 @@ CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnAS
     _placedOnASquare(placedOnASquare),
     _paintStyle(kBox),
     _arrowAngle(0),
-    _arrowHead(NULL)
+    _arrowHead(NULL),
+    _isHovered(false)
 {
    this->setParentItem(parent);
     _outterborderPen.setWidth(2);
@@ -120,6 +121,7 @@ void CornerGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
+    _isHovered= false;
     _outterborderColor = Qt::black;
     this->update(0,0,_width,_height);
 }
@@ -127,6 +129,7 @@ void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
     //qDebug() << "CornerGrabber HoverEnterEvent";
+    _isHovered = true;
     _outterborderColor = Qt::red;
     this->update(0,0,_width,_height);
 }
@@ -139,6 +142,16 @@ QRectF CornerGrabber::boundingRect() const
 
     QRectF rect (topLeft, bottomRight);
     return rect;
+}
+
+void CornerGrabber::setHovered(bool isHovered)
+{
+    _isHovered = isHovered;
+}
+
+bool CornerGrabber::isHovered()
+{
+    return _isHovered;
 }
 
 QPointF CornerGrabber::getCenterPoint()

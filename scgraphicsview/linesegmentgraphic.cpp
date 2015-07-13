@@ -1,5 +1,5 @@
 #include "linesegmentgraphic.h"
-
+#include <QDebug>
 
 LineSegmentGraphic::LineSegmentGraphic()
 {
@@ -60,6 +60,7 @@ void LineSegmentGraphic::forceHoverLeaveEvent()
 
 void LineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
+    qDebug() << "hover enter for line";
 
     _isHovered = true;
     // set parent's currently hovered object to this line segment
@@ -79,6 +80,7 @@ void LineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 void LineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
+    qDebug() << "hover leave for line";
     _isHovered = false;
     // clear parent's currently hovered object
     this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredSegment();

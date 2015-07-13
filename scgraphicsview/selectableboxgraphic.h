@@ -71,7 +71,7 @@ public:
 
 signals:
     void stateBoxMoved(QPointF);    // this signal activates when the statebox graphic is moved or resized to alert the transition graphic to be updated as to remained anchored to its target state. Although the sink anchor is still a child of the source state graphic, it should behave like a child of its target state.
-    void stateBoxResized(QRectF, QRectF);
+    void stateBoxResized(QRectF, QRectF, int corner);
 
 protected:
 
@@ -98,7 +98,7 @@ private:
     void setCornerPositions();
     void adjustDrawingSize(int x, int y);
 
-
+    int getHoveredCorner();
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
 

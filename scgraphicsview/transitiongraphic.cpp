@@ -9,7 +9,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _elbows(),
     _targetStateGraphic(targetGraphic),
     _keyController(keys),
-    _mouseController(mouse)
+    _mouseController(mouse)//,
+    //TextItem(parent, )
+
 {
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
     this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
@@ -74,7 +76,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         emit _anchors[0]->anchorMoved(sourceAnchor);
         emit _anchors[1]->anchorMoved(targetAnchor);
 
-
+        segment->enclosePathInElbows();
         //elbOne->setVisible(false);
        // elbOne->setVisible(false);
 
@@ -127,7 +129,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             }
 
 
-
             // make the elbows invisible by default
             //elbOne->setVisible(false);
             //elbOne->setVisible(false);
@@ -151,6 +152,10 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
         connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
         //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
+
+        // do this to set closest wall from default
+        emit _anchors[0]->anchorMoved(mapToScene(_anchors[0]->pos()));
+        emit _anchors[1]->anchorMoved(mapToScene(_anchors[1]->pos()));
     }
 }
 
@@ -351,7 +356,7 @@ TransitionGraphic::~TransitionGraphic()
     _elbows.clear();
 }
 
-void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox)
+void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
     int buffer = 12;
     qreal newWidth = newBox.width()-buffer;
@@ -423,16 +428,18 @@ qreal dy = diff.y();
 
 }
 
-void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF newBox)
+void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
-    qDebug() << "handleTargetStateGraphicResized: ";
-    int buffer = 12;
+   // qDebug() << "handleTargetStateGraphicResized: ";
+    qreal buffer = 5.5;
     qreal newWidth = newBox.width()-buffer;
     qreal newHeight = newBox.height()-buffer;
     qreal oldWidth = oldBox.width()-buffer;
     qreal oldHeight = oldBox.height()-buffer;
     qreal scaleX = newWidth/oldWidth;
     qreal scaleY = newHeight/oldHeight;
+
+    qDebug() << "scaleX " << scaleX << " scaleY " << scaleY;
 
     QPointF mtsTL = mapToScene(oldBox.topLeft());
     QPointF nmtsTL = mapToScene(newBox.topLeft());
@@ -444,14 +451,111 @@ QPointF diff = mtsTL - nmtsTL;
 qreal dx = diff.x();
 qreal dy = diff.y();
 
-    _anchors[1]->setPos(QPointF((_anchors[1]->x()-dx), _anchors[1]->y()-dy));
+    //_anchors[1]->setPos(QPointF((_anchors[1]->x()-dx), _anchors[1]->y()-dy));
 QPointF anchmts = mapToScene(_anchors[1]->pos());
 QPointF anchOnBox = _targetStateGraphic->mapFromScene(anchmts);
-anchOnBox.setX(anchOnBox.x() * scaleX);
-anchOnBox.setY(anchOnBox.y() * scaleY);
+anchOnBox.setX((anchOnBox.x()-0) * scaleX);
+anchOnBox.setY((anchOnBox.y()-0) * scaleY);
+
+QPointF anchorOnBox = this->mapToItem(_targetStateGraphic, _anchors[1]->pos());
+//qDebug()<<"anchor on box" << anchorOnBox;
+//qDebug() << "old box " << mtsTL;
+//qDebug() << "new Box" << nmtsTL;
+
+qreal newX, newY, h1, h2, zPrime, z;
+QPointF newP, newPI;
+//qDebug() << "_anchors[1] "<< _anchors[1]->getSnappedSide();
+//qDebug() << "corner : " << corner;
+qDebug() << "old box" << mapToScene(mtsTL);
+
+switch(_anchors[1]->getSnappedSide())
+{
+// the anchor only needs to modify its x position
+
+case EAST:
+   if(corner == 2)
+   {
+       newY = anchorOnBox.y()*scaleY;
+       newX = anchorOnBox.x()*scaleX;
+       newP = QPointF(newX ,newY);
+       newPI = _targetStateGraphic->mapToItem(this, newP);
+
+      //_anchors[1]->setPos(QPointF(_anchors[1]->x(), newPI.y()));
+    //  _anchors[1]->setPos(QPointF(newPI.x(), _anchors[1]->y()));
+      _anchors[1]->setPos(QPointF(newPI.x()-dx, newPI.y()-dy));
+   }
+   else if (corner == 1)
+   {
+       /*
+       qDebug() << "z is " << anchorOnBox.y();
+       qDebug() << "d is " << scaleY * (oldHeight-anchorOnBox.y()) + anchorOnBox.y();
+        newY = mtsTL.y() + scaleY * (oldHeight-anchorOnBox.y()) + anchorOnBox.y();
+        newX = mtsTL.x()+ scaleX * (oldWidth - anchorOnBox.x()) + anchorOnBox.x();
+        newP = QPointF(newX ,newY);
+        newPI = _targetStateGraphic->mapToItem(this, newP);
+        _anchors[1]->setPos(QPointF(newPI.x()-dx, newPI.y()-dy));
+        */
+   }
+   break;
+}
+
+/*
+ *
+ *
+ *
+
+case NORTH:
+
+    newX = anchorOnBox.x()*scaleX;
+    newP= QPointF(newX, anchorOnBox.y());
+    newPI = _targetStateGraphic->mapToItem(this, newP);
+
+    _anchors[1]->setPos(QPointF(newPI.x(), _anchors[1]->y()));
+
+    break;
+case SOUTH:
+     newY = anchorOnBox.y()*scaleY;
+     newX = anchorOnBox.x()*scaleX;
+     newP = QPointF(newX ,newY);
+     newPI = _targetStateGraphic->mapToItem(this, newP);
+
+    //_anchors[1]->setPos(QPointF(_anchors[1]->x(), ));
+    _anchors[1]->setPos(QPointF(newPI.x(), newPI.y()));
+    break;
+
+ // the anchor only needs to modify its y position
+
+ case WEST:
+    newY = anchorOnBox.y()*scaleY;
+    newP = QPointF(anchorOnBox.x() ,newY);
+    newPI = _targetStateGraphic->mapToItem(this, newP);
+
+   _anchors[1]->setPos(QPointF(_anchors[1]->x(), newPI.y()));
+    break;
+
+switch(_anchors[1]->getSnappedSide())
+{
+// the anchor only needs to modify its x position
+case NORTH:
+    _anchors[1]->setPos(QPointF(_anchors[1]->x()*scaleX, _anchors[1]->y()));
+    break;
+case SOUTH:
+    _anchors[1]->setPos(QPointF(_anchors[1]->x(), _anchors[1]->y()*scaleY));
+    _anchors[1]->setPos(QPointF(_anchors[1]->x()*scaleX, _anchors[1]->y()));
+    break;
+
+ // the anchor only needs to modify its y position
+ case EAST:
+    _anchors[1]->setPos(QPointF(_anchors[1]->x()*scaleX, _anchors[1]->y()));
+    _anchors[1]->setPos(QPointF(_anchors[1]->x(), _anchors[1]->y()*scaleY));
+    break;
+ case WEST:
+    _anchors[1]->setPos(QPointF(_anchors[1]->x(), _anchors[1]->y()*scaleY));
+    break;
+}
 
    // _anchors[1]->setPos(this->mapFromScene(mapToScene(anchOnBox)));
-
+*/
 
 }
 

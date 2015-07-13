@@ -64,6 +64,9 @@ public:
 
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
+    bool isHovered();
+    void setHovered(bool);
+
 private:
 
 
@@ -92,6 +95,8 @@ private:
 
     int _mouseButtonState;
     bool _placedOnASquare;
+
+    bool _isHovered;
 
     PaintStyle _paintStyle;
     int        _arrowAngle;

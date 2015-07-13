@@ -212,12 +212,14 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
             corner->setMouseState(CornerGrabber::kMouseDown);
             corner->mouseDownX = mevent->pos().x();
             corner->mouseDownY = mevent->pos().y();
+            //corner->setHovered(true);
         }
         break;
 
     case QEvent::GraphicsSceneMouseRelease:
         {
             corner->setMouseState(CornerGrabber::kMouseReleased);
+            //corner->setHovered(false);
             graphicHasChanged();
         }
         break;
@@ -336,14 +338,30 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         //scaleY = (newHeight-buffer)/(scaleY-buffer);
         //emit stateBoxResized((scaleX-buffer),(scaleY-buffer),(newWidth-buffer), (newHeight-buffer) );
         //qDebug() <<"scaleX "<<
-        emit stateBoxResized(oldBox, newBox);
+        int corner = this->getHoveredCorner();
+        if(corner==-1)
+            qDebug() << "ERROR there was no hovered corner, should not be allowed";
+        else
+            emit stateBoxResized(oldBox, newBox, corner);
         this->update();
     }
 
     return true;// true => do not send event to watched - we are finished with this event
 }
 
+int SelectableBoxGraphic::getHoveredCorner()
+{
 
+    for(int i = 0; i < 4 ; i++)
+    {
+        //qDebug() << "Corner " << i <<" is hovered?: " << _corners[i]->isHovered();
+
+        if(_corners[i]->isHovered())
+            return i;
+
+    }
+    return -1;  // no corner is hovered.
+}
 
 // for supporting moving the box across the scene
 void SelectableBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
@@ -385,9 +403,20 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
     //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
+
     emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
+
+
+
     this->setPos(location);
 }
+
+/*
+void SelectableBoxGraphic::emitChildrenStateBoxMoved()
+{
+
+}
+*/
 
 // remove the corner grabbers
 

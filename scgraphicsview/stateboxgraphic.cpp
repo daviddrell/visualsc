@@ -363,7 +363,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
    // qDebug() << "the box pos is " << box.topLeft();
     QPointF boxTopLeft(box.topLeft());
     QPointF boxInScene = mapToScene(boxTopLeft);
-    qDebug() << "the box in the scene is " << boxInScene;
+   // qDebug() << "the box in the scene is " << boxInScene;
     QRectF adjustedBox(boxInScene.x(), boxInScene.y(), box.width(), box.height());
     int closest = findNearestWall(adjustedBox, cursorPos);
 
@@ -375,6 +375,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 
     qreal x = 0;
     qreal y = 0;
+   // qDebug() << "Setting closest wall: " << closest;
     elbow->setSnappedSide(closest);
     switch(closest)
     {    

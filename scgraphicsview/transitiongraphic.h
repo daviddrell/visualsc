@@ -47,9 +47,9 @@ public slots:
     void handleParentStateGraphicMoved(QPointF);
     void handleTargetStateGraphicMoved(QPointF);
 
-    void handleParentStateGraphicResized(QRectF,QRectF);
+    void handleParentStateGraphicResized(QRectF,QRectF, int);
     //void handleParentStateGraphicResized(qreal, qreal, qreal, qreal);
-    void handleTargetStateGraphicResized(QRectF, QRectF);
+    void handleTargetStateGraphicResized(QRectF, QRectF, int);
 
 
 
@@ -79,6 +79,8 @@ private :
     KeyController * _keyController;
     MouseController* _mouseController;
     LineSegmentGraphic* _hovered;
+    //5SelectableTextBlock TextItem;    ///<  text to go in the title area.
+
 
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
