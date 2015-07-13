@@ -12,7 +12,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
     _outterborderPen(),
     _width(6),
     _height(6),
-    _corner(0),
+    _snappedSide(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
     _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
@@ -40,7 +40,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
     _outterborderPen(),
     _width(6),
     _height(6),
-    _corner(0),
+    _snappedSide(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
     _paintStyle(ELBOW_DEFAULT_PAINT_STYLE),
@@ -62,6 +62,16 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
 
     _segments[0] = NULL;
     _segments[1] = NULL;
+}
+
+void ElbowGrabber::setSnappedSide(int side)
+{
+    _snappedSide = side;
+}
+
+int ElbowGrabber::getSnappedSide()
+{
+    return _snappedSide;
 }
 
 bool ElbowGrabber::isAnchor()
@@ -146,10 +156,6 @@ int ElbowGrabber::getMouseState()
     return _mouseButtonState;
 }
 
-int ElbowGrabber::getCorner()
-{
-    return _corner;
-}
 
 
 // we have to implement the mouse events to keep the linker happy,
@@ -231,6 +237,7 @@ QPointF ElbowGrabber::getCenterPoint()
 
      if (_placedOnASquare)
      {
+         /*
          if ( _corner == 0 )
              return QPointF(pos().x() + _width/2,pos().y() + _height/2);
          else  if ( _corner == 1 )
@@ -239,6 +246,7 @@ QPointF ElbowGrabber::getCenterPoint()
              return QPointF(pos().x() - _width/2,pos().y() - _height/2);
          else
              return QPointF(pos().x() + _width/2,pos().y() - _height/2);
+             */
      }
      else
      {

@@ -307,8 +307,8 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
 
     // create the connect to automatically move anchor elbows when state graphics are moved.
-    connect(parentGraphic, SIGNAL(stateBoxResized(QPointF)),transGraphic, SLOT(handleParentStateGraphicResized(QPointF)));
-    connect(targetGraphic, SIGNAL(stateBoxResized(QPointF)),transGraphic, SLOT(handleTargetStateGraphicResized(QPointF)));
+    connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF)),transGraphic, SLOT(handleParentStateGraphicResized(QRectF, QRectF)));
+    //connect(targetGraphic, SIGNAL(stateBoxResized(qreal)),transGraphic, SLOT(handleTargetStateGraphicResized(qreal)));
 
     // add the transitiongraphic to the map of transition graphics
     _mapTransitionToGraphic.insert(t, transGraphic);

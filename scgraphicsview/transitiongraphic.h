@@ -46,8 +46,10 @@ public slots:
     void updateModel ();
     void handleParentStateGraphicMoved(QPointF);
     void handleTargetStateGraphicMoved(QPointF);
-    void handleParentStateGraphicResized(QPointF);
-    void handleTargetStateGraphicResized(QPointF);
+
+    void handleParentStateGraphicResized(QRectF,QRectF);
+    //void handleParentStateGraphicResized(qreal, qreal, qreal, qreal);
+    void handleTargetStateGraphicResized(qreal, qreal);
 
 
 

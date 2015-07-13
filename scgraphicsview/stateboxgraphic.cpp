@@ -275,7 +275,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
     qreal x = 0;
     qreal y = 0;
-
+    elbow->setSnappedSide(closest);
     switch(closest)
     {
     case NORTH: //northwest and northeast
@@ -374,7 +374,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 
     qreal x = 0;
     qreal y = 0;
-
+    elbow->setSnappedSide(closest);
     switch(closest)
     {    
     case NORTH: //northwest and northeast

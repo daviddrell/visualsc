@@ -58,6 +58,9 @@ public:
     TransitionGraphic* parentAsTransitionGraphic();
 
 
+    void setSnappedSide(int);
+    int getSnappedSide();
+
 signals:
     void anchorMoved(QPointF newPos);   // signal the stateboxgraphic parent and target that the anchors need updating, newPos given in scene scope
 
@@ -87,7 +90,7 @@ private:
     qreal   _width;
     qreal   _height;
 
-    int _corner;// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
+    int _snappedSide;// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
 
     int _mouseButtonState;
     bool _placedOnASquare;

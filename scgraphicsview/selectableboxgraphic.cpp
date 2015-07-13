@@ -239,7 +239,10 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
     {
 
         qreal x = mevent->pos().x(), y = mevent->pos().y();
-
+        QRectF oldBox = QRectF(this->x(), this->y(), _width, _height);
+        //QRectF oldBox = this->getUsableArea();
+        qreal scaleX =_width;
+        qreal scaleY = _height;
         // depending on which corner has been grabbed, we want to move the position
         // of the item as it grows/shrinks accordingly. so we need to eitehr add
         // or subtract the offsets based on which corner this is.
@@ -298,7 +301,7 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         deltaWidth *= (-1);
         deltaHeight *= (-1);
 
-        double newXpos, newYpos;
+        qreal newXpos, newYpos;
         QPointF old(this->pos());
 
         if ( corner->getCorner() == 0 )
@@ -317,13 +320,23 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
             newXpos = this->pos().x() + deltaWidth;
             this->setPos(newXpos,this->pos().y());
         }
-        QPointF difference;
-        difference.setX(old.x() - pos().x());
-        difference.setX(old.y() - pos().y());
+
+
         setCornerPositions();
         //emit stateBoxMoved(difference);    // linked to transition graphic. connect witten in scgraphicsview.cpp
+        QPointF newPos(xMoved, yMoved);
+        QPointF diff = newPos -_dragStart;
+        //QRectF newBox = this->getUsableArea();
+        QRectF newBox = QRectF(this->x(), this->y(), newWidth, newHeight);
+        //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
-        emit stateBoxResized(difference);
+        //emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
+        int buffer = 12;
+        //scaleX = (newWidth-buffer)/(scaleX-buffer);
+        //scaleY = (newHeight-buffer)/(scaleY-buffer);
+        //emit stateBoxResized((scaleX-buffer),(scaleY-buffer),(newWidth-buffer), (newHeight-buffer) );
+        //qDebug() <<"scaleX "<<
+        emit stateBoxResized(oldBox, newBox);
         this->update();
     }
 

@@ -351,14 +351,76 @@ TransitionGraphic::~TransitionGraphic()
     _elbows.clear();
 }
 
-void TransitionGraphic::handleParentStateGraphicResized(QPointF point)
+void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox)
 {
-    qDebug() << "handleParentStateGraphicResized: " << point;
+    int buffer = 12;
+    qreal newWidth = newBox.width()-buffer;
+    qreal newHeight = newBox.height()-buffer;
+    qreal oldWidth = oldBox.width()-buffer;
+    qreal oldHeight = oldBox.height()-buffer;
+    qreal scaleX = newWidth/oldWidth;
+    qreal scaleY = newHeight/oldHeight;
+
+
+    qDebug() << "handleParentStateGraphicResized: x, y: " << scaleX << ", "<<scaleY;
+    //_anchors[0]->setPos(_anchors[0]->pos()-point);
+    //_anchors[0]->setPos(_anchors[0]->pos()*scale);
+
+    switch(_anchors[0]->getSnappedSide())
+    {
+    // the anchor only needs to modify its x position
+    case NORTH:
+        _anchors[0]->setPos(QPointF(_anchors[0]->x()*scaleX, _anchors[0]->y()));
+        break;
+    case SOUTH:
+        _anchors[0]->setPos(QPointF(_anchors[0]->x(), _anchors[0]->y()*scaleY));
+        _anchors[0]->setPos(QPointF(_anchors[0]->x()*scaleX, _anchors[0]->y()));
+        break;
+
+     // the anchor only needs to modify its y position
+     case EAST:
+        _anchors[0]->setPos(QPointF(_anchors[0]->x()*scaleX, _anchors[0]->y()));
+        _anchors[0]->setPos(QPointF(_anchors[0]->x(), _anchors[0]->y()*scaleY));
+        break;
+     case WEST:
+        _anchors[0]->setPos(QPointF(_anchors[0]->x(), _anchors[0]->y()*scaleY));
+        break;
+    }
+
+    //QPointF diff = mapToScene(oldBox - newBox);
+
+    QPointF mtsTL = mapToScene(oldBox.topLeft());
+    QPointF nmtsTL = mapToScene(newBox.topLeft());
+  //  qDebug() << "old xy: " << oldBox.x()<< ", " << oldBox.y();
+//qDebug() << "new xy: " << newBox.x()<< ", " << newBox.y();
+qDebug() << "old "<<mtsTL;
+qDebug() << "new "<<nmtsTL;
+QPointF diff = mtsTL - nmtsTL;
+qreal dx = diff.x();
+qreal dy = diff.y();
+    switch(_anchors[1]->getSnappedSide())
+    {
+    // the anchor only needs to modify its x position
+    case NORTH:
+    case SOUTH:
+       // _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()));
+        break;
+
+     // the anchor only needs to modify its y position
+     case EAST:
+     case WEST:
+       // _anchors[1]->setPos(QPointF(_anchors[1]->x(), _anchors[1]->y()+dy));
+        break;
+    }
+
+ _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()+dy));
+   // _anchors[0]->setPos(QPointF(_anchors[0]->x()*scaleX, _anchors[0]->y()*scaleY));
 }
 
-void TransitionGraphic::handleTargetStateGraphicResized(QPointF point)
+void TransitionGraphic::handleTargetStateGraphicResized(qreal scaleX, qreal scaleY)
 {
-    qDebug() << "handleTargetStateGraphicResized: " << point;
+   // qDebug() << "handleTargetStateGraphicResized: " << scale;
+    _anchors[1]->setPos(_anchors[1]->pos()*scaleX);
 }
 
 /**
@@ -380,11 +442,7 @@ void TransitionGraphic::handleParentStateGraphicMoved(QPointF point)
     // point will be the coorindate of the statebox after it moved.
   //  QPointF difference =
   //  qDebug()<<"the source state graphic has moved. must update the transition anchor" << point;
-
-
     // point will be the difference.
-
-
     //emit _anchors[1]->anchorMoved(_anchors[1]->mapToScene(_anchors[1]->pos()) + point);
     QPointF location = _anchors[1]->pos();
     location-=point;
