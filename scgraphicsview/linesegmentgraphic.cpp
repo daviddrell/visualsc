@@ -59,10 +59,10 @@ void LineSegmentGraphic::forceHoverEnterEvent()
 
     _isHovered = true;
     // set parent's currently hovered object to this line segment
-     this->parentItemAsTransitionGraphic()->setCurrentlyHoveredSegment(this);
+     this->parentItemAsTransitionGraphic()->setCurrentlyHoveredLineSegment(this);
 
     // connect the key controller to this transition graphic
-    connect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleKeyPressEvent(int)));
+    connect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleLineSegmentKeyPressEvent(int)));
 
 
     _pen.setWidth(TRANSITION_HOVER_WIDTH);
@@ -76,10 +76,10 @@ void LineSegmentGraphic::forceHoverLeaveEvent()
    // this->hoverLeaveEvent(NULL);
     _isHovered = false;
     // clear parent's currently hovered object
-    this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredSegment();
+    this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredLineSegment();
 
     // connect the key controller to this transition graphic
-    disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleKeyPressEvent(int)));
+    disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleLineSegmentKeyPressEvent(int)));
 
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
     _pen.setColor(TRANSITION_DEFAULT_COLOR);

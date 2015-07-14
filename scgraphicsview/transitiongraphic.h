@@ -32,10 +32,17 @@ public:
     void printInfo();
     StateBoxGraphic* parentItemAsStateBoxGraphic();
     ~TransitionGraphic();
-    void setCurrentlyHoveredSegment(LineSegmentGraphic* seg);
-    void clearCurrentlyHoveredSegment();
-    bool isCurrentlyHovered();
-    LineSegmentGraphic* getCurrentlyHoveredSegment();
+
+    void setCurrentlyHoveredLineSegment(LineSegmentGraphic* seg);
+    void clearCurrentlyHoveredLineSegment();
+    bool isLineSegmentCurrentlyHovered();
+    LineSegmentGraphic* getCurrentlyHoveredLineSegment();
+
+    void setCurrentlyHoveredElbow(ElbowGrabber*);
+    void clearCurrentlyHoveredElbow();
+    bool isElbowCurrentlyHovered();
+    ElbowGrabber* getCurrentlyHoveredElbow();
+
     void setGrabbersVisible(bool visible);
 
 
@@ -79,16 +86,21 @@ private :
     StateBoxGraphic *_targetStateGraphic;
     KeyController * _keyController;
     MouseController* _mouseController;
-    LineSegmentGraphic* _hovered;
+    LineSegmentGraphic* _hoveredLine;
+    ElbowGrabber* _hoveredElbow;
+
     //5SelectableTextBlock TextItem;    ///<  text to go in the title area.
 
+    bool _hasMovedSinceCreatingElbow;
 
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
 
 private slots:
-    void handleKeyPressEvent(int key);
+    void handleElbowKeyPressEvent(int key);
+    void handleLineSegmentKeyPressEvent(int key);
     void createNewElbow();
+    void deleteHoveredElbow();
 
 };
 

@@ -258,7 +258,7 @@ int StateBoxGraphic::findNearestWall(QRectF box, QPointF point)
  */
 void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 {
-    qDebug()<<"htls moved";
+    //qDebug()<<"htls moved";
     // this method keeps the starting position of a line snapped to the outter edge of the box
 
     ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
@@ -338,7 +338,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
  */
 void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 {
-    qDebug() << "htle moved";
+    // qDebug() << "htle moved";
     // this method keeps the starting position of a line snapped to the outter edge of the box
 
     ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());

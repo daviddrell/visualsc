@@ -9,7 +9,10 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _elbows(),
     _targetStateGraphic(targetGraphic),
     _keyController(keys),
-    _mouseController(mouse)//,
+    _mouseController(mouse),
+    _hasMovedSinceCreatingElbow(true)
+
+    //,
     //TextItem(parent, )
 
 {
@@ -22,10 +25,10 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
 
     QList<QPointF> pointList = p->asQPointFList();
-  /*  qDebug() << "Printing Point List of size: " <<pointList.count();
+    qDebug() << "Printing Point List of size: " <<pointList.count();
     for(int i = 0; i < pointList.count();i++)
         qDebug() << pointList.at(i);
-*/
+
 
     // populate the transition graphic with elbows.
     // if this is a new transition graphic, then create two elbows
@@ -33,13 +36,13 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     if(pointList.count() < 2 && targetGraphic != NULL )
     {
         // create two new elbows, these are the anchors attached to the source and sink state
-        _anchors[0] = new ElbowGrabber(this);
+        _anchors[0] = new ElbowGrabber(this,_keyController);
         _anchors[0]->installSceneEventFilter(this);
         _anchors[0]->setAcceptHoverEvents(true);
         _elbows.append(_anchors[0]);
 
 
-        _anchors[1] = new ElbowGrabber(this);
+        _anchors[1] = new ElbowGrabber(this, _keyController);
         _anchors[1]->installSceneEventFilter(this);
         _anchors[1]->setAcceptHoverEvents(true);
         _elbows.append(_anchors[1]);
@@ -55,10 +58,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         QPointF targetAnchor = (_targetStateGraphic->getSideCenterPointInSceneCoord(targetSide));
 
         // use the statebox function handleTransitionLineStartMoved & handleTransitionLineEndMoved to update the anchors to this position and snap them to the box border.
-        _anchors[0]->setPos(mapFromScene(sourceAnchor));
-        _anchors[1]->setPos(mapFromScene(targetAnchor));
-        //emit _anchors[0]->anchorMoved(sourceAnchor);
-        //emit _anchors[1]->anchorMoved(targetAnchor);
+        //_anchors[0]->setPos(mapFromScene(sourceAnchor));
+        //_anchors[1]->setPos(mapFromScene(targetAnchor));
+
 
 
         LineSegmentGraphic* segment = new LineSegmentGraphic(_anchors[0], _anchors[1], this, _keyController);
@@ -66,11 +68,11 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         segment->installSceneEventFilter(this);
 
 
-        _anchors[0]->setSegmentOne(NULL);
-        _anchors[0]->setSegmentTwo(segment);
+        _anchors[0]->setSegmentAt(0, NULL);
+        _anchors[0]->setSegmentAt(1, segment);
 
-        _anchors[1]->setSegmentOne(segment);
-        _anchors[1]->setSegmentTwo(NULL);
+        _anchors[1]->setSegmentAt(0, segment);
+        _anchors[1]->setSegmentAt(1, NULL);
 
         _anchors[1]->setTerminal(true);                         // set the last elbow grabber as the terminator
         _anchors[1]->setPaintStyle(ElbowGrabber::kArrowHead);   // set the end of the transition to an arrowhead
@@ -92,14 +94,20 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
 
         _lineSegments.append(segment);
+
+        emit _anchors[0]->anchorMoved(sourceAnchor);
+        emit _anchors[1]->anchorMoved(targetAnchor);
+
+        this->updateModel();
     }
     else // load the point list and create the elbows and line segments
     {
+        qDebug() << "loading the point list";
         // add every point as an elbow
         for(int i = 0; i < pointList.count(); i++)
         {
             ElbowGrabber* elb;
-            elb = new ElbowGrabber(this, pointList.at(i));
+            elb = new ElbowGrabber(this, pointList.at(i), _keyController);
             elb->installSceneEventFilter(this);                 // transition graphic will handle elbow events
             elb->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
 
@@ -110,6 +118,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         // create a line segment in between every elbow
         for(int i = 0; i < _elbows.count()-1; i++)
         {
+            qDebug()<<"i: "<<i;
             ElbowGrabber* elbOne = _elbows.at(i);
             ElbowGrabber* elbTwo = _elbows.at(i+1);
 
@@ -124,18 +133,25 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             if(i==0 || i== _elbows.count()-2)   // anchor elbows at the end and beginning
             {
                 if(i==0){                       // source anchor
-                    elbOne->setSegmentOne(NULL);
-                    elbOne->setSegmentTwo(segment);
+                    qDebug() << "source anchor";
+                    elbOne->setSegmentAt(0, NULL);
+                    elbOne->setSegmentAt(1, segment);
+
+                    elbTwo->setSegmentAt(0, segment);
                 }
                 if(i==_elbows.count()-2){      // sink anchor
-                    elbTwo->setSegmentOne(segment);
-                    elbTwo->setSegmentTwo(NULL);
+                    qDebug() << "sink anchor";
+                    elbTwo->setSegmentAt(0, segment);
+                    elbTwo->setSegmentAt(1, NULL);
+
+                    elbOne->setSegmentAt(1, segment);
                 }
             }
             else                                // standard elbow that connects two line segments
             {
-                elbOne->setSegmentTwo(segment);
-                elbTwo->setSegmentOne(segment);
+                qDebug() << "normal elbow";
+                elbOne->setSegmentAt(1, segment);
+                elbTwo->setSegmentAt(0, segment);
             }
 
 
@@ -217,6 +233,7 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
 
     // update the polygon of the segments
     updateLineSegments(elbow);
+    this->updateModel();
 }
 
 /**
@@ -268,7 +285,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
         switch(event->type())
         {
          case QEvent::GraphicsSceneHoverEnter:
-            qDebug() << "Hover Enter";
+            //qDebug() << "Hover Enter";
             if(elbow!=NULL)
             {
                 //elbow->forceLineHoverLeaveEvent();    no longer necessary
@@ -283,7 +300,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
             break;
         case QEvent::GraphicsSceneHoverLeave:
-            qDebug() << "Hover Leave";
+            //qDebug() << "Hover Leave";
             if(elbow!=NULL)
             {
                 elbow->forceHoverLeaveEvent();
@@ -291,6 +308,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             else if(line!=NULL)
             {
                 line->forceHoverLeaveEvent();
+                _hasMovedSinceCreatingElbow = true;     // elbows can be created again after unhovering the segment
             }
 
             break;
@@ -477,6 +495,9 @@ qreal dy = diff.y();
     }
 // _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()+dy));
 
+
+    this->updateModel();
+
 }
 
 void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
@@ -615,6 +636,8 @@ case SOUTH:
    // _anchors[1]->setPos(this->mapFromScene(mapToScene(anchOnBox)));
 */
 
+
+this->updateModel();
 }
 
 /**
@@ -642,6 +665,7 @@ void TransitionGraphic::handleParentStateGraphicMoved(QPointF point)
     location-=point;
     _anchors[1]->setPos(location);
     updateLineSegments(_anchors[1]);
+    this->updateModel();
 }
 
 /**
@@ -672,31 +696,50 @@ void TransitionGraphic::handleTargetStateGraphicMoved(QPointF point)
     location+=point;
     _anchors[1]->setPos(location);
     updateLineSegments(_anchors[1]);
+    this->updateModel();
 }
 
 
 /**
  * @brief setCurrentlyHoveredSegment
  */
-void TransitionGraphic::setCurrentlyHoveredSegment(LineSegmentGraphic* seg)
+void TransitionGraphic::setCurrentlyHoveredLineSegment(LineSegmentGraphic* seg)
 {
-    _hovered = seg;
+    _hoveredLine = seg;
 }
 
-void TransitionGraphic::clearCurrentlyHoveredSegment()
+void TransitionGraphic::clearCurrentlyHoveredLineSegment()
 {
-    _hovered = NULL;
+    _hoveredLine = NULL;
 }
 
-bool TransitionGraphic::isCurrentlyHovered()
+bool TransitionGraphic::isLineSegmentCurrentlyHovered()
 {
-    return (_hovered!=NULL);
+    return (_hoveredLine!=NULL);
 }
 
-LineSegmentGraphic* TransitionGraphic::getCurrentlyHoveredSegment()
+LineSegmentGraphic* TransitionGraphic::getCurrentlyHoveredLineSegment()
 {
-    return _hovered;
+    return _hoveredLine;
 }
+
+void TransitionGraphic::setCurrentlyHoveredElbow(ElbowGrabber * elb)
+{
+    _hoveredElbow = elb;
+}
+void TransitionGraphic::clearCurrentlyHoveredElbow()
+{
+    _hoveredElbow = NULL;
+}
+bool TransitionGraphic::isElbowCurrentlyHovered()
+{
+    return (_hoveredElbow!=NULL);
+}
+ElbowGrabber* TransitionGraphic::getCurrentlyHoveredElbow()
+{
+    return _hoveredElbow;
+}
+
 
 /**
  * @brief TransitionGraphic::printInfo
@@ -707,6 +750,45 @@ void TransitionGraphic::printInfo(void)
     qDebug() << "Transition graphic from: " << this->parentItemAsStateBoxGraphic()->objectName() << " to: " << _targetStateGraphic->objectName();
 }
 
+void TransitionGraphic::deleteHoveredElbow()
+{
+    /*
+                    delete these
+                    v  v
+     O------O-------X~~~~~~~O-------O
+
+     O------O------->       ]O-------O
+     hook up the left line to point to the next elbow
+     hook up the right elbow to point to the left line
+
+     */
+    // delete this elbow and delete the elbow's second segment
+    ElbowGrabber* elb = this->getCurrentlyHoveredElbow();
+
+    if(elb && !(elb->isAnchor()))  // check the elbow exists and that is not an anchor elbow
+    {
+        LineSegmentGraphic* deadLine = elb->getSegment(1);
+        LineSegmentGraphic* leftLine = elb->getSegment(0);
+        ElbowGrabber* rightElb = deadLine->getElbow(1);
+
+        leftLine->setElbowAt(1, rightElb);
+        rightElb->setSegmentAt(0, leftLine);
+
+        int index = _elbows.indexOf(elb);
+        _elbows.removeAt(index);
+
+        index = _lineSegments.indexOf(deadLine);
+        _lineSegments.removeAt(index);
+
+        leftLine->enclosePathInElbows();    // redraw the line segment's hover box
+
+        delete elb;
+        delete deadLine;
+
+        this->updateModel();
+    }
+}
+
 /**
  * @brief TransitionGraphic::createNewElbow
  * create a new elbow on the currently hovered line segment, based on where the mouse is currently
@@ -714,15 +796,22 @@ void TransitionGraphic::printInfo(void)
  */
 void TransitionGraphic::createNewElbow()
 {
+    //static bool isCreating = false;
+    LineSegmentGraphic* splitLine = this->getCurrentlyHoveredLineSegment();  // segment that is being split
+    if(splitLine && splitLine->isHovered() && _hasMovedSinceCreatingElbow)
+    {
+        _hasMovedSinceCreatingElbow = false;        // prevents creating two elbows ontop of each other
+        //isCreating = true;
+
+
     //_hovered->printInfo();
-    ElbowGrabber* elbMid = new ElbowGrabber(this, this->mapFromScene(_mouseController->getX(),_mouseController->getY()));  // maps the scene based mouse coordinates to create a new elbow at the cursor location
+    ElbowGrabber* elbMid = new ElbowGrabber(this, this->mapFromScene(_mouseController->getX(),_mouseController->getY()), _keyController);  // maps the scene based mouse coordinates to create a new elbow at the cursor location
     elbMid->installSceneEventFilter(this);
     elbMid->setAcceptHoverEvents(true);
 
     //elb->setPos(this->_mouseController->getX(),_mouseController->getY());
 
 
-    LineSegmentGraphic* splitLine = this->getCurrentlyHoveredSegment();  // segment that is being split
     ElbowGrabber* elbEnd = splitLine->getElbow(1);
 
     // update the split line's end elbow to the new one
@@ -739,9 +828,9 @@ void TransitionGraphic::createNewElbow()
     // update the old elbows sockets
     //  start       mid        end
     // [  A x]----[x B y]----[y C  ]
-    elbEnd->setSegmentOne(newLine);
-    elbMid->setSegmentOne(splitLine);
-    elbMid->setSegmentTwo(newLine);
+    elbEnd->setSegmentAt(0, newLine);
+    elbMid->setSegmentAt(0, splitLine);
+    elbMid->setSegmentAt(1, newLine);
 
     // keep the elbow placements in order
     _elbows.insert(_elbows.indexOf(elbEnd), elbMid);    // insert the new elbow before the end elbow
@@ -755,6 +844,10 @@ void TransitionGraphic::createNewElbow()
         _lineSegments.insert(_lineSegments.indexOf(splitLine)+1,newLine);*/
 
     _lineSegments.append(newLine);
+    //isCreating = false;
+
+    this->updateModel();
+    }
 }
 
 /**
@@ -762,7 +855,7 @@ void TransitionGraphic::createNewElbow()
  * @param key
  * connection made when a line segment of this transition graphic is hovered
  */
-void TransitionGraphic::handleKeyPressEvent(int key)
+void TransitionGraphic::handleLineSegmentKeyPressEvent(int key)
 {
     qDebug() << "Transition Graphic Key Press: " << key;
     if(key==Qt::Key_N)
@@ -770,14 +863,25 @@ void TransitionGraphic::handleKeyPressEvent(int key)
         qDebug() << "Creating New Elbow at pos: ";
         this->createNewElbow();
     }
+
 // TODO elbow deletion
 
 }
 
+void TransitionGraphic::handleElbowKeyPressEvent(int key)
+{
+    if(key == Qt::Key_D)
+    {
+        qDebug() << "Deleting Currently Hovered Elbow";
+        this->deleteHoveredElbow();
+    }
+}
+
+
 /**
  * @brief TransitionGraphic::updateModel
  * Updates the transition graphic's data model if it exists
- * converts
+ *
  */
 void TransitionGraphic::updateModel()
 {

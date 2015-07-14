@@ -22,8 +22,8 @@ class ElbowGrabber : public QObject ,  public QGraphicsItem
     Q_OBJECT
 
 public:
-    ElbowGrabber(TransitionGraphic* parentGraphic);
-    ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point);
+    ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys);
+    ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyController* keys);
     ~ElbowGrabber();
     void setAngle(int agle);///< set the rotation angle for corners which are drawn as arrowheads
     int  getCorner(); ///< allows the owner to find out which corner this is
@@ -47,8 +47,8 @@ public:
     void forceHoverEnterEvent();
     void forceHoverLeaveEvent();
 
-    void setSegmentOne(LineSegmentGraphic*);
-    void setSegmentTwo(LineSegmentGraphic*);
+    void setSegmentAt(int index,LineSegmentGraphic*);
+    //void setSegmentTwo(LineSegmentGraphic*);
 
     LineSegmentGraphic* getSegment(int);
 
@@ -107,6 +107,8 @@ private:
 
     ArrowHeadGraphic* _arrowHead;
     LineSegmentGraphic* _segments[2];
+
+    KeyController*  _keyController;
 };
 
 #endif // ELBOWGRABBER_H

@@ -5,7 +5,7 @@
 
 
 
-ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
+ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys) :
     mouseDownX(0),
     mouseDownY(0),
     _outterborderColor(TRANSITION_DEFAULT_COLOR),
@@ -19,7 +19,8 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
     _arrowAngle(0),
     _arrowHead(NULL),
     _anchor(false),
-    _terminator(false)
+    _terminator(false),
+    _keyController(keys)
 {
 
     this->setParentItem(parentGraphic);
@@ -33,7 +34,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic) :
     _segments[1] = NULL;
 }
 
-ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
+ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyController* keys) :
     mouseDownX(0),
     mouseDownY(0),
     _outterborderColor(TRANSITION_DEFAULT_COLOR),
@@ -47,7 +48,8 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point) :
     _arrowAngle(0),
     _arrowHead(NULL),
     _anchor(false),
-    _terminator(false)
+    _terminator(false),
+    _keyController(keys)
 {
 
     this->setParentItem(parentGraphic);
@@ -100,14 +102,9 @@ void ElbowGrabber::setTerminal(bool isTerminal)
     _terminator = isTerminal;
 }
 
-void ElbowGrabber::setSegmentOne(LineSegmentGraphic* segOne)
+void ElbowGrabber::setSegmentAt(int index,LineSegmentGraphic* segOne)
 {
-    _segments[0] = segOne;
-}
-
-void ElbowGrabber::setSegmentTwo(LineSegmentGraphic* segTwo)
-{
-    _segments[1] = segTwo;
+    _segments[index] = segOne;
 }
 
 LineSegmentGraphic* ElbowGrabber::getSegment(int index)
@@ -208,6 +205,12 @@ void ElbowGrabber::forceLineHoverLeaveEvent()
 
 void ElbowGrabber::forceHoverEnterEvent()
 {
+
+    // set this parent's hovered elbow to this
+    this->parentAsTransitionGraphic()->setCurrentlyHoveredElbow(this);
+
+    connect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject*>(this->parentItem()), SLOT(handleElbowKeyPressEvent(int)));
+
     _outterborderColor = TRANSITION_HOVER_COLOR;
     _outterborderPen.setWidth(ELBOW_HOVER_WIDTH);
     _outterborderPen.setColor(TRANSITION_HOVER_COLOR);
@@ -219,6 +222,12 @@ void ElbowGrabber::forceHoverEnterEvent()
 
 void ElbowGrabber::forceHoverLeaveEvent()
 {
+
+    // clear this parent's hovered elbow
+    this->parentAsTransitionGraphic()->clearCurrentlyHoveredElbow();
+
+    disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject*>(this->parentItem()), SLOT(handleElbowKeyPressEvent(int)));
+
     _outterborderColor = TRANSITION_DEFAULT_COLOR;
     _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
     _outterborderPen.setColor(TRANSITION_DEFAULT_COLOR);
