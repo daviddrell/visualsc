@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 // uncomment this macro to autoload a file
-#define AUTO_LOAD_FILE
+// #define AUTO_LOAD_FILE
 
 #ifdef AUTO_LOAD_FILE
     #define DEFAULT_FILE "C:/visualsc/bin/debug/State Chart.scxml";
