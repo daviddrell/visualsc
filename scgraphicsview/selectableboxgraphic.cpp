@@ -371,7 +371,7 @@ int SelectableBoxGraphic::getHoveredCorner()
  */
 void SelectableBoxGraphic::getAllChildren(QList<SelectableBoxGraphic*> &stateList)
 {
-    qDebug() << "children items "<< this->childItems().count();
+    //qDebug() << "children items "<< this->childItems().count();
     for(int i = 0; i < this->childItems().count(); i++)
     {
         SelectableBoxGraphic* state = dynamic_cast<SelectableBoxGraphic*>(this->childItems()[i]);
@@ -431,7 +431,7 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     // also emit statebox moved for all children
     for(int i = 0; i < children.size();i++)
     {
-        qDebug() << "i " << children.at(i)->objectName();
+       // qDebug() << "i " << children.at(i)->objectName();
         emit children.at(i)->stateBoxMoved(diff);
     }
 

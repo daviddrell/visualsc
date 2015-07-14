@@ -6,6 +6,8 @@
 #include "transitiongraphic.h"
 
 #define CORNER_GRAB_BUFFER 5
+#define ELBOW_GUARD_BUFFER 15.0
+#define LINE_HOVER_WIDTH  10.0
 
 
 class ElbowGrabber;
@@ -27,6 +29,7 @@ public:
     TransitionGraphic* parentItemAsTransitionGraphic();
     void setElbowAt(int index, ElbowGrabber* elb);
     void forceHoverLeaveEvent();
+    void forceHoverEnterEvent();
     void setHovered(bool);
     bool isHovered();
 
@@ -39,9 +42,11 @@ private:
     QPen            _pen;
     bool            _isHovered;
 
+    /*
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
     virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
+    */
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
 
 

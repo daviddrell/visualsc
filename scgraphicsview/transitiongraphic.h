@@ -10,6 +10,7 @@
 #include "elbowgrabber.h"
 #include "mousecontroller.h"
 #include "linesegmentgraphic.h"
+#include <QObject>
 
 #define TRANSITION_DEFAULT_COLOR Qt::blue
 #define TRANSITION_HOVER_COLOR Qt::red

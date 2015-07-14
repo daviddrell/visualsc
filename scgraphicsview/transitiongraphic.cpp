@@ -25,8 +25,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
   /*  qDebug() << "Printing Point List of size: " <<pointList.count();
     for(int i = 0; i < pointList.count();i++)
         qDebug() << pointList.at(i);
-
 */
+
     // populate the transition graphic with elbows.
     // if this is a new transition graphic, then create two elbows
     // otherwise this is a transition graphic being loaded in, so add elbows according to its path list
@@ -35,14 +35,35 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         // create two new elbows, these are the anchors attached to the source and sink state
         _anchors[0] = new ElbowGrabber(this);
         _anchors[0]->installSceneEventFilter(this);
+        _anchors[0]->setAcceptHoverEvents(true);
         _elbows.append(_anchors[0]);
+
 
         _anchors[1] = new ElbowGrabber(this);
         _anchors[1]->installSceneEventFilter(this);
+        _anchors[1]->setAcceptHoverEvents(true);
         _elbows.append(_anchors[1]);
 
+
+        // set the anchor positions by snapping them to their source and sink state boxes
+        int sourceSide=0;
+        int targetSide=0;
+
+        // get the mid point of the source and sink on the sides that are nearest to each other
+        getClosestSides( & sourceSide, & targetSide);
+        QPointF sourceAnchor = (this->parentItemAsStateBoxGraphic()->getSideCenterPointInSceneCoord(sourceSide));
+        QPointF targetAnchor = (_targetStateGraphic->getSideCenterPointInSceneCoord(targetSide));
+
+        // use the statebox function handleTransitionLineStartMoved & handleTransitionLineEndMoved to update the anchors to this position and snap them to the box border.
+        _anchors[0]->setPos(mapFromScene(sourceAnchor));
+        _anchors[1]->setPos(mapFromScene(targetAnchor));
+        //emit _anchors[0]->anchorMoved(sourceAnchor);
+        //emit _anchors[1]->anchorMoved(targetAnchor);
+
+
         LineSegmentGraphic* segment = new LineSegmentGraphic(_anchors[0], _anchors[1], this, _keyController);
-        segment->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
+        segment->setAcceptHoverEvents(true);                    // allow the segment to be hovered
+        segment->installSceneEventFilter(this);
 
 
         _anchors[0]->setSegmentOne(NULL);
@@ -63,20 +84,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
 
 
-        // set the anchor positions by snapping them to their source and sink state boxes
-        int sourceSide=0;
-        int targetSide=0;
 
-        // get the mid point of the source and sink on the sides that are nearest to each other
-        getClosestSides( & sourceSide, & targetSide);
-        QPointF sourceAnchor = (this->parentItemAsStateBoxGraphic()->getSideCenterPointInSceneCoord(sourceSide));
-        QPointF targetAnchor = (_targetStateGraphic->getSideCenterPointInSceneCoord(targetSide));
 
-        // use the statebox function handleTransitionLineStartMoved & handleTransitionLineEndMoved to update the anchors to this position and snap them to the box border.
-        emit _anchors[0]->anchorMoved(sourceAnchor);
-        emit _anchors[1]->anchorMoved(targetAnchor);
 
-        segment->enclosePathInElbows();
         //elbOne->setVisible(false);
        // elbOne->setVisible(false);
 
@@ -91,7 +101,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             ElbowGrabber* elb;
             elb = new ElbowGrabber(this, pointList.at(i));
             elb->installSceneEventFilter(this);                 // transition graphic will handle elbow events
-           // elb->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
+            elb->setAcceptHoverEvents(true);                    // allow the elbow to be hovered
 
             _elbows.append(elb);
         }
@@ -105,7 +115,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
             LineSegmentGraphic* segment = new LineSegmentGraphic(elbOne, elbTwo, this, _keyController);
             segment->setAcceptHoverEvents(true);                    // allow the line segment to be hovered
-            //segment->installSceneEventFilter(this);
+            segment->installSceneEventFilter(this);
 
            // connect(segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
            // connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
@@ -149,6 +159,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _anchors[0]->setAnchor(true);
         _anchors[1]->setAnchor(true);
 
+        //_anchors[1]->setAcceptHoverEvents(true);    // enable the sink anchor to be hovered
+
         connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
         connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
         //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
@@ -156,7 +168,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         // do this to set closest wall from default
         emit _anchors[0]->anchorMoved(mapToScene(_anchors[0]->pos()));
         emit _anchors[1]->anchorMoved(mapToScene(_anchors[1]->pos()));
-    }
+    } // end of loading a transition from file
 }
 
 
@@ -220,6 +232,7 @@ void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
     if(one) // check if object exists
     {
         // update start and end?
+       // one->update(50,50,200,10);
         one->enclosePathInElbows();
         //qDebug() << "updated one";
     }
@@ -227,6 +240,7 @@ void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
     if(two) // check if object exists
     {
         // update start and end?
+        //two->update(50,50,200,10);
         two->enclosePathInElbows();
         //qDebug() << "updated two";
     }
@@ -244,89 +258,126 @@ void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
  */
 bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event )
 {
-    // qDebug() << "transition graphic scene event filter";
-    // qDebug() << " QEvent == " + QString::number(event->type()) << " " << count++;
-    // qDebug() << "QGraphicsItem Scene Event " << watched->
     ElbowGrabber * elbow = dynamic_cast<ElbowGrabber *>(watched);
-    if ( elbow == NULL) return false; // not expected to get here
-
+    LineSegmentGraphic * line = dynamic_cast<LineSegmentGraphic *>(watched);
     QGraphicsSceneMouseEvent * mevent = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-    if ( mevent == NULL)
-    {
-        // this is not one of the mouse events we are interrested in
-        return false;
-    }
+    QGraphicsSceneHoverEvent * hevent = dynamic_cast <QGraphicsSceneHoverEvent*>(event);
 
-    switch (event->type() )
+    if(hevent)
     {
-        // if the mouse went down, record the x,y coords of the press, record it inside the corner object
-    case QEvent::GraphicsSceneMousePress:
+        switch(event->type())
         {
-        //qDebug() << "mouse press";
-            elbow->setMouseState(ElbowGrabber::kMouseDown);
-
-            QPointF scenePosition =  elbow->mapToScene(mevent->pos());
-            elbow->mouseDownY = scenePosition.y();
-            elbow->mouseDownX = scenePosition.x();
-
-
-
-            //_cornerGrabbed = true;
-            qDebug() << "Corner Position: " << elbow->mouseDownX<<" ," << elbow->mouseDownY;
-
-            LineSegmentGraphic* segOne = elbow->getSegment(0);
-            LineSegmentGraphic* segTwo = elbow->getSegment(1);
-            if(segOne && segOne->isHovered())
+         case QEvent::GraphicsSceneHoverEnter:
+            qDebug() << "Hover Enter";
+            if(elbow!=NULL)
             {
-                segOne->forceHoverLeaveEvent(); // a mouse press should switch focus to elbows, so force the segments for this elbow to be unhovered
+                //elbow->forceLineHoverLeaveEvent();    no longer necessary
+                elbow->forceHoverEnterEvent();
+
             }
-            if(segTwo && segTwo->isHovered())
+            else if(line!=NULL)
             {
-
-                segTwo->forceHoverLeaveEvent();
+                line->forceHoverEnterEvent();
             }
-            elbow->forceHoverEnterEvent(); // old elbow hover events will trigger for mouse press and releases
 
+
+            break;
+        case QEvent::GraphicsSceneHoverLeave:
+            qDebug() << "Hover Leave";
+            if(elbow!=NULL)
+            {
+                elbow->forceHoverLeaveEvent();
+            }
+            else if(line!=NULL)
+            {
+                line->forceHoverLeaveEvent();
+            }
+
+            break;
         }
-        break;
-
-
-    case QEvent::GraphicsSceneMouseRelease:
-        {
-            //qDebug() << "mouse release";
-            //_cornerGrabbed = false;
-
-            elbow->setMouseState(ElbowGrabber::kMouseReleased);
-            updateModel();                  // update the transition datamodel for this path
-            elbow->forceHoverLeaveEvent();  // old elbow hover events will trigger for mouse press and releases
-        }
-        break;
-
-
-    case QEvent::GraphicsSceneMouseMove:
-        {
-       //     qDebug() << "mouse moving";
-            elbow->setMouseState(ElbowGrabber::kMouseMoving );
-        }
-        break;
-
-
-    default:
-        // we dont care about the rest of the events
-        return false;
-        break;
     }
-
-
-    if ( elbow->getMouseState() == ElbowGrabber::kMouseMoving )
+    else if(mevent && elbow)
     {
-        // give the scene scope position of the mouse and update the elbow that triggered the scene event
-        this->updateElbow(elbow->mapToScene(mevent->pos()), elbow);
-        //this->updateElbow(this->mapFromItem(elbow, mevent->pos()), elbow);
-        //this->update();
+        switch(event->type())
+        {
+            // if the mouse went down, record the x,y coords of the press, record it inside the corner object
+        case QEvent::GraphicsSceneMousePress:
+            {
+            //qDebug() << "mouse press";
+                elbow->setMouseState(ElbowGrabber::kMouseDown);
+
+                QPointF scenePosition =  elbow->mapToScene(mevent->pos());
+                elbow->mouseDownY = scenePosition.y();
+                elbow->mouseDownX = scenePosition.x();
+
+
+
+                //_cornerGrabbed = true;
+                qDebug() << "Corner Position: " << elbow->mouseDownX<<" ," << elbow->mouseDownY;
+
+                LineSegmentGraphic* segOne = elbow->getSegment(0);
+                LineSegmentGraphic* segTwo = elbow->getSegment(1);
+                if(segOne && segOne->isHovered())
+                {
+                    segOne->forceHoverLeaveEvent(); // a mouse press should switch focus to elbows, so force the segments for this elbow to be unhovered
+                }
+                if(segTwo && segTwo->isHovered())
+                {
+
+                    segTwo->forceHoverLeaveEvent();
+                }
+                elbow->forceHoverEnterEvent(); // old elbow hover events will trigger for mouse press and releases
+
+            }
+            break;
+
+
+        case QEvent::GraphicsSceneMouseRelease:
+            {
+                //qDebug() << "mouse release";
+                //_cornerGrabbed = false;
+
+                elbow->setMouseState(ElbowGrabber::kMouseReleased);
+                updateModel();                  // update the transition datamodel for this path
+                elbow->forceHoverLeaveEvent();  // old elbow hover events will trigger for mouse press and releases
+            }
+            break;
+
+
+        case QEvent::GraphicsSceneMouseMove:
+            {
+           //     qDebug() << "mouse moving";
+                elbow->setMouseState(ElbowGrabber::kMouseMoving );
+            }
+            break;
+
+
+        default:
+            // we dont care about the rest of the events
+            return false;
+            break;
+
+
+        }
+
+        if ( elbow->getMouseState() == ElbowGrabber::kMouseMoving )
+        {
+            // give the scene scope position of the mouse and update the elbow that triggered the scene event
+            this->updateElbow(elbow->mapToScene(mevent->pos()), elbow);
+            //this->updateElbow(this->mapFromItem(elbow, mevent->pos()), elbow);
+            //this->update();
+        }
+
+        return true;// true => do not send event to watched - we are finished with this event
+
     }
 
-    return true;// true => do not send event to watched - we are finished with this event
+
+
+
+
+
+    return false;
 
 }
 
@@ -431,7 +482,7 @@ qreal dy = diff.y();
 void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
    // qDebug() << "handleTargetStateGraphicResized: ";
-    qreal buffer = 5.5;
+    qreal buffer = 12;
     qreal newWidth = newBox.width()-buffer;
     qreal newHeight = newBox.height()-buffer;
     qreal oldWidth = oldBox.width()-buffer;
@@ -463,6 +514,7 @@ QPointF anchorOnBox = this->mapToItem(_targetStateGraphic, _anchors[1]->pos());
 //qDebug() << "new Box" << nmtsTL;
 
 qreal newX, newY, h1, h2, zPrime, z;
+qreal solX,solY;
 QPointF newP, newPI;
 //qDebug() << "_anchors[1] "<< _anchors[1]->getSnappedSide();
 //qDebug() << "corner : " << corner;
@@ -495,6 +547,12 @@ case EAST:
         newPI = _targetStateGraphic->mapToItem(this, newP);
         _anchors[1]->setPos(QPointF(newPI.x()-dx, newPI.y()-dy));
         */
+       solY = (anchOnBox.y()) + (oldHeight - anchOnBox.y()) * (1.0 - newHeight/oldHeight) - (newHeight - oldHeight);
+       solX = anchOnBox.x() + (oldWidth - anchOnBox.x()) * (1.0 - newWidth/oldWidth) - (newWidth - oldWidth);
+
+       newP = QPointF(solX,solY);
+       newPI = _targetStateGraphic->mapToItem(this, newP);
+       _anchors[1]->setPos(newPI);
    }
    break;
 }
@@ -669,9 +727,12 @@ void TransitionGraphic::createNewElbow()
 
     // update the split line's end elbow to the new one
     splitLine->setElbowAt(1, elbMid);
+    splitLine->enclosePathInElbows();
 
     // create the new line segment that starts from the new elbow and goes to the old end
     LineSegmentGraphic* newLine = new LineSegmentGraphic(elbMid, elbEnd, this, _keyController);
+
+    newLine->installSceneEventFilter(this);
     newLine->setAcceptHoverEvents(true);
 
 
@@ -709,6 +770,8 @@ void TransitionGraphic::handleKeyPressEvent(int key)
         qDebug() << "Creating New Elbow at pos: ";
         this->createNewElbow();
     }
+// TODO elbow deletion
+
 }
 
 /**

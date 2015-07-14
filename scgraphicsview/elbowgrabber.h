@@ -39,6 +39,9 @@ public:
     enum PaintStyle {kBox, kCrossHair, kArrowHead};
     void setPaintStyle(PaintStyle s);///< set box or cross-hairs
 
+    void forceLineHoverLeaveEvent();
+
+
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
     void forceHoverEnterEvent();
@@ -68,8 +71,8 @@ private:
 
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
-    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
-    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+   // virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+   // virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
     // once the hover event handlers are implemented in this class,
     // the mouse events must also be implemented because of

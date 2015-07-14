@@ -53,11 +53,40 @@ bool LineSegmentGraphic::isHovered()
     return _isHovered;
 }
 
-void LineSegmentGraphic::forceHoverLeaveEvent()
+void LineSegmentGraphic::forceHoverEnterEvent()
 {
-    this->hoverLeaveEvent(NULL);
+   //qDebug() << "hover enter for line";
+
+    _isHovered = true;
+    // set parent's currently hovered object to this line segment
+     this->parentItemAsTransitionGraphic()->setCurrentlyHoveredSegment(this);
+
+    // connect the key controller to this transition graphic
+    connect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleKeyPressEvent(int)));
+
+
+    _pen.setWidth(TRANSITION_HOVER_WIDTH);
+    _pen.setColor(TRANSITION_HOVER_COLOR);
+    _pen.setStyle(TRANSITION_HOVER_LINE_STYLE);
 }
 
+
+void LineSegmentGraphic::forceHoverLeaveEvent()
+{
+   // this->hoverLeaveEvent(NULL);
+    _isHovered = false;
+    // clear parent's currently hovered object
+    this->parentItemAsTransitionGraphic()->clearCurrentlyHoveredSegment();
+
+    // connect the key controller to this transition graphic
+    disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleKeyPressEvent(int)));
+
+    _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
+    _pen.setColor(TRANSITION_DEFAULT_COLOR);
+    _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
+}
+
+/*
 void LineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
     qDebug() << "hover enter for line";
@@ -92,7 +121,7 @@ void LineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     _pen.setColor(TRANSITION_DEFAULT_COLOR);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
 }
-
+*/
 /**
  * @brief LineSegmentGraphic::enclosePathInElbows
  * called by a line segment to remake its polygon based on its elbows' positions
@@ -123,27 +152,89 @@ void LineSegmentGraphic::enclosePathInItemCoordiates(qreal lineStartX,qreal line
  * @param lineStartY
  * @param lineEndX
  * @param lineEndY
- * creates a "Z-BOX" polygon for this line segment based on the two points given
- * a Z-Box is a path of lines that creates a 3d rectangular prism, allowing for hover detection regardless of the given coordinates
+ *
+ * Recreates the polygon, or rectangle, for the line segment hover collision using two points
+ *
+ *
  */
 void LineSegmentGraphic::enclosePathInCoordindates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  )
 {
-    QPointF p1(  QPointF(lineStartX  - CORNER_GRAB_BUFFER, lineStartY - CORNER_GRAB_BUFFER));
-    QPointF p2(  QPointF(lineStartX + CORNER_GRAB_BUFFER, lineStartY - CORNER_GRAB_BUFFER));
-    QPointF p3(  QPointF(lineStartX + CORNER_GRAB_BUFFER, lineStartY + CORNER_GRAB_BUFFER));
-    QPointF p4(  QPointF(lineStartX - CORNER_GRAB_BUFFER, lineStartY + CORNER_GRAB_BUFFER));
+    /*
+     Line segment hover box
 
-    QPointF p5(  QPointF(lineEndX - CORNER_GRAB_BUFFER, lineEndY - CORNER_GRAB_BUFFER));
-    QPointF p6(  QPointF(lineEndX + CORNER_GRAB_BUFFER, lineEndY - CORNER_GRAB_BUFFER));
-    QPointF p7(  QPointF(lineEndX + CORNER_GRAB_BUFFER, lineEndY + CORNER_GRAB_BUFFER));
-    QPointF p8(  QPointF(lineEndX - CORNER_GRAB_BUFFER, lineEndY + CORNER_GRAB_BUFFER));
+    |<elbow>|
+    |<guard>|
+             ___________________
+            |        ^          |
+    X-------x   hover|width     x-------X
+            |________v__________|
 
+    ^                                   ^
+  elbow                               elbow
+
+    */
+
+
+    //qDebug() << "theta is: " << theta * 180.0/3.141536 << "\tthe x  multiple would be " << cos(theta) << "\tthe y multiple would be " << sin(theta);
+
+    qreal m = (lineEndY - lineStartY)/(lineEndX - lineStartX);  // y = mx + b
+    qreal theta = atan(m);          // find the angle between the two points
+
+    // if the two points are within 2 elbow guards of each other, then the line segment hover box will be a line in the middle of them
+    qreal dist = sqrt( (lineEndY - lineStartY)* (lineEndY - lineStartY) + (lineEndX - lineStartX)*(lineEndX - lineStartX)   );
+    qreal xElbowGuard, yElbowGuard;
+    if(dist < 2*ELBOW_GUARD_BUFFER)
+    {
+        xElbowGuard = cos(theta) * dist/2.0;
+        yElbowGuard = sin(theta) * dist/2.0;
+    }
+    else
+    {
+        xElbowGuard = cos(theta) * ELBOW_GUARD_BUFFER;
+        yElbowGuard = sin(theta) * ELBOW_GUARD_BUFFER;
+    }
+
+    qreal xLineWidth = cos(theta) * LINE_HOVER_WIDTH;
+    qreal yLineWidth = sin(theta) * LINE_HOVER_WIDTH;
+
+    QPointF p1, p2, p3, p4;
+    if( lineEndX >= lineStartX)     // for quadrants 4 and 1
+    {
+        // move the two points closer to another by a total of the elbowguard units
+        lineStartX += xElbowGuard;
+        lineStartY += yElbowGuard;
+
+        lineEndX -= xElbowGuard;
+        lineEndY -= yElbowGuard;
+
+        // create the rectangle corners based on the new elbow points
+        p1 = QPointF(lineStartX  +  yLineWidth, lineStartY - xLineWidth);
+        p2 = QPointF(lineStartX  -  yLineWidth, lineStartY + xLineWidth);
+        p3 = QPointF(lineEndX + yLineWidth, lineEndY - xLineWidth);
+        p4 = QPointF(lineEndX - yLineWidth, lineEndY + xLineWidth);
+    }
+    else                        // for quadrants 2 and 3
+    {
+        // move the two points closer to another by a total of the elbowguard units
+        lineStartX -= xElbowGuard;
+        lineStartY -= yElbowGuard;
+
+        lineEndX += xElbowGuard;
+        lineEndY += yElbowGuard;
+
+         // create the rectangle corners based on the new elbow points
+        p1 = QPointF(lineStartX  +  yLineWidth, lineStartY - xLineWidth);
+        p2 = QPointF(lineStartX  -  yLineWidth, lineStartY + xLineWidth);
+        p3 = QPointF(lineEndX + yLineWidth, lineEndY - xLineWidth);
+        p4 = QPointF(lineEndX - yLineWidth, lineEndY + xLineWidth);
+    }
+
+    // clear the old polygon
     _selectRegion.clear();
-    //_selectRegion << p1 << p2 << p5 << p6 << p7 << p8 << p3 << p4 << p1;
-    //_selectRegion << p1 << p5 << p6 << p2 << p3 << p7 << p8 << p4 << p1;
 
-    //connect the Z-Box
-    _selectRegion << p1 << p5 << p6 << p2 << p3 << p7 << p8 << p4 << p1 << p2 << p4 << p3 << p5 << p8 << p6 << p7 << p1;
+    // connect the four corners of the rectangle
+    _selectRegion<<p1<<p2<<p4<<p3<<p1;
+
     this->setPolygon(_selectRegion);
 }
 
@@ -236,7 +327,8 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
 
     this->setPolygon(_selectRegion);
 
-    this->update();
+    //TODO do we need this?
+    //this->update();
 
 }
 
@@ -249,7 +341,9 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
 //TODO move terminal and arrow head paint to elbowgrabber
 void LineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-//    #define SHOW_HOVER_BOXES
+  //  enclosePathInElbows();
+    //_pen.setWidth(20);
+//#define SHOW_HOVER_BOXES
     painter->setPen(_pen);
 
 #ifndef SHOW_HOVER_BOXES

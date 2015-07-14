@@ -78,10 +78,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 // uncomment this macro to autoload a file
-// #define AUTO_LOAD_FILE
+ #define AUTO_LOAD_FILE
 
 #ifdef AUTO_LOAD_FILE
-    #define DEFAULT_FILE "C:/visualsc/bin/debug/State Chart.scxml";
+    #define DEFAULT_FILE "C:/xml/State Chart.scxml";
     QString fileName =DEFAULT_FILE;
     _settings->setValue(_keyLastFilePath, fileName);
 
@@ -186,7 +186,5 @@ void MainWindow::handleNewClick()
 
     _formEditorWindow = new SCFormView(0, _project->getDM());
     _formEditorWindow->show();
-
-
 
 }
