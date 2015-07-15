@@ -337,7 +337,7 @@ void ElbowGrabber::updateArrowHead()
 
 void ElbowGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setRenderHint(QPainter::HighQualityAntialiasing);
     if ( _paintStyle == kBox)
     {
         // fill the box with solid color, use sharp corners

@@ -497,13 +497,15 @@ qreal dy = diff.y();
 
 
     // make other elbows stay in place
+    // and update their line segment hover boxes
     for(int i = 1 ; i < _elbows.count();i++)
     {
         _elbows[i]->setPos(QPointF(_elbows[i]->x()+dx, _elbows[i]->y()+dy));
+        _elbows[i]->getSegment(0)->enclosePathInElbows();
     }
 // _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()+dy));
 
-    _anchors[0]->getSegment(1)->enclosePathInElbows();
+    //_anchors[0]->getSegment(1)->enclosePathInElbows();
     this->updateModel();
 
 }
