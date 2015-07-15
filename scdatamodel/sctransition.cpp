@@ -35,8 +35,24 @@ SCTransition::SCTransition(QObject * parent):
      path
      */
 
+
+    // SCTransition will load with target, event, commentary, and path
     TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (this, "target",QString());
     attributes.addItem(target);
+
+    TransitionAttributes::TransitionStringAttribute * event = new TransitionAttributes::TransitionStringAttribute (this, "event",QString());
+    attributes.addItem(event);
+
+    TransitionAttributes::TransitionStringAttribute * comments = new TransitionAttributes::TransitionStringAttribute (this, "comments",QString());
+    attributes.addItem(comments);
+
+    QList<QPointF> emptyPath;
+    TransitionAttributes::TransitionPathAttribute * path = new TransitionAttributes::TransitionPathAttribute (this, QString("path"),emptyPath);
+    attributes.addItem(path);
+
+
+
+    /*
 
     TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitionStringAttribute (this, "cond",QString());
     attributes.addItem(cond);
@@ -44,12 +60,11 @@ SCTransition::SCTransition(QObject * parent):
     TransitionAttributes::TransitionStringAttribute * type = new TransitionAttributes::TransitionStringAttribute (this, "type",QString("internal"));
     attributes.addItem(type);
 
+
     TransitionAttributes::TransitionPositionAttribute * position = new TransitionAttributes::TransitionPositionAttribute (this, "position",QPointF(0,0));
     attributes.addItem(position);
+*/
 
-    QList<QPointF> emptyPath;
-    TransitionAttributes::TransitionPathAttribute * path = new TransitionAttributes::TransitionPathAttribute (this, QString("path"),emptyPath);
-    attributes.addItem(path);
 
 
 }
@@ -100,10 +115,33 @@ void SCTransition::handleLineUnSelected()
 }*/
 
 
+/**
+ * @brief SCTransition::writeSCVXML
+ * @param sw
+ *
+ * writes each specified attribute from the transition into the saved .scxml file.
+ *
+ */
 void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
 {
     sw.writeStartElement(QString("transition"));
+    /*
     sw.writeAttribute(QString("target"), attributes.value("target")->asString());
+    sw.writeAttribute(QString("event"), attributes.value("event")->asString());
+    sw.writeAttribute(QString("cond"), attributes.value("cond")->asString());
+    sw.writeAttribute(QString("type"), attributes.value("type")->asString());
+*/
+
+    QMapIterator<QString, IAttribute*> i(attributes);
+
+    while(i.hasNext())
+    {
+        QString key = i.next().key();
+        if(key != "path")
+        {
+            sw.writeAttribute(key, attributes.value(key)->asString());
+        }
+    }
 
     if (  attributes.contains("path"))
     {
@@ -112,6 +150,7 @@ void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
          sw.writeAttribute(QString("d"),path);
          sw.writeEndElement();
     }
+
 
 
     sw.writeEndElement();

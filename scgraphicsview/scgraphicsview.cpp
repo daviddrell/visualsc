@@ -88,7 +88,7 @@ bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
         //qDebug()<<"mouse moved in event filter";
         QGraphicsSceneMouseEvent* qgs = static_cast<QGraphicsSceneMouseEvent*>(e);
         _mouseController->mouseInput(qgs);
-        _mouseController->printPos();
+        //_mouseController->printPos();
     }
     return false;
 }
@@ -270,7 +270,7 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     // get the parent state graphic
     SCState *parentState = dynamic_cast<SCState *>(t->parent());
     StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
-    if ( parentGraphic == NULL)
+    if ( parentGraphic == NULL )
     {
         // no parent graphic means the user is adding a transition to the root machine
         QMessageBox msgBox;
@@ -282,8 +282,7 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     // if the transition is deleted, then call the handleTransitionDeleted function in SCGraphicsView
     connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
 
-     // create a transition graphic
-    TransitionGraphic * transGraphic  = 0;
+
     TransitionAttributes::TransitionPositionAttribute * pos =
             dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> (  t->attributes.value("position"));
     QPointF position(0,0);
@@ -296,8 +295,9 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     StateBoxGraphic * targetGraphic  = lookUpTargetStateGraphic( targetName->asString() );
  //   qDebug() << "target Graphic look up: " << targetName->asString();
  //   qDebug() << "target Graphic is set " << targetGraphic->objectName();
-    transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController,_mouseController);
 
+    // create a transition graphic
+    TransitionGraphic * transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController,_mouseController);
 
     // when this transition graphic is deleted, call handleTransitionGraphicDeleted
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));

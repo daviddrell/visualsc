@@ -507,7 +507,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
 
 void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
 {
-    qDebug() << "handleMakeANewTransition, : "  + ta->value("target")->asString();
+    qDebug() << "handleMakeANewTransition, : "  + ta->value("target")->asString() << "\t" << ta->value("event")->asString();
 
     SCTransition * transition = new SCTransition(_currentState);
 

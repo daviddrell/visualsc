@@ -26,6 +26,12 @@
 #include "selectableboxgraphic.h"
 #include "selectabletextblock.h"
 
+#define SOURCE_ANCHOR_BUFFER 6.0    // smaller value means closer to real dimensions
+#define SOURCE_ANCHOR_POS_BUFFER 9.0    // was 2
+
+#define SINK_ANCHOR_BUFFER 5.5
+#define SINK_ANCHOR_POS_BUFFER 8.5
+
 class SCState;
 class IAttribute;
 
@@ -81,6 +87,7 @@ public:
     QString getSizeAsString();
     QPointF getSize();
     void setHighlighted(bool);
+    SCState* getStateModel();
 
 
 public slots:

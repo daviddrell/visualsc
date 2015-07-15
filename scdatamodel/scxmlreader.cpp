@@ -24,10 +24,9 @@
 #include <QPoint>
 #include <QString>
 #include <QStringList>
-
+#include "transitionattributes.h"
 #include "sctransition.h"
 #include "scstate.h"
-
 #include <QDebug>
 
 SCXMLReader::SCXMLReader(): QObject(NULL), _reader(),_file(), _resultMessages(), _error(false)
@@ -84,6 +83,8 @@ void SCXMLReader::readElement()
     bool enteredAStateElement = false;
     bool enteredATransistionElement = false;
     bool enteredATransistionPathElement = false;
+
+    qDebug() << "READING... "<< _reader.name();
 
     if (_reader.name() == "scxml")
     {
@@ -239,20 +240,34 @@ void SCXMLReader::readTransistion()
 {
     TransitionAttributes * ta = new TransitionAttributes(0,"TransitionAttributes");
 
+    for(int i = 0; i < _reader.attributes().size();i++)
+    {
+        QString key =  _reader.attributes().at(i).name().toString();
+        QString value = _reader.attributes().at(i).value().toString();
+        qDebug() << "reader attributes: " << _reader.attributes().at(i).name() << ":"<<_reader.attributes().at(i).value();
+        TransitionAttributes::TransitionStringAttribute* tsa = new TransitionAttributes::TransitionStringAttribute(NULL, key, value);
+        ta->addItem(tsa);
+    }
+
+/*
     TransitionAttributes::TransitionStringAttribute * event = new TransitionAttributes::TransitionStringAttribute(NULL,"event", _reader.attributes().value("event").toString());
 
     TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitionStringAttribute (NULL,"cond", _reader.attributes().value("cond").toString());
 
     TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (NULL,"target", _reader.attributes().value("target").toString());
 
-    TransitionAttributes::TransitionStringAttribute * ttype = new  TransitionAttributes::TransitionStringAttribute (NULL,"type", _reader.attributes().value("internal").toString());
+    TransitionAttributes::TransitionStringAttribute * ttype = new  TransitionAttributes::TransitionStringAttribute (NULL,"type", _reader.attributes().value("type").toString());
 
     ta->addItem(event);
     ta->addItem(cond);
     ta->addItem(target);
     ta->addItem(ttype);
 
+     qDebug() << "target : " << target->asString();
+     qDebug() << "event : " << event->asString();
 
+
+    // restrict type to interal or external
     if ( ! _reader.attributes().value("type").isEmpty() )
     {
         if (_reader.attributes().value("type").toString().toLower() == "internal")
@@ -264,8 +279,8 @@ void SCXMLReader::readTransistion()
             ta->value("type")->setValue("external");
         }
     }
-
-    emit makeANewTransistion(ta);
+*/
+    emit makeANewTransistion(ta);   // connected to handleMakeANewTransition in scdatamodel.cpp
 
 }
 
@@ -279,7 +294,6 @@ void SCXMLReader::readTransistionPath()
 
     emit makeANewTransistionPath(data);
 }
-
 
 void SCXMLReader::readIDTextBlockElement()
 {

@@ -21,6 +21,7 @@
 
 #include <QListIterator>
 #include <QStringList>
+#include <QDebug>
 
 
 //////////////////////////////////////////
@@ -61,6 +62,75 @@ TransitionAttributes::~TransitionAttributes()
 
 void TransitionAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 {
+    QMapIterator<QString,IAttribute*> i(sourceAttrList);
+
+    while(i.hasNext())
+    {
+        QString key = i.next().key();
+        qDebug() << "key is: " << key;
+        IAttribute* sourceAttr = sourceAttrList.value(key);
+        IAttribute* myAttr = this->value(key);
+
+        // check if this transitionattributes has the attribute
+        // add the attribute to the transitionattributes and then set its value
+        if(!myAttr)
+        {
+            IAttribute* newAttr=NULL;
+
+            TransitionPathAttribute *pt;
+            TransitionPositionAttribute *ps;
+            TransitionStringAttribute *str;
+
+            if ( ( pt = dynamic_cast<TransitionPathAttribute *>(sourceAttr)) != NULL)
+            {
+                TransitionPathAttribute * newPt = new TransitionPathAttribute (*pt);
+                newPt->setValue(sourceAttr->asString());
+                addItem(newPt);
+                newAttr= newPt;
+            }
+            else if ( (  ps = dynamic_cast<TransitionPositionAttribute *>(sourceAttr) ) != NULL )
+            {
+                TransitionPositionAttribute * newPs = new TransitionPositionAttribute (*ps);
+                newPs->setValue(sourceAttr->asString());
+                addItem(newPs);
+                newAttr = newPs;
+            }
+            else if ( ( str = dynamic_cast<TransitionStringAttribute *>(sourceAttr) ) != NULL )
+            {
+                TransitionStringAttribute * newStr = new TransitionStringAttribute (*str);
+                newStr->setValue(sourceAttr->asString());
+                addItem(newStr);
+                newAttr = newStr;
+            }
+
+            qDebug() <<"newAttr created: "<< newAttr->asString();
+
+            if ( newAttr ) emit attributeAdded(newAttr);
+        }
+        else
+        {
+            myAttr->setValue(sourceAttr->asString());
+        }
+    }
+
+    // now delete local attributes that are not contained in the source list
+
+   QMapIterator<QString,IAttribute*> j(sourceAttrList);
+
+    while (j.hasNext())
+    {
+        QString key  = j.next().key();
+
+        if ( !sourceAttrList.contains(key) )
+        {
+            IAttribute* attr = this->value(key);
+            this->remove(key);
+            emit attributeDeleted(attr);
+            delete attr;
+        }
+    }
+
+#ifdef USEOLD
     // if the dest container has a matching key,
     // update the value to be the source value.
     // else, add the source to the container
@@ -72,12 +142,22 @@ void TransitionAttributes::setAttributes(const IAttributeContainer& sourceAttrLi
     while (i.hasNext())
     {
         QString key  = i.next().key();
+
         IAttribute* sourceAttr = sourceAttrList.value(key)  ;
+
+
         IAttribute* destAttr = this->value( key ) ;
+        qDebug() << "key is: "<<key << " source: "<< sourceAttr->asString();
+
 
         if ( destAttr )
         {
-            destAttr->setValue( sourceAttr->asString());
+            qDebug() << "setting destAttr from to source: " << destAttr->asString();
+            //destAttr->setValue("YYEYYYYYYY");
+           // if(key == "target")
+                destAttr->setValue( sourceAttr->asString());
+          //  else
+             //   destAttr->setValue("AYY");
         }
         else
         {
@@ -126,6 +206,7 @@ void TransitionAttributes::setAttributes(const IAttributeContainer& sourceAttrLi
             delete attr;
         }
     }
+#endif
 }
 
 

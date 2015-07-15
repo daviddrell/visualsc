@@ -75,6 +75,10 @@ StateBoxGraphic::~StateBoxGraphic()
 }
 
 
+SCState* StateBoxGraphic::getStateModel()
+{
+    return _stateModel;
+}
 
 double StateBoxGraphic::yDistance(QPointF q1, QPointF q2)
 {
@@ -266,7 +270,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
     // find the side which is closest to the newPos
     //QRectF box = getUsableArea();
-    QRectF box = *(getBufferedBoxRect(12,2)); // 10 is the cornerGuard
+    QRectF box = *(getBufferedBoxRect(SOURCE_ANCHOR_BUFFER, SOURCE_ANCHOR_POS_BUFFER)); // 10 is the cornerGuard
     int closest = findNearestWall(box, cursorPos);
     QPointF* corners[4];
     corners[NORTHWEST] = new QPointF(box.x(),box.y());
@@ -347,7 +351,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
     // find the side which is closest to the newPos
     //QRectF box = getUsableArea();
     // account for the shading and reduce the width and height
-    QRectF box = *(getBufferedBoxRect(5.5, 8.5));
+    QRectF box = *(getBufferedBoxRect(SINK_ANCHOR_BUFFER, SINK_ANCHOR_POS_BUFFER));
 
 
     /*

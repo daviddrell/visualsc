@@ -11,11 +11,11 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _keyController(keys),
     _mouseController(mouse),
     _hasMovedSinceCreatingElbow(true)
-
-    //,
-    //TextItem(parent, )
+  //,
+    //TextItem(parentGraphic, parentGraphic->getStateModel()->getIDTextBlock())
 
 {
+
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
     this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
     //this->acceptHoverEvents();            // a Transition graphic has no dimensions, its invididual elbows and line segments will have hover events
@@ -105,12 +105,15 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         segment->enclosePathInElbows();
 
 
+       // TextItem.setPos(25,10);
+      //  TextItem.setParentItem(_anchors[1]);
+
 
         this->updateModel();
     }
     else // load the point list and create the elbows and line segments
     {
-        qDebug() << "loading the point list";
+        //qDebug() << "loading the point list";
         // add every point as an elbow
         for(int i = 0; i < pointList.count(); i++)
         {
@@ -126,7 +129,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         // create a line segment in between every elbow
         for(int i = 0; i < _elbows.count()-1; i++)
         {
-            qDebug()<<"i: "<<i;
+            //qDebug()<<"i: "<<i;
             ElbowGrabber* elbOne = _elbows.at(i);
             ElbowGrabber* elbTwo = _elbows.at(i+1);
 
@@ -170,6 +173,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
             _lineSegments.append(segment);  // add the line segments
 
+
+
         }
 
         // set first and last elbows as the anchors and the last elbow as the terminal elbow
@@ -192,8 +197,19 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         // do this to set closest wall from default
         emit _anchors[0]->anchorMoved(mapToScene(_anchors[0]->pos()));
         emit _anchors[1]->anchorMoved(mapToScene(_anchors[1]->pos()));
+
+        //TextItem.setPos(25,10);
+        //TextItem.setParentItem(_anchors[1]);
+
+
     } // end of loading a transition from file
-}
+
+
+    _transitionTextBox = new TextBox(_anchors[0], "Hello World");
+    _transitionTextBox->setVisible(false);
+    _transitionTextBox->setPos(100,100);
+
+}   // end of constructor
 
 
 
@@ -303,6 +319,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             else if(line!=NULL)
             {
                 line->forceHoverEnterEvent();
+                //_transitionTextBox->setVisible(true);
             }
 
 
@@ -316,6 +333,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             else if(line!=NULL)
             {
                 line->forceHoverLeaveEvent();
+                //_transitionTextBox->setVisible(false);
                 _hasMovedSinceCreatingElbow = true;     // elbows can be created again after unhovering the segment
             }
 
@@ -397,6 +415,19 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
         return true;// true => do not send event to watched - we are finished with this event
 
     }
+    else if( mevent && line)
+    {
+        switch(event->type())
+        {
+            // if the mouse went down, record the x,y coords of the press, record it inside the corner object
+        case QEvent::GraphicsSceneMouseDoubleClick:
+            {
+                _transitionTextBox->setVisible(!_transitionTextBox->isVisible());
+            }
+            break;
+        }
+
+    }
 
 
 
@@ -431,6 +462,8 @@ TransitionGraphic::~TransitionGraphic()
         delete elb;
     }
     _elbows.clear();
+
+    //delete _transitionTextBox;
 }
 
 void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
@@ -480,21 +513,6 @@ void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF ne
 QPointF diff = mtsTL - nmtsTL;
 qreal dx = diff.x();
 qreal dy = diff.y();
-    switch(_anchors[1]->getSnappedSide())
-    {
-    // the anchor only needs to modify its x position
-    case NORTH:
-    case SOUTH:
-       // _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()));
-        break;
-
-     // the anchor only needs to modify its y position
-     case EAST:
-     case WEST:
-       // _anchors[1]->setPos(QPointF(_anchors[1]->x(), _anchors[1]->y()+dy));
-        break;
-    }
-
 
     // make other elbows stay in place
     // and update their line segment hover boxes
@@ -503,11 +521,8 @@ qreal dy = diff.y();
         _elbows[i]->setPos(QPointF(_elbows[i]->x()+dx, _elbows[i]->y()+dy));
         _elbows[i]->getSegment(0)->enclosePathInElbows();
     }
-// _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()+dy));
 
-    //_anchors[0]->getSegment(1)->enclosePathInElbows();
     this->updateModel();
-
 }
 
 /**

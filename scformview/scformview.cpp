@@ -563,8 +563,8 @@ void SCFormView::handlePropertyChanged(IAttribute *attr)
     currentTreeItemName = propertyTable->item(0,1)->text();
 
 
-    //qDebug()<< "handlePropertyChanged: "<<attr->asString() << " parent: " << parentName << " currentTreeItem: " << currentTreeItemName;
-    //qDebug()<< propertyTable->parent()->objectName();
+    qDebug()<< "handlePropertyChanged: "<<attr->asString() << " parent: " << parentName << " currentTreeItem: " << currentTreeItemName;
+    qDebug()<< propertyTable->parent()->objectName();
 
         for (int r =0; r <propertyTable->rowCount(); r++ )
         {

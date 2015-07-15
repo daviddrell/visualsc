@@ -75,7 +75,7 @@ void SCState::initCommon()
 
         int childCount = parent->getStateCount();
 
-        defaultName = "sub_of_" + parentsName + "_" + QString::number(childCount);
+        defaultName = "" + parentsName + "_" + QString::number(childCount);
     }
 
 

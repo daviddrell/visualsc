@@ -11,6 +11,7 @@
 #include "mousecontroller.h"
 #include "linesegmentgraphic.h"
 #include <QObject>
+#include "textbox.h"
 
 #define TRANSITION_DEFAULT_COLOR Qt::blue
 #define TRANSITION_HOVER_COLOR Qt::red
@@ -89,7 +90,10 @@ private :
     LineSegmentGraphic* _hoveredLine;
     ElbowGrabber* _hoveredElbow;
 
-    //5SelectableTextBlock TextItem;    ///<  text to go in the title area.
+    TextBox* _transitionTextBox;
+
+    //SelectableTextBlock TextItem;    ///<  text to go in the title area.
+
 
     bool _hasMovedSinceCreatingElbow;
 
