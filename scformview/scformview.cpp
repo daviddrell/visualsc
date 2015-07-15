@@ -608,8 +608,10 @@ void SCFormView::buttonGroupClicked(int )
 
 void SCFormView::deleteItem()
 {
+    // TODO check if anything is highlighted
     QMessageBox msgBox;
     QString itemType = getCurrentlySelectedType();
+
     msgBox.setText("Confirm delete");
     msgBox.setInformativeText("Are you sure you want to delete item: " + _currentlySelected->objectName() + " (" + itemType + ")");
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);

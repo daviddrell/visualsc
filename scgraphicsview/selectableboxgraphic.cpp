@@ -545,19 +545,19 @@ QPointF SelectableBoxGraphic::getSideCenterPointInSceneCoord(int side)
 {
     switch (side)
     {
-    case 0:
+    case NORTH:
         return mapToScene( QPointF ( (_drawingOrigenX +  _drawingWidth)/2, _drawingOrigenY ));
         break;
 
-    case 1:
+    case EAST:
         return  mapToScene( QPointF ( _drawingOrigenX +_drawingWidth, (_drawingOrigenY + _drawingHeight)/2));
         break;
 
-    case 2:
+    case SOUTH:
         return  mapToScene( QPointF ( (_drawingOrigenX +  _drawingWidth)/2,_drawingOrigenY +  _drawingHeight));
         break;
 
-    case 3:
+    case WEST:
         return  mapToScene( QPointF ( _drawingOrigenX, (_drawingOrigenY + _drawingHeight)/2));
         break;
     }

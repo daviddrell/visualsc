@@ -95,8 +95,16 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
         _lineSegments.append(segment);
 
+
+        //_anchors[0]->setPos(this->mapFromScene(sourceAnchor));
+        //_anchors[1]->setPos(this->mapFromScene(targetAnchor));
+
         emit _anchors[0]->anchorMoved(sourceAnchor);
         emit _anchors[1]->anchorMoved(targetAnchor);
+
+        segment->enclosePathInElbows();
+
+
 
         this->updateModel();
     }
@@ -495,149 +503,133 @@ qreal dy = diff.y();
     }
 // _anchors[1]->setPos(QPointF(_anchors[1]->x()+dx, _anchors[1]->y()+dy));
 
-
+    _anchors[0]->getSegment(1)->enclosePathInElbows();
     this->updateModel();
 
 }
 
+/**
+ * @brief TransitionGraphic::handleTargetStateGraphicResized
+ * @param oldBox
+ * @param newBox
+ * @param corner
+ *
+ * Called by the target statebox when it is resized to reposition the sink anchor and keep it snapped to the edge
+ *
+ * uses scene based oldBox and newBox rectangles and which corner grabber is being manipulated to calculate the new position of a sink anchor
+ *
+ */
 void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
-   // qDebug() << "handleTargetStateGraphicResized: ";
-    qreal buffer = 12;
-    qreal newWidth = newBox.width()-buffer;
-    qreal newHeight = newBox.height()-buffer;
-    qreal oldWidth = oldBox.width()-buffer;
-    qreal oldHeight = oldBox.height()-buffer;
-    qreal scaleX = newWidth/oldWidth;
-    qreal scaleY = newHeight/oldHeight;
+    // old box and new box are scene mapped.
 
-    qDebug() << "scaleX " << scaleX << " scaleY " << scaleY;
+   // qDebug() << "Box:\t" << oldBox << "\t-->\t" << newBox;
 
-    QPointF mtsTL = mapToScene(oldBox.topLeft());
-    QPointF nmtsTL = mapToScene(newBox.topLeft());
-  //  qDebug() << "old xy: " << oldBox.x()<< ", " << oldBox.y();
-//qDebug() << "new xy: " << newBox.x()<< ", " << newBox.y();
-//qDebug() << "old "<<mtsTL;
-//qDebug() << "new "<<nmtsTL;
-QPointF diff = mtsTL - nmtsTL;
-qreal dx = diff.x();
-qreal dy = diff.y();
+    qreal buffer = 0;
+    qreal xScale = (newBox.width()-buffer)/(oldBox.width()-buffer);
+    qreal yScale = (newBox.height()-buffer)/(oldBox.height()-buffer);
 
-    //_anchors[1]->setPos(QPointF((_anchors[1]->x()-dx), _anchors[1]->y()-dy));
-QPointF anchmts = mapToScene(_anchors[1]->pos());
-QPointF anchOnBox = _targetStateGraphic->mapFromScene(anchmts);
-anchOnBox.setX((anchOnBox.x()-0) * scaleX);
-anchOnBox.setY((anchOnBox.y()-0) * scaleY);
+    qreal xDiff = (newBox.x() - oldBox.x());
+    qreal yDiff = (newBox.y() - oldBox.y());
 
-QPointF anchorOnBox = this->mapToItem(_targetStateGraphic, _anchors[1]->pos());
-//qDebug()<<"anchor on box" << anchorOnBox;
-//qDebug() << "old box " << mtsTL;
-//qDebug() << "new Box" << nmtsTL;
+    qreal widthDiff = newBox.width() - oldBox.width();
+    qreal heightDiff = newBox.height() - oldBox.height();
 
-qreal newX, newY, h1, h2, zPrime, z;
-qreal solX,solY;
-QPointF newP, newPI;
-//qDebug() << "_anchors[1] "<< _anchors[1]->getSnappedSide();
-//qDebug() << "corner : " << corner;
-qDebug() << "old box" << mapToScene(mtsTL);
-
-switch(_anchors[1]->getSnappedSide())
-{
-// the anchor only needs to modify its x position
-
-case EAST:
-   if(corner == 2)
-   {
-       newY = anchorOnBox.y()*scaleY;
-       newX = anchorOnBox.x()*scaleX;
-       newP = QPointF(newX ,newY);
-       newPI = _targetStateGraphic->mapToItem(this, newP);
-
-      //_anchors[1]->setPos(QPointF(_anchors[1]->x(), newPI.y()));
-    //  _anchors[1]->setPos(QPointF(newPI.x(), _anchors[1]->y()));
-      _anchors[1]->setPos(QPointF(newPI.x()-dx, newPI.y()-dy));
-   }
-   else if (corner == 1)
-   {
-       /*
-       qDebug() << "z is " << anchorOnBox.y();
-       qDebug() << "d is " << scaleY * (oldHeight-anchorOnBox.y()) + anchorOnBox.y();
-        newY = mtsTL.y() + scaleY * (oldHeight-anchorOnBox.y()) + anchorOnBox.y();
-        newX = mtsTL.x()+ scaleX * (oldWidth - anchorOnBox.x()) + anchorOnBox.x();
-        newP = QPointF(newX ,newY);
-        newPI = _targetStateGraphic->mapToItem(this, newP);
-        _anchors[1]->setPos(QPointF(newPI.x()-dx, newPI.y()-dy));
-        */
-       solY = (anchOnBox.y()) + (oldHeight - anchOnBox.y()) * (1.0 - newHeight/oldHeight) - (newHeight - oldHeight);
-       solX = anchOnBox.x() + (oldWidth - anchOnBox.x()) * (1.0 - newWidth/oldWidth) - (newWidth - oldWidth);
-
-       newP = QPointF(solX,solY);
-       newPI = _targetStateGraphic->mapToItem(this, newP);
-       _anchors[1]->setPos(newPI);
-   }
-   break;
-}
-
-/*
- *
- *
- *
-
-case NORTH:
-
-    newX = anchorOnBox.x()*scaleX;
-    newP= QPointF(newX, anchorOnBox.y());
-    newPI = _targetStateGraphic->mapToItem(this, newP);
-
-    _anchors[1]->setPos(QPointF(newPI.x(), _anchors[1]->y()));
-
-    break;
-case SOUTH:
-     newY = anchorOnBox.y()*scaleY;
-     newX = anchorOnBox.x()*scaleX;
-     newP = QPointF(newX ,newY);
-     newPI = _targetStateGraphic->mapToItem(this, newP);
-
-    //_anchors[1]->setPos(QPointF(_anchors[1]->x(), ));
-    _anchors[1]->setPos(QPointF(newPI.x(), newPI.y()));
-    break;
-
- // the anchor only needs to modify its y position
-
- case WEST:
-    newY = anchorOnBox.y()*scaleY;
-    newP = QPointF(anchorOnBox.x() ,newY);
-    newPI = _targetStateGraphic->mapToItem(this, newP);
-
-   _anchors[1]->setPos(QPointF(_anchors[1]->x(), newPI.y()));
-    break;
-
-switch(_anchors[1]->getSnappedSide())
-{
-// the anchor only needs to modify its x position
-case NORTH:
-    _anchors[1]->setPos(QPointF(_anchors[1]->x()*scaleX, _anchors[1]->y()));
-    break;
-case SOUTH:
-    _anchors[1]->setPos(QPointF(_anchors[1]->x(), _anchors[1]->y()*scaleY));
-    _anchors[1]->setPos(QPointF(_anchors[1]->x()*scaleX, _anchors[1]->y()));
-    break;
-
- // the anchor only needs to modify its y position
- case EAST:
-    _anchors[1]->setPos(QPointF(_anchors[1]->x()*scaleX, _anchors[1]->y()));
-    _anchors[1]->setPos(QPointF(_anchors[1]->x(), _anchors[1]->y()*scaleY));
-    break;
- case WEST:
-    _anchors[1]->setPos(QPointF(_anchors[1]->x(), _anchors[1]->y()*scaleY));
-    break;
-}
-
-   // _anchors[1]->setPos(this->mapFromScene(mapToScene(anchOnBox)));
-*/
+    QPointF anchorOnScene, anchorOnBox, newAnchorOnBox,newAnchorOnScene;
+    qreal oldDistToOrigin, newDistToOrigin, newXPos, newYPos;
 
 
-this->updateModel();
+    // map the anchor to the scene and to the target graphic
+     anchorOnScene = this->mapToScene(_anchors[1]->pos());
+     anchorOnBox = _targetStateGraphic->mapFromScene(anchorOnScene);
+
+    int side = _anchors[1]->getSnappedSide();
+
+    if(     ((side == NORTH)&&(corner == NORTHWEST || corner==NORTHEAST))    ||   ((side == SOUTH)&&(corner == SOUTHWEST || corner==SOUTHEAST))     )  // x change by percentage, y change by true value
+    {
+        //qDebug() << "anchor is "<< anchorOnScene<<"\tmapped on box: "<<anchorOnBox;
+
+        // determine the new X value based on how far the anchor was from the origin
+         oldDistToOrigin = anchorOnScene.x() - oldBox.x();
+         newDistToOrigin = newBox.x() + oldDistToOrigin*xScale;
+
+         newXPos = newDistToOrigin;
+
+         if(side==SOUTH)
+            newYPos = anchorOnBox.y() + heightDiff;
+         else
+            newYPos = anchorOnBox.y() + yDiff;
+
+        // map the anchor to the scene and back to its parent
+         newAnchorOnBox = QPointF(0,newYPos);
+         newAnchorOnScene = _targetStateGraphic->mapToScene(newAnchorOnBox);
+
+        newAnchorOnScene.setX(newXPos);
+
+        _anchors[1]->setPos(this->mapFromScene(newAnchorOnScene));
+    }
+    else if(    ((side == WEST)&&(corner == NORTHWEST || corner==SOUTHWEST))    ||   ((side == EAST)&&(corner == NORTHEAST || corner==SOUTHEAST))     )   // x change by true value, y change by percentage
+    {
+
+        // determine the new Y value based on how far the anchor was from the origin
+         oldDistToOrigin = anchorOnScene.y() - oldBox.y();
+         newDistToOrigin = newBox.y() + oldDistToOrigin*yScale;
+
+         newYPos = newDistToOrigin;
+
+         if(side == EAST)     // must use width in place of x for x change by true value
+            newXPos = anchorOnBox.x() + widthDiff;
+         else
+            newXPos = anchorOnBox.x() + xDiff;
+
+
+
+        // map the anchor to the scene and back to its parent
+         newAnchorOnBox = QPointF(newXPos,0);
+         newAnchorOnScene = _targetStateGraphic->mapToScene(newAnchorOnBox);
+
+        newAnchorOnScene.setY(newYPos);
+
+        _anchors[1]->setPos(this->mapFromScene(newAnchorOnScene));
+
+    }
+    else if(    ((side == WEST)&&(corner == NORTHEAST || corner==SOUTHEAST))    ||   ((side == EAST)&&(corner == NORTHWEST || corner==SOUTHWEST))     )   // x no change, y change by percentage
+    {
+        // calculate the new Y based on percentage
+        oldDistToOrigin = anchorOnScene.y() - oldBox.y();
+        newDistToOrigin = newBox.y() + oldDistToOrigin*yScale;
+
+        // create the QPoints for the anchor on the box and on the scene
+        newAnchorOnBox = QPointF(anchorOnBox.x(),0);
+        newAnchorOnScene = _targetStateGraphic->mapToScene(newAnchorOnBox);
+        // set the Y to the scene based new Y
+        newAnchorOnScene.setY(newDistToOrigin);
+
+        _anchors[1]->setPos(this->mapFromScene(newAnchorOnScene));
+
+    }
+    else if(    ((side == NORTH)&&(corner == SOUTHEAST || corner==SOUTHWEST))    ||   ((side == SOUTH)&&(corner == NORTHEAST || corner==NORTHWEST))     )   // x change by percentage, y no change
+    {
+        // calculate the new X based on percentage
+        oldDistToOrigin = anchorOnScene.x() - oldBox.x();
+        newDistToOrigin = newBox.x() + oldDistToOrigin*xScale;
+
+        // create the QPoints for the anchor on the box and on the scene
+        newAnchorOnBox = QPointF(0, anchorOnBox.y());
+        newAnchorOnScene = _targetStateGraphic->mapToScene(newAnchorOnBox);
+        // set the Y to the scene based new Y
+        newAnchorOnScene.setX(newDistToOrigin);
+
+        _anchors[1]->setPos(this->mapFromScene(newAnchorOnScene));
+    }
+    else
+    {
+        qDebug() << "Invalid corner and side combination in TransitionGraphic::handleTargetStateGraphicResized()";
+    }
+
+    // update the line segment hover box too
+    _anchors[1]->getSegment(0)->enclosePathInElbows();
+    this->updateModel();
 }
 
 /**
@@ -918,26 +910,26 @@ void TransitionGraphic::getClosestSides(int* sourceSide, int* targetSide)
     {
         if ( sourcePos.x() > targetPos.x() )
         {      
-            *sourceSide = 3;
-            *targetSide = 1;
+            *sourceSide = WEST;
+            *targetSide = EAST;
         }
         else
         {
-            *sourceSide = 1;
-            *targetSide = 3;
+            *sourceSide = EAST;
+            *targetSide = WEST;
         }
     }
     else
     {
         if ( sourcePos.y() > targetPos.y() )
         {
-            *sourceSide = 0;
-            *targetSide = 2;
+            *sourceSide = NORTH;
+            *targetSide = SOUTH;
         }
         else
         {
-            *sourceSide = 2;
-            *targetSide = 0;
+            *sourceSide = SOUTH;
+            *targetSide = NORTH;
         }
     }
 }

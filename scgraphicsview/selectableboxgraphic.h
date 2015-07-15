@@ -12,6 +12,8 @@
 #include <QPointF>
 #include "cornergrabber.h"
 
+#define BOX_BUFFER 12
+
 class CornerGrabber;
 class IAttribute;
 

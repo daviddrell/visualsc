@@ -336,14 +336,14 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
  * @brief LineSegmentGraphic::paint
  * @param painter
  *
- * paints the line and an arrow head if this is the terminating segment
+ * paints the line
  */
 //TODO move terminal and arrow head paint to elbowgrabber
 void LineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   //  enclosePathInElbows();
     //_pen.setWidth(20);
-//#define SHOW_HOVER_BOXES
+#define SHOW_HOVER_BOXES
     painter->setPen(_pen);
 
 #ifndef SHOW_HOVER_BOXES
