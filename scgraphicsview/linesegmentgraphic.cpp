@@ -343,7 +343,7 @@ void LineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsIte
 {
   //  enclosePathInElbows();
     //_pen.setWidth(20);
-#define SHOW_HOVER_BOXES
+//#define SHOW_HOVER_BOXES
     painter->setPen(_pen);
     painter->setRenderHint(QPainter::Antialiasing);
 
