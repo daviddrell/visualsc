@@ -159,6 +159,8 @@ private:
     QToolBar *colorToolBar;
     QToolBar *pointerToolbar;
 
+    QToolBar *propertyToolBar;
+
     QComboBox *sceneScaleCombo;
     QComboBox *itemColorCombo;
     QComboBox *textColorCombo;
@@ -172,6 +174,10 @@ private:
     QToolButton *fontColorToolButton;
     QToolButton *fillColorToolButton;
     QToolButton *lineColorToolButton;
+
+
+    QToolButton *addPropertyToolButton;
+
     QAction *boldAction;
     QAction *underlineAction;
     QAction *italicAction;

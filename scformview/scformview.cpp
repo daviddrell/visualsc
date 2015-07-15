@@ -73,6 +73,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
 
     propertyTable = new QTableWidget();
     propertyTable->setColumnCount(2);
+
     vlayout->addWidget( propertyTable );
 
     setWindowTitle(tr("State Chart Tree Editor"));
@@ -793,6 +794,17 @@ void SCFormView::about()
 
 void SCFormView::createActions()
 {
+    // insert properties
+
+    // Property Table stuff
+    /*
+    addPropertyToolButton = new QToolButton();
+    addPropertyToolButton->setPopupMode(QToolButton::MenuButtonPopup);
+
+    propertyToolBar = addToolBar(tr("Add"));
+    propertyToolBar->addWidget(addPropertyToolButton);
+    */
+
     insertStateAction = new QAction(QIcon(":/SCFormView/statebutton.bmp"), tr("Insert State"), this);
     insertStateAction->setShortcut(tr("Ctrl+I"));
     insertStateAction->setStatusTip(tr("Insert State"));
@@ -919,6 +931,7 @@ void SCFormView::createToolbars()
     fontColorToolButton->setAutoFillBackground(true);
     connect(fontColorToolButton, SIGNAL(clicked()),
             this, SLOT(textButtonTriggered()));
+
 
 
 

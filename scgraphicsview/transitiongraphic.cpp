@@ -308,6 +308,8 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
     {
         switch(event->type())
         {
+
+
          case QEvent::GraphicsSceneHoverEnter:
             //qDebug() << "Hover Enter";
             if(elbow!=NULL)

@@ -10,8 +10,8 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys
     mouseDownY(0),
     _outterborderColor(TRANSITION_DEFAULT_COLOR),
     _outterborderPen(),
-    _width(6),
-    _height(6),
+    _width(DEFAULT_OUTTER_BORDER_WIDTH),
+    _height(DEFAULT_OUTTER_BORDER_HEIGHT),
     _snappedSide(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
@@ -39,8 +39,8 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyC
     mouseDownY(0),
     _outterborderColor(TRANSITION_DEFAULT_COLOR),
     _outterborderPen(),
-    _width(6),
-    _height(6),
+    _width(DEFAULT_OUTTER_BORDER_WIDTH),
+    _height(DEFAULT_OUTTER_BORDER_HEIGHT),
     _snappedSide(0),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(false),
@@ -126,6 +126,8 @@ void ElbowGrabber::setPaintStyle(PaintStyle s)
         if ( ! _arrowHead )
         {
             _arrowHead = new ArrowHeadGraphic(this);
+            _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+            _height = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
             _arrowHead->setWidth(_width);
             _arrowHead->setHeight(_height);
             _arrowHead->setPos( - _width/2, - _height/2);
@@ -136,9 +138,12 @@ void ElbowGrabber::setPaintStyle(PaintStyle s)
     {
         if ( _arrowHead )
         {
+            _width = DEFAULT_OUTTER_BORDER_WIDTH;
+            _height = DEFAULT_OUTTER_BORDER_HEIGHT;
             delete _arrowHead;
             _arrowHead = NULL;
         }
+
     }
     this->update();
 }
@@ -214,8 +219,18 @@ void ElbowGrabber::forceHoverEnterEvent()
     _outterborderColor = TRANSITION_HOVER_COLOR;
     _outterborderPen.setWidth(ELBOW_HOVER_WIDTH);
     _outterborderPen.setColor(TRANSITION_HOVER_COLOR);
-    _width = ELBOW_ARROWHEAD_HOVER_WIDTH;
-    _height = ELBOW_ARROWHEAD_HOVER_WIDTH;
+
+    if(_paintStyle==kArrowHead)
+    {
+        _width = ELBOW_ARROWHEAD_HOVER_WIDTH;
+        _height = ELBOW_ARROWHEAD_HOVER_WIDTH;
+    }
+    else
+    {
+        _width = HOVER_OUTTER_BORDER_WIDTH;
+        _height = HOVER_OUTTER_BORDER_WIDTH;
+    }
+
     //_outterborderPen.setStyle();
     //this->update(0,0,_width,_height);
 }
@@ -231,10 +246,22 @@ void ElbowGrabber::forceHoverLeaveEvent()
     _outterborderColor = TRANSITION_DEFAULT_COLOR;
     _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
     _outterborderPen.setColor(TRANSITION_DEFAULT_COLOR);
-    _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
-    _height = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+    if(_paintStyle==kArrowHead)
+    {
+        _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+        _height = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+    }
+    else
+    {
+        _width = DEFAULT_OUTTER_BORDER_WIDTH;
+        _height = DEFAULT_OUTTER_BORDER_HEIGHT;
+    }
+
     //this->update(0,0,_width,_height);
 }
+
+
+// Hover Events now received in Transition Graphic Scene Event filter
 /*
 void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
