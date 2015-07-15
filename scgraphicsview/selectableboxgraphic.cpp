@@ -667,8 +667,10 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
 
 void SelectableBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+
     if  ( (_showBoxStyle == kAlways) || (( _showBoxStyle == kWhenSelected) && ( _isHovered == true)))
     {
+        painter->setRenderHint(QPainter::Antialiasing);
         paintWithVisibleBox (painter,0,0);
     }
     //else no painting required

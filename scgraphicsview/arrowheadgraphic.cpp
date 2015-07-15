@@ -42,6 +42,7 @@ void ArrowHeadGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem 
     pen.setWidth(2);
     pen.setColor(_color);
     painter->setPen(pen);
+    painter->setRenderHint(QPainter::Antialiasing);
 
     painter->drawLine(QPointF(_width/2,_height/2), QPointF(_width, _height));
     painter->drawLine(QPointF(0,_height), QPointF(_width, _height));
