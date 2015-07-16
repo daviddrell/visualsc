@@ -107,6 +107,8 @@ public:
     void logError(QString message);///< inform the user there was an error
     void logInfo(QString message);///< inform the user of anything that is not an error such as progress, etc
 
+    void insertNewProperty(SCItem* item, QString propertyName);
+
 
 signals:
     void openCompleted(bool sucess, QStringList message);
@@ -122,6 +124,7 @@ private slots:
     void handleTransitUp();
     void handleTransitDown();
     void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
+    void handleMakeANewTransitionProperty(const QString name);
 
 private:
     SCXMLReader     _reader;

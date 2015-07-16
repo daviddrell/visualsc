@@ -179,6 +179,12 @@ void SCXMLReader::readState(STATE_TYPE stateType)
     // delete it when its done.
 
     StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
+/*
+    for(int i = 0 ; i < _reader.attributes().count(); i++)
+    {
+
+    }
+  */
 
     QString stateTypeStr;
     switch ( stateType)

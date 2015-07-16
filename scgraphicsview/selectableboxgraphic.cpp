@@ -621,9 +621,9 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
         _pen.setColor(Qt::black);
 
     if ( _isHovered )
-         _pen.setWidth(_hoverLineThickness);
+         _pen.setWidth(BOX_HOVER_PEN_WIDTH);
     else
-        _pen.setWidth(1);
+        _pen.setWidth(BOX_DEFAULT_PEN_WIDTH);
 
     if ( _drawBoxLineStyle == kDrawSolid )
         _pen.setStyle( Qt::SolidLine );

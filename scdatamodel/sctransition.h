@@ -56,12 +56,17 @@ public:
     virtual IAttributeContainer * getAttributes(); //reimplemented from base SCItem
     void    setAttributeValue(QString key, QString value);
     QString getAttributeValue(QString key);
+    void addAttribute(QString key, QString value);
+    TransitionAttributes attributes;
+
     void    writeSCVXML(QXmlStreamWriter & sw);
     SCState *targetState();
 
+
+
      //public data members
 
-    TransitionAttributes attributes;
+
 
 signals:
     void selected();

@@ -68,6 +68,7 @@ public:
    // void makeTargetConnections(QList<SCTransition*> & transitionList);
 
     void setAttributeValue(QString key, QString value);
+    void addAttribute(QString key, QString value);
     QString getAttributeValue(QString key);
 
     int  getStateCount();

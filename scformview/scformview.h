@@ -28,6 +28,8 @@
 #include <QList>
 #include <QModelIndex>
 #include <QSignalMapper>
+#include <QInputDialog>
+
 
 class StateSelectionWindow;
 
@@ -110,6 +112,13 @@ private slots:
     void handleStateSelectionWindowStateSelected(SCState *st, QString name);
 
     void setSelectedTreeItem(QObject *);
+
+    void sendMessage(QString title, QString message);
+    const QString promptTextInput(QString windowTitle, QString message, QString defaultText, bool* ok);
+
+    void itemPromptTextBox();
+    void itemPromptProperty();
+
 private:
 
     IAttributeContainer * getCurrentlySelectedAttributes();
@@ -134,6 +143,10 @@ private:
     void deleteItem(QObject * item);
     void setAttributeConnections(IAttributeContainer * atts, bool shouldConnect);
     void clearPropertyTable();
+    void reloadPropertyTable();
+
+    void itemInsertProperty(const QString name);
+
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;
     QLabel         *selectedChartItem;
@@ -150,6 +163,7 @@ private:
     QAction *insertStateAction;
     QAction *aboutAction;
 
+
     QMenu *fileMenu;
     QMenu *itemMenu;
     QMenu *aboutMenu;
@@ -158,7 +172,6 @@ private:
     QToolBar *editToolBar;
     QToolBar *colorToolBar;
     QToolBar *pointerToolbar;
-
     QToolBar *propertyToolBar;
 
     QComboBox *sceneScaleCombo;
@@ -191,8 +204,8 @@ private:
     StateSelectionWindow * _targetStateSelectionWindow;
 
 
-
-
+    QAction *insertTextBox; // will allow user to add a text box to any highlighted tree item
+    QAction *insertProperty; // allows user to add own properties
 };
 
 

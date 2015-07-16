@@ -39,7 +39,7 @@
 #include <QSignalMapper>
 
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
-        QMainWindow(parent, Qt::WindowStaysOnTopHint),
+        QMainWindow(parent, Qt::Window),
         _dm(dataModel),
         _currentlySelected(NULL),
         _previouslySelected(NULL)
@@ -51,7 +51,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
 
     // central widget and outter layout
 
-    QHBoxLayout *layout = new QHBoxLayout;
+    QHBoxLayout *layout = new QHBoxLayout;  // main layout, horizontal
     QWidget *widget = new QWidget;
     widget->setLayout(layout);
     setCentralWidget(widget);
@@ -61,20 +61,30 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
     stateChartTreeView = new QTreeWidget();
     stateChartTreeView->setColumnCount(1);
     connect ( stateChartTreeView, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(handleTreeViewItemClicked(QTreeWidgetItem*,int)));
-    layout->addWidget (stateChartTreeView );
 
-    QVBoxLayout *vlayout = new QVBoxLayout;
-    layout->addLayout(vlayout );
+    QVBoxLayout *treeLayout = new QVBoxLayout();
+    //selectedChartItem = new QLabel();
 
-    selectedChartItem = new QLabel();
-    vlayout->addWidget( selectedChartItem);
+    treeLayout->addWidget(editToolBar);             // add the edit tool bar to the tree layout
+    //treeLayout->addWidget(selectedChartItem);
+
+    treeLayout->addWidget (stateChartTreeView );    // first item added to layout
+    layout->addLayout(treeLayout);
+
+
+    QVBoxLayout *propertyLayout = new QVBoxLayout;     // property table is a vertical layout
+    layout->addLayout(propertyLayout );                // second item added to horizontal layout
+
+
+    //propertyLayout->addWidget( selectedChartItem);     // sec
+    propertyLayout->addWidget( propertyToolBar);
 
     //  property table
 
     propertyTable = new QTableWidget();
     propertyTable->setColumnCount(2);
 
-    vlayout->addWidget( propertyTable );
+    propertyLayout->addWidget( propertyTable );
 
     setWindowTitle(tr("State Chart Tree Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
@@ -92,6 +102,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
 
 void SCFormView::handleNewTransition(SCTransition*t)
 {
+    // not sure what this does...
     (void)t;
     QList<SCState*> states;
     states.append( _dm->getTopState());
@@ -515,7 +526,7 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
 
     QString selectedItemTitle = getCurrentlySelectedType()  + " : " +  getCurrentlySelectedTitle();
 
-    selectedChartItem->setText(selectedItemTitle );
+    //selectedChartItem->setText(selectedItemTitle );
 
     if (getCurrentlySelectedType() == "TextBlock" )
     {
@@ -534,6 +545,9 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
 
     // load the new attributes
     IAttributeContainer * currentAttributes =  getCurrentlySelectedAttributes();
+
+    qDebug()<< "loading current attributes with count " << currentAttributes->count();
+
     propertyTable->setRowCount(currentAttributes->count());
     setAttributeConnections(currentAttributes, true);
 
@@ -541,6 +555,22 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
 
     // watch for user changes to the attributes
     connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
+
+
+}
+
+
+/**
+ * @brief SCFormView::reloadPropertyTable
+ * reloads the property table with the currentAttributes
+ */
+void SCFormView::reloadPropertyTable()
+{
+    IAttributeContainer * currentAttributes =  getCurrentlySelectedAttributes();
+    clearPropertyTable();                   // clear out the table
+
+    propertyTable->setRowCount(currentAttributes->count());     // load the table to have a set number of elements
+    setAttributeConnections(currentAttributes, false);      // set up the attribute connections but do not call connect
 }
 
 /**
@@ -561,11 +591,13 @@ void SCFormView::handlePropertyChanged(IAttribute *attr)
     else
         parentName = "";
 
+
+
     currentTreeItemName = propertyTable->item(0,1)->text();
 
 
-    qDebug()<< "handlePropertyChanged: "<<attr->asString() << " parent: " << parentName << " currentTreeItem: " << currentTreeItemName;
-    qDebug()<< propertyTable->parent()->objectName();
+    //qDebug()<< "handlePropertyChanged: "<<attr->asString() << " parent: " << parentName << " currentTreeItem: " << currentTreeItemName;
+    //qDebug()<< propertyTable->parent()->objectName();
 
         for (int r =0; r <propertyTable->rowCount(); r++ )
         {
@@ -580,7 +612,7 @@ void SCFormView::handlePropertyChanged(IAttribute *attr)
                 if ( key =="name")
                 {
                     // the user changed the name
-                    selectedChartItem->setText( attr->asString()  );
+                    // selectedChartItem->setText( attr->asString()  );
 
 
                     // reload the tree
@@ -606,6 +638,120 @@ void SCFormView::buttonGroupClicked(int )
 
 }
 
+void SCFormView::itemPromptTextBox()
+{
+    qDebug()  << "iit";
+
+    QString itemType = "New Property";
+    bool ok;
+    QInputDialog qid;
+    qid.setInputMode(QInputDialog::TextInput);
+    qid.setWindowFlags(Qt::WindowStaysOnTopHint);
+    QString input = qid.getText(NULL, itemType, getCurrentlySelectedType()+" Property",QLineEdit::Normal,"type a name...", &ok);
+
+    if(ok && !input.isEmpty())
+    {
+        qDebug () << input;
+    }
+
+}
+
+void SCFormView::sendMessage(QString title, QString message)
+{
+    // TODO check if anything is highlighted
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(title);
+    msgBox.setText(message);
+    //msgBox.setStandardButtons(QMessageBox::Ok);
+    //msgBox.setDefaultButton(QMessageBox::Ok);
+
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    int ret = msgBox.exec();
+
+    switch (ret)
+    {
+    case QMessageBox::Ok:
+        // ok was pressed;
+        break;
+
+    default:
+        // should never be reached
+        break;
+    }
+}
+
+const QString SCFormView::promptTextInput(QString windowTitle, QString message, QString defaultText, bool* ok)
+{
+    QInputDialog qid;
+    qid.setInputMode(QInputDialog::TextInput);
+    qid.setWindowFlags(Qt::WindowStaysOnTopHint);
+    return qid.getText(NULL, windowTitle, message,QLineEdit::Normal,defaultText, ok);
+}
+
+/**
+ * @brief SCFormView::itemPromptProperty
+ *
+ * connected to the QAction insertProperty
+ *
+ * prompts the user for a property name to add to the currently highlighted item when the button is pressed
+ *
+ *
+ * button pressed > itemPromptProperty() for the name > itemInsertProperty() to update the datamodel and the table
+ *
+ *
+ */
+void SCFormView::itemPromptProperty()
+{
+
+    if(getCurrentlySelectedType().isEmpty())
+    {
+        this->sendMessage("Error","Please Select Something First");
+        return;
+    }
+    //qDebug()<< "iip";
+
+    QString windowTitle = "New Property";
+    bool ok;
+    QString input = this->promptTextInput("New Property", getCurrentlySelectedType()+" Property", "", &ok);
+    if(ok && !input.isEmpty())
+    {
+        // the user inputted something
+        this->itemInsertProperty(input);
+    }
+    //qid.
+
+}
+
+
+void SCFormView::itemInsertProperty(QString propertyName)
+{
+    //disconnect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
+    QString itemType = getCurrentlySelectedType();
+
+    SCItem* item = dynamic_cast<SCItem*> (_currentlySelected);
+
+    qDebug() << "item Type " << itemType;
+    _dm->insertNewProperty(item, propertyName);
+
+
+    // insert the new table item
+    QTableWidgetItem * propName = new QTableWidgetItem(propertyName);
+
+    propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
+
+    QTableWidgetItem * propValue = new QTableWidgetItem("");
+
+    propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+
+    propertyTable->insertRow(0);
+    propertyTable->setItem(0, 0, propName);
+    propertyTable->setItem(0, 1, propValue);
+
+    // propertyTable->item(0,0)->setText(propertyName);
+    // propertyTable->item(0,1)->setText("default new text");
+    // this->reloadPropertyTable();
+    //connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
+}
 
 void SCFormView::deleteItem()
 {
@@ -794,6 +940,7 @@ void SCFormView::about()
 
 void SCFormView::createActions()
 {
+    // TODO button
     // insert properties
 
     // Property Table stuff
@@ -861,6 +1008,19 @@ void SCFormView::createActions()
     aboutAction = new QAction(tr("A&bout"), this);
     aboutAction->setShortcut(tr("Ctrl+B"));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+
+
+    insertTextBox = new QAction(QIcon(":/SCFormView/textbox.png"),
+                               tr("Insert Textbox"), this);
+    insertTextBox->setShortcut(tr("Ctrl+T"));
+    insertTextBox->setStatusTip(tr("Insert a text box for the selected item"));
+    connect(insertTextBox, SIGNAL(triggered()), this, SLOT(itemPromptTextBox()));
+
+    insertProperty = new QAction(QIcon(":/SCFormView/roundadd.png"), tr("Add Property"),this);
+    insertProperty->setShortcut(tr("Ctrl+A"));
+    insertProperty->setStatusTip(tr("Insert a property for the selected item"));
+    connect(insertProperty, SIGNAL(triggered()), this, SLOT(itemPromptProperty()));
+
 }
 
 void SCFormView::handleBoldChanged()
@@ -900,13 +1060,21 @@ void SCFormView::createMenus()
 void SCFormView::createToolbars()
 {
 
+    propertyToolBar = new QToolBar("Property",this);
+    propertyToolBar->addAction(insertProperty);
+    propertyToolBar->addAction(insertTextBox);
 
-    editToolBar = addToolBar(tr("Edit"));
+    //editToolBar = addToolBar(tr("Edit"));
+    editToolBar = new QToolBar("Edit", this);
+    editToolBar->addAction(insertTransitionAction);
+    editToolBar->addAction(insertStateAction);
     editToolBar->addAction(deleteAction);
     editToolBar->addAction(toFrontAction);
     editToolBar->addAction(sendBackAction);
-    editToolBar->addAction(insertTransitionAction);
-    editToolBar->addAction(insertStateAction);
+
+
+    //editToolBar->addAction(insertTextBox);
+    //editToolBar->addAction(insertProperty);
 
     fontCombo = new QFontComboBox();
     connect(fontCombo, SIGNAL(currentFontChanged(QFont)),

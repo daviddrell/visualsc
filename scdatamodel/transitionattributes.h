@@ -48,6 +48,7 @@ public:
     TransitionAttributes();
     ~TransitionAttributes();
 
+    void addAttribute(const QString attrName);
     virtual void setAttributes(const IAttributeContainer& sourceAttrList);
 
 

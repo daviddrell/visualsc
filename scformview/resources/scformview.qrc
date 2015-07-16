@@ -14,5 +14,9 @@
         <file>transitionbutton.bmp</file>
         <file>statebutton.bmp</file>
         <file>textblock.bmp</file>
+        <file>roundadd.png</file>
+        <file>textbox.png</file>
+        <file>leftarrow.png</file>
+        <file>roundminus.png</file>
     </qresource>
 </RCC>

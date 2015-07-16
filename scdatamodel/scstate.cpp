@@ -136,6 +136,16 @@ IAttributeContainer * SCState::getAttributes()
     return   & attributes;
 }
 
+void SCState::addAttribute(QString key, QString value)
+{
+    qDebug()  << "adding state pperopryt: " << key;
+    TransitionAttributes::TransitionStringAttribute * attr = new TransitionAttributes::TransitionStringAttribute (this, key,QString());
+    attr->setValue(value);
+    qDebug() << "attributes count before " << attributes.count();
+    attributes.addItem(attr);
+    qDebug() << "attributes count after " << attributes.count();
+}
+
 void SCState::setAttributeValue(QString key, QString value)
 {
     IAttribute * attr = attributes.value(key);
@@ -344,6 +354,39 @@ void SCState::getAllStates(QList<SCState *> & stateList)
 void SCState::writeSCVXML(QXmlStreamWriter & sw)
 {
     sw.writeStartElement(QString("state"));
+
+
+
+    QMapIterator<QString, IAttribute*> i(attributes);       // get the keys of the attributes
+
+    while(i.hasNext())                                      // for every attribute of this state, write into the scxml
+    {
+        QString key = i.next().key();
+        qDebug() << "writing " << key <<"...";
+        sw.writeAttribute(key, attributes.value(key)->asString());
+    }
+
+
+    // additionally, write each of the attributes of this state's children.
+    for(int k = 0 ; k < children().length(); k++)
+    {
+        SCState * sc = dynamic_cast<SCState*>(children()[k]);
+        if (sc)
+            sc->writeSCVXML(sw);
+
+        SCTransition * st = dynamic_cast<SCTransition*>(children()[k]);
+        if (st)
+            st->writeSCVXML(sw);
+
+        SCTextBlock * tb = dynamic_cast<SCTextBlock*>(children()[k]);
+        if (tb)
+            tb->writeSCVXML(sw);
+    }
+
+
+
+
+    /*
     sw.writeAttribute(QString("id"), attributes.value("name")->asString());
     sw.writeAttribute(QString("position"),attributes.value("position")->asString());
     sw.writeAttribute(QString("size"),attributes.value("size")->asString());
@@ -362,7 +405,7 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
         if (tb)
             tb->writeSCVXML(sw);
 
-    }
+    }*/
 
     sw.writeEndElement();
 }

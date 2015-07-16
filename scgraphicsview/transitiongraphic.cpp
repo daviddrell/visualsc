@@ -428,7 +428,6 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             }
             break;
         }
-
     }
 
 

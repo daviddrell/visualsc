@@ -58,7 +58,33 @@ TransitionAttributes::~TransitionAttributes()
 
 }
 
+void TransitionAttributes::addAttribute(const QString attrName)
+{
 
+    IAttribute* myAttr = this->value(attrName);
+
+    if(!myAttr)
+    {
+        IAttribute* newAttr=NULL;
+
+        TransitionStringAttribute *str;
+
+
+        TransitionStringAttribute * newStr = new TransitionStringAttribute (*str);
+        newStr->setValue(attrName);
+        addItem(newStr);
+        newAttr = newStr;
+
+
+        qDebug() <<"newAttr created: "<< newAttr->asString();
+
+        if ( newAttr ) emit attributeAdded(newAttr);
+    }
+    else
+    {
+        qDebug() << "Attribute "+ attrName+" already exists";
+    }
+}
 
 void TransitionAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 {

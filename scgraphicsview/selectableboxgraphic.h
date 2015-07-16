@@ -13,6 +13,8 @@
 #include "cornergrabber.h"
 
 #define BOX_BUFFER 12
+#define BOX_DEFAULT_PEN_WIDTH 2
+#define BOX_HOVER_PEN_WIDTH 4
 
 class CornerGrabber;
 class IAttribute;

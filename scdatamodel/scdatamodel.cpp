@@ -489,7 +489,46 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 }
 
+void SCDataModel::insertNewProperty(SCItem* item, QString propertyName)
+{
+    SCTransition* trans = dynamic_cast<SCTransition*>(item);
+    SCState* state = dynamic_cast<SCState*>(item);
 
+    if(state)
+    {
+        qDebug() << "insert new state property: "<<propertyName;
+        state->addAttribute(propertyName,"");
+    }
+    else if(trans)
+    {
+        qDebug() << "insert new transition property: " << propertyName;
+        trans->addAttribute(propertyName,"");
+    }
+    else
+    {
+        qDebug() << "SCDataModel::insertNewProperty ERROR Given unexpected type: ";
+    }
+
+    //item->addAttribute(propertyName,"");
+
+#ifdef USE_THE_STRING_INSTEAD
+    qDebug() << "SCDataModel::insertNewProperty\titemType " << itemType;
+    if(itemType.toLower() == "state")
+    {
+        qDebug() << "current state: "  << _currentState->objectName();
+        _currentState->addAttribute(propertyName, "");
+    }
+    else if(itemType.toLower() == "transition")
+    {
+
+        _currentTransition->addAttribute(propertyName, "");
+    }
+    else
+    {
+        qDebug() << "SCDataModel::insertNewProperty ERROR Given unexpected type: " << propertyName;
+    }
+#endif
+}
 
 SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
 {
@@ -499,7 +538,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
 
     transition->setAttributeValue("target", target);
 
-    emit newTransitionSignal(transition);
+    emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition
 
     return transition;
 }
@@ -535,6 +574,10 @@ void SCDataModel::handleLeaveTransitionElement()
 
 }
 
+void SCDataModel::handleMakeANewTransitionProperty(const QString name)
+{
+    qDebug() << "handle make a new transition property " << name;
+}
 
 
 void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)

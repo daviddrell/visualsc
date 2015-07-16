@@ -94,6 +94,13 @@ IAttributeContainer * SCTransition::getAttributes()
     return & attributes;
 }
 
+void SCTransition::addAttribute(QString key, QString value)
+{
+    TransitionAttributes::TransitionStringAttribute * attr = new TransitionAttributes::TransitionStringAttribute (this, key,QString());
+    attr->setValue(value);
+    attributes.addItem(attr);
+}
+
 void SCTransition::setAttributeValue(QString key, QString value)
 {
     IAttribute * attr = attributes.value(key);
@@ -125,34 +132,26 @@ void SCTransition::handleLineUnSelected()
 void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
 {
     sw.writeStartElement(QString("transition"));
-    /*
-    sw.writeAttribute(QString("target"), attributes.value("target")->asString());
-    sw.writeAttribute(QString("event"), attributes.value("event")->asString());
-    sw.writeAttribute(QString("cond"), attributes.value("cond")->asString());
-    sw.writeAttribute(QString("type"), attributes.value("type")->asString());
-*/
+    QMapIterator<QString, IAttribute*> i(attributes);       // get the keys of the attributes
 
-    QMapIterator<QString, IAttribute*> i(attributes);
-
-    while(i.hasNext())
+    while(i.hasNext())              // for every attribute, write into the scxml
     {
         QString key = i.next().key();
-        if(key != "path")
+
+        if(key != "path")           // do a special write for the path
         {
+            qDebug() << "writing " << key <<"...";
             sw.writeAttribute(key, attributes.value(key)->asString());
         }
     }
 
-    if (  attributes.contains("path"))
+    if (  attributes.contains("path"))  // write all the path values in a separate element
     {
          sw.writeStartElement(QString("path"));
          QString path = attributes.value("path")->asString();
          sw.writeAttribute(QString("d"),path);
          sw.writeEndElement();
     }
-
-
-
     sw.writeEndElement();
 }
 
