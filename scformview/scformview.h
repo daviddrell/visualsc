@@ -118,6 +118,7 @@ private slots:
 
     void itemPromptTextBox();
     void itemPromptProperty();
+    void itemDeleteSelectedProperty();
 
 private:
 
@@ -206,7 +207,9 @@ private:
 
     QAction *insertTextBox; // will allow user to add a text box to any highlighted tree item
     QAction *insertProperty; // allows user to add own properties
+    QAction *deleteProperty;
 };
+
 
 
 #endif // SCFORMVIEW_H

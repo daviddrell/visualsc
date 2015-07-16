@@ -363,6 +363,7 @@ IAttributeContainer * SCFormView::getCurrentlySelectedAttributes()
     return attributes;
 }
 
+
 IAttributeContainer * SCFormView:: getPreviouslySelectedAttributes(){
     IAttributeContainer * attributes=NULL;
     SCState * st = dynamic_cast<SCState *>(  _previouslySelected );
@@ -385,6 +386,16 @@ IAttributeContainer * SCFormView:: getPreviouslySelectedAttributes(){
     return attributes;
 }
 
+/**
+   returns the name of the currently selected tree item
+
+   state: returns name attribute
+
+   transition: returns target state attribute
+
+   textblock: returns "TextBlock"
+
+ */
 QString SCFormView::getCurrentlySelectedTitle()
 {
     QString title;
@@ -416,7 +427,9 @@ QString SCFormView::getCurrentlySelectedTitle()
 }
 
 
-
+/**
+   returns a string of the currently selected tree view item's type
+ */
 QString SCFormView::getCurrentlySelectedType()
 {
 
@@ -440,6 +453,12 @@ QString SCFormView::getCurrentlySelectedType()
     return QString();
 }
 
+/**
+ set attribtue Connections
+ Connects or disconnects all attributes in the given attribute container to handleproperty changed.
+
+
+ */
 void SCFormView::setAttributeConnections(IAttributeContainer * atts, bool shouldConnect)
 {
     if(!(atts)) // return if atts is null
@@ -638,9 +657,26 @@ void SCFormView::buttonGroupClicked(int )
 
 }
 
+
+/**
+   itemDeleteSelectedProperty()
+
+  Deletes the currently selected propertyTable property if one is currently selected
+  will remove it from the scform propertyTable and from the dataModel
+
+ */
+void SCFormView::itemDeleteSelectedProperty()
+{
+    //propertyTable->getSelectedItem();
+    qDebug() << "deleting"
+}
+
+/**
+ currently not being used
+ */
 void SCFormView::itemPromptTextBox()
 {
-    qDebug()  << "iit";
+    // qDebug()  << "iit";
 
     QString itemType = "New Property";
     bool ok;
@@ -655,6 +691,18 @@ void SCFormView::itemPromptTextBox()
     }
 
 }
+
+
+
+
+/**
+   sendMessage
+
+   will create a pop up message
+   can set the window title and the message using the arguments
+
+   has an OK button to dismiss the pop up
+ */
 
 void SCFormView::sendMessage(QString title, QString message)
 {
@@ -680,6 +728,16 @@ void SCFormView::sendMessage(QString title, QString message)
     }
 }
 
+/**
+   promptTextInput
+
+   Opens a popup with a text input field
+
+   The arguments will set the pop up's window title, the message, and set the intial input text field's text
+
+   returns the input text by the user or (not tested) an empty string if nothing is returned
+
+ */
 const QString SCFormView::promptTextInput(QString windowTitle, QString message, QString defaultText, bool* ok)
 {
     QInputDialog qid;
@@ -703,26 +761,35 @@ const QString SCFormView::promptTextInput(QString windowTitle, QString message, 
 void SCFormView::itemPromptProperty()
 {
 
+    // check if there is a highlighted tree object to add a property to
     if(getCurrentlySelectedType().isEmpty())
     {
         this->sendMessage("Error","Please Select Something First");
         return;
     }
-    //qDebug()<< "iip";
 
-    QString windowTitle = "New Property";
+    // prompt the user for a property name
     bool ok;
     QString input = this->promptTextInput("New Property", getCurrentlySelectedType()+" Property", "", &ok);
+
+    // check if the input is valid
     if(ok && !input.isEmpty())
     {
-        // the user inputted something
-        this->itemInsertProperty(input);
+        // the user inputted something so insert this as a new property
+        itemInsertProperty(input);
     }
-    //qid.
-
 }
 
+/**
 
+   itemInsertProperty
+
+   Creates a new property for the highlighted tree object with given property name
+
+   will update the datamodel for both SCTransitions and SCStates
+
+   will also update the current property table, adding the new property to the top of the table
+ */
 void SCFormView::itemInsertProperty(QString propertyName)
 {
     //disconnect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
@@ -736,13 +803,12 @@ void SCFormView::itemInsertProperty(QString propertyName)
 
     // insert the new table item
     QTableWidgetItem * propName = new QTableWidgetItem(propertyName);
-
     propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
 
     QTableWidgetItem * propValue = new QTableWidgetItem("");
-
     propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
 
+    // insert the new property at the top of the table
     propertyTable->insertRow(0);
     propertyTable->setItem(0, 0, propName);
     propertyTable->setItem(0, 1, propValue);
@@ -1020,6 +1086,11 @@ void SCFormView::createActions()
     insertProperty->setShortcut(tr("Ctrl+A"));
     insertProperty->setStatusTip(tr("Insert a property for the selected item"));
     connect(insertProperty, SIGNAL(triggered()), this, SLOT(itemPromptProperty()));
+
+    deleteProperty = new QAction(QIcon(":/SCFormView/roundminus.png"), tr("Remove Property"), this);
+    deleteProperty->setShortcut(tr("Ctrl+A"));
+    deleteProperty->setStatusTip(tr("Insert a property for the selected item"));
+    connect(deleteProperty, SIGNAL(triggered()), this, SLOT(itemDeleteSelectedProperty()));
 
 }
 
