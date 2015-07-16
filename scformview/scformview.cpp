@@ -668,7 +668,7 @@ void SCFormView::buttonGroupClicked(int )
 void SCFormView::itemDeleteSelectedProperty()
 {
     //propertyTable->getSelectedItem();
-    qDebug() << "deleting"
+    qDebug() << "deleting";
 }
 
 /**
@@ -764,13 +764,21 @@ void SCFormView::itemPromptProperty()
     // check if there is a highlighted tree object to add a property to
     if(getCurrentlySelectedType().isEmpty())
     {
-        this->sendMessage("Error","Please Select Something First");
+        this->sendMessage("Error","Please select a tree object");
         return;
     }
+
 
     // prompt the user for a property name
     bool ok;
     QString input = this->promptTextInput("New Property", getCurrentlySelectedType()+" Property", "", &ok);
+
+    // check if the property name has a space (not supported by scxml reading)
+    if(input.contains(' '))
+    {
+        sendMessage("Error", "Property Name cannot contain spaces");
+        return;
+    }
 
     // check if the input is valid
     if(ok && !input.isEmpty())
@@ -798,7 +806,9 @@ void SCFormView::itemInsertProperty(QString propertyName)
     SCItem* item = dynamic_cast<SCItem*> (_currentlySelected);
 
     qDebug() << "item Type " << itemType;
-    _dm->insertNewProperty(item, propertyName);
+    if(!_dm->insertNewProperty(item, propertyName))
+        return; // failed to insert, so halt here.
+
 
 
     // insert the new table item

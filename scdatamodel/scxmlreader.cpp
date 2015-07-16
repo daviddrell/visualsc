@@ -77,7 +77,10 @@ void SCXMLReader::getReadResult(bool &success, QStringList& message)
     message = _resultMessages;
 }
 
-
+/**
+ * @brief SCXMLReader::readElement
+ * recursively read the elements in the scxml file
+ */
 void SCXMLReader::readElement()
 {
     bool enteredAStateElement = false;
@@ -92,6 +95,8 @@ void SCXMLReader::readElement()
         readState(kSTATE_TYPE_Machine);
         enteredAStateElement = true;
     }
+
+
     if (_reader.name() == "state")
     {
         emit enterStateElement();
@@ -132,6 +137,10 @@ void SCXMLReader::readElement()
         readOnEntry();
     else if ( _reader.name() == "onexit")
         readOnExit();
+    else
+    {
+        qDebug() << "not sure what to here " << _reader.name();
+    }
 
 
     _reader.readNext();
@@ -145,8 +154,10 @@ void SCXMLReader::readElement()
             break; // hit end of this tree
         }
 
-        if ( _reader.isStartElement())
+        if ( _reader.isStartElement()){
+            qDebug() << "this element has another start element!";
             readElement();
+        }
 
         _reader.readNext();
     }
@@ -213,7 +224,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
     for (int i = 0; i < _reader.attributes().count(); i++)
     {
         QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
-
+        qDebug() << "reading attribute: " << XmlAttr.name();
         // look for the Sate Attribute Name (id in SCXML)
         if ( XmlAttr.name() == "id")
         {

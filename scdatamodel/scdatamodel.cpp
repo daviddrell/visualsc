@@ -489,7 +489,13 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 }
 
-void SCDataModel::insertNewProperty(SCItem* item, QString propertyName)
+/**
+ * @brief SCDataModel::insertNewProperty
+ * @param item
+ * @param propertyName
+ * @return true if attempted to insert, false if highlighted item was not expected
+ */
+bool SCDataModel::insertNewProperty(SCItem* item, QString propertyName)
 {
     SCTransition* trans = dynamic_cast<SCTransition*>(item);
     SCState* state = dynamic_cast<SCState*>(item);
@@ -507,7 +513,9 @@ void SCDataModel::insertNewProperty(SCItem* item, QString propertyName)
     else
     {
         qDebug() << "SCDataModel::insertNewProperty ERROR Given unexpected type: ";
+        return false;
     }
+    return true;
 
     //item->addAttribute(propertyName,"");
 
@@ -546,8 +554,9 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
 
 void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
 {
+    /*
     qDebug() << "handleMakeANewTransition, : "  + ta->value("target")->asString() << "\t" << ta->value("event")->asString();
-
+*/
     SCTransition * transition = new SCTransition(_currentState);
 
     if ( _currentState == 0)
