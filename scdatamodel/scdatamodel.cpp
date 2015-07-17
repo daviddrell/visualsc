@@ -489,6 +489,31 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 }
 
+
+bool SCDataModel::insertNewTextBox(SCItem* item, QString name)
+{
+    SCTransition* trans = dynamic_cast<SCTransition*> (item);
+    SCState* state = dynamic_cast<SCState*>(item);
+
+    if(state)
+    {
+      //  state->addTextBox(name, name);
+    }
+    else if(trans)
+    {
+        trans->addTextBox(name, name);
+        // TODO MONDAY
+        emit newTextBox(trans, name);
+    }
+    else
+    {
+        qDebug() << "SCDataModel::insertNewTextBox ERROR given unexpected type";
+        return false;
+    }
+    return true;
+}
+
+
 /**
  * @brief SCDataModel::insertNewProperty
  * @param item

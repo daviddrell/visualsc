@@ -34,6 +34,19 @@ void CustomTreeWidgetItem::setData(QObject* d)
 }
 
 
+void CustomTreeWidgetItem::createNewTextBox(SCTextBlock* textBlock)
+{
+    CustomTreeWidgetItem * item=0;
+
+    item = new CustomTreeWidgetItem(this);
+    item->setData(textBlock);
+
+    QString text = textBlock->getText();
+    item->setText(0, text);
+
+    item->setIcon(0,QIcon(":/SCFormView/textblock.bmp"));
+}
+
 QObject * CustomTreeWidgetItem::data()
 {
     return  _stateOrTransitionItem ;

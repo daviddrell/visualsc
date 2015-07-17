@@ -21,7 +21,10 @@
 #define CUSTOMTREEWIDGETITEM_H
 #include "scformview_global.h"
 #include <QTreeWidgetItem>
+#include "textblock.h"
+#include <QObject>
 class QObject;
+class SCTextBlock;
 
 /** \class CustomTreeWidgetItem
   *
@@ -33,14 +36,16 @@ class QObject;
   *
   */
 
-class SCFORMVIEWSHARED_EXPORT CustomTreeWidgetItem : public QTreeWidgetItem
+class SCFORMVIEWSHARED_EXPORT CustomTreeWidgetItem : public QTreeWidgetItem, public QObject
 {
+    //Q_OBJECT
 public:
     CustomTreeWidgetItem(CustomTreeWidgetItem * parent=NULL);
 
     void setData(QObject* d);
     QObject * data();
-
+public slots:
+    void createNewTextBox(SCTextBlock*);
 
 private:
     QObject * _stateOrTransitionItem;

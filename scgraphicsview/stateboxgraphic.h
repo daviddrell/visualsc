@@ -26,7 +26,7 @@
 #include "selectableboxgraphic.h"
 #include "selectabletextblock.h"
 
-#define SOURCE_ANCHOR_BUFFER 6.0    // smaller value means closer to real dimensions
+#define SOURCE_ANCHOR_BUFFER 2.0    // smaller value means closer to real dimensions
 #define SOURCE_ANCHOR_POS_BUFFER 9.0    // was 2
 
 #define SINK_ANCHOR_BUFFER 5.5

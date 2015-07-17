@@ -29,6 +29,7 @@ class SCState;
 #include "scdatamodel_global.h"
 class QXmlStreamWriter;
 #include "scitem.h"
+#include "textblock.h"
 
 /**
 
@@ -58,12 +59,16 @@ public:
     QString getAttributeValue(QString key);
     void addAttribute(QString key, QString value);
     bool removeAttribute(QString key);
+
+    void addTextBox(QString key, QString value);
+
     TransitionAttributes attributes;
 
     void    writeSCVXML(QXmlStreamWriter & sw);
     SCState *targetState();
 
-
+    QList<SCTextBlock*> getTextBlocks();
+    SCTextBlock* getTextBlock(QString textBlockName);
 
      //public data members
 
@@ -72,6 +77,7 @@ public:
 signals:
     void selected();
     void unselected();
+    void insertNewTextBox(SCTextBlock*);
 
 private slots:
     //void handleLineSelected();
@@ -80,6 +86,9 @@ private slots:
 private:
     QList<QString> DEFAULT_PROPERTIES_LIST;
     SCState *       _targetState;
+
+    QList<SCTextBlock*> _textBlocks;
+
 
 };
 

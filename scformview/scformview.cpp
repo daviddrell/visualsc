@@ -216,6 +216,14 @@ void SCFormView::handleStateDeleted(QObject *s)
 
 }
 
+void SCFormView::reloadTree()
+{
+    QList<SCState*> states;
+    states.append( _dm->getTopState());
+    stateChartTreeView->clear();
+    loadTree (NULL, states);
+}
+
 // recursively walk through the state tree and build the tree view
 
 void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states)
@@ -309,6 +317,9 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , SCTextBlock* tex
 
     item->setIcon(0,QIcon(":/SCFormView/textblock.bmp"));
 
+
+
+
 }
 
 
@@ -334,6 +345,19 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransiti
         item->setText(0, tr->attributes.value("target")->asString());
 
         item->setIcon(0,QIcon(":/SCFormView/transitionbutton.bmp"));
+
+
+        // load the transition's text blocks
+
+
+
+        for(int i = 0; i < tr->getTextBlocks().count();i++)
+        {
+            SCTextBlock  * textBlock = tr->getTextBlocks().at(i);
+            loadTree (item, textBlock);
+        }
+
+        connect(tr, SIGNAL(insertNewTextBox(SCTextBlock*)), parentItem, SLOT(createNewTextBox(SCTextBlock*)));
 
     }
 
@@ -664,24 +688,57 @@ void SCFormView::buttonGroupClicked(int )
  */
 void SCFormView::itemPromptTextBox()
 {
-    // qDebug()  << "iit";
-
-    QString itemType = "New Property";
-    bool ok;
-    QInputDialog qid;
-    qid.setInputMode(QInputDialog::TextInput);
-    qid.setWindowFlags(Qt::WindowStaysOnTopHint);
-    QString input = qid.getText(NULL, itemType, getCurrentlySelectedType()+" Property",QLineEdit::Normal,"type a name...", &ok);
-
-    if(ok && !input.isEmpty())
+    if(getCurrentlySelectedType().isEmpty())
     {
-        qDebug () << input;
+        this->sendMessage("Error","Please select a tree object");
+        return;
     }
 
+    // prompt a user for a text box name
+    bool ok;
+    QString input = promptTextInput("New Text Box", "Text Box Title","", &ok);
+
+    if(input.isEmpty()) // should be allowed to do this actually.
+    {
+
+    }
+
+    if(ok)
+    {
+        itemInsertTextBox(dynamic_cast<SCItem*>(_currentlySelected), input);
+    }
 }
 
 
+void SCFormView::itemInsertTextBox(SCItem *item, const QString name)
+{
+    qDebug() << "item inesrt text box called ";
+    if(!_dm->insertNewTextBox(item, name)){
+        qDebug() << "failed here";
+        return;
+    }
 
+    // insert the new text box into the tree and sc graphics view
+
+
+    //loadTree (item, item->getTextBlock());
+
+    SCTransition* trans = dynamic_cast<SCTransition*>(item);
+    SCState* state = dynamic_cast<SCState*>(item);
+    if(state)
+    {
+
+    }
+    else if(trans)
+    {
+        qDebug() << "trans texblock object name "<<trans->getTextBlock(name)->objectName();
+        //loadTree(item, trans->getTextBlock(name));
+        connect(trans->getTextBlock(name), SIGNAL(destroyed(QObject*)), this, SLOT(handleTextBlockDeleted(QObject*)), Qt::QueuedConnection);
+        emit trans->insertNewTextBox(trans->getTextBlock(name));
+        this->reloadTree();
+    }
+
+}
 
 /**
    sendMessage
@@ -784,32 +841,27 @@ void SCFormView::itemPromptProperty()
     if(ok && !input.isEmpty())
     {
         // the user inputted something so insert this as a new property
-        itemInsertProperty(input);
+        itemInsertProperty(dynamic_cast<SCItem*>(_currentlySelected),input);
     }
 }
 
 /**
-
-   itemInsertProperty
-
-   Creates a new property for the highlighted tree object with given property name
+ * @brief SCFormView::itemInsertProperty
+ * @param item
+ * @param propertyName
+ * Creates a new property for the highlighted tree object with given property name
 
    will update the datamodel for both SCTransitions and SCStates
 
    will also update the current property table, adding the new property to the top of the table
  */
-void SCFormView::itemInsertProperty(QString propertyName)
+void SCFormView::itemInsertProperty(SCItem* item, QString propertyName)
 {
-    //disconnect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
     QString itemType = getCurrentlySelectedType();
-
-    SCItem* item = dynamic_cast<SCItem*> (_currentlySelected);
 
     qDebug() << "item Type " << itemType;
     if(!_dm->insertNewProperty(item, propertyName))
         return; // failed to insert, so halt here.
-
-
 
     // insert the new table item
     QTableWidgetItem * propName = new QTableWidgetItem(propertyName);
@@ -822,11 +874,6 @@ void SCFormView::itemInsertProperty(QString propertyName)
     propertyTable->insertRow(0);
     propertyTable->setItem(0, 0, propName);
     propertyTable->setItem(0, 1, propValue);
-
-    // propertyTable->item(0,0)->setText(propertyName);
-    // propertyTable->item(0,1)->setText("default new text");
-    // this->reloadPropertyTable();
-    //connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
 }
 
 

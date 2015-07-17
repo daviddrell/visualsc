@@ -91,6 +91,32 @@ QString SCTransition::getAttributeValue(QString key)
     else return QString();
 }
 
+void SCTransition::addTextBox(QString key, QString value)
+{
+    SCTextBlock* tb = new SCTextBlock();
+
+    tb->setObjectName(key);
+    tb->setText(value);
+
+    this->_textBlocks.append(tb);
+}
+
+QList<SCTextBlock*> SCTransition::getTextBlocks()
+{
+    return _textBlocks;
+}
+
+SCTextBlock* SCTransition::getTextBlock(QString textBlockName)
+{
+    for(int i = 0; i < _textBlocks.count(); i++)
+    {
+
+                                                if(_textBlocks.at(i)->objectName()== textBlockName)
+                                                return _textBlocks.at(i);
+    }
+    return NULL;
+}
+
 IAttributeContainer * SCTransition::getAttributes()
 {
     return & attributes;

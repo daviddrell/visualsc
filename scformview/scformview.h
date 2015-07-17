@@ -29,7 +29,7 @@
 #include <QModelIndex>
 #include <QSignalMapper>
 #include <QInputDialog>
-
+#include <QHash>
 
 class StateSelectionWindow;
 
@@ -122,6 +122,8 @@ private slots:
 
 private:
 
+    void reloadTree();
+
     IAttributeContainer * getCurrentlySelectedAttributes();
     IAttributeContainer * getPreviouslySelectedAttributes();
     QString               getCurrentlySelectedTitle();
@@ -146,7 +148,8 @@ private:
     void clearPropertyTable();
     void reloadPropertyTable();
 
-    void itemInsertProperty(const QString name);
+    void itemInsertProperty(SCItem* item, const QString name);
+    void itemInsertTextBox(SCItem* item, const QString name);
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;
@@ -208,6 +211,8 @@ private:
     QAction *insertTextBox; // will allow user to add a text box to any highlighted tree item
     QAction *insertProperty; // allows user to add own properties
     QAction *deleteProperty;
+
+   // QHash<SCItem*, CustomTreeWidgetItem> _itemToTreeWidget;
 };
 
 

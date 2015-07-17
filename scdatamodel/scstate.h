@@ -186,6 +186,7 @@ private:
     QList<SCTransition*> _transitingTransitionsIn;
     QList<SCTransition*> _transitionsTerminatingHere;
 
+    QList<SCTextBlock*> _textBlocks;
 
     int _level ; ///< distance from top state in terms of parent-child relationships
     QList<QString> DEFAULT_PROPERTIES_LIST;

@@ -468,7 +468,6 @@ TransitionGraphic::~TransitionGraphic()
     //delete _transitionTextBox;
 }
 
-
 /**
  * @brief TransitionGraphic::handleGrandParentStateGraphicResized
  * @param oldBox

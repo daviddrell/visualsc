@@ -150,7 +150,7 @@ bool SCState::removeAttribute(QString key)
 
 void SCState::addAttribute(QString key, QString value)
 {
-    qDebug()  << "adding state pperopryt: " << key;
+    qDebug()  << "adding state property: " << key;
     TransitionAttributes::TransitionStringAttribute * attr = new TransitionAttributes::TransitionStringAttribute (this, key,QString());
     attr->setValue(value);
     qDebug() << "attributes count before " << attributes.count();
