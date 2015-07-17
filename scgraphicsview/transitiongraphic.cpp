@@ -469,6 +469,17 @@ TransitionGraphic::~TransitionGraphic()
 }
 
 
+/**
+ * @brief TransitionGraphic::handleGrandParentStateGraphicResized
+ * @param oldBox
+ * @param newBox
+ * @param corner
+ *
+ * connect in scgraphicsview.cpp
+ *
+ * connects all grandparents of a state box graphic to update elbows to stay in the same spot if a parent of the statebox is resized
+ *
+ */
 void TransitionGraphic::handleGrandParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
     QPointF mtsTL = mapToScene(oldBox.topLeft());
@@ -553,6 +564,28 @@ void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF ne
     this->updateModel();
 }
 
+
+/**
+ * @brief TransitionGraphic::handleGrandParentTargetStateGraphicResized
+ * @param oldBox
+ * @param newBox
+ * @param corner
+ *essentially does the same thing as handleParentStateGraphicMoved for anchor elbows but with the offset adjustments inverted
+ *
+ */
+void TransitionGraphic::handleGrandParentTargetStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
+{
+    qreal xDiff = (newBox.x() - oldBox.x());
+    qreal yDiff = (newBox.y() - oldBox.y());
+
+    QPointF point = QPointF(xDiff,yDiff);
+    QPointF location = _anchors[1]->pos();
+    location+=point;
+    _anchors[1]->setPos(location);
+    updateLineSegments(_anchors[1]);
+    this->updateModel();
+}
+
 /**
  * @brief TransitionGraphic::handleTargetStateGraphicResized
  * @param oldBox
@@ -561,7 +594,7 @@ void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF ne
  *
  * Called by the target statebox when it is resized to reposition the sink anchor and keep it snapped to the edge
  *
- * uses scene based oldBox and newBox rectangles and which corner grabber is being manipulated to calculate the new position of a sink anchor
+ * uses the old box and new box of the state being changed to calculate relative position offsets to update the sink anchor's position
  *
  */
 void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
@@ -580,8 +613,8 @@ void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF ne
     qreal widthDiff = newBox.width() - oldBox.width();
     qreal heightDiff = newBox.height() - oldBox.height();
 
-    QPointF anchorOnScene, anchorOnBox, newAnchorOnBox,newAnchorOnScene;
-    qreal oldDistToOrigin, newDistToOrigin, newXPos, newYPos,dx, dy, newXOnBox, anchorXRatio,updatedNewDistToOrigin;
+    QPointF anchorOnBox;
+    qreal newDistToOrigin, dx, dy, updatedNewDistToOrigin;
 
 
     // map the anchor
@@ -736,96 +769,6 @@ void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF ne
         qDebug() <<"ERROR transitiongraphic::handletargetstategraphicresize unexpected side: "<<side;
     }
 
-#ifdef USEROLDSTYLE
-    if(     ((side == NORTH)&&(corner == NORTHWEST || corner==NORTHEAST))    ||   ((side == SOUTH)&&(corner == SOUTHWEST || corner==SOUTHEAST))     )  // x change by percentage, y change by true value
-    {
-        dx = (xScale-1.0)*(anchorOnBox.x());
-
-        if(side==SOUTH)
-            dy = heightDiff;
-        else
-            dy = yDiff;
-
-        QPointF location = _anchors[1]->pos();
-        QPointF point = QPointF(dx, dy);
-
-
-            location+=point;
-
-        _anchors[1]->setPos(location);
-    }
-    else if(    ((side == WEST)&&(corner == NORTHWEST || corner==SOUTHWEST))    ||   ((side == EAST)&&(corner == NORTHEAST || corner==SOUTHEAST))     )   // x change by true value, y change by percentage
-    {
-
-        dy = yScale*anchorOnBox.y() - anchorOnBox.y();
-
-        if(side == EAST)
-            dx = widthDiff;
-        else
-            dx = xDiff;
-
-        QPointF location = _anchors[1]->pos();
-        QPointF point = QPointF(dx, dy);
-        location+=point;
-        _anchors[1]->setPos(location);
-
-        // determine the new Y value based on how far the anchor was from the origin
-         oldDistToOrigin = anchorOnScene.y() - oldBox.y();
-         newDistToOrigin = newBox.y() + oldDistToOrigin*yScale;
-
-         newYPos = newDistToOrigin;
-
-         if(side == EAST)     // must use width in place of x for x change by true value
-            newXPos = anchorOnBox.x() + widthDiff;
-         else
-            newXPos = anchorOnBox.x() + xDiff;
-
-
-
-        // map the anchor to the scene and back to its parent
-         newAnchorOnBox = QPointF(newXPos,0);
-         newAnchorOnScene = _targetStateGraphic->mapToScene(newAnchorOnBox);
-
-        newAnchorOnScene.setY(newYPos);
-
-        _anchors[1]->setPos(this->mapFromScene(newAnchorOnScene));
-
-    }
-    else if(    ((side == WEST)&&(corner == NORTHEAST || corner==SOUTHEAST))    ||   ((side == EAST)&&(corner == NORTHWEST || corner==SOUTHWEST))     )   // x no change, y change by percentage
-    {
-        // calculate the new Y based on percentage
-        oldDistToOrigin = anchorOnScene.y() - oldBox.y();
-        newDistToOrigin = newBox.y() + oldDistToOrigin*yScale;
-
-        // create the QPoints for the anchor on the box and on the scene
-        newAnchorOnBox = QPointF(anchorOnBox.x(),0);
-        newAnchorOnScene = _targetStateGraphic->mapToScene(newAnchorOnBox);
-        // set the Y to the scene based new Y
-        newAnchorOnScene.setY(newDistToOrigin);
-
-        _anchors[1]->setPos(this->mapFromScene(newAnchorOnScene));
-
-    }
-    else if(    ((side == NORTH)&&(corner == SOUTHEAST || corner==SOUTHWEST))    ||   ((side == SOUTH)&&(corner == NORTHEAST || corner==NORTHWEST))     )   // x change by percentage, y no change
-    {
-        // calculate the new X based on percentage
-        oldDistToOrigin = anchorOnScene.x() - oldBox.x();
-        newDistToOrigin = newBox.x() + oldDistToOrigin*xScale;
-
-        // create the QPoints for the anchor on the box and on the scene
-        newAnchorOnBox = QPointF(0, anchorOnBox.y());
-        newAnchorOnScene = _targetStateGraphic->mapToScene(newAnchorOnBox);
-        // set the Y to the scene based new Y
-        newAnchorOnScene.setX(newDistToOrigin);
-
-        _anchors[1]->setPos(this->mapFromScene(newAnchorOnScene));
-    }
-    else
-    {
-        qDebug() << "Invalid corner and side combination in TransitionGraphic::handleTargetStateGraphicResized()";
-    }
-
-#endif
     // update the line segment hover box too
     _anchors[1]->getSegment(0)->enclosePathInElbows();
     this->updateModel();

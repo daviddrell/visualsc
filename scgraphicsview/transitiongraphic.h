@@ -60,6 +60,7 @@ public slots:
     void handleGrandParentStateGraphicResized(QRectF, QRectF, int);
     //void handleParentStateGraphicResized(qreal, qreal, qreal, qreal);
     void handleTargetStateGraphicResized(QRectF, QRectF, int);
+    void handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int);
 
 
 

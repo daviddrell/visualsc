@@ -312,18 +312,20 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
     connect(targetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleTargetStateGraphicResized(QRectF, QRectF, int)));
 
+    // connect this state box's grand parents update anchors when they are resized
     StateBoxGraphic* grandParentGraphic = parentGraphic->parentItemAsStateBoxGraphic();
     while(grandParentGraphic)
     {
-        //connect(grandParentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentStateGraphicResized(QRectF, QRectF, int)));
+        connect(grandParentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentStateGraphicResized(QRectF, QRectF, int)));
         grandParentGraphic = grandParentGraphic->parentItemAsStateBoxGraphic();
     }
 
+    // connect the target state box's grand parents to update the target anchors when they are resized
     StateBoxGraphic* grandParentTargetGraphic = targetGraphic;
     while(grandParentTargetGraphic->parentItemAsStateBoxGraphic())
     {
         grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
-        connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleTargetStateGraphicResized(QRectF, QRectF, int)));
+        connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
     }
 
 
