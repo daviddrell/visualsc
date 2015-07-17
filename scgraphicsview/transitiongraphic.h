@@ -19,7 +19,7 @@
 #define TRANSITION_HOVER_LINE_STYLE Qt::DashLine
 #define TRANSITION_DEFAULT_WIDTH 2
 #define TRANSITION_HOVER_WIDTH 3
-
+#define ANCHOR_BUFFER_LENGTH 15
 
 class ElbowGrabber;
 class LineSegmentGraphic;
@@ -57,6 +57,7 @@ public slots:
     void handleTargetStateGraphicMoved(QPointF);
 
     void handleParentStateGraphicResized(QRectF,QRectF, int);
+    void handleGrandParentStateGraphicResized(QRectF, QRectF, int);
     //void handleParentStateGraphicResized(qreal, qreal, qreal, qreal);
     void handleTargetStateGraphicResized(QRectF, QRectF, int);
 

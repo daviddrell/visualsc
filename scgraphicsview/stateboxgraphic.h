@@ -89,6 +89,7 @@ public:
     void setHighlighted(bool);
     SCState* getStateModel();
 
+    StateBoxGraphic* parentItemAsStateBoxGraphic();
 
 public slots:
     void handleTransitionLineStartMoved(QPointF newPos);

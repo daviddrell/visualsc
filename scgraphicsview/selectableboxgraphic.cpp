@@ -240,8 +240,11 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
     if ( corner->getMouseState() == CornerGrabber::kMouseMoving )
     {
 
+
         qreal x = mevent->pos().x(), y = mevent->pos().y();
-        QRectF oldBox = QRectF(this->x(), this->y(), _width, _height);
+        QPointF mts = mapToScene(pos());
+        mts = pos();
+        QRectF oldBox = QRectF(mts.x(), mts.y(), _width, _height);
         //QRectF oldBox = this->getUsableArea();
         qreal scaleX =_width;
         qreal scaleY = _height;
@@ -329,7 +332,9 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         QPointF newPos(xMoved, yMoved);
         QPointF diff = newPos -_dragStart;
         //QRectF newBox = this->getUsableArea();
-        QRectF newBox = QRectF(this->x(), this->y(), newWidth, newHeight);
+        //QPointF nmts = mapToScene(pos());
+        QPointF nmts = pos();
+        QRectF newBox = QRectF(nmts.x(), nmts.y(), newWidth, newHeight);
         //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
         //emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
@@ -342,7 +347,10 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         if(corner==-1)
             qDebug() << "ERROR there was no hovered corner, should not be allowed";
         else
+        {
+            //qDebug() << "new Box: " << newBox;
             emit stateBoxResized(oldBox, newBox, corner);
+        }
         this->update();
     }
 

@@ -457,6 +457,10 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
     elbow->setPos(test);                                    // set the elbow's position
 }
 
+StateBoxGraphic* StateBoxGraphic::parentItemAsStateBoxGraphic()
+{
+    return dynamic_cast<StateBoxGraphic* >(this->parentItem());
+}
 
 void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
