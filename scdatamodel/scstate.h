@@ -69,6 +69,7 @@ public:
 
     void setAttributeValue(QString key, QString value);
     void addAttribute(QString key, QString value);
+    bool removeAttribute(QString key);
     QString getAttributeValue(QString key);
 
     int  getStateCount();
@@ -187,6 +188,7 @@ private:
 
 
     int _level ; ///< distance from top state in terms of parent-child relationships
+    QList<QString> DEFAULT_PROPERTIES_LIST;
 
 };
 

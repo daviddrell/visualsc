@@ -108,6 +108,7 @@ public:
     void logInfo(QString message);///< inform the user of anything that is not an error such as progress, etc
 
     bool insertNewProperty(SCItem* item, QString propertyName);
+    bool deleteProperty(SCItem* item, QString propertyName);
 
 
 signals:

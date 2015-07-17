@@ -79,6 +79,8 @@ void SCState::initCommon()
     }
 
 
+    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type"; // type is added to the state in scxml reader.
+
     StateName * name = new StateName (this, "name",defaultName);
     SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
@@ -134,6 +136,16 @@ QString SCState::getAttributeValue(QString key)
 IAttributeContainer * SCState::getAttributes()
 {
     return   & attributes;
+}
+
+bool SCState::removeAttribute(QString key)
+{
+    if(DEFAULT_PROPERTIES_LIST.indexOf(key)==-1)
+    {
+        attributes.remove(key);
+        return true;
+    }
+    return false;
 }
 
 void SCState::addAttribute(QString key, QString value)

@@ -10,7 +10,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _targetStateGraphic(targetGraphic),
     _keyController(keys),
     _mouseController(mouse),
-    _hasMovedSinceCreatingElbow(true)
+    _hasMovedSinceCreatingElbow(true),
+    _isCurrentlyDeleting(false)
   //,
     //TextItem(parentGraphic, parentGraphic->getStateModel()->getIDTextBlock())
 
@@ -762,6 +763,15 @@ void TransitionGraphic::printInfo(void)
 
 void TransitionGraphic::deleteHoveredElbow()
 {
+
+    if(_isCurrentlyDeleting)
+    {
+        qDebug() << "Halt. an elbow is currently being deleted.";
+        return;
+    }
+
+
+
     /*
                     delete these
                     v  v
@@ -777,9 +787,29 @@ void TransitionGraphic::deleteHoveredElbow()
 
     if(elb && !(elb->isAnchor()))  // check the elbow exists and that is not an anchor elbow
     {
+
+        _isCurrentlyDeleting = true;
+
+
         LineSegmentGraphic* deadLine = elb->getSegment(1);
         LineSegmentGraphic* leftLine = elb->getSegment(0);
+
+
+
         ElbowGrabber* rightElb = deadLine->getElbow(1);
+
+        /*
+        if(!deadLine || !leftLine)
+        {
+            qDebug() << "Error: elbow deletion object does not exist!";
+            return;
+        }
+        if(!rightElb)
+        {
+            qDebug() << "Error: elbow deletion object does not exist!";
+            return;
+        }
+        */
 
         leftLine->setElbowAt(1, rightElb);
         rightElb->setSegmentAt(0, leftLine);
@@ -796,7 +826,11 @@ void TransitionGraphic::deleteHoveredElbow()
         delete deadLine;
 
         this->updateModel();
+
+        _isCurrentlyDeleting = false;
     }
+
+
 }
 
 /**

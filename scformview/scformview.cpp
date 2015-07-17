@@ -44,7 +44,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         _currentlySelected(NULL),
         _previouslySelected(NULL)
 {
-
+this->resize(600,1000);
     createActions();
     createMenus();
     createToolbars();
@@ -658,18 +658,6 @@ void SCFormView::buttonGroupClicked(int )
 }
 
 
-/**
-   itemDeleteSelectedProperty()
-
-  Deletes the currently selected propertyTable property if one is currently selected
-  will remove it from the scform propertyTable and from the dataModel
-
- */
-void SCFormView::itemDeleteSelectedProperty()
-{
-    //propertyTable->getSelectedItem();
-    qDebug() << "deleting";
-}
 
 /**
  currently not being used
@@ -710,8 +698,10 @@ void SCFormView::sendMessage(QString title, QString message)
     QMessageBox msgBox;
     msgBox.setWindowTitle(title);
     msgBox.setText(message);
+    //msgBox.setDetailedText(message);
+    //msgBox.setInformativeText(message);
     //msgBox.setStandardButtons(QMessageBox::Ok);
-    //msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
 
     msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
     int ret = msgBox.exec();
@@ -742,7 +732,12 @@ const QString SCFormView::promptTextInput(QString windowTitle, QString message, 
 {
     QInputDialog qid;
     qid.setInputMode(QInputDialog::TextInput);
-    qid.setWindowFlags(Qt::WindowStaysOnTopHint);
+    //qid.setWindowFlags(Qt);
+    int tet = Qt::WindowStaysOnTopHint | Qt::Popup | Qt::WindowMinMaxButtonsHint; //& (~(Qt::WindowContextHelpButtonHint));
+    //Qt::WindowCloseButtonHint |
+    qDebug() << "test: "<<tet;
+    qid.setWindowFlags(static_cast<Qt::WindowFlags>(tet));
+ //   qid.set
     return qid.getText(NULL, windowTitle, message,QLineEdit::Normal,defaultText, ok);
 }
 
@@ -777,6 +772,11 @@ void SCFormView::itemPromptProperty()
     if(input.contains(' '))
     {
         sendMessage("Error", "Property Name cannot contain spaces");
+        return;
+    }
+    else if(input.isEmpty())
+    {
+        sendMessage("Error", "Property Name cannot be empty");
         return;
     }
 
@@ -828,6 +828,56 @@ void SCFormView::itemInsertProperty(QString propertyName)
     // this->reloadPropertyTable();
     //connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
 }
+
+
+/**
+   itemDeleteSelectedProperty()
+
+  Deletes the currently selected propertyTable property if one is currently selected
+  will remove it from the scform propertyTable and from the dataModel
+
+ */
+void SCFormView::itemDeleteSelectedProperty()
+{
+    // check for the highlighted row
+    QString propertyName;
+    QTableWidgetItem* marked = NULL;
+    marked = propertyTable->currentItem();
+
+    if(!marked)
+    {
+        sendMessage("Error", "Please select a property");
+        return;
+    }
+
+    propertyName = propertyTable->item(marked->row(),0)->text();    // get the property name regardless of the column
+
+    qDebug() <<"propertyName : " << propertyName;
+
+    //propertyName = propertyTable->selectedItems().at(0);
+
+
+
+    //propertyTable->getSelectedItem();
+    qDebug() << "deleting";
+
+
+
+    SCItem* item = dynamic_cast<SCItem*>(_currentlySelected);
+
+
+
+    if(!_dm->deleteProperty(item, propertyName))
+    {
+        qDebug() << "failed to delete!";
+        return;
+    }
+
+    propertyTable->removeRow(marked->row());    // remove the deleted property from the property table
+
+
+}
+
 
 void SCFormView::deleteItem()
 {
@@ -1143,12 +1193,14 @@ void SCFormView::createToolbars()
 
     propertyToolBar = new QToolBar("Property",this);
     propertyToolBar->addAction(insertProperty);
+    propertyToolBar->addAction(deleteProperty);
     propertyToolBar->addAction(insertTextBox);
 
     //editToolBar = addToolBar(tr("Edit"));
     editToolBar = new QToolBar("Edit", this);
-    editToolBar->addAction(insertTransitionAction);
     editToolBar->addAction(insertStateAction);
+    editToolBar->addAction(insertTransitionAction);
+
     editToolBar->addAction(deleteAction);
     editToolBar->addAction(toFrontAction);
     editToolBar->addAction(sendBackAction);

@@ -57,6 +57,7 @@ public:
     void    setAttributeValue(QString key, QString value);
     QString getAttributeValue(QString key);
     void addAttribute(QString key, QString value);
+    bool removeAttribute(QString key);
     TransitionAttributes attributes;
 
     void    writeSCVXML(QXmlStreamWriter & sw);
@@ -77,7 +78,7 @@ private slots:
    //void handleLineUnSelected();
 
 private:
-
+    QList<QString> DEFAULT_PROPERTIES_LIST;
     SCState *       _targetState;
 
 };

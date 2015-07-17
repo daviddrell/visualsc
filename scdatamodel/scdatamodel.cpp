@@ -516,26 +516,32 @@ bool SCDataModel::insertNewProperty(SCItem* item, QString propertyName)
         return false;
     }
     return true;
+}
 
-    //item->addAttribute(propertyName,"");
+bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
+{
+    SCTransition* trans = dynamic_cast<SCTransition*>(item);
+    SCState* state = dynamic_cast<SCState*>(item);
 
-#ifdef USE_THE_STRING_INSTEAD
-    qDebug() << "SCDataModel::insertNewProperty\titemType " << itemType;
-    if(itemType.toLower() == "state")
+
+    if(state)
     {
-        qDebug() << "current state: "  << _currentState->objectName();
-        _currentState->addAttribute(propertyName, "");
+        qDebug() << "deleting state property: " << propertyName;
+        return state->removeAttribute(propertyName);
+
     }
-    else if(itemType.toLower() == "transition")
+    else if(trans)
     {
-
-        _currentTransition->addAttribute(propertyName, "");
+        qDebug() << "deleting transition property: " << propertyName;
+        return trans->removeAttribute(propertyName);
     }
     else
     {
-        qDebug() << "SCDataModel::insertNewProperty ERROR Given unexpected type: " << propertyName;
+        qDebug() << "SCDataModel::deleteProperty ERROR given unexpected type.";
+        return false;
     }
-#endif
+    return false;    // should not reach this
+
 }
 
 SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )

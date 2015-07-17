@@ -35,6 +35,8 @@ SCTransition::SCTransition(QObject * parent):
      path
      */
 
+    DEFAULT_PROPERTIES_LIST << "target" << "event" << "comments" << "path";
+
 
     // SCTransition will load with target, event, commentary, and path
     TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (this, "target",QString());
@@ -99,6 +101,16 @@ void SCTransition::addAttribute(QString key, QString value)
     TransitionAttributes::TransitionStringAttribute * attr = new TransitionAttributes::TransitionStringAttribute (this, key,QString());
     attr->setValue(value);
     attributes.addItem(attr);
+}
+
+bool SCTransition::removeAttribute(QString key)
+{
+    if(DEFAULT_PROPERTIES_LIST.indexOf(key)==-1)   // remove the attribute it it's not part of the core properties
+    {
+        attributes.remove(key);
+        return true;
+    }
+    return false;
 }
 
 void SCTransition::setAttributeValue(QString key, QString value)

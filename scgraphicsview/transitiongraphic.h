@@ -96,6 +96,7 @@ private :
 
 
     bool _hasMovedSinceCreatingElbow;
+    bool _isCurrentlyDeleting;
 
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
