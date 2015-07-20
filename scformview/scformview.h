@@ -131,6 +131,8 @@ private slots:
 
 private:
 
+    bool isCurrentlySelectedEqualTo(SCItem*);
+    void updateStateName(SCState* state, QString name);
     void reloadTree();
 
     IAttributeContainer * getCurrentlySelectedAttributes();

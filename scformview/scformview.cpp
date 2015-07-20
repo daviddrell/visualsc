@@ -200,6 +200,10 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
         QString key = propertyTable->item(r,0)->text();
         QString value = propertyTable->item(r,1)->text();
 
+        SCState* st = dynamic_cast<SCState*>(_currentlySelected);
+        updateStateName(st, value); // update the tree, property table (redundant), SCState's attributes, and the selectablebox
+
+        /*
         SCItem * item = dynamic_cast<SCItem*>(_currentlySelected);
         attributes = item->getAttributes();
         attr = attributes->value(key);
@@ -222,6 +226,7 @@ qDebug() << "got into name " << "ins count: " << ins.count();
                 ins.at(i)->setAttributeValue("target",value);
             }
         }
+        */
     }
     else if(getCurrentlySelectedType().toLower() == "transition" )
     {
@@ -1353,14 +1358,75 @@ void SCFormView::handleItemNameChanged(SCState* state, QString name)
 
     if(state)
     {
+        /*
         qDebug() << "state name was changed. updating tree and prop table...";
         QTreeWidgetItem* treeItem = findItem(state);
 
-        treeItem->setText(0,name);
+        treeItem->setText(0,name);  // update the tree
 
+        if(isCurrentlySelectedEqualTo(state))  // update the property table
+        {
+
+        }*/
+
+        updateStateName(state, name);
 
     }
 
+}
+
+/**
+ * @brief SCFormView::updateState
+ * @param state
+ * @param name
+ *
+ * called when a state's name is changed to update
+ *
+ * SCState's attribute's name
+ * tree view name
+ * property name (if currently selected)
+ * and transition target names
+ *
+ */
+void SCFormView::updateStateName(SCState* state, QString name)
+{
+    state->attributes.value("name")->setValue(name);
+
+    QTreeWidgetItem* treeItem = findItem(state);
+    treeItem->setText(0, name);  // update the tree
+
+    if(isCurrentlySelectedEqualTo(state))  // update the property table
+    {
+        for(int i = 0 ; i < propertyTable->rowCount(); i++)
+        {
+
+            if(propertyTable->item(i,0)->text() == "name")
+            {
+                propertyTable->item(i,1)->setText(name);
+                break;
+            }
+        }
+    }
+
+    // update any transitions that target this state
+
+    QList<SCTransition*> ins = state->getDestinationTransitions();
+    //qDebug() << "got into name " << "ins count: " << ins.count();
+    for(int i = 0; i < ins.count(); i++)
+    {
+        //qDebug() << "inbound transition to state: " << st->attributes.value("name")->asString() << " have target " << ins.at(i)->attributes.value("target")->asString();
+        ins.at(i)->setAttributeValue("target",name);
+    }
+
+    state->setText(name);   // update the selectable text box as well.
+}
+
+bool SCFormView::isCurrentlySelectedEqualTo(SCItem* item)
+{
+    SCItem* cs = dynamic_cast<SCItem*>(_currentlySelected);
+    if(item == cs)
+        return true;
+    return false;
 }
 
 void SCFormView::handleItemNameChanged(SCTransition * trans, QString name)
