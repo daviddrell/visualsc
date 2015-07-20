@@ -89,6 +89,11 @@ SCState *SCTransition::targetState()
     return _targetState;
 }
 
+void SCTransition::setTargetState(SCState* state)
+{
+    _targetState = state;
+}
+
 SCTextBlock* SCTransition::getEventTextBlock()
 {
     return _eventTextBlock;
@@ -203,6 +208,17 @@ void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
          sw.writeAttribute(QString("d"),path);
          sw.writeEndElement();
     }
+
+    // additionally, write each of the attributes of this state's children.
+    for(int k = 0 ; k < children().length(); k++)
+    {
+
+        SCTransition * st = dynamic_cast<SCTransition*>(children()[k]);
+        if (st)
+            st->writeSCVXML(sw);
+
+    }
+
     sw.writeEndElement();
 }
 

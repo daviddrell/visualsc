@@ -139,6 +139,9 @@ private:
     SCTransition    *_currentTransition;
     SCState         *_topState;
     QGraphicsScene * _scene;
+    QList<SCState*> _states;
+    QList<SCTransition*> _transitions;
+
 
 
 //private methods

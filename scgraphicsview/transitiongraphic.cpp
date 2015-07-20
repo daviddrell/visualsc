@@ -24,17 +24,16 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     //this->acceptHoverEvents();            // a Transition graphic has no dimensions, its invididual elbows and line segments will have hover events
     //this->setParent(targetGraphic);
    // _eventText = new SelectableTextBlock(parentGraphic, t->getEventTextBlock());
-    _eventText->setParentItem(parentGraphic);
-    _eventText->setPos(0,0);
+
 
     TransitionAttributes::TransitionPathAttribute * p =
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
 
     QList<QPointF> pointList = p->asQPointFList();
-    qDebug() << "Printing Point List of size: " <<pointList.count();
+    /*qDebug() << "Printing Point List of size: " <<pointList.count();
     for(int i = 0; i < pointList.count();i++)
         qDebug() << pointList.at(i);
-
+*/
 
     // populate the transition graphic with elbows.
     // if this is a new transition graphic, then create two elbows
@@ -206,6 +205,10 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
         //TextItem.setPos(25,10);
         //TextItem.setParentItem(_anchors[1]);
+
+        // set the event text to be tied to the source anchor
+        _eventText->setParentItem(_anchors[0]);
+        //_eventText->setPos(0,0);
 
 
     } // end of loading a transition from file

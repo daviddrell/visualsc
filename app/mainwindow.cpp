@@ -58,6 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setWindowTitle("Visual State Chart Editor");
 
+    this->resize(1290,1000);
 
 /*
     _project = new SMProject(  ui->centralWidget );
@@ -78,10 +79,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 // uncomment this macro to autoload a file
-//#define AUTO_LOAD_FILE
+#define AUTO_LOAD_FILE
 
 #ifdef AUTO_LOAD_FILE
-    #define DEFAULT_FILE "C:/xml/test.scxml";
+    #define DEFAULT_FILE "C:/xml/w.scxml";
     QString fileName =DEFAULT_FILE;
     _settings->setValue(_keyLastFilePath, fileName);
     _project = new SMProject(  ui->centralWidget );

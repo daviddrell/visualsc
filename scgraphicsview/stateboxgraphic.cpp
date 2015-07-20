@@ -459,7 +459,10 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 
 StateBoxGraphic* StateBoxGraphic::parentItemAsStateBoxGraphic()
 {
-    return dynamic_cast<StateBoxGraphic* >(this->parentItem());
+    if(this==NULL)
+        return NULL;
+    else
+        return dynamic_cast<StateBoxGraphic* >(this->parentItem());
 }
 
 void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

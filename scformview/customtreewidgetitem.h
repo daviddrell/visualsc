@@ -50,6 +50,7 @@ public slots:
 private:
     QObject * _stateOrTransitionItem;
 
+
 };
 
 #endif // CUSTOMTREEWIDGETITEM_H

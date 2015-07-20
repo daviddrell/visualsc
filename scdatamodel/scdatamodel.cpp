@@ -155,6 +155,7 @@ void SCDataModel::open(QString file)
     QStringList messages;
     _reader.getReadResult(ok, messages);
 
+    //qDebug() << "ok is " << ok;
     if ( ok )
     {
         // now for the second pass, connect all the transitions to the states in the state-path.
@@ -173,17 +174,18 @@ void SCDataModel::connectTransitionsToStatePath()
     QList<SCTransition *> tlist;
 
     _topState->getAllTransitions(tlist);
-
+    qDebug () << "SCDataModel::connectTransitionsToStatePath() " <<tlist.count();
     for (int t = 0; t < tlist.count(); t++)
     {
         SCTransition* trans = tlist.at(t);
 
-        QString targetStr = trans->attributes["target"]->asString();;
+        QString targetStr = trans->attributes["target"]->asString();
 
         SCState * targetState = _topState->getStateByName(targetStr);
-
+        qDebug() << "target String: " << targetStr << " targetState; " << targetState->objectName();
         if ( targetState )
         {
+
             makeTransitionConnections(targetState, trans);
         }
     }
@@ -193,6 +195,7 @@ void SCDataModel::connectTransitionsToStatePath()
 
 void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition* trans)
 {
+    qDebug() << "SCDataModel::makeTransitionConnections";
     // work backwards from target state to its ancestors, from the transitions source state to its ancestors, until
     // both have a common ancestor
 
@@ -596,6 +599,18 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
 
 }
 
+/**
+ * @brief SCDataModel::insertNewTransition
+ * @param source
+ * @param target
+ * @return
+ *
+ * called by SCFormView::insertTransition
+ *
+ * creates a new SCTransition object and then emits a newTransitionSignal
+ * which will show the new transition in the tree view and in the graphics view
+ *
+ */
 SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
 {
     if ( source == NULL)  return NULL;
@@ -603,13 +618,21 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
     SCTransition * transition = new SCTransition(source);
 
     transition->setAttributeValue("target", target);
+    transition->setAttributeValue("event", "Event Name");
+    transition->setObjectName("Transition");
 
-    emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition
+    emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition and scformview's handle new transition
 
     return transition;
 }
 
-
+/**
+ * @brief SCDataModel::handleMakeANewTransition
+ * @param ta
+ *
+ * connect(scxmlreader, makeANewTransition, scdatamodel, handleMakeANewTransition)
+ *
+ */
 void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
 {
     /*
@@ -625,7 +648,7 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     _currentTransition = transition;
     _currentState->addTransistion(transition);
 
-
+    //transition->setTargetState(transition);
 
     delete ta;
 

@@ -72,6 +72,8 @@ public:
     bool removeAttribute(QString key);
     QString getAttributeValue(QString key);
 
+    void setText(QString text);
+
     int  getStateCount();
 
     void setSize (QPointF& size);
@@ -92,6 +94,10 @@ public:
        */
 
      void getTransitions(QList<SCTransition*> & transitionList);
+
+     QList<SCTransition*> getInboundTransitions();
+
+     QList<SCTransition*> getDestinationTransitions();
 
     /**
       * \fn getStates
@@ -162,6 +168,8 @@ public:
 signals:
 
      void changed();
+     void attributeChangedSignal(IAttribute*);
+     void nameChanged(SCState*,QString);
 
 
 

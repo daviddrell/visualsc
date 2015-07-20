@@ -73,7 +73,7 @@ void SCXMLReader::run()
 
 void SCXMLReader::getReadResult(bool &success, QStringList& message)
 {
-    success  = _error;
+    success  = !(_error);
     message = _resultMessages;
 }
 

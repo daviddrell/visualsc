@@ -93,18 +93,40 @@ void SCState::initCommon()
 
     _IdTextBlock->setParent(this);
     _IdTextBlock->setText(name->asString());
-    connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
+
+    // connect change the state name to handleNameChanged
+
+
+   // connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
+   // connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleSizeChanged(IAttribute*)));
+
+    // connect changing the SCTextBlock to handleTextBlockChanged()
     connect (_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
 
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
 }
 
 
+void SCState::setText(QString text)
+{
+    _IdTextBlock->setText(text);
+}
+
 SCTextBlock* SCState::getIDTextBlock()
 {
     return  _IdTextBlock;
 }
 
+/**
+ * @brief SCState::handleTextBlockChanged
+ *
+ *SLOT
+ *
+ * connect in scstate
+ *
+ * connects an SCTextBlock textChanged to an SCState handleTextBlockChanged
+ *
+ */
 void SCState::handleTextBlockChanged()
 {
     qDebug()<<"SCState::handleTextBlockChanged";
@@ -113,11 +135,13 @@ void SCState::handleTextBlockChanged()
     QString nameText = _IdTextBlock->getText();
     this->setObjectName(nameText);
     name->setValue(nameText);
+    emit nameChanged(this,nameText); // connected to SCFormView::handleItemNameChanged()
 
 }
 
 void SCState::handleNameChanged(IAttribute *name)
 {
+    qDebug()<<"SCState::handleNameChanged " << name->asString();
     this->setObjectName(name->asString());// to support debug tracing
     _IdTextBlock->setText(name->asString());
 }
@@ -213,6 +237,15 @@ void SCState::makeTargetConnections(QList<SCTransition*> & transitionList)
 }
 #endif
 
+
+QList<SCTransition*> SCState::getInboundTransitions()
+{
+    return  _transitingTransitionsIn;
+}
+QList<SCTransition*> SCState::getDestinationTransitions()
+{
+    return _transitionsTerminatingHere;
+}
 
 void SCState::addTransitionReference(SCTransition* t, TransitionTransitDirection d)
 {

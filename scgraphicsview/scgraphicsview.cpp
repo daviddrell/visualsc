@@ -50,7 +50,7 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
-    connect(_dm, SIGNAL(newTextBlockSignal(SCTransition*,QString)), this, SLOT(handleNewTextBlock(SCTransition,QString)));
+    //connect(_dm, SIGNAL(newTextBlockSignal(SCTransition*,QString)), this, SLOT(handleNewTextBlock(SCTransition,QString)));
 
     //using openGL
 
@@ -323,11 +323,12 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     }
 
     // connect the target state box's grand parents to update the target anchors when they are resized
-    StateBoxGraphic* grandParentTargetGraphic = targetGraphic;
-    while(grandParentTargetGraphic->parentItemAsStateBoxGraphic())
+    StateBoxGraphic* grandParentTargetGraphic = targetGraphic->parentItemAsStateBoxGraphic();
+    while(grandParentTargetGraphic)
     {
-        grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
+
         connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
+        grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
     }
 
 

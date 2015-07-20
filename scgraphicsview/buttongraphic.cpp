@@ -23,7 +23,7 @@ ButtonGraphic::~ButtonGraphic()
 
 void ButtonGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent *  )
 {
-    qDebug() << "ButtonGraphic HoverEnterEvent";
+    //qDebug() << "ButtonGraphic HoverEnterEvent";
     _mouseState = kHovered;
     update();
 }

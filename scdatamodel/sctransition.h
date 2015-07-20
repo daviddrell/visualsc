@@ -74,7 +74,7 @@ public:
 
      //public data members
 
-
+    void setTargetState(SCState*);
 
 signals:
     void selected();

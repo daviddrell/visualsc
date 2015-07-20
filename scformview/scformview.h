@@ -30,6 +30,8 @@
 #include <QSignalMapper>
 #include <QInputDialog>
 #include <QHash>
+#include <QObject>
+#include "scitem.h"
 
 class StateSelectionWindow;
 
@@ -53,6 +55,8 @@ class CustomTreeWidgetItem;
 class QTableWidget;
 class QLabel;
 class SCTextBlock;
+class SCItem;
+
 QT_END_NAMESPACE
 
 
@@ -120,12 +124,21 @@ private slots:
     void itemPromptProperty();
     void itemDeleteSelectedProperty();
 
+
+
+    void handleItemNameChanged(SCState*, QString);
+    void handleItemNameChanged(SCTransition*, QString);
+
 private:
 
     void reloadTree();
 
     IAttributeContainer * getCurrentlySelectedAttributes();
     IAttributeContainer * getPreviouslySelectedAttributes();
+
+    IAttributeContainer * getCurrentlySelectedTextBlockAttributes();
+    IAttributeContainer * getPreviouslySelectedTextBlockAttributes();
+
     QString               getCurrentlySelectedTitle();
     QString               getCurrentlySelectedType();
     QObject*              getNeighborState(QObject*s);
@@ -145,14 +158,21 @@ private:
 
     void deleteItem(QObject * item);
     void setAttributeConnections(IAttributeContainer * atts, bool shouldConnect);
+    void setTextBlockAttributeConnections(IAttributeContainer* atts, bool connect);
     void clearPropertyTable();
+    void clearTextBlockPropertyTable();
     void reloadPropertyTable();
 
     void itemInsertProperty(SCItem* item, const QString name);
     void itemInsertTextBlock(SCItem* item, const QString name);
 
+    void clearAndLoadPropertyTable(SCItem*,SCItem*);
+
+    CustomTreeWidgetItem* findItem(SCState*);
+
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;
+    QTableWidget   *textBlockPropertyTable;
     QLabel         *selectedChartItem;
 
     QGraphicsView *view;
@@ -212,7 +232,11 @@ private:
     QAction *insertProperty; // allows user to add own properties
     QAction *deleteProperty;
 
-   // QHash<SCItem*, CustomTreeWidgetItem> _itemToTreeWidget;
+    QHash<SCItem*, CustomTreeWidgetItem*> _itemToTreeWidget;
+    QHash<SCItem*, SCTextBlock*> _itemToTextBlock;
+    QHash<CustomTreeWidgetItem*, SCTextBlock*> _treeWidgetToTextBlock;
+
+
 };
 
 

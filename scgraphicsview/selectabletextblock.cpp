@@ -59,7 +59,12 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
 
    // setSize (_minSize);
 
+
+    // if the textblock model changed, signal handle text changed to update it from the textblock model
     connect ( _textBlockModel, SIGNAL(textChanged()), this, SLOT(handleTextChanged()), Qt::QueuedConnection);
+
+
+
     connect ( & _textBlockModel->attributes,SIGNAL(attributeAdded(IAttribute*)), SLOT(handleAttributeAdded(IAttribute*)), Qt::QueuedConnection );
     connect ( & _textBlockModel->attributes,SIGNAL(attributeDeleted(IAttribute*)), SLOT(handleAttributeDeleted(IAttribute*)), Qt::QueuedConnection );
 
@@ -74,6 +79,7 @@ SelectableTextBlock::~SelectableTextBlock()
 
 void SelectableTextBlock::handleTextChanged()
 {
+    qDebug() << "SelectableTextBlock::handleTextChanged";
     _textItem.setPlainText( _textBlockModel->getText() );
 }
 
