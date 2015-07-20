@@ -149,7 +149,7 @@ private:
     void reloadPropertyTable();
 
     void itemInsertProperty(SCItem* item, const QString name);
-    void itemInsertTextBox(SCItem* item, const QString name);
+    void itemInsertTextBlock(SCItem* item, const QString name);
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;

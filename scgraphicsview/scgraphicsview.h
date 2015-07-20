@@ -68,6 +68,7 @@ private slots:
     void handleTransitionDeleted(QObject* tr);
     void handleStateGraphicDeleted(QObject *sg);
     void handleTransitionGraphicDeleted(QObject *tg);
+    void handleNewTextBlock(SCTransition*, QString);
 
 private:
 

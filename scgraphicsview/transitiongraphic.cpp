@@ -1,5 +1,6 @@
 ﻿#include "transitiongraphic.h"
 #include "scstate.h"
+#include "selectableboxgraphic.h"
 #include <QDebug>
 
 TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys, MouseController* mouse) :
@@ -11,7 +12,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _keyController(keys),
     _mouseController(mouse),
     _hasMovedSinceCreatingElbow(true),
-    _isCurrentlyDeleting(false)
+    _isCurrentlyDeleting(false),
+    _eventText(new SelectableTextBlock(parentGraphic, t->getEventTextBlock()))
   //,
     //TextItem(parentGraphic, parentGraphic->getStateModel()->getIDTextBlock())
 
@@ -21,6 +23,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
     //this->acceptHoverEvents();            // a Transition graphic has no dimensions, its invididual elbows and line segments will have hover events
     //this->setParent(targetGraphic);
+   // _eventText = new SelectableTextBlock(parentGraphic, t->getEventTextBlock());
+    _eventText->setParentItem(parentGraphic);
+    _eventText->setPos(0,0);
 
     TransitionAttributes::TransitionPathAttribute * p =
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
@@ -205,10 +210,11 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
     } // end of loading a transition from file
 
-
+/*
     _transitionTextBox = new TextBox(_anchors[0], "Hello World");
     _transitionTextBox->setVisible(false);
     _transitionTextBox->setPos(100,100);
+    */
 
 }   // end of constructor
 
@@ -425,7 +431,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             // if the mouse went down, record the x,y coords of the press, record it inside the corner object
         case QEvent::GraphicsSceneMouseDoubleClick:
             {
-                _transitionTextBox->setVisible(!_transitionTextBox->isVisible());
+                //_transitionTextBox->setVisible(!_transitionTextBox->isVisible());
             }
             break;
         }
@@ -465,7 +471,11 @@ TransitionGraphic::~TransitionGraphic()
     }
     _elbows.clear();
 
-    //delete _transitionTextBox;
+
+
+// Delete causes an exception
+   //qDebug() << "eventText" << _eventText->objectName() << _eventText->isEnabled();
+   // delete _eventText;
 }
 
 /**

@@ -34,7 +34,16 @@ void CustomTreeWidgetItem::setData(QObject* d)
 }
 
 
-void CustomTreeWidgetItem::createNewTextBox(SCTextBlock* textBlock)
+/**
+ * @brief CustomTreeWidgetItem::treeAddTextBlock
+ * @param textBlock
+ *
+ * connected in scformview.cpp
+ *
+ * when a SCTransition emits insertNew
+ *
+ */
+void CustomTreeWidgetItem::treeAddTextBlock(SCTextBlock* textBlock)
 {
     CustomTreeWidgetItem * item=0;
 

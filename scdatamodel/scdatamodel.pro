@@ -27,9 +27,9 @@ SOURCES += scdatamodel.cpp \
     textblockattributes.cpp \
     sizeattribute.cpp \
     positionattribute.cpp \
-    textblock.cpp \
     idattribute.cpp \
-    scitem.cpp
+    scitem.cpp \
+    textblock.cpp
 
 HEADERS += scdatamodel.h\
     SCDataModel_global.h \

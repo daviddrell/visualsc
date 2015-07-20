@@ -94,6 +94,7 @@ this->resize(600,1000);
 
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
+    // TODO make a handle new textblock for scformview
 
     loadTree (NULL, states);
 
@@ -113,7 +114,15 @@ void SCFormView::handleNewTransition(SCTransition*t)
 
 }
 
-
+/**
+ * @brief SCFormView::handleNewState
+ * @param s
+ *
+ * connected to the signal newStateSignal in SCDataModel
+ *
+ * will create a new state in the formview and reload the tree
+ *
+ */
 void SCFormView::handleNewState(SCState*s)
 {
     (void)s;
@@ -357,7 +366,9 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransiti
             loadTree (item, textBlock);
         }
 
-        connect(tr, SIGNAL(insertNewTextBox(SCTextBlock*)), parentItem, SLOT(createNewTextBox(SCTextBlock*)));
+        // TODO
+        //connect(tr, SIGNAL(transitionAddTextBlock(SCTextBlock*)), parentItem, SLOT(treeAddTextBlock(SCTextBlock*)));        // connect the transition to the tree when creating a new text block
+        // connect(tr, SIGNAL(transitionAddTextBlock(SCTextBlock*)),
 
     }
 
@@ -684,7 +695,13 @@ void SCFormView::buttonGroupClicked(int )
 
 
 /**
- currently not being used
+ * @brief SCFormView::itemPromptTextBox
+ *
+ * connected to the QAction button insertTextBox
+ *
+ * will create a pop up for the user to name their new text box
+ * and call itemInsertTextBox with the string input
+ *
  */
 void SCFormView::itemPromptTextBox()
 {
@@ -705,15 +722,23 @@ void SCFormView::itemPromptTextBox()
 
     if(ok)
     {
-        itemInsertTextBox(dynamic_cast<SCItem*>(_currentlySelected), input);
+        itemInsertTextBlock(dynamic_cast<SCItem*>(_currentlySelected), input);
     }
 }
 
-
-void SCFormView::itemInsertTextBox(SCItem *item, const QString name)
+/**
+ * @brief SCFormView::itemInsertTextBox
+ * @param item
+ * @param name
+ *
+ * creates a new text block and adds it to the QList of textblocks that belongs to item
+ * and adds it to the tree
+ */
+void SCFormView::itemInsertTextBlock(SCItem *item, const QString name)
 {
     qDebug() << "item inesrt text box called ";
-    if(!_dm->insertNewTextBox(item, name)){
+    // add the text block to the data model
+    if(!_dm->insertNewTextBlock(item, name)){
         qDebug() << "failed here";
         return;
     }
@@ -721,7 +746,7 @@ void SCFormView::itemInsertTextBox(SCItem *item, const QString name)
     // insert the new text box into the tree and sc graphics view
 
 
-    //loadTree (item, item->getTextBlock());
+    // loadTree (item, item->getTextBlock());
 
     SCTransition* trans = dynamic_cast<SCTransition*>(item);
     SCState* state = dynamic_cast<SCState*>(item);
@@ -734,8 +759,15 @@ void SCFormView::itemInsertTextBox(SCItem *item, const QString name)
         qDebug() << "trans texblock object name "<<trans->getTextBlock(name)->objectName();
         //loadTree(item, trans->getTextBlock(name));
         connect(trans->getTextBlock(name), SIGNAL(destroyed(QObject*)), this, SLOT(handleTextBlockDeleted(QObject*)), Qt::QueuedConnection);
-        emit trans->insertNewTextBox(trans->getTextBlock(name));
+
+        // add the textblock to the tree view and reload the tree.
+        emit trans->transitionAddTextBlock(trans->getTextBlock(name));
         this->reloadTree();
+
+       // add the textblock to the sc graphics view
+
+
+
     }
 
 }

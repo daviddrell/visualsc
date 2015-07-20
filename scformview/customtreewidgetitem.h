@@ -45,7 +45,7 @@ public:
     void setData(QObject* d);
     QObject * data();
 public slots:
-    void createNewTextBox(SCTextBlock*);
+    void treeAddTextBlock(SCTextBlock*);
 
 private:
     QObject * _stateOrTransitionItem;

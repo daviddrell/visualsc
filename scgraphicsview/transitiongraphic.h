@@ -10,6 +10,7 @@
 #include "elbowgrabber.h"
 #include "mousecontroller.h"
 #include "linesegmentgraphic.h"
+#include "selectabletextblock.h"
 #include <QObject>
 #include "textbox.h"
 
@@ -45,6 +46,8 @@ public:
     ElbowGrabber* getCurrentlyHoveredElbow();
 
     void setGrabbersVisible(bool visible);
+
+
 
 
 signals:
@@ -92,9 +95,9 @@ private :
     LineSegmentGraphic* _hoveredLine;
     ElbowGrabber* _hoveredElbow;
 
-    TextBox* _transitionTextBox;
+    //TextBox* _transitionTextBox;
 
-    //SelectableTextBlock TextItem;    ///<  text to go in the title area.
+    SelectableTextBlock* _eventText;    ///<  text to go in the title area.
 
 
     bool _hasMovedSinceCreatingElbow;

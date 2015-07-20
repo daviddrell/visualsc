@@ -50,6 +50,8 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
+    connect(_dm, SIGNAL(newTextBlockSignal(SCTransition*,QString)), this, SLOT(handleNewTextBlock(SCTransition,QString)));
+
     //using openGL
 
     _view.setViewport( new QGLWidget (QGLFormat(QGL::SampleBuffers) ));
@@ -374,6 +376,20 @@ void SCGraphicsView::handleStateGraphicDeleted(QObject *st)
 }
 
 
+void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
+{
+    SCTextBlock* textBlock = new SCTextBlock();
+}
+
+/**
+ * @brief SCGraphicsView::handleNewState
+ * @param newState
+ *
+ * connected to signal newStateSignal in the SCDataModel
+ *
+ * will add a state to the graphics view
+ *
+ */
 void SCGraphicsView::handleNewState (SCState *newState)
 {
     static int zVal = 0;

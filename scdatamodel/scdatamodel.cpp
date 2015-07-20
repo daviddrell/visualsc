@@ -284,9 +284,21 @@ bool SCDataModel::deleteItem(QObject * item)
     return false;
 }
 
-
+/**
+ * @brief SCDataModel::insertNewState
+ * @param parent
+ * @return
+ *
+ * Called from scformview::insertState()
+ *
+ * will add a new state that is a child of the parent parameter
+ *
+ * and will use newStateSignal to signal the scformview and scgraphcisview for their new state protocols
+ *
+ */
 SCState* SCDataModel::insertNewState(SCState *parent)
 {
+    //
     SCState * state = new SCState (parent);
 
     emit newStateSignal(state);
@@ -489,8 +501,18 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 }
 
-
-bool SCDataModel::insertNewTextBox(SCItem* item, QString name)
+/**
+ * @brief SCDataModel::insertNewTextBlock
+ * @param item
+ * @param name
+ * @return
+ *
+ * called by scformview::itemInsertTextBlock
+ * handles adding a new textblock to either a transiton or state's list of textblocks
+ *
+ * then emits newTextBlockSignal for the scformview and scgraphics view protocol for new textblocks
+ */
+bool SCDataModel::insertNewTextBlock(SCItem* item, QString name)
 {
     SCTransition* trans = dynamic_cast<SCTransition*> (item);
     SCState* state = dynamic_cast<SCState*>(item);
@@ -501,9 +523,14 @@ bool SCDataModel::insertNewTextBox(SCItem* item, QString name)
     }
     else if(trans)
     {
-        trans->addTextBox(name, name);
-        // TODO MONDAY
-        emit newTextBox(trans, name);
+
+        // add a new textblock to the datamodel
+        trans->addTextBlock(name, name);
+        // TODO MONday
+
+        //
+        emit newTextBlockSignal(trans, name);
+        //emit newTextBox(trans, name);
     }
     else
     {

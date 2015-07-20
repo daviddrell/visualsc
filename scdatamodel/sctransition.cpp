@@ -24,7 +24,10 @@
 #include <QDebug>
 
 SCTransition::SCTransition(QObject * parent):
-        SCItem(parent), attributes(this, "transition.attributes")
+        SCItem(parent),
+        attributes(this, "transition.attributes"),
+        _eventTextBlock(new SCTextBlock())
+
 {
     /*
      event
@@ -54,9 +57,14 @@ SCTransition::SCTransition(QObject * parent):
 
 
 
+    _eventTextBlock->setParent(this);
+    _eventTextBlock->setText("Event");
+    // handle textBlock Changed...
+    //connect()
+
     /*
 
-    TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitionStringAttribute (this, "cond",QString());
+    TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitizgonStringAttribute (this, "cond",QString());
     attributes.addItem(cond);
 
     TransitionAttributes::TransitionStringAttribute * type = new TransitionAttributes::TransitionStringAttribute (this, "type",QString("internal"));
@@ -68,17 +76,22 @@ SCTransition::SCTransition(QObject * parent):
 */
 
 
-
 }
 
 SCTransition::~SCTransition()
 {
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
+    delete _eventTextBlock;
 }
 
 SCState *SCTransition::targetState()
 {
     return _targetState;
+}
+
+SCTextBlock* SCTransition::getEventTextBlock()
+{
+    return _eventTextBlock;
 }
 
 QString SCTransition::getAttributeValue(QString key)
@@ -91,7 +104,7 @@ QString SCTransition::getAttributeValue(QString key)
     else return QString();
 }
 
-void SCTransition::addTextBox(QString key, QString value)
+void SCTransition::addTextBlock(QString key, QString value)
 {
     SCTextBlock* tb = new SCTextBlock();
 

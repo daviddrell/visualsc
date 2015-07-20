@@ -54,13 +54,14 @@ public:
 
     ~SCTransition();
 
+
     virtual IAttributeContainer * getAttributes(); //reimplemented from base SCItem
     void    setAttributeValue(QString key, QString value);
     QString getAttributeValue(QString key);
     void addAttribute(QString key, QString value);
     bool removeAttribute(QString key);
 
-    void addTextBox(QString key, QString value);
+    void addTextBlock(QString key, QString value);
 
     TransitionAttributes attributes;
 
@@ -69,6 +70,7 @@ public:
 
     QList<SCTextBlock*> getTextBlocks();
     SCTextBlock* getTextBlock(QString textBlockName);
+    SCTextBlock* getEventTextBlock();
 
      //public data members
 
@@ -77,7 +79,7 @@ public:
 signals:
     void selected();
     void unselected();
-    void insertNewTextBox(SCTextBlock*);
+    void transitionAddTextBlock(SCTextBlock*);          // connected in scformview::loadtree for sctransitions. connected to the parentitem's treeAddTextBlock(SCTextBlock) in customtreewidgetitem
 
 private slots:
     //void handleLineSelected();
@@ -88,6 +90,8 @@ private:
     SCState *       _targetState;
 
     QList<SCTextBlock*> _textBlocks;
+
+    SCTextBlock* _eventTextBlock;
 
 
 };

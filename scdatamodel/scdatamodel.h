@@ -110,14 +110,14 @@ public:
     bool insertNewProperty(SCItem* item, QString propertyName);
     bool deleteProperty(SCItem* item, QString propertyName);
 
-    bool insertNewTextBox(SCItem* item, QString name);
+    bool insertNewTextBlock(SCItem* item, QString name);
 
 
 signals:
     void openCompleted(bool sucess, QStringList message);
     void newStateSignal(SCState * newState);
     void newTransitionSignal(SCTransition * newTransition);
-    void newTextBox(SCTransition*, QString);
+    void newTextBlockSignal(SCTransition*, QString);
 
 private slots:
 
