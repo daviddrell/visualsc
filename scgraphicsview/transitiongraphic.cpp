@@ -13,7 +13,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _mouseController(mouse),
     _hasMovedSinceCreatingElbow(true),
     _isCurrentlyDeleting(false),
-    _eventText(new SelectableTextBlock(parentGraphic, t->getEventTextBlock()))
+    _eventText(new SelectableTextBlock(this, t->getEventTextBlock()))
   //,
     //TextItem(parentGraphic, parentGraphic->getStateModel()->getIDTextBlock())
 
@@ -23,7 +23,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
     //this->acceptHoverEvents();            // a Transition graphic has no dimensions, its invididual elbows and line segments will have hover events
     //this->setParent(targetGraphic);
-   // _eventText = new SelectableTextBlock(parentGraphic, t->getEventTextBlock());
+    //_eventText = new SelectableTextBlock(parentGraphic, t->getEventTextBlock());
 
 
     TransitionAttributes::TransitionPathAttribute * p =
@@ -207,7 +207,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         //TextItem.setParentItem(_anchors[1]);
 
         // set the event text to be tied to the source anchor
-        _eventText->setParentItem(_anchors[0]);
+        //_eventText->setParentItem(_anchors[0]);
+
         //_eventText->setPos(0,0);
 
 
@@ -218,6 +219,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _transitionTextBox->setVisible(false);
     _transitionTextBox->setPos(100,100);
     */
+
+    _eventText->setParentItem(_anchors[0]);
 
 }   // end of constructor
 
@@ -461,6 +464,7 @@ void TransitionGraphic::createCustomPath(QPointF mouseLocation, ElbowGrabber* el
 
 TransitionGraphic::~TransitionGraphic()
 {
+
     for(int i=0;i < _lineSegments.count(); i++)
     {
         LineSegmentGraphic * ls =_lineSegments.at(i);
@@ -475,10 +479,11 @@ TransitionGraphic::~TransitionGraphic()
     _elbows.clear();
 
 
-
 // Delete causes an exception
    //qDebug() << "eventText" << _eventText->objectName() << _eventText->isEnabled();
-   // delete _eventText;
+   //delete _eventText;
+
+
 }
 
 /**

@@ -284,6 +284,14 @@ QObject* SCFormView::getNeighborState(QObject*s)
     return prev;
 }
 
+/**
+ * @brief SCFormView::handleStateDeleted
+ * @param s
+ *
+ * connect(state, destroyed, scformview, handleStateDeleted)
+ *
+ */
+
 void SCFormView::handleStateDeleted(QObject *s)
 {
     if ( s == _currentlySelected)
@@ -456,13 +464,13 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransiti
         _itemToTextBlock.insert(tr,textBlock);
         loadTree (item, textBlock);
 
-
+/*
         for(int i = 0; i < tr->getTextBlocks().count();i++)
         {
             SCTextBlock  * textBlock = tr->getTextBlocks().at(i);
             loadTree (item, textBlock);
         }
-
+*/
         // TODO
         //connect(tr, SIGNAL(transitionAddTextBlock(SCTextBlock*)), parentItem, SLOT(treeAddTextBlock(SCTextBlock*)));        // connect the transition to the tree when creating a new text block
         // connect(tr, SIGNAL(transitionAddTextBlock(SCTextBlock*)),
@@ -1002,6 +1010,7 @@ void SCFormView::itemInsertTextBlock(SCItem *item, const QString name)
     }
     else if(trans)
     {
+        /*
         qDebug() << "trans texblock object name "<<trans->getTextBlock(name)->objectName();
         //loadTree(item, trans->getTextBlock(name));
         connect(trans->getTextBlock(name), SIGNAL(destroyed(QObject*)), this, SLOT(handleTextBlockDeleted(QObject*)), Qt::QueuedConnection);
@@ -1011,7 +1020,7 @@ void SCFormView::itemInsertTextBlock(SCItem *item, const QString name)
         this->reloadTree();
 
        // add the textblock to the sc graphics view
-
+*/
 
 
     }
@@ -1231,6 +1240,14 @@ void SCFormView::deleteItem()
     }
 }
 
+/**
+ * @brief SCFormView::deleteItem
+ * @param item
+ *
+ * called when the QAction deleteAction is triggered
+ *
+ *
+ */
 void SCFormView::deleteItem(QObject * item)
 {
 
@@ -1276,12 +1293,24 @@ void SCFormView::insertTransition()
 
 }
 
-void SCFormView::handleStateSelectionWindowStateSelected(SCState* ,QString targetName)
+/**
+ * @brief SCFormView::handleStateSelectionWindowStateSelected
+ * @param targetName
+ *
+ * connect is in insertTransition
+ *
+ * connect(StateSelectionWindow, stateSelected, scformview, handleStateSelectionWindowStateSelected)
+ *
+ *
+ *
+ *
+ */
+void SCFormView::handleStateSelectionWindowStateSelected(SCState* target,QString targetName)
 {
     // user has clicked on a new state, create the transition with this target state
 
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
-    _dm->insertNewTransition(st, targetName);
+    _dm->insertNewTransition(st, target);
     _targetStateSelectionWindow->close();
 
     delete _targetStateSelectionWindow;

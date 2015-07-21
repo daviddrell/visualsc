@@ -384,7 +384,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
    // qDebug() << "Setting closest wall: " << closest;
     elbow->setSnappedSide(closest);
     switch(closest)
-    {    
+    {
     case NORTH: //northwest and northeast
         x = cursorPos.x();
         y = adjustedBox.y();
@@ -573,5 +573,4 @@ void StateBoxGraphic::graphicHasChanged ()
         _stateModel->setSize(sz);
     }
 }
-
 

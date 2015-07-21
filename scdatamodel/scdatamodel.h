@@ -102,7 +102,8 @@ public:
       * \param source - the SCState from which the transition leaves
       * \param event  -  the string which represents the event that causes the transition to occur
       */
-    SCTransition* insertNewTransition(SCState *source, QString event );
+    //SCTransition* insertNewTransition(SCState *source, QString event );
+    SCTransition* insertNewTransition(SCState *source, SCState* target);
 
     void logError(QString message);///< inform the user there was an error
     void logInfo(QString message);///< inform the user of anything that is not an error such as progress, etc
@@ -131,6 +132,9 @@ private slots:
     void handleMakeANewTransitionProperty(const QString name);
 
 private:
+
+
+
     SCXMLReader     _reader;
     QXmlStreamWriter *_writer;
     int              _level;
@@ -139,8 +143,8 @@ private:
     SCTransition    *_currentTransition;
     SCState         *_topState;
     QGraphicsScene * _scene;
-    QList<SCState*> _states;
-    QList<SCTransition*> _transitions;
+    //QList<SCState*> _states;
+    //QList<SCTransition*> _transitions;
 
 
 
@@ -148,6 +152,7 @@ private:
     SCDataModel(QObject * parent=NULL);
     void connectTransitionsToStatePath();
     void makeTransitionConnections(SCState * targetState, SCTransition* trans);
+    //void deleteInTransitions(SCState* state);
 };
 
 #endif // SCDATAMODEL_H

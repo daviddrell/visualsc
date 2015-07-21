@@ -61,15 +61,15 @@ public:
     void addAttribute(QString key, QString value);
     bool removeAttribute(QString key);
 
-    void addTextBlock(QString key, QString value);
+    //void addTextBlock(QString key, QString value);
 
     TransitionAttributes attributes;
 
     void    writeSCVXML(QXmlStreamWriter & sw);
     SCState *targetState();
 
-    QList<SCTextBlock*> getTextBlocks();
-    SCTextBlock* getTextBlock(QString textBlockName);
+    //QList<SCTextBlock*> getTextBlocks();
+    //SCTextBlock* getTextBlock(QString textBlockName);
     SCTextBlock* getEventTextBlock();
 
      //public data members
@@ -89,7 +89,7 @@ private:
     QList<QString> DEFAULT_PROPERTIES_LIST;
     SCState *       _targetState;
 
-    QList<SCTextBlock*> _textBlocks;
+    //QList<SCTextBlock*> _textBlocks;
 
     SCTextBlock* _eventTextBlock;
 

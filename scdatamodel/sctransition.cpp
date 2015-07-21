@@ -108,7 +108,7 @@ QString SCTransition::getAttributeValue(QString key)
     }
     else return QString();
 }
-
+/*
 void SCTransition::addTextBlock(QString key, QString value)
 {
     SCTextBlock* tb = new SCTextBlock();
@@ -134,7 +134,7 @@ SCTextBlock* SCTransition::getTextBlock(QString textBlockName)
     }
     return NULL;
 }
-
+*/
 IAttributeContainer * SCTransition::getAttributes()
 {
     return & attributes;

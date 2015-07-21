@@ -47,6 +47,8 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     _dm->setScene( _scene);
     // initialize key controller
 
+
+
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
 
@@ -334,13 +336,15 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
 
     // add the transitiongraphic to the map of transition graphics
     _mapTransitionToGraphic.insert(t, transGraphic);
+
+    //targetGraphic->
 }
 
 /**
  * @brief SCGraphicsView::handleStateDeleted
  * @param state
  *
- * If a state is deleted in the tree view, also remove it from the graphicsview
+ * if the SCState is destroyed, delete it from the graphics view.
  */
 void SCGraphicsView::handleStateDeleted(QObject *state)
 {
@@ -356,8 +360,20 @@ void SCGraphicsView::handleStateDeleted(QObject *state)
         i.next();
         if ( i.key() == st)
         {
+
+
+            QList<QGraphicsItem*> children = i.value()->childItems();
+            qDebug() << "deleting children for state "<<" with num children: " << children.count();
+            for(int i = 0; i < children.count(); i++)
+            {
+                this->handleStateDeleted( (SCState*)(children.at(i)) );
+            }
+
+
             delete i.value();// delete the graphic and all its children
             _mapStateToGraphic.remove(i.key());
+
+
         }
     }
 

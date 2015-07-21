@@ -24,7 +24,7 @@ public:
     ~FormViewObject();
 
 private:
-    _treeWidget QTreeWidget;
+   // _treeWidget QTreeWidget;
 
 
 };

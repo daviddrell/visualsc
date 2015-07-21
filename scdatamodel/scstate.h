@@ -80,6 +80,8 @@ public:
     void setSize (QPoint& size);
     void setPosition (QPointF& size);
 
+    void deleteInTransitions(SCState* state);
+
     /**
       * \fn getAllTransitions
       * \brief Get all transitions including decendant state's transitions

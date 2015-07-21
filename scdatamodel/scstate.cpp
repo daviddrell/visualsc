@@ -59,6 +59,7 @@ SCState::SCState( bool topState) :
 
 SCState::~SCState()
 {
+    deleteInTransitions(this);
     delete _IdTextBlock;
 }
 
@@ -262,6 +263,43 @@ void SCState::addTransitionReference(SCTransition* t, TransitionTransitDirection
         _transitionsTerminatingHere.append(t);
     }
 }
+
+/**
+ * @brief SCState::deleteInTransitions
+ * @param state
+ *
+ * deletes all inbound transitions on a state
+ *
+ */
+void SCState::deleteInTransitions(SCState* state)
+{
+
+    if(!state)
+    {
+        qDebug() << "delete In Transitions skipping because this is not a state!";
+        return;
+    }
+
+    QList<SCTransition*> dest = state->getDestinationTransitions();
+    qDebug() << "Deleting destination transitions for state: " << state->attributes.value("name")->asString() << " with # inbound transitions "<<dest.count();
+    SCTransition* tr;
+    for(int i = 0; i < dest.count(); i++)
+    {
+        tr = dest.at(i);
+        dest.removeAt(i);
+        delete tr;
+    }
+
+
+/*
+    QList<QObject*> childList = state->children();
+    for(int i = 0; i < childList.count(); i++)
+    {
+        deleteInTransitions(dynamic_cast<SCState*>(childList.at(i)));
+    }
+    */
+}
+
 
 void SCState::addTransistion(SCTransition * t)
 {

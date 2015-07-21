@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
+#include <QDebug>
 
 StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
         QMainWindow(parent, Qt::WindowStaysOnTopHint),
@@ -60,6 +61,7 @@ void StateSelectionWindow::handleDoneButtonPushed()
     if ( _currentlySelected == NULL ) return;
 
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
+    qDebug() << "the currently selected state is: " << st->attributes.value("name")->asString();
     emit stateSelected (st,  st->attributes.value("name")->asString());
 }
 

@@ -247,6 +247,22 @@ void SCDataModel::getStates(QList<SCState *>& list)
     return _topState->getStates(list);
 }
 
+
+
+
+/**
+ * @brief SCDataModel::deleteItem
+ * @param item
+ * @return
+ *
+ * called by scformview when the delete item button is pressed
+ *
+ * will search through all states and transitions and deletes the parameter item
+ *
+ * returns true if item was found and deleted
+ * returns false if item was not found
+ *
+ */
 bool SCDataModel::deleteItem(QObject * item)
 {
 
@@ -261,6 +277,7 @@ bool SCDataModel::deleteItem(QObject * item)
         SCState *st = list.at(i);
         if ( item == st )
         {
+            //deleteInTransitions(st);
             int i = list.indexOf(st);
             list.removeAt(i);
             delete st;
@@ -528,11 +545,11 @@ bool SCDataModel::insertNewTextBlock(SCItem* item, QString name)
     {
 
         // add a new textblock to the datamodel
-        trans->addTextBlock(name, name);
+        //trans->addTextBlock(name, name);
         // TODO MONday
 
         //
-        emit newTextBlockSignal(trans, name);
+        //emit newTextBlockSignal(trans, name);
         //emit newTextBox(trans, name);
     }
     else
@@ -611,15 +628,16 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
  * which will show the new transition in the tree view and in the graphics view
  *
  */
-SCTransition* SCDataModel::insertNewTransition(SCState *source, QString target )
+SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target )
 {
     if ( source == NULL)  return NULL;
 
     SCTransition * transition = new SCTransition(source);
 
-    transition->setAttributeValue("target", target);
+    transition->setAttributeValue("target", target->attributes.value("name")->asString());
     transition->setAttributeValue("event", "Event Name");
     transition->setObjectName("Transition");
+    target->addTransitionReference(transition, SCState::kDestination);
 
     emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition and scformview's handle new transition
 
