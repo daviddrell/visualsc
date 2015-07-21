@@ -59,7 +59,13 @@ SCState::SCState( bool topState) :
 
 SCState::~SCState()
 {
-    deleteInTransitions(this);
+    // remove all the transitions into this state
+    // scdatamodel will handle disconnections other transitions related to this state
+    removeAllTransitionsIn();
+    _transitingTransitionsIn.clear();
+    _transitingTransitionsOut.clear();
+    _transitionsTerminatingHere.clear();
+
     delete _IdTextBlock;
 }
 
@@ -239,13 +245,71 @@ void SCState::makeTargetConnections(QList<SCTransition*> & transitionList)
 #endif
 
 
-QList<SCTransition*> SCState::getInboundTransitions()
+QList<SCTransition*> SCState::getTransitionsIn()
 {
     return  _transitingTransitionsIn;
 }
-QList<SCTransition*> SCState::getDestinationTransitions()
+QList<SCTransition*> SCState::getTransitionsTerminating()
 {
     return _transitionsTerminatingHere;
+}
+
+
+
+
+
+/**
+ * @brief SCState::removeTargetsTransitionIn
+ *
+ * Called when this state is deleted.
+ *
+ * for any state targeted, remove the transition targeting that state from its inbound transitions list
+ *
+ */
+void SCState::removeTargetsTransitionIn()
+{
+    qDebug() <<"SCState::removeTargetsTransitonIn";
+    SCTransition* trans;
+    SCState* target;
+    qDebug() << "_transitingTransitionsOut: " << _transitingTransitionsOut.count();
+    for(int i = 0; i < _transitingTransitionsOut.count();i++)
+    {
+        trans = _transitingTransitionsOut.at(i);
+        target = trans->targetState();
+        target->removeTransitionIn(trans);
+    }
+}
+
+/**
+ * @brief SCState::removeTransitionIn
+ * @param trans
+ *
+ * Remove the passed transition from this state's inbound transitions list
+ *
+ *
+ */
+void SCState::removeTransitionIn(SCTransition* trans)
+{
+    int k = _transitingTransitionsIn.indexOf(trans);
+    if(k!=-1)
+    {
+        _transitingTransitionsIn.removeAt(k);
+        return;
+    }
+    qDebug() << "ERROR SCState::deleteTransitionsIn transition not found!";
+}
+
+
+
+void SCState::removeTransitionOut(SCTransition* trans)
+{
+    int k = _transitingTransitionsOut.indexOf(trans);
+    if(k!=-1)
+    {
+        _transitingTransitionsOut.removeAt(k);
+        return;
+    }
+    qDebug() << "ERROR SCState::deleteTransitionsOut transition not found!";
 }
 
 void SCState::addTransitionReference(SCTransition* t, TransitionTransitDirection d)
@@ -265,14 +329,17 @@ void SCState::addTransitionReference(SCTransition* t, TransitionTransitDirection
 }
 
 /**
- * @brief SCState::deleteInTransitions
+ * @brief SCState::deleteAllInTransitions
  * @param state
  *
- * deletes all inbound transitions on a state
+ * deletes all inbound transitions on this state
+ *
+ * Called when a SCState is deleted and ALL of the inbound transitions should also be deleted
  *
  */
-void SCState::deleteInTransitions(SCState* state)
+void SCState::removeAllTransitionsIn()
 {
+    SCState* state = this;
 
     if(!state)
     {
@@ -280,25 +347,26 @@ void SCState::deleteInTransitions(SCState* state)
         return;
     }
 
-    QList<SCTransition*> dest = state->getDestinationTransitions();
+    QList<SCTransition*> dest = state->getTransitionsIn();
     qDebug() << "Deleting destination transitions for state: " << state->attributes.value("name")->asString() << " with # inbound transitions "<<dest.count();
     SCTransition* tr;
+    int k;
     for(int i = 0; i < dest.count(); i++)
     {
         tr = dest.at(i);
+        k = _transitingTransitionsIn.indexOf(tr);
+        if(k!=-1)
+        {
+            qDebug() << "deleting in transition " << tr->attributes.value("target")->asString();
+            qDebug() << "tth size before: " << _transitingTransitionsIn.count();
+            _transitingTransitionsIn.removeAt(k);
+            qDebug() << "tth size after: " << _transitingTransitionsIn.count();
+        }
         dest.removeAt(i);
         delete tr;
     }
-
-
-/*
-    QList<QObject*> childList = state->children();
-    for(int i = 0; i < childList.count(); i++)
-    {
-        deleteInTransitions(dynamic_cast<SCState*>(childList.at(i)));
-    }
-    */
 }
+
 
 
 void SCState::addTransistion(SCTransition * t)

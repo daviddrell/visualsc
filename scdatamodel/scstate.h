@@ -80,7 +80,15 @@ public:
     void setSize (QPoint& size);
     void setPosition (QPointF& size);
 
-    void deleteInTransitions(SCState* state);
+
+    void removeTargetsTransitionIn();
+
+    QList<SCTransition*> getTransitionsIn();
+    QList<SCTransition*> getTransitionsTerminating();
+
+    void removeTransitionIn(SCTransition* trans);
+    void removeTransitionOut(SCTransition* trans);
+    void removeAllTransitionsIn();
 
     /**
       * \fn getAllTransitions
@@ -97,9 +105,7 @@ public:
 
      void getTransitions(QList<SCTransition*> & transitionList);
 
-     QList<SCTransition*> getInboundTransitions();
 
-     QList<SCTransition*> getDestinationTransitions();
 
     /**
       * \fn getStates

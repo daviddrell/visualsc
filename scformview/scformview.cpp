@@ -744,7 +744,7 @@ void SCFormView::clearTextBlockPropertyTable()
         delete item;
     }
     textBlockPropertyTable->clear();
-    disconnect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)),this, SLOT(handlePropertyCellChanged(int,int)));
+    //disconnect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)),this, SLOT(handlePropertyCellChanged(int,int)));
 }
 
 /**
@@ -1439,7 +1439,7 @@ void SCFormView::updateStateName(SCState* state, QString name)
 
     // update any transitions that target this state
 
-    QList<SCTransition*> ins = state->getDestinationTransitions();
+    QList<SCTransition*> ins = state->getTransitionsIn();
     //qDebug() << "got into name " << "ins count: " << ins.count();
     for(int i = 0; i < ins.count(); i++)
     {

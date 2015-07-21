@@ -199,9 +199,16 @@ void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition*
     // work backwards from target state to its ancestors, from the transitions source state to its ancestors, until
     // both have a common ancestor
 
-    targetState->addTransitionReference(trans, SCState::kDestination);
+    // set the transition to point to its target
+    trans->setTargetState(targetState);
+
+    // add this transition to the target state's list of in transitions
+    targetState->addTransitionReference(trans, SCState::kTransitIn);
 
     SCState * sourceState = dynamic_cast<SCState *> ( trans->parent());
+
+    // add this transition to the source state's list of out transitions
+    sourceState->addTransitionReference(trans,SCState::kTransitOut);
 
     SCState *sourceTreeNode=NULL;
     SCState *targetTreeNode=NULL;
@@ -277,7 +284,10 @@ bool SCDataModel::deleteItem(QObject * item)
         SCState *st = list.at(i);
         if ( item == st )
         {
+
+            st->removeTargetsTransitionIn();
             //deleteInTransitions(st);
+
             int i = list.indexOf(st);
             list.removeAt(i);
             delete st;
@@ -637,7 +647,9 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     transition->setAttributeValue("target", target->attributes.value("name")->asString());
     transition->setAttributeValue("event", "Event Name");
     transition->setObjectName("Transition");
-    target->addTransitionReference(transition, SCState::kDestination);
+    target->addTransitionReference(transition, SCState::kTransitIn);
+    qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
+    source->addTransitionReference(transition, SCState::kTransitOut);
 
     emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition and scformview's handle new transition
 
@@ -665,7 +677,7 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
 
     _currentTransition = transition;
     _currentState->addTransistion(transition);
-
+    //transition->setTargetState();
     //transition->setTargetState(transition);
 
     delete ta;
