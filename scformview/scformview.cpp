@@ -189,19 +189,25 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
 
     if(getCurrentlySelectedType().toLower() == "state")
     {
+
         qDebug() << "got into state";
         // first update the datamodel's SCState's attribute value
 
         // if this is "name" attribute, then also update the tree view and graphics view and any transitions that have this as its target
 
-        IAttributeContainer * attributes;
-        IAttribute * attr;
+       // IAttributeContainer * attributes;
+       // IAttribute * attr;
 
         QString key = propertyTable->item(r,0)->text();
         QString value = propertyTable->item(r,1)->text();
+        if(key == "name")
+        {
 
-        SCState* st = dynamic_cast<SCState*>(_currentlySelected);
-        updateStateName(st, value); // update the tree, property table (redundant), SCState's attributes, and the selectablebox
+
+            SCState* st = dynamic_cast<SCState*>(_currentlySelected);
+            updateStateName(st, value); // update the tree, property table (redundant), SCState's attributes, and the selectablebox
+        }
+
 
         /*
         SCItem * item = dynamic_cast<SCItem*>(_currentlySelected);
@@ -230,6 +236,14 @@ qDebug() << "got into name " << "ins count: " << ins.count();
     }
     else if(getCurrentlySelectedType().toLower() == "transition" )
     {
+        // update the datamodel, tree, and graphics view box
+        QString key = propertyTable->item(r,0)->text();
+        QString value = propertyTable->item(r,1)->text();
+        if(key == "event")
+        {
+            SCTransition* trans= dynamic_cast<SCTransition*>(_currentlySelected);
+            updateTransitionEvent(trans, value);
+        }
 
     }
 
@@ -443,6 +457,8 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransiti
 
         connect(tr, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)), Qt::QueuedConnection);
 
+        connect(tr, SIGNAL(nameChanged(SCTransition*, QString)),this, SLOT(handleItemNameChanged(SCTransition*,QString)));
+
         CustomTreeWidgetItem * item=0;
 
         item = new CustomTreeWidgetItem(parentItem);
@@ -455,6 +471,8 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransiti
 
         item->setIcon(0,QIcon(":/SCFormView/transitionbutton.bmp"));
 
+        // connect the transition and tree widget item to the hashtable
+        _itemToTreeWidget.insert(tr, item);
 
         // load the transition's text blocks
 
@@ -1266,7 +1284,18 @@ void SCFormView::bringToFront()
 
 }
 
-
+/**
+ * @brief SCFormView::insertTransition
+ *
+ * Part 1 of inserting a new transition is to open up a new target state selection window
+ *
+ * the currently selected state is the source
+ * the chosen state from the state selection window is the target
+ *
+ * will next call
+ * handleStateSelectionWindowStateSelected and is passed the target state and its name
+ *
+ */
 void SCFormView::insertTransition()
 {
     SCState * st = dynamic_cast<SCState *> (_currentlySelected);
@@ -1287,6 +1316,7 @@ void SCFormView::insertTransition()
     // create a new state tree window to select a state from
     _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
 
+    // Pass the target and the target name to handleStateSelectionWindowStateSelected
     connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*,QString)), this, SLOT(handleStateSelectionWindowStateSelected(SCState*,QString)));
     _targetStateSelectionWindow->show();
 
@@ -1310,7 +1340,10 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* target,QString
     // user has clicked on a new state, create the transition with this target state
 
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
-    _dm->insertNewTransition(st, target);
+    SCTransition* trans = _dm->insertNewTransition(st, target);
+
+    connect(trans, SIGNAL(nameChanged(SCTransition*, QString)), this, SLOT(handleItemNameChanged(SCTransition*,QString)));
+
     _targetStateSelectionWindow->close();
 
     delete _targetStateSelectionWindow;
@@ -1331,6 +1364,7 @@ void SCFormView::insertState()
 
     connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
 
+    // connect the state changing its name to updating the name across the formview, data model, and graphics view
     connect(st, SIGNAL(nameChanged(SCState*,QString)), this, SLOT(handleItemNameChanged(SCState*,QString)));
 
 }
@@ -1338,6 +1372,13 @@ void SCFormView::insertState()
 void SCFormView::sendToBack()
 {
 
+}
+
+
+CustomTreeWidgetItem* SCFormView::findItem(SCTransition* item)
+{
+    CustomTreeWidgetItem* find = _itemToTreeWidget.value(dynamic_cast<SCItem*>(item));
+    return find;
 }
 
 CustomTreeWidgetItem* SCFormView::findItem(SCState* item)
@@ -1366,6 +1407,50 @@ CustomTreeWidgetItem* SCFormView::findItem(SCState* item)
     return ret;
     */
     return find;
+}
+
+
+void SCFormView::handleItemNameChanged(SCTransition * trans, QString name)
+{
+    qDebug() << "transition name was changed";
+    if(trans)
+    {
+        updateTransitionEvent(trans, name);
+    }
+}
+
+/**
+ * @brief SCFormView::updateTransitionEvent
+ * @param trans
+ * @param eventName
+ *
+ * Updates the event text block of a transition across the data model, tree view, property table, and graphics view text block
+ *
+ */
+void SCFormView::updateTransitionEvent(SCTransition* trans, QString eventName)
+{
+    // update the data model
+    trans->attributes.value("event")->setValue(eventName);
+
+    // update the tree
+    QTreeWidgetItem* treeItem = findItem(trans);
+    treeItem->setText(0, eventName);
+
+    // update the property table (if necessary)
+    if(isCurrentlySelectedEqualTo(trans))
+    {
+        for(int i = 0 ; i < propertyTable->rowCount();i++)
+        {
+            if(propertyTable->item(i,0)->text() == "event")
+            {
+                propertyTable->item(i,1)->setText(eventName);
+                break;
+            }
+        }
+    }
+
+    // update the selectable text box
+    trans->setText(eventName);
 }
 
 
@@ -1456,11 +1541,6 @@ bool SCFormView::isCurrentlySelectedEqualTo(SCItem* item)
     if(item == cs)
         return true;
     return false;
-}
-
-void SCFormView::handleItemNameChanged(SCTransition * trans, QString name)
-{
-    qDebug() << "transition name was changed";
 }
 
 

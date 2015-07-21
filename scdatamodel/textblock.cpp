@@ -74,6 +74,18 @@ QString SCTextBlock::getText()
     return  _text;
 }
 
+/**
+ * @brief SCTextBlock::setText
+ * @param text
+ *
+ * updates the datamodel for an item's textblock and then signals textChanged
+ *
+ * SIGNAL textChanged
+ *
+ * connect(textBlock, textChanged, scGraphicsView, handleTextChanged)
+ *
+ *
+ */
 void  SCTextBlock::setText(QString text)
 {
     if  ( text != _text)

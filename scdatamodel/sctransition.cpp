@@ -58,9 +58,9 @@ SCTransition::SCTransition(QObject * parent):
 
 
     _eventTextBlock->setParent(this);
-    _eventTextBlock->setText("Event");
-    // handle textBlock Changed...
-    //connect()
+    _eventTextBlock->setText("event");
+    // handle textBlock Changed for the event text box
+    connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
 
     /*
 
@@ -82,6 +82,21 @@ SCTransition::~SCTransition()
 {
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
     delete _eventTextBlock;
+}
+
+void SCTransition::setText(QString eventText)
+{
+    _eventTextBlock->setText(eventText);
+}
+
+void SCTransition::handleTextBlockChanged()
+{
+    IAttribute* event = attributes.value("event");
+    QString eventText = _eventTextBlock->getText();
+
+    this->setObjectName(eventText);
+    event->setValue(eventText);
+    emit nameChanged(this, eventText);
 }
 
 SCState *SCTransition::targetState()

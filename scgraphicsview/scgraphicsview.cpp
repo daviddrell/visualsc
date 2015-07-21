@@ -360,8 +360,6 @@ void SCGraphicsView::handleStateDeleted(QObject *state)
         i.next();
         if ( i.key() == st)
         {
-
-
             QList<QGraphicsItem*> children = i.value()->childItems();
             qDebug() << "deleting children for state "<<" with num children: " << children.count();
             for(int i = 0; i < children.count(); i++)
@@ -369,11 +367,8 @@ void SCGraphicsView::handleStateDeleted(QObject *state)
                 this->handleStateDeleted( (SCState*)(children.at(i)) );
             }
 
-
             delete i.value();// delete the graphic and all its children
             _mapStateToGraphic.remove(i.key());
-
-
         }
     }
 
@@ -440,6 +435,8 @@ void SCGraphicsView::handleNewState (SCState *newState)
     stateGraphic->setObjectName(newState->objectName());
     //stateGraphic->setPos(newState->attributes.value("position"));
     //stateGraphic->setSize(newState->attributes.value("size"));
+
+    // connect the state graphic's deconstructor to do removal protocol in the graphics view
     connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 
     // quick look up of graphics from state model references

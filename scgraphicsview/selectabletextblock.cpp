@@ -91,6 +91,7 @@ void SelectableTextBlock::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * eve
     QPointF myPos = this->mapToScene( this->pos() );
     SCDataModel::singleton()->getScene()->addItem( editBox);
     editBox->setPos( myPos.x(), myPos.y() +100 );
+    editBox->setZValue(999);    // temporary fix for getting the box to appear in front of everything in the scene
 
 }
 
@@ -107,11 +108,17 @@ void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
     }
 }
 
+/**
+ * @brief SelectableTextBlock::handleEditBoxSavedText
+ * @param text
+ *
+ * when the check box is clicked, update the textItem (GraphicsView) and update the textBlockModel (DataModel)
+ *
+ */
 void SelectableTextBlock::handleEditBoxSavedText(QString text)
 {
     _textItem.setPlainText( text );
     _textBlockModel->setText(text);
-
 }
 
 void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)

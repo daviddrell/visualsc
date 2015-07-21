@@ -133,6 +133,7 @@ private:
 
     bool isCurrentlySelectedEqualTo(SCItem*);
     void updateStateName(SCState* state, QString name);
+    void updateTransitionEvent(SCTransition* trans, QString eventText);
     void reloadTree();
 
     IAttributeContainer * getCurrentlySelectedAttributes();
@@ -171,6 +172,7 @@ private:
     void clearAndLoadPropertyTable(SCItem*,SCItem*);
 
     CustomTreeWidgetItem* findItem(SCState*);
+    CustomTreeWidgetItem* findItem(SCTransition* item);
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;

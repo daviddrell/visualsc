@@ -127,7 +127,7 @@ SCTextBlock* SCState::getIDTextBlock()
 /**
  * @brief SCState::handleTextBlockChanged
  *
- *SLOT
+ * SLOT
  *
  * connect in scstate
  *

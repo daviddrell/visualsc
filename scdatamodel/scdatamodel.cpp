@@ -637,6 +637,9 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
  * creates a new SCTransition object and then emits a newTransitionSignal
  * which will show the new transition in the tree view and in the graphics view
  *
+ * also adds two connection references for the states
+ *
+ *
  */
 SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target )
 {
@@ -645,7 +648,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     SCTransition * transition = new SCTransition(source);
 
     transition->setAttributeValue("target", target->attributes.value("name")->asString());
-    transition->setAttributeValue("event", "Event Name");
+    transition->setAttributeValue("event", "event");
     transition->setObjectName("Transition");
     target->addTransitionReference(transition, SCState::kTransitIn);
     qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
@@ -660,6 +663,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
  * @brief SCDataModel::handleMakeANewTransition
  * @param ta
  *
+ * SLOT
  * connect(scxmlreader, makeANewTransition, scdatamodel, handleMakeANewTransition)
  *
  */
@@ -674,6 +678,7 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
         return;
 
     transition->attributes.setAttributes(*ta);
+    transition->setText(transition->attributes.value("event")->asString());
 
     _currentTransition = transition;
     _currentState->addTransistion(transition);
