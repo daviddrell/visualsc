@@ -58,7 +58,7 @@ SCTransition::SCTransition(QObject * parent):
 
 
     _eventTextBlock->setParent(this);
-    _eventTextBlock->setText("DEFAULT EVENT TEXT");
+    _eventTextBlock->setText("event");  // default event text
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
 

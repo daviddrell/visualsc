@@ -500,6 +500,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
             StateName *nm = new StateName(NULL,"name",name);
             state->attributes.addItem(nm);
+
         }
         else
         {
@@ -507,6 +508,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         }
 
         state->setObjectName( name);
+
 
         qDebug() << "adding new state at top level : " + state->attributes.value("name")->asString();
     }
@@ -547,6 +549,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         }
 
         state->setObjectName( name );
+        state->setText(name);
 
         qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
 
@@ -795,47 +798,48 @@ void SCDataModel::handleMakeANewTransitionProperty(const QString name)
 
 
 */
+
+/**
+ * @brief SCDataModel::handleMakeANewIDTextBlock
+ * @param attributes
+ *
+ * SLOT
+ * connect in scdatamodel::open
+ * connect(sxcmlreader, makeANewIDTextBlockElement, scdatamodel, handleMakeANewIdTextBlock
+ *
+ * called when the scxml reader is reading text block attributes for a state
+ * this updates the corresponding state's SCTextBlock with the attributes
+ *
+ */
 void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)
 {
     if  ( _currentState == NULL )
         return;
 
-    QString text = _currentState->attributes["name"]->asString();
-
     SCTextBlock *textBlock = _currentState->getIDTextBlock();
     qDebug()<<" handleMakeANewIDTextBlock textBlock=" +QString::number((int)textBlock)+", current state= "+ _currentState->objectName();
 
-    textBlock->setText(text);
     textBlock->attributes.setAttributes(*attributes);
-
-    QMapIterator<QString, IAttribute* > i(textBlock->attributes);
-
-    while(i.hasNext())
-    {
-        i.next();
-        qDebug() << "textblock key: " << i.key() << " value: " << i.value()->asString();
-    }
-
     delete attributes;
 }
 
+/**
+ * @brief SCDataModel::handleMakeANewEventTextBlock
+ * @param attributes
+ * SLOT
+ * connect in scdatamodel
+ * connect(scxmlreader, makeANewTransitionTextBlockElement, scdatamodel, handleMakeANewEventTextBlock)
+ *
+ * called when the scxml reader is reading textblock attributes for a transition
+ * this updates the current transition's text block attributes
+ *
+ */
 void SCDataModel::handleMakeANewEventTextBlock( TextBlockAttributes* attributes)
 {
     qDebug () << "SCDataModel::handleMakeANewEventTextBlock";
 
     SCTextBlock *textBlock = _currentTransition->getEventTextBlock();
-
-    // but this is already set somewhere...
-  //  textBlock->setText();
     textBlock->attributes.setAttributes(*attributes);
-
-    QMapIterator<QString, IAttribute* > i(textBlock->attributes);
-
-    while(i.hasNext())
-    {
-        i.next();
-        qDebug() << "EFVENT ETXTNBLOCK textblock key: " << i.key() << " value: " << i.value()->asString();
-    }
     delete attributes;
 }
 

@@ -100,8 +100,8 @@ void SCState::initCommon()
     this->setObjectName(defaultName);// to support debug tracing
 
     _IdTextBlock->setParent(this);
-    _IdTextBlock->setText(name->asString());
-    _IdTextBlock->setText("DEFAULT ID TEXT");
+    _IdTextBlock->setText(name->asString());     // default state text
+    //_IdTextBlock->setText("DEFAULT ID TEXT");
 
     // connect change the state name to handleNameChanged
 
