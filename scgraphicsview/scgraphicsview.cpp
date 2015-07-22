@@ -39,8 +39,10 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     _view(parentWidget),
     _dm(dm),
     _mapStateToGraphic(),
+    _hashStateToGraphic(),
     _keyController(new KeyController()),
     _mouseController(new MouseController())
+
 
 
 {
@@ -263,6 +265,8 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
 
 }
 
+
+
 /**
  * @brief SCGraphicsView::handleNewTransition
  * @param t
@@ -284,6 +288,7 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     }
 
     // if the transition is deleted, then call the handleTransitionDeleted function in SCGraphicsView
+    // SCTransition connects
     connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
 
 
@@ -353,11 +358,7 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     }
 }
 
-/*
-void SCGraphicsView::handleStatePositionChanged(SCState*)
-{
 
-}*/
 
 /**
  * @brief SCGraphicsView::handleStateDeleted
@@ -391,6 +392,9 @@ void SCGraphicsView::handleStateDeleted(QObject *state)
         }
     }
 
+
+    _hashStateToGraphic.remove(st);
+
 }
 
 
@@ -407,6 +411,27 @@ void SCGraphicsView::handleStateGraphicDeleted(QObject *st)
 }
 
 
+/**
+ * @brief SCGraphicsView::handleStatePositionChangedInFormView
+ *
+ * SLOT
+ * connect in SCGraphicsView
+ *
+ * connect(SCState, positionChangedInFormView, scgraphicsview, handleStatePositionChangedInFormView)
+ *
+ * will update the state to new coordinates and update its anchors as well
+ *
+ */
+void SCGraphicsView::handleStatePositionChangedInFormView(SCState* state, QPointF position)
+{
+    qDebug() << "SCGraphicsView::handleStatePositionChangedInFormView";
+    StateBoxGraphic* sbg = _hashStateToGraphic.value(state);
+    qDebug() << "sbg: "<< sbg->objectName();
+    //sbg->setPos(position);
+    sbg->setPosAndUpdateAnchors(position);
+}
+
+
 void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
 {
     SCTextBlock* textBlock = new SCTextBlock();
@@ -415,6 +440,9 @@ void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
 /**
  * @brief SCGraphicsView::handleNewState
  * @param newState
+ *
+ * generic add state for the graphics view:
+ * called when the insert state button is pressed to create a new state and when loading the xml states
  *
  * scformview::insertState -> scdatamodel::insertNewState, emit newStateSignal -> scgraphicsview::handleNewState
  * connected to signal newStateSignal in the SCDataModel
@@ -425,7 +453,11 @@ void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
 void SCGraphicsView::handleNewState (SCState *newState)
 {
     static int zVal = 0;
+    // SCState connects
     connect(newState, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
+
+    // connect formview and graphics view to update the graphics view if the box is changed by property value
+    connect(newState, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
 
     StateString * type = dynamic_cast<StateString *> ( newState->attributes.value("type"));
     if ( type != 0 && (type->asString() == "machine"))
@@ -467,7 +499,7 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     // link the SCState and StateBoxGraphic
     _mapStateToGraphic.insert(newState, stateGraphic);
-    //newState->setGraphic(stateGraphic);
+    _hashStateToGraphic.insert(newState,stateGraphic);
 
     // load size and position from state model
     PositionAttribute * position = dynamic_cast<PositionAttribute*> (newState->attributes.value("position"));

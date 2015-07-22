@@ -348,9 +348,16 @@ bool SCDataModel::deleteItem(QObject * item)
  */
 SCState* SCDataModel::insertNewState(SCState *parent)
 {
-    // SCState connects
+    // SCState connects. 1 of 2 places. this is for any newly created state
     SCState * state = new SCState (parent);
     connect(state,SIGNAL(nameChangedInFormView(SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
+
+    // connect changing the state position in the property table of the form view to changing the position in the data model
+    connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)),this,SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
+
+    //
+    //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), );
+
     emit newStateSignal(state);
 
     return state;
@@ -553,8 +560,10 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
         qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
 
-        // SCState connects
+        // SCState connects. 1 of 2 places where the SCState connects are set up. this is for loading states through the xml
         connect(state,SIGNAL(nameChangedInFormView(SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
+
+        connect(state,SIGNAL(positionChangedInFormView(SCState*,QPointF)),this,SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
 
     }
 
@@ -694,14 +703,19 @@ void SCDataModel::handleStateNameChangedInFormView(SCState* state, QString name)
  * @param point
  *
  * SLOT
+ * connect in SCDataModel
+ * connect(SCState,SIGNAL(positionChangedInFormView(SCState*,QPointF)),SCDataModel,SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
  *
+ *
+ * SIGNAL
+ * connect in
  *
  */
 void SCDataModel::handleStatePositionChangedInFormView(SCState* state, QPointF point)
 {
     qDebug() << "SCDataModel::handleStatePositionChangeInFormView";
     state->setPosition(point);
-    emit state->positionChangedInDataModel(state, point);
+    //emit state->positionChangedInDataModel(state, point);
 }
 
 

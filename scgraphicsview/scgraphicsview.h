@@ -69,6 +69,8 @@ private slots:
     void handleStateGraphicDeleted(QObject *sg);
     void handleTransitionGraphicDeleted(QObject *tg);
     void handleNewTextBlock(SCTransition*, QString);
+    //void handleStatePositionChangedInDataModel(SCState* state, QPointF position);
+    void handleStatePositionChangedInFormView(SCState* state, QPointF position);
 
 private:
 

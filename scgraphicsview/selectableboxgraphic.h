@@ -50,6 +50,8 @@ public:
     SelectableBoxGraphic(QGraphicsObject*parent);
     ~SelectableBoxGraphic();
 
+
+    void setPosAndUpdateAnchors(QPointF newPos);
     virtual void setSize(QPointF size); ///< set the size of this object
     void    increaseWidth(int inc);
     QString getPositionAsString();

@@ -446,6 +446,34 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     this->setPos(location);
 }
 
+/**
+ * @brief SelectableBoxGraphic::setPosAndUpdateAnchors
+ *
+ * in addition to setPos, this function will also update all anchors
+ *
+ */
+void SelectableBoxGraphic::setPosAndUpdateAnchors(QPointF newPos)
+{
+    QPointF location = this->pos();
+    QPointF diff = newPos - location;
+
+    //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
+
+
+    emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
+    QList<SelectableBoxGraphic*> children;
+    this->getAllChildren(children);
+
+    // also emit statebox moved for all children
+    for(int i = 0; i < children.size();i++)
+    {
+       // qDebug() << "i " << children.at(i)->objectName();
+        emit children.at(i)->stateBoxMoved(diff);
+    }
+
+    this->setPos(newPos);
+}
+
 /*
 void SelectableBoxGraphic::emitChildrenStateBoxMoved()
 {
