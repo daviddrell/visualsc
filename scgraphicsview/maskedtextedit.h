@@ -1,6 +1,7 @@
 #ifndef MASKEDTEXTEDIT_H
 #define MASKEDTEXTEDIT_H
 
+#include <QGraphicsItem>
 #include <QGraphicsTextItem>
 
 /**
@@ -12,6 +13,7 @@
 
 class MaskedTextEdit : public QGraphicsTextItem
 {
+    //Q_OBJECT
 public:
     MaskedTextEdit(QGraphicsItem *parent = NULL, QRectF rect = QRectF());
     void setBoundingRect(QRectF rect);

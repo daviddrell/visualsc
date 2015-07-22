@@ -464,7 +464,10 @@ TextBlockAttributes::~TextBlockAttributes()
 { }
 
 
-
+/**
+ * @brief TextBlockAttributes::setAttributes
+ * @param sourceAttrList
+ */
 void TextBlockAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 {
     // if the dest container has a matching key,

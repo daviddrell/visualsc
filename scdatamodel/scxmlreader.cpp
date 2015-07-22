@@ -249,6 +249,9 @@ void SCXMLReader::readState(STATE_TYPE stateType)
         }
     }
 
+    //  connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::DirectConnection);
+
+    // signal connected to handleMakeANewState in scdatamodel
     emit makeANewState( stateAttributes);
 
 }

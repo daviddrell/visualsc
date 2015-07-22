@@ -502,15 +502,27 @@ void SCState::getAllStates(QList<SCState *> & stateList)
 }
 
 
+/**
+ * @brief SCState::writeSCVXML
+ * @param sw
+ *
+ * scxml writer
+ *
+ * called by the data model when the save button is pressed in the graphics view.
+ *
+ * this function is specific to when states are saved
+ *
+ */
 void SCState::writeSCVXML(QXmlStreamWriter & sw)
 {
+    // xml start element "state"
     sw.writeStartElement(QString("state"));
 
+    // get the keys of the attributes
+    QMapIterator<QString, IAttribute*> i(attributes);
 
-
-    QMapIterator<QString, IAttribute*> i(attributes);       // get the keys of the attributes
-
-    while(i.hasNext())                                      // for every attribute of this state, write into the scxml
+    // for every attribute of this state, write into the scxml
+    while(i.hasNext())
     {
         QString key = i.next().key();
         qDebug() << "writing " << key <<"...";

@@ -41,6 +41,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
     _textItem.setFlag(QGraphicsItem::ItemIsMovable, false );
     QRectF viewArea = this->getUsableArea();
+    //qDebug() << "viewArea " << viewArea.x() << ", " << viewArea.y();
     _textItem.setPos( viewArea.x() , viewArea.y() );
 
     setShowBoxLineStyle(SelectableBoxGraphic::kWhenSelected  );
@@ -121,6 +122,13 @@ void SelectableTextBlock::handleEditBoxSavedText(QString text)
     _textBlockModel->setText(text);
 }
 
+/**
+ * @brief SelectableTextBlock::connectAttributes
+ * @param attributes
+ *
+ * called by constructor to connect each of the properties to handling an attribute change
+ *
+ */
 void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)
 {
 
@@ -186,6 +194,15 @@ void SelectableTextBlock::handleAttributeDeleted(IAttribute *)
 {
 }
 
+/**
+ * @brief SelectableTextBlock::handleAttributeChanged
+ * @param attr
+ *
+ * SLOT
+ *
+ * connected in connectAttributes method
+ *
+ */
 void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 {
 //    FontFamilyAttribute * ff     = dynamic_cast<FontFamilyAttribute *> ( attr);
@@ -260,8 +277,16 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
  }
 
 
+ /**
+ * @brief SelectableTextBlock::graphicHasChanged
+ *
+ *
+ * update the datamodel to match the graphic when the graphic has changed
+ *
+ */
 void SelectableTextBlock::graphicHasChanged()
 {
+    qDebug() << "selectable textblock graphic has changed.";
 
     QPointF sz =this->getSize();
 
@@ -272,6 +297,4 @@ void SelectableTextBlock::graphicHasChanged()
 
     size->setValue(sz);
     position->setValue(ps);
-
-
 }

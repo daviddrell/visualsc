@@ -48,6 +48,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     setDrawBoxLineStyle  ( SelectableBoxGraphic::kDrawSolid );
     setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
 
+    // these are moved to selectabletextblock's constructor
     /*
     StateName * name = dynamic_cast<StateName *> ( _stateModel->attributes.value("name"));
     connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
@@ -62,10 +63,14 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     handleAttributeChanged(position);
 */
 
-    TextItem.setPos(25,10);
+    //TextItem.setPos(25,10);
 
     TextItem.setParentItem(this);
-
+    //PositionAttribute* position = dynamic_cast<PositionAttribute*> (_stateModel->attributes.value("position"));
+    //qDebug() << "setting position: " << mapFromScene(position->asPointF());
+    //qDebug() << "setting position: " << mapToScene(position->asPointF());
+    //qDebug() << "setting position: " << mapToParent(position->asPointF());
+    //TextItem.setPos(position->asPointF());
 }
 
 

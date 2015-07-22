@@ -110,9 +110,12 @@ void SCTextBlock::writeSCVXML(QXmlStreamWriter & sw)
     QMapIterator<QString,IAttribute*> i(attributes);
     while (i.hasNext())
     {
+
         i.next();
 
         sw.writeAttribute(i.key(), i.value()->asString());
+
+        qDebug () << "sctextblock write scxml: key: " << i.key() <<" value: " << i.value()->asString();
     }
 
     sw.writeEndElement();

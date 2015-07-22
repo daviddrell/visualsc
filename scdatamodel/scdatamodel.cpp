@@ -90,6 +90,15 @@ SCTextBlock * SCDataModel::getAsTextBlock(QObject*o)
     return v;
 }
 
+/**
+ * @brief SCDataModel::save
+ * @param fileName
+ * @param errorMessage
+ * @return
+ *
+ * Saves the datamodel into an scxml file
+ *
+ */
 bool SCDataModel::save(QString fileName, QString& errorMessage)
 {
 
@@ -134,6 +143,15 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     return true;
 }
 
+/**
+ * @brief SCDataModel::open
+ * @param file
+ *
+ * called when the mainwindow.cpp QAction actionOpen fires
+ *
+ * will read from an scxml file and create a the datamodel
+ *
+ */
 void SCDataModel::open(QString file)
 {
 
@@ -524,6 +542,9 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
     _currentState  = state;
 
+
+    // connected to scformview slot handleNewState
+    // connected to scgraphicsview slot handleNewState
     emit newStateSignal(state);
 
 
@@ -699,6 +720,7 @@ void SCDataModel::handleLeaveTransitionElement()
 
 }
 
+// TODO remove deprecated function. Transition properties will be part of the transition xml element and not under its own element
 void SCDataModel::handleMakeANewTransitionProperty(const QString name)
 {
     qDebug() << "handle make a new transition property " << name;
@@ -718,6 +740,14 @@ void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)
     textBlock->setText(text);
 
     textBlock->attributes.setAttributes(*attributes);
+
+    QMapIterator<QString, IAttribute* > i(textBlock->attributes);
+
+    while(i.hasNext())
+    {
+        i.next();
+        qDebug() << "textblock key: " << i.key() << " value: " << i.value()->asString();
+    }
 
     delete attributes;
 }

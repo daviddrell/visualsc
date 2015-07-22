@@ -397,6 +397,7 @@ void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
  * @brief SCGraphicsView::handleNewState
  * @param newState
  *
+ * scformview::insertState -> scdatamodel::insertNewState, emit newStateSignal -> scgraphicsview::handleNewState
  * connected to signal newStateSignal in the SCDataModel
  *
  * will add a state to the graphics view
@@ -427,11 +428,13 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // will be linked internally. e.g. setting the size of the graphic
     // will set the size of the model and vice versa
 
-    stateGraphic = new StateBoxGraphic( parentGraphic, newState);
+    // create the stateboxgraphic
+    stateGraphic = new StateBoxGraphic(parentGraphic, newState);
 
     // new states will be on top
     stateGraphic->setZValue(zVal++);
 
+    // set the name
     stateGraphic->setObjectName(newState->objectName());
     //stateGraphic->setPos(newState->attributes.value("position"));
     //stateGraphic->setSize(newState->attributes.value("size"));
@@ -450,6 +453,8 @@ void SCGraphicsView::handleNewState (SCState *newState)
     PositionAttribute * position = dynamic_cast<PositionAttribute*> (newState->attributes.value("position"));
     stateGraphic->setPos(position->asPointF());
     //qDebug() << "pos : " << position->asString();
+    //SelectableTextBlock stateTextBlock = stateGraphic->TextItem;
+    //PositionAttribute * tbPosition = dynamic_cast<PositionAttribute*> (stateTextBlock.att);
 
     SizeAttribute * size = dynamic_cast<SizeAttribute*> (newState->attributes.value("size"));
     stateGraphic->setSize(size->asPointF());
