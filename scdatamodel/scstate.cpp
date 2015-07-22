@@ -87,15 +87,26 @@ void SCState::initCommon()
     }
 
 
-    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type"; // type is added to the state in scxml reader.
+    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"onEntryAction"<<"onExitAction"<<"finalState"<<"initialState"; // type is added to the state in scxml reader.
 
     StateName * name = new StateName (this, "name",defaultName);
     SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
+    StateString * type = new StateString(this, "type", "default type");
+    StateString * onEntryAction = new StateString(this, "onEntryAction","default entry action");
+    StateString * onExitAction = new StateString(this, "onExitAction", "default exit action");
+    StateString * finalState = new StateString(this, "finalState", "false");
+    StateString * initialState = new StateString(this, "initialState", "false");
+
 
     attributes.addItem(name);
     attributes.addItem(size);
     attributes.addItem(position);
+    attributes.addItem(type);
+    attributes.addItem(onEntryAction);
+    attributes.addItem(onExitAction);
+    attributes.addItem(finalState);
+    attributes.addItem(initialState);
 
     this->setObjectName(defaultName);// to support debug tracing
 
@@ -143,12 +154,40 @@ void SCState::setText(QString text)
 
 
 
-
+/**
+ * @brief SCState::setPosition
+ * @param position
+ *
+ * SIGNAL
+ * connect in scformview
+ * connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
+ *
+ * sets the position attribute of the state and then signals the formview
+ *
+ */
 void SCState::setPosition(QPointF &position)
 {
     PositionAttribute * pos = dynamic_cast<PositionAttribute *> (attributes.value("position"));
     pos->setValue(position);
-    emit this->positionChangedInDataModel(this, position);
+    emit positionChangedInDataModel(this, position);
+}
+
+/**
+ * @brief SCState::setSize
+ * @param size
+ *
+ * SIGNAL
+ * connect in scformview
+ * connect(SCState, SIGNAL(sizeChangedInDataModel() ,  SCFormView, handleItemSizeChangedInDataModel)
+ *
+ * sets the size attribute then signals the formview to update the property table if necessary.
+ *
+ */
+void SCState::setSize(QPointF &size)
+{
+    SizeAttribute* sz = dynamic_cast<SizeAttribute*>(attributes.value("size"));
+    sz->setValue(size);
+    emit sizeChangedInDataModel(this, size);
 }
 
 SCTextBlock* SCState::getIDTextBlock()
@@ -242,19 +281,6 @@ void SCState::setAttributeValue(QString key, QString value)
     {
         attr->setValue(value);
     }
-}
-
-
-void SCState::setSize(QPointF &size)
-{
-    SizeAttribute * sz = dynamic_cast<SizeAttribute *> (attributes.value("size"));
-    sz->setValue(size);
-}
-
-void SCState::setSize(QPoint &size)
-{
-    QPointF pointF = QPointF(size.x(),size.y());
-    setSize(pointF);
 }
 
 

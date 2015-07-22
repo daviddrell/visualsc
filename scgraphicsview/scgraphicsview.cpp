@@ -421,6 +421,8 @@ void SCGraphicsView::handleStateGraphicDeleted(QObject *st)
  *
  * will update the state to new coordinates and update its anchors as well
  *
+ *
+ * when the form view property table is changed, the dat model will be changed and the graphics view will be changed.
  */
 void SCGraphicsView::handleStatePositionChangedInFormView(SCState* state, QPointF position)
 {

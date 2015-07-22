@@ -79,8 +79,9 @@ public:
 
     int  getStateCount();
 
+    //void setSize (QPointF& size);
     void setSize (QPointF& size);
-    void setSize (QPoint& size);
+
     void setPosition (QPointF& size);
 
 
@@ -184,6 +185,7 @@ signals:
      void positionChangedInDataModel(SCState*, QPointF);
      void nameChangedInFormView(SCState*,QString);
      void positionChangedInFormView(SCState*, QPointF);
+     void sizeChangedInDataModel(SCState*, QPointF);
 
 
 

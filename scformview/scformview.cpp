@@ -412,7 +412,7 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
         connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
         //connect(st, SIGNAL(nameChangedInFormView(QString)), this,SLOT(handleStateNameChangedInFormView(QString)));     // MOVED TO when SCXML is read because it has scope of the SCDataModel handle function
         connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
-
+        connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
 
         CustomTreeWidgetItem * item=0;
         if (parentItem == 0)
@@ -950,6 +950,9 @@ void SCFormView::reloadPropertyTable()
     setAttributeConnections(currentAttributes, false);      // set up the attribute connections but do not call connect
 }
 
+
+
+// TODO marked for deletion, currently not used. replaced this function with multiple functions depending on SCItem and the property changed as it was too generic and we needed to be able to identify which SCItem actually changed its property
 /**
  * @brief SCFormView::handlePropertyChanged
  * When a property change is detected from the FormView's cell or the GraphicsView, update the attribute value
@@ -1425,11 +1428,14 @@ void SCFormView::insertState()
     qDebug() << "inserting new state into parent = " + _currentlySelected->objectName();
 
     _dm->insertNewState(st);
+
+    // SCState connects
     connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
 
     // connect the state changing its name to updating the name across the formview, data model, and graphics view
     connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
     connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
+    connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
 }
 
 void SCFormView::sendToBack()
@@ -1468,6 +1474,43 @@ CustomTreeWidgetItem* SCFormView::findItem(SCState* item)
     return find;
 }
 
+/**
+ * @brief SCFormView::handleItemSizeChangedInDataModel
+ * @param state
+ * @param size
+ *
+ * SLOT
+ * connect in SCFormView
+ * connect(SCState, SIGNAL(sizeChangedInDataModel() ,  SCFormView, handleItemSizeChangedInDataModel)
+ *
+ * when the data model updates its size attribute, update the property table too
+ *
+ */
+void SCFormView::handleItemSizeChangedInDataModel(SCState* state, QPointF size)
+{
+    qDebug() << "handleItemSizeChangedInDataModel state pos: " << state->attributes.value("size")->asString() << " size: " << size;
+
+    if(state)
+    {
+        // state size was changed in data model
+
+        // update the property table to the new size
+        SizeAttribute * sz = dynamic_cast<SizeAttribute *> (state->attributes.value("size"));
+        qDebug() << "state size: updated the datamodel! "<< sz->asPointF();
+
+        if(isCurrentlySelectedEqualTo(state))
+        {
+            for(int i = 0 ; i < propertyTable->rowCount();i++)
+            {
+                if(propertyTable->item(i,0)->text() == "size")
+                {
+                    propertyTable->item(i,1)->setText(sz->asString());
+                    break;
+                }
+            }
+        }
+    }
+}
 
 /**
  * @brief SCFormView::handleItemPositionChangedInDataModel
@@ -1508,6 +1551,17 @@ void SCFormView::handleItemPositionChangedInDataModel(SCState* state, QPointF po
     }
 }
 
+/**
+ * @brief SCFormView::handleItemNameChangedInDataModel
+ * @param trans
+ * @param eventName
+ *
+ * SLOT
+ * connect in SCFormView
+ * connect(SCTransition, SIGNAL(eventChangedInDataModel(SCTransition*,QString)),SCFormView,SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
+ *
+ * updates the tree and property table when the event name of transition changes in the data model
+ */
 void SCFormView::handleItemNameChangedInDataModel(SCTransition* trans, QString eventName)
 {
     qDebug() << "transition event name was changed in the data model";
@@ -1581,6 +1635,30 @@ void SCFormView::handleItemNameChangedInDataModel(SCState* state, QString name)
                 }
             }
         }
+
+        // update any transitions that target this state
+
+        QList<SCTransition*> ins = state->getTransitionsIn();
+        //qDebug() << "got into name " << "ins count: " << ins.count();
+        for(int i = 0; i < ins.count(); i++)
+        {
+            //qDebug() << "inbound transition to state: " << st->attributes.value("name")->asString() << " have target " << ins.at(i)->attributes.value("target")->asString();
+            ins.at(i)->setAttributeValue("target",name);
+            if(isCurrentlySelectedEqualTo(ins.at(i)))
+            {
+                for(int i = 0 ; i < propertyTable->rowCount(); i++)
+                {
+
+                    if(propertyTable->item(i,0)->text() == "target")
+                    {
+                        propertyTable->item(i,1)->setText(name);
+                        break;
+                    }
+                }
+            }
+        }
+
+
     }
 }
 

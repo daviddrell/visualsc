@@ -129,6 +129,7 @@ private slots:
     void handleItemNameChangedInDataModel(SCState*, QString);
     void handleItemNameChangedInDataModel(SCTransition*, QString);
     void handleItemPositionChangedInDataModel(SCState*, QPointF);
+    void handleItemSizeChangedInDataModel(SCState* state, QPointF size);
 
 private:
 

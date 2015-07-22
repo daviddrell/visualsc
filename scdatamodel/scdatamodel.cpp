@@ -707,15 +707,14 @@ void SCDataModel::handleStateNameChangedInFormView(SCState* state, QString name)
  * connect(SCState,SIGNAL(positionChangedInFormView(SCState*,QPointF)),SCDataModel,SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
  *
  *
- * SIGNAL
- * connect in
+ * change the SCState's position
  *
+ * this also will emit signal position changed in datamodel
  */
 void SCDataModel::handleStatePositionChangedInFormView(SCState* state, QPointF point)
 {
     qDebug() << "SCDataModel::handleStatePositionChangeInFormView";
     state->setPosition(point);
-    //emit state->positionChangedInDataModel(state, point);
 }
 
 
