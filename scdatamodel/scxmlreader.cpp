@@ -99,6 +99,7 @@ void SCXMLReader::readElement()
 
     if (_reader.name() == "state")
     {
+        _currentItemType = ItemType::STATE;
         emit enterStateElement();
         readState(kSTATE_TYPE_Normal);
         enteredAStateElement = true;
@@ -117,6 +118,7 @@ void SCXMLReader::readElement()
     }
     else if (_reader.name() == "transition")
     {
+        _currentItemType = ItemType::TRANSITION;
         emit enterTransistionElement();
         readTransistion();
         enteredATransistionElement = true;
@@ -129,8 +131,25 @@ void SCXMLReader::readElement()
     }
     else if (_reader.name() == "textblock")
     {
-        qDebug() <<"reading TextBlockElement";
-        readIDTextBlockElement();
+        switch(_currentItemType)
+        {
+        case ItemType::STATE:
+            qDebug() <<"reading State TextBlockElement";
+            readIDTextBlockElement();
+
+            break;
+
+
+        case ItemType::TRANSITION:
+            qDebug() <<"reading Event TextBlockElement";
+            readEventTextBlockElement();
+            break;
+
+
+        default:
+            break;
+        }
+
         return; // textBlocks do not contain elements
     }
     else if ( _reader.name() == "onentry")
@@ -315,6 +334,14 @@ void SCXMLReader::readTransistionPath()
     emit makeANewTransistionPath(data);
 }
 
+/**
+ * @brief SCXMLReader::readIDTextBlockElement
+ *
+ * SIGNAL
+ *
+ * connect in scdatamodel
+ * connect(&_reader, SIGNAL(makeANewIDTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewIDTextBlock(TextBlockAttributes*)), Qt::DirectConnection);
+ */
 void SCXMLReader::readIDTextBlockElement()
 {
 
@@ -331,7 +358,28 @@ void SCXMLReader::readIDTextBlockElement()
 
    _reader.readElementText(); //-- id-textblock gets it text data from the state ID
 
-    emit makeANewIDTextBlockElement( tb);
+    emit makeANewIDTextBlockElement(tb);   // connected to handleMakeANewIDTextBlock in scdatamodel
+}
+
+void SCXMLReader::readEventTextBlockElement()
+{
+
+    qDebug()<<"readEventTextBlockElement";
+
+    TextBlockAttributes * tb = new TextBlockAttributes(0,"TextBlockAttributes");
+
+    for (int i = 0; i < _reader.attributes().count(); i++)
+    {
+        QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
+        GenericAttribute * a  = new GenericAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+        tb->addItem( a );
+        //qDebug() << "adding attribute: "<<a->asString();
+    }
+
+   _reader.readElementText(); //-- id-textblock gets it text data from the state ID
+
+    emit makeANewTransitionTextBlockElement(tb); //connected to handleMakeANewTransitionTextBlock in scdatamodel
+    //emit makeANewIDTextBlockElement( tb);
 }
 
 void SCXMLReader::readFinal()

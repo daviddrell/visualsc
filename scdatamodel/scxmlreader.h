@@ -29,6 +29,7 @@
 #include "stateattributes.h"
 #include "transitionattributes.h"
 #include "textblock.h"
+#include "sctransition.h"
 
 class StateData;
 
@@ -37,6 +38,12 @@ class StateData;
 class  SCDATAMODELSHARED_EXPORT  SCXMLReader : public QObject
 {
     Q_OBJECT
+
+    enum ItemType{
+        STATE,
+        TRANSITION,
+        TEXTBLOCK
+    };
 
 public:
     SCXMLReader( );
@@ -59,6 +66,7 @@ signals:
      void leaveTransitionPathElement();
      void makeANewTransistionPath(QString path);
      void makeANewIDTextBlockElement( TextBlockAttributes*);
+     void makeANewTransitionTextBlockElement(TextBlockAttributes*);
 
 
 
@@ -69,8 +77,10 @@ private:
     QXmlStreamReader _reader;
     QString _file;
     QStringList _resultMessages;
+    int _currentItemType;
 
     void readIDTextBlockElement();
+    void readEventTextBlockElement();
     void readElement();
     void readState(STATE_TYPE t= kSTATE_TYPE_Normal);
     void readTransistion();

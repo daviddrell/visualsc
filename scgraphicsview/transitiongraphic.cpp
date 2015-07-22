@@ -1085,6 +1085,17 @@ void TransitionGraphic::updateModel()
 
 
 
+void TransitionGraphic::setTextPos(QPointF position)
+{
+    _eventText->setPos(position);
+}
+
+void TransitionGraphic::setTextSize(qreal w, qreal h)
+{
+    QPoint size(w,h);
+    _eventText->setSize(size);
+}
+
 void TransitionGraphic::getClosestSides(int* sourceSide, int* targetSide)
 {
 

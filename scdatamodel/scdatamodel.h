@@ -129,8 +129,10 @@ private slots:
     void handleTransitUp();
     void handleTransitDown();
     void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
+    void handleMakeANewEventTextBlock(TextBlockAttributes* attributes);
     void handleMakeANewTransitionProperty(const QString name);
     void handleStateNameChangedInFormView(SCState*, QString);
+    void handleStatePositionChangedInFormView(SCState*, QPointF);
 
 private:
 

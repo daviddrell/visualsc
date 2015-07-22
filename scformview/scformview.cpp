@@ -249,6 +249,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
                 qDebug() << "xy: " << x<< " " << y;
                 QPointF point(x,y);
 
+                emit st->positionChangedInFormView(st, point);
                 //handleItemPositionChangedInDataModel(st, point);
             }
             catch(...)
@@ -256,6 +257,11 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
                 qDebug() << "invalid input";
                 throw;
             }
+        }
+
+        else    // some other property was updated
+        {
+            st->attributes.value(key)->setValue(value);
         }
 
     }
@@ -402,9 +408,10 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
         connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
 
         // connect SCState item changes to update the tree view / property table
-        connect(st, SIGNAL(nameChanged(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
+        // SCState connects
+        connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
         //connect(st, SIGNAL(nameChangedInFormView(QString)), this,SLOT(handleStateNameChangedInFormView(QString)));     // MOVED TO when SCXML is read because it has scope of the SCDataModel handle function
-        connect(st, SIGNAL(positionChanged(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
+        connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
 
 
         CustomTreeWidgetItem * item=0;
@@ -499,9 +506,9 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransiti
         SCTransition * tr = transitions.at(i);
         if (!tr) continue;
 
+        // SCTransition connects
         // set up the transition connects for a loaded transition
         connect(tr, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)), Qt::QueuedConnection);
-        //connect(tr, SIGNAL(nameChanged(SCTransition*, QString)),this, SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
         connect(tr, SIGNAL(eventChangedInDataModel(SCTransition*,QString)),this,SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
 
 
@@ -1421,8 +1428,8 @@ void SCFormView::insertState()
     connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
 
     // connect the state changing its name to updating the name across the formview, data model, and graphics view
-    connect(st, SIGNAL(nameChanged(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
-    connect(st, SIGNAL(positionChanged(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
+    connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
+    connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
 }
 
 void SCFormView::sendToBack()
@@ -1468,7 +1475,7 @@ CustomTreeWidgetItem* SCFormView::findItem(SCState* item)
  *
  * SLOT
  * connect in SCFormView::insertState and SCFormView::loadTree (for states)
- * connect(SCState, SIGNAL(positionChanged(SCState*)), SCFormView, SLOT(handleItemPositionChangedInDataModel(SCState*)));
+ * connect(SCState, SIGNAL(positionChangedInDataModel(SCState*)), SCFormView, SLOT(handleItemPositionChangedInDataModel(SCState*)));
  *
  *
  * when SCState sets its position, it will also emit positionChanged to update it in the formview

@@ -54,6 +54,9 @@ public:
 
     ~SCTransition();
 
+
+    //void setTextPos(QPointF);
+ //   void setTextSize(qreal w, qreal h);
     void setText(QString eventText);
 
 

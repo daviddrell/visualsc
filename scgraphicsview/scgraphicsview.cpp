@@ -338,6 +338,19 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     _mapTransitionToGraphic.insert(t, transGraphic);
 
     //targetGraphic->
+    PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
+    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
+    transGraphic->setTextPos(textPos->asPointF());
+    //transGraphic->setTextSize();
+
+
+    QMapIterator<QString, IAttribute* > i(t->getEventTextBlock()->attributes);
+
+    while(i.hasNext())
+    {
+        i.next();
+        qDebug() << "SCGPVH && textblock key: " << i.key() << " value: " << i.value()->asString();
+    }
 }
 
 /*

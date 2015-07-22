@@ -165,6 +165,8 @@ void SCDataModel::open(QString file)
     connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
 
+    connect(&_reader, SIGNAL(makeANewTransitionTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewEventTextBlock(TextBlockAttributes*)));
+
     _reader.readFile(file);
 
     _reader.run();
@@ -346,7 +348,7 @@ bool SCDataModel::deleteItem(QObject * item)
  */
 SCState* SCDataModel::insertNewState(SCState *parent)
 {
-    //
+    // SCState connects
     SCState * state = new SCState (parent);
     connect(state,SIGNAL(nameChangedInFormView(SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
     emit newStateSignal(state);
@@ -684,6 +686,23 @@ void SCDataModel::handleStateNameChangedInFormView(SCState* state, QString name)
 }
 
 /**
+ * @brief SCDataModel::handleStatePositionChangedInFormView
+ * @param state
+ * @param point
+ *
+ * SLOT
+ *
+ *
+ */
+void SCDataModel::handleStatePositionChangedInFormView(SCState* state, QPointF point)
+{
+    qDebug() << "SCDataModel::handleStatePositionChangeInFormView";
+    state->setPosition(point);
+    emit state->positionChangedInDataModel(state, point);
+}
+
+
+/**
  * @brief SCDataModel::insertNewTransition
  * @param source
  * @param target
@@ -710,6 +729,8 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     target->addTransitionReference(transition, SCState::kTransitIn);
     qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
     source->addTransitionReference(transition, SCState::kTransitOut);
+
+    //connect(transition,SIGNAL((SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
 
     emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition and scformview's handle new transition
 
@@ -760,9 +781,20 @@ void SCDataModel::handleLeaveTransitionElement()
 void SCDataModel::handleMakeANewTransitionProperty(const QString name)
 {
     qDebug() << "handle make a new transition property " << name;
+
 }
+/**
+ * @brief SCDataModel::handleMakeANewIDTextBlock
+ * @param attributes
+
+ SLOT
+ connect in SCDataModel::open()
+    connect(&_reader, SIGNAL(makeANewIDTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewIDTextBlock(TextBlockAttributes*)), Qt::DirectConnection);
 
 
+
+
+*/
 void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)
 {
     if  ( _currentState == NULL )
@@ -774,7 +806,6 @@ void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)
     qDebug()<<" handleMakeANewIDTextBlock textBlock=" +QString::number((int)textBlock)+", current state= "+ _currentState->objectName();
 
     textBlock->setText(text);
-
     textBlock->attributes.setAttributes(*attributes);
 
     QMapIterator<QString, IAttribute* > i(textBlock->attributes);
@@ -788,6 +819,25 @@ void SCDataModel::handleMakeANewIDTextBlock ( TextBlockAttributes *attributes)
     delete attributes;
 }
 
+void SCDataModel::handleMakeANewEventTextBlock( TextBlockAttributes* attributes)
+{
+    qDebug () << "SCDataModel::handleMakeANewEventTextBlock";
+
+    SCTextBlock *textBlock = _currentTransition->getEventTextBlock();
+
+    // but this is already set somewhere...
+  //  textBlock->setText();
+    textBlock->attributes.setAttributes(*attributes);
+
+    QMapIterator<QString, IAttribute* > i(textBlock->attributes);
+
+    while(i.hasNext())
+    {
+        i.next();
+        qDebug() << "EFVENT ETXTNBLOCK textblock key: " << i.key() << " value: " << i.value()->asString();
+    }
+    delete attributes;
+}
 
 void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 {

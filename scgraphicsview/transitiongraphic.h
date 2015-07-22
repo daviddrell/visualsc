@@ -35,6 +35,8 @@ public:
     StateBoxGraphic* parentItemAsStateBoxGraphic();
     ~TransitionGraphic();
 
+    void setTextPos(QPointF position);
+    void setTextSize(qreal w, qreal h);
     void setCurrentlyHoveredLineSegment(LineSegmentGraphic* seg);
     void clearCurrentlyHoveredLineSegment();
     bool isLineSegmentCurrentlyHovered();

@@ -58,7 +58,7 @@ SCTransition::SCTransition(QObject * parent):
 
 
     _eventTextBlock->setParent(this);
-    _eventTextBlock->setText("event");
+    _eventTextBlock->setText("DEFAULT EVENT TEXT");
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
 
@@ -96,7 +96,6 @@ void SCTransition::handleTextBlockChanged()
 
     this->setObjectName(eventText);
     event->setValue(eventText);
-    //emit nameChanged(this, eventText);
     emit eventChangedInDataModel(this, eventText);
 }
 
@@ -182,6 +181,8 @@ void SCTransition::setAttributeValue(QString key, QString value)
     }
 }
 
+
+
 /*
 void SCTransition::handleLineSelected()
 {
@@ -225,14 +226,12 @@ void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
          sw.writeEndElement();
     }
 
-    // additionally, write each of the attributes of this state's children.
+    // additionally, write each of the attributes of this transitions's children.
     for(int k = 0 ; k < children().length(); k++)
     {
-
-        SCTransition * st = dynamic_cast<SCTransition*>(children()[k]);
-        if (st)
-            st->writeSCVXML(sw);
-
+        SCTextBlock * tb = dynamic_cast<SCTextBlock*>(children()[k]);
+        if (tb)
+            tb->writeSCVXML(sw);
     }
 
     sw.writeEndElement();

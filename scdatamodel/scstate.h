@@ -180,18 +180,18 @@ signals:
 
      void changed();
      void attributeChangedSignal(IAttribute*);
-     void nameChanged(SCState*,QString);
-     void positionChanged(SCState*, QPointF);
+     void nameChangedInDataModel(SCState*,QString);
+     void positionChangedInDataModel(SCState*, QPointF);
      void nameChangedInFormView(SCState*,QString);
+     void positionChangedInFormView(SCState*, QPointF);
+
 
 
 
 public slots:
 
 
-private slots:
-
-     void handleNameChanged(IAttribute* name);     
+private slots:   
      void handleTextBlockChanged();
 
 
