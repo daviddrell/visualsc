@@ -37,33 +37,7 @@ SCTextBlock::SCTextBlock(): SCItem()
 
     connect(sa, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)));
 }
-/*
-SCTextBlock::SCTextBlock(const SCState& st): SCItem(st.parent())
-{
-    FontFamilyAttribute * ff = new FontFamilyAttribute(NULL,"font-family", "courier");
-    attributes.addItem(ff);
 
-    FontSizeAttribute * fs = new FontSizeAttribute(NULL,"font-size",8);
-    attributes.addItem(fs);
-
-    FontColorAttribute * fc = new FontColorAttribute(NULL,"font-color", Qt::black);
-    attributes.addItem(fc);
-
-    FontBoldAttribute * fb = new FontBoldAttribute(NULL,"font-bold",false);
-    attributes.addItem(fb);
-
-    FontUnderlineAttribute * fu = new FontUnderlineAttribute(NULL,"font-underline", false);
-    attributes.addItem(fu);
-
-    PositionAttribute* pa = new PositionAttribute(NULL, "position", QPointF(10,10));
-    attributes.addItem(pa);
-
-    SizeAttribute * sa = new SizeAttribute(NULL, "size", QPointF(100,60) );
-    attributes.addItem(sa);
-
-    connect(sa, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)));
-}
-*/
 IAttributeContainer * SCTextBlock::getAttributes()
 {
     return & attributes;
@@ -82,8 +56,9 @@ QString SCTextBlock::getText()
  *
  * SIGNAL textChanged
  *
- * connect(textBlock, textChanged, scGraphicsView, handleTextChanged)
  *
+ * connect (SCTextBlock, SIGNAL(textChanged()), SCState, SLOT(handleTextBlockChanged()));
+ * connect (SCTextBlock, SIGNAL(textChanged()), SelectableTextBlock, SLOT(handleTextChanged()), Qt::QueuedConnection);
  *
  */
 void  SCTextBlock::setText(QString text)

@@ -48,21 +48,6 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     setDrawBoxLineStyle  ( SelectableBoxGraphic::kDrawSolid );
     setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
 
-    // these are moved to selectabletextblock's constructor
-    /*
-    StateName * name = dynamic_cast<StateName *> ( _stateModel->attributes.value("name"));
-    connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(name);
-
-    SizeAttribute * size = dynamic_cast<SizeAttribute *> (  _stateModel->attributes.value("size"));
-    connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(size);
-
-    PositionAttribute * position =dynamic_cast<PositionAttribute*> ( _stateModel->attributes.value("position"));
-    connect (position, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(position);
-*/
-
     //TextItem.setPos(25,10);
 
     TextItem.setParentItem(this);
@@ -71,6 +56,8 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     //qDebug() << "setting position: " << mapToScene(position->asPointF());
     //qDebug() << "setting position: " << mapToParent(position->asPointF());
     //TextItem.setPos(position->asPointF());
+
+    //connect(_stateModel, SIGNAL(positionChanged()))
 }
 
 
@@ -491,9 +478,10 @@ void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem 
 }
 
 
-
+/*
 void StateBoxGraphic::handleAttributeChanged(void *attr)
 {
+    qDebug() << "StateBoxGraphic::handleAttributeChanged: ";
 
     StateName * name = dynamic_cast<StateName *> ((IAttribute*)attr);
     SizeAttribute * size = dynamic_cast<SizeAttribute *> ( (IAttribute*)attr);
@@ -524,7 +512,7 @@ void StateBoxGraphic::handleAttributeChanged(void *attr)
         this->update();
 
 }
-
+*/
 
 
 void StateBoxGraphic::setHighlighted(bool on)
@@ -567,7 +555,7 @@ void StateBoxGraphic::setSize(QPointF size)
 
 void StateBoxGraphic::graphicHasChanged ()
 {
-
+    qDebug () << "StateBoxGraphic::graphicsHasChanged";
     if ( _stateModel )
     {
         QPointF ps = this->pos();

@@ -404,7 +404,7 @@ void SelectableBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event 
     //qDebug() << "MOUSE RELEASE : " << this->pos() << "";
    // emit stateBoxMoved(this->pos());
 
-
+    // will call the corresponding overrided graphicHasChanged function for a subclass
     graphicHasChanged();
 }
 

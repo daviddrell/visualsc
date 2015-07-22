@@ -73,45 +73,6 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPo
     _selectRegion << p1 << p2 << p5 << p6 << p7 << p8 << p3 << p4 << p1;
 
     this->setPolygon(_selectRegion);
-
-    //TODO
-    /*
-    _elbows[0] = new ElbowGrabber(this,0, false);
-    _elbows[1] = new ElbowGrabber(this,1, false);
-
-
-
-   // qDebug() << "installing corner scenes";
-    _elbows[0]->installSceneEventFilter(this);
-    _elbows[1]->installSceneEventFilter(this);
-
-    _elbows[0]->setVisible(false);
-    _elbows[1]->setVisible(false);
-*/
-    /*
-    _elbows[0] = new ElbowGrabber(this);
-    _elbows[1] = new ElbowGrabber(this);
-
-    _elbows[0]->installSceneEventFilter(this);
-    _elbows[1]->installSceneEventFilter(this);
-
-    */
-    //TODO Check if this is needed
-    /*
-    TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> ( _transitionModel->attributes.value("target"));
-    connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(name);
-
-    TransitionAttributes::TransitionPathAttribute * path = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  _transitionModel->attributes.value("path"));
-    connect (path, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(path);
-
-    TransitionAttributes::TransitionPositionAttribute * tpos =dynamic_cast<TransitionAttributes::TransitionPositionAttribute*> ( _transitionModel->attributes.value("position"));
-    connect (tpos, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(tpos);
-*/
-
-
 }
 
 
@@ -162,45 +123,6 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(ElbowGrabber* startPo
     _selectRegion << p1 << p2  << p5 << p6 << p7 << p8 << p3 << p4 << p1;
 
     this->setPolygon(_selectRegion);
-
-    //TODO
-    /*
-    _elbows[0] = new ElbowGrabber(this,0, false);
-    _elbows[1] = new ElbowGrabber(this,1, false);
-
-
-
-   // qDebug() << "installing corner scenes";
-    _elbows[0]->installSceneEventFilter(this);
-    _elbows[1]->installSceneEventFilter(this);
-
-    _elbows[0]->setVisible(false);
-    _elbows[1]->setVisible(false);
-*/
-    /*
-    _elbows[0] = new ElbowGrabber(this);
-    _elbows[1] = new ElbowGrabber(this);
-
-    _elbows[0]->installSceneEventFilter(this);
-    _elbows[1]->installSceneEventFilter(this);
-
-    */
-    //TODO Check if this is needed
-    /*
-    TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> ( _transitionModel->attributes.value("target"));
-    connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(name);
-
-    TransitionAttributes::TransitionPathAttribute * path = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  _transitionModel->attributes.value("path"));
-    connect (path, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(path);
-
-    TransitionAttributes::TransitionPositionAttribute * tpos =dynamic_cast<TransitionAttributes::TransitionPositionAttribute*> ( _transitionModel->attributes.value("position"));
-    connect (tpos, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
-    handleAttributeChanged(tpos);
-*/
-
-
 }
 
 

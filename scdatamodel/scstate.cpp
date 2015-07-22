@@ -71,6 +71,7 @@ SCState::~SCState()
 
 void SCState::initCommon()
 {
+   // _stateBoxGraphic = NULL;
     QString defaultName = QString();
 
 
@@ -113,10 +114,50 @@ void SCState::initCommon()
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
 }
 
-
+/**
+ * @brief SCState::setText
+ * @param text
+ *
+ * emits textChanged
+ *
+ * updates the datamodel for an item's textblock and then signals textChanged
+ *
+ * SIGNAL textChanged
+ *
+ *
+ * connect (SCTextBlock, SIGNAL(textChanged()), SCState, SLOT(handleTextBlockChanged()));
+ * connect (SCTextBlock, SIGNAL(textChanged()), SelectableTextBlock, SLOT(handleTextChanged()), Qt::QueuedConnection);
+ *
+ */
 void SCState::setText(QString text)
 {
     _IdTextBlock->setText(text);
+    /*if  ( text != _text)
+    {
+         _text = text;
+        this->setObjectName(text);
+        emit textChanged();
+    }*/
+}
+
+
+
+/**
+ * @brief SCState::setPosition
+ * @param position
+ *
+ *
+ * SIGNAL
+ * connect in SCFormView
+ *
+ * connect(SCState, SIGNAL(positionChanged(SCState*, QPointF)), SCFormView, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
+ */
+void SCState::setPosition(QPointF &position)
+{
+    PositionAttribute * pos = dynamic_cast<PositionAttribute *> (attributes.value("position"));
+    pos->setValue(position);
+    emit positionChanged(this, position);   // alert the formview that the position has changed
+
 }
 
 SCTextBlock* SCState::getIDTextBlock()
@@ -128,10 +169,20 @@ SCTextBlock* SCState::getIDTextBlock()
  * @brief SCState::handleTextBlockChanged
  *
  * SLOT
- *
  * connect in scstate
- *
+ * connect (SCTextBlock, SIGNAL(textChanged()), SCState, SLOT(handleTextBlockChanged()));
  * connects an SCTextBlock textChanged to an SCState handleTextBlockChanged
+ *
+ *
+ * propogates a change of a statebox's main textbox (SCTextBlock) to update the state as well
+ *
+ *                   -> SelectableTextBlock changed
+ * textBlock Changed -> SCState's name changed -> tree/table update
+ *
+ *
+ * SIGNAL
+ * connect in scformview
+ * connect(SCState, SIGNAL(nameChanged(SCState*,QString)), SCFormView, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
  *
  */
 void SCState::handleTextBlockChanged()
@@ -142,10 +193,10 @@ void SCState::handleTextBlockChanged()
     QString nameText = _IdTextBlock->getText();
     this->setObjectName(nameText);
     name->setValue(nameText);
-    emit nameChanged(this,nameText); // connected to SCFormView::handleItemNameChanged()
-
+    emit nameChanged(this,nameText); // connected to SCFormView::handleItemNameChangedInDataModel()
 }
 
+// TODO marked for deletion, deprecated SLOT, functionality now in handleTextBlockChanged
 void SCState::handleNameChanged(IAttribute *name)
 {
     qDebug()<<"SCState::handleNameChanged " << name->asString();
@@ -153,6 +204,25 @@ void SCState::handleNameChanged(IAttribute *name)
     _IdTextBlock->setText(name->asString());
 }
 
+/*
+void SCState::handlePositionChanged(QPointF position)
+{
+    qDebug() << "SCState::handlePositionChanged " << position;
+    PositionAttribute * pos = dynamic_cast<PositionAttribute *> (this->attributes.value("position"));
+
+}*/
+/*
+void SCState::setGraphic(StateBoxGraphic* graphic)
+{
+    _stateBoxGraphic = graphic;
+}
+*/
+/*
+void SCState::updateGraphic()
+{
+
+}
+*/
 
 QString SCState::getAttributeValue(QString key)
 {
@@ -211,11 +281,6 @@ void SCState::setSize(QPoint &size)
     setSize(pointF);
 }
 
-void SCState::setPosition(QPointF &position)
-{
-    PositionAttribute * pos = dynamic_cast<PositionAttribute *> (attributes.value("position"));
-    pos->setValue(position);
-}
 
 #if 0
 void SCState::makeTargetConnections(QList<SCTransition*> & transitionList)

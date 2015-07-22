@@ -130,6 +130,7 @@ private slots:
     void handleTransitDown();
     void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
     void handleMakeANewTransitionProperty(const QString name);
+    void handleStateNameChangedInFormView(SCState*, QString);
 
 private:
 

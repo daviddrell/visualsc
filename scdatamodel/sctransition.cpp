@@ -96,7 +96,8 @@ void SCTransition::handleTextBlockChanged()
 
     this->setObjectName(eventText);
     event->setValue(eventText);
-    emit nameChanged(this, eventText);
+    //emit nameChanged(this, eventText);
+    emit eventChangedInDataModel(this, eventText);
 }
 
 SCState *SCTransition::targetState()

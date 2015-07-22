@@ -126,14 +126,15 @@ private slots:
 
 
 
-    void handleItemNameChanged(SCState*, QString);
-    void handleItemNameChanged(SCTransition*, QString);
+    void handleItemNameChangedInDataModel(SCState*, QString);
+    void handleItemNameChangedInDataModel(SCTransition*, QString);
+    void handleItemPositionChangedInDataModel(SCState*, QPointF);
 
 private:
 
+    void updateTransitionEvent(SCTransition*, QString);
+    void updateStateName(SCState*, QString);
     bool isCurrentlySelectedEqualTo(SCItem*);
-    void updateStateName(SCState* state, QString name);
-    void updateTransitionEvent(SCTransition* trans, QString eventText);
     void reloadTree();
 
     IAttributeContainer * getCurrentlySelectedAttributes();

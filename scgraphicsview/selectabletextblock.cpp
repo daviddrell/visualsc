@@ -40,23 +40,23 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
 {
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
     _textItem.setFlag(QGraphicsItem::ItemIsMovable, false );
+
+    // set the text into the viewable area of the rectangle
     QRectF viewArea = this->getUsableArea();
-    //qDebug() << "viewArea " << viewArea.x() << ", " << viewArea.y();
     _textItem.setPos( viewArea.x() , viewArea.y() );
 
+    // set the initial text to what the datamodel loaded
+    _textItem.setPlainText( _textBlockModel->getText() );
+
+
     setShowBoxLineStyle(SelectableBoxGraphic::kWhenSelected  );
-
     setDrawBoxLineStyle( SelectableBoxGraphic::kDrawDotted );
-
     setBoxStyle(SelectableBoxGraphic::kTransparent );
-
     setHoverLineThickness( 1 );
-
     setFlags(QGraphicsItem::ItemClipsChildrenToShape);
-
     setFlag(QGraphicsItem::ItemIsFocusable, true);
 
-    _textItem.setPlainText( _textBlockModel->getText() );
+
 
    // setSize (_minSize);
 

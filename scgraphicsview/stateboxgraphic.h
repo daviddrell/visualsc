@@ -112,7 +112,7 @@ private:
 
 private slots:
 
-    void handleAttributeChanged(void *attr);
+    //void handleAttributeChanged(void *attr);
 
 
 private:

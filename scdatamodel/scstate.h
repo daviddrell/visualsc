@@ -30,6 +30,7 @@ class QPoint;
 #include "textblock.h"
 #include "scdatamodel_global.h"
 #include "scitem.h"
+//#include "stateboxgraphic.h"
 
 /**
 
@@ -56,6 +57,8 @@ public:
     SCState(const SCState& st);
     SCState(bool topState=false);
     ~SCState();
+
+   // void setGraphic(StateBoxGraphic*);
 
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
 
@@ -178,6 +181,8 @@ signals:
      void changed();
      void attributeChangedSignal(IAttribute*);
      void nameChanged(SCState*,QString);
+     void positionChanged(SCState*, QPointF);
+     void nameChangedInFormView(SCState*,QString);
 
 
 
@@ -197,6 +202,8 @@ private:
 
     //private data
 
+
+    //StateBoxGraphic* _stateBoxGraphic;
     SCTextBlock * _IdTextBlock;
     QList<SCTransition*> _transitingTransitionsOut;
     QList<SCTransition*> _transitingTransitionsIn;

@@ -79,7 +79,8 @@ public:
     void setTargetState(SCState*);
 
 signals:
-    void nameChanged(SCTransition*, QString);
+    void eventChangedInFormView(SCTransition*, QString);
+    void eventChangedInDataModel(SCTransition*, QString);
     void selected();
     void unselected();
     void transitionAddTextBlock(SCTextBlock*);          // connected in scformview::loadtree for sctransitions. connected to the parentitem's treeAddTextBlock(SCTextBlock) in customtreewidgetitem

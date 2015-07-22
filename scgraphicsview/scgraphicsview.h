@@ -79,6 +79,9 @@ private:
     SCDataModel    *_dm;
     QMap<SCState*,StateBoxGraphic*> _mapStateToGraphic;
     QMap<SCTransition*,TransitionGraphic *> _mapTransitionToGraphic;
+
+    QHash<SCState*, StateBoxGraphic*> _hashStateToGraphic;
+
     KeyController *_keyController;
     MouseController* _mouseController;
 

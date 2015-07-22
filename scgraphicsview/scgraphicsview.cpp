@@ -340,6 +340,12 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     //targetGraphic->
 }
 
+/*
+void SCGraphicsView::handleStatePositionChanged(SCState*)
+{
+
+}*/
+
 /**
  * @brief SCGraphicsView::handleStateDeleted
  * @param state
@@ -445,9 +451,10 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // quick look up of graphics from state model references
 
    // qDebug() << "inserting new state into mapstate to graphic : " << newState->objectName();
+
+    // link the SCState and StateBoxGraphic
     _mapStateToGraphic.insert(newState, stateGraphic);
-
-
+    //newState->setGraphic(stateGraphic);
 
     // load size and position from state model
     PositionAttribute * position = dynamic_cast<PositionAttribute*> (newState->attributes.value("position"));

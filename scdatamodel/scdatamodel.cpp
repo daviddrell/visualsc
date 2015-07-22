@@ -337,7 +337,7 @@ bool SCDataModel::deleteItem(QObject * item)
  * @param parent
  * @return
  *
- * Called from scformview::insertState()
+ * Called from scformview::insertState(), when the new state button is pressed
  *
  * will add a new state that is a child of the parent parameter
  *
@@ -348,7 +348,7 @@ SCState* SCDataModel::insertNewState(SCState *parent)
 {
     //
     SCState * state = new SCState (parent);
-
+    connect(state,SIGNAL(nameChangedInFormView(SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
     emit newStateSignal(state);
 
     return state;
@@ -463,6 +463,17 @@ void SCDataModel::initializeEmptyStateMachine()
 
 }
 
+/**
+ * @brief SCDataModel::handleMakeANewState
+ * @param sa
+ *
+ *
+ * SLOT
+ *
+ * connected to SCXMLReader
+ * this function is only used when creating states from the xml file.
+ *
+ */
 void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 {
     SCState * state = NULL;
@@ -536,6 +547,10 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         state->setObjectName( name );
 
         qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
+
+        // SCState connects
+        connect(state,SIGNAL(nameChangedInFormView(SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
+
     }
 
 
@@ -645,6 +660,27 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
     }
     return false;    // should not reach this
 
+}
+
+/**
+ * @brief SCDataModel::handleStateNameChangedInFormView
+ *
+ * SLOT
+ *
+ * connect in SCDataModel
+ * connect(SCState,SIGNAL(nameChangedInFormView(SCState*,QString)), SCDataModel,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
+ *
+ *
+ * called when the user types in the name in the property table
+ * will update the data model's textbox with the new name
+ * by calling SCState::setText, which will then emit a signal to change the graphics view text
+ *
+ *
+ */
+void SCDataModel::handleStateNameChangedInFormView(SCState* state, QString name)
+{
+    qDebug() << "SCDataModel::handleStateNameChangedInFormView";
+    state->setText(name);
 }
 
 /**
