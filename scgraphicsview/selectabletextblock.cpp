@@ -224,6 +224,7 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
         QPointF ps = position->asPointF();
         qDebug()<<"SelectableTextBlock::handleAttributeChanged ("+  _textBlockModel->getText()+") setting position = (" +QString::number(ps.x())+","+QString::number(ps.y())+")";
         SelectableBoxGraphic::setPos(ps);
+        //emit _textBlockModel->
     }
     else if ( fc )
     {
@@ -297,4 +298,8 @@ void SelectableTextBlock::graphicHasChanged()
 
     size->setValue(sz);
     position->setValue(ps);
+
+    emit _textBlockModel->sizeChangedInDataModel(_textBlockModel, sz);
+    emit _textBlockModel->positionChangedInDataModel(_textBlockModel, ps);
+
 }

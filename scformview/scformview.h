@@ -127,11 +127,22 @@ private slots:
 
 
     void handleItemNameChangedInDataModel(SCState*, QString);
-    void handleItemNameChangedInDataModel(SCTransition*, QString);
     void handleItemPositionChangedInDataModel(SCState*, QPointF);
     void handleItemSizeChangedInDataModel(SCState* state, QPointF size);
 
+    void handleItemPositionChangedInDataModel(SCTextBlock*, QPointF);
+    void handleItemSizeChangedInDataModel(SCTextBlock*, QPointF);
+
+
+     void handleItemNameChangedInDataModel(SCTransition*, QString);
+
 private:
+
+
+    int propertyTableIndexOf(QString propertyName);
+    int textBlockPropertyTableIndexOf(QString propertyName);
+    void propertyTableSetText(int index, QString text);
+    void textBlockPropertyTableSetText(int index, QString text);
 
     void updateTransitionEvent(SCTransition*, QString);
     void updateStateName(SCState*, QString);

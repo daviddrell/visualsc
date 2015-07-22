@@ -413,6 +413,8 @@ void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> 
         //connect(st, SIGNAL(nameChangedInFormView(QString)), this,SLOT(handleStateNameChangedInFormView(QString)));     // MOVED TO when SCXML is read because it has scope of the SCDataModel handle function
         connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
         connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
+        connect(st->getIDTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*, QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*, QPointF)));
+        connect(st->getIDTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));
 
         CustomTreeWidgetItem * item=0;
         if (parentItem == 0)
@@ -886,10 +888,10 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
     previousAttributes = getPreviouslySelectedTextBlockAttributes();
     setTextBlockAttributeConnections(previousAttributes, false);
 
+    // reload the textBlockPropertyTable
     currentAttributes = getCurrentlySelectedTextBlockAttributes();
     textBlockPropertyTable->setRowCount(currentAttributes->count());
     setTextBlockAttributeConnections(currentAttributes, true);
-
 }
 
 /**
@@ -1194,7 +1196,7 @@ void SCFormView::itemPromptProperty()
     }
     else if(input.isEmpty())
     {
-        sendMessage("Error", "Property Name cannot be empty");
+        //sendMessage("Error", "Property Name cannot be empty");
         return;
     }
 
@@ -1277,6 +1279,7 @@ void SCFormView::itemDeleteSelectedProperty()
 
     if(!_dm->deleteProperty(item, propertyName))
     {
+        sendMessage("Error", "Cannot delete core property");
         qDebug() << "failed to delete!";
         return;
     }
@@ -1436,6 +1439,8 @@ void SCFormView::insertState()
     connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
     connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
     connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
+    connect(st->getIDTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*, QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*, QPointF)));
+    connect(st->getIDTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));
 }
 
 void SCFormView::sendToBack()
@@ -1474,6 +1479,8 @@ CustomTreeWidgetItem* SCFormView::findItem(SCState* item)
     return find;
 }
 
+
+
 /**
  * @brief SCFormView::handleItemSizeChangedInDataModel
  * @param state
@@ -1496,8 +1503,6 @@ void SCFormView::handleItemSizeChangedInDataModel(SCState* state, QPointF size)
 
         // update the property table to the new size
         SizeAttribute * sz = dynamic_cast<SizeAttribute *> (state->attributes.value("size"));
-        qDebug() << "state size: updated the datamodel! "<< sz->asPointF();
-
         if(isCurrentlySelectedEqualTo(state))
         {
             for(int i = 0 ; i < propertyTable->rowCount();i++)
@@ -1550,6 +1555,117 @@ void SCFormView::handleItemPositionChangedInDataModel(SCState* state, QPointF po
 
     }
 }
+
+int SCFormView::propertyTableIndexOf(QString propertyName)
+{
+   for(int i = 0 ;  i < propertyTable->rowCount(); i++)
+   {
+       if(propertyTable->item(i,0)->text() == propertyName)
+       {
+           //propertyTable->item(i,1)->setText(pos->asString());
+           return i;
+       }
+   }
+   return -1;
+}
+int SCFormView::textBlockPropertyTableIndexOf(QString propertyName)
+{
+    for(int i = 0 ;  i < textBlockPropertyTable->rowCount(); i++)
+    {
+        if(textBlockPropertyTable->item(i,0)->text() == propertyName)
+        {
+            //propertyTable->item(i,1)->setText(pos->asString());
+            return i;
+        }
+    }
+    return -1;
+}
+
+void SCFormView::propertyTableSetText(int index, QString text)
+{
+    propertyTable->item(index,1)->setText(text);
+}
+
+void SCFormView::textBlockPropertyTableSetText(int index, QString text)
+{
+    textBlockPropertyTable->item(index,1)->setText(text);
+}
+
+
+/**
+ * @brief SCFormView::handleItemPositionChangedInDataModel
+ * @param tb
+ * @param point
+ *
+ * SLOT
+ * connect in SCFormView
+ *
+ *
+ */
+void SCFormView::handleItemPositionChangedInDataModel(SCTextBlock* tb, QPointF point)
+{
+    qDebug() << "SCFormView:: handle tb position changed in data model";
+
+    SCState* state = dynamic_cast<SCState*>(_currentlySelected);
+
+    SCTransition* trans = dynamic_cast<SCTransition*>(_currentlySelected);
+
+    if(state)
+    {
+        qDebug() << "this tb belongs to a state";
+
+        // check that this textBlock is the currently selected one's
+        if(state->getIDTextBlock() == tb)
+        {
+            // update the textblock property table
+            textBlockPropertyTableSetText(textBlockPropertyTableIndexOf("position"), state->getIDTextBlock()->attributes.value("position")->asString());
+        }
+    }
+    else if(trans)
+    {
+        qDebug( )<< "this tb belongs to a transition";
+        if(trans->getEventTextBlock() == tb)
+        {
+            textBlockPropertyTableSetText(textBlockPropertyTableIndexOf("position"), trans->getEventTextBlock()->attributes.value("position")->asString());
+        }
+    }
+    else
+    {
+        qDebug() << "SCFormView: ERROR: cannot update textblock " << tb->objectName();
+    }
+}
+
+void SCFormView::handleItemSizeChangedInDataModel(SCTextBlock *tb, QPointF size)
+{
+    qDebug() << "SCFormView:: handle tb size changed in data model";
+    SCState* state = dynamic_cast<SCState*>(_currentlySelected);
+    SCTransition* trans = dynamic_cast<SCTransition*>(_currentlySelected);
+
+    if(state)
+    {
+        qDebug() << "this tb belongs to a state";
+
+        // check that this textBlock is the currently selected one's
+        if(state->getIDTextBlock() == tb)
+        {
+            // update the textblock property table
+            textBlockPropertyTableSetText(textBlockPropertyTableIndexOf("size"), state->getIDTextBlock()->attributes.value("size")->asString());
+        }
+    }
+    else if(trans)
+    {
+        qDebug( )<< "this tb belongs to a transition";
+        if(trans->getEventTextBlock() == tb)
+        {
+            textBlockPropertyTableSetText(textBlockPropertyTableIndexOf("size"), trans->getEventTextBlock()->attributes.value("size")->asString());
+        }
+    }
+    else
+    {
+        qDebug() << "SCFormView: ERROR: cannot update textblock " << tb->objectName();
+    }
+}
+
 
 /**
  * @brief SCFormView::handleItemNameChangedInDataModel

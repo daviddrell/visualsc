@@ -71,7 +71,12 @@ void  SCTextBlock::setText(QString text)
     }
 }
 
-
+/**
+ * @brief SCTextBlock::handleAttributeChanged
+ * @param attr
+ *
+ * not currently used, function called is in this object's parent: SelectableTextBlock
+ */
 void SCTextBlock::handleAttributeChanged(IAttribute *attr)
 {
     qDebug()<<"SCTextBlock::handleAttributeChanged "<<attr->asString();

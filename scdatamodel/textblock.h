@@ -34,6 +34,8 @@ public slots:
 
 signals:
      void textChanged();
+     void positionChangedInDataModel(SCTextBlock*, QPointF);
+     void sizeChangedInDataModel(SCTextBlock*, QPointF);
 
 private:
 
