@@ -194,6 +194,15 @@ void SCFormView :: setSelectedTreeItem(QObject * q){
 //    qDebug() << "updated the tree items: " << _previouslySelected << " + " << _currentlySelected;
 }
 
+/**
+ * @brief SCFormView::updateStateName
+ * @param state
+ * @param name
+ *
+ * Called by handlePropertyCellChanged
+ * this function updates the name of a state in the tree and property table
+ *
+ */
 void SCFormView::updateStateName(SCState* state, QString name)
 {
     // update the tree and table if necessary
@@ -209,17 +218,10 @@ void SCFormView::updateStateName(SCState* state, QString name)
         ins.at(i)->setAttributeValue("target",name);
     }
 
-    if(isCurrentlySelectedEqualTo(state))  // update the property table
+    // update the property table if the state is selected
+    if(isCurrentlySelectedEqualTo(state))
     {
-        for(int i = 0 ; i < propertyTable->rowCount(); i++)
-        {
-
-            if(propertyTable->item(i,0)->text() == "name")
-            {
-                propertyTable->item(i,1)->setText(name);
-                break;
-            }
-        }
+        propertyTableSetText(propertyTableIndexOf("name"), name);
     }
 }
 
@@ -270,25 +272,80 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
         }
         else if (key == "position")
         {
-            // TODO add exception handling for invalid inputs.
-            try
-            {
+                bool failed = false;
                 QStringList xy = value.split(",");
-                qreal x = std::stoi(xy.at(0).toStdString());
-                qreal y = std::stoi(xy.at(1).toStdString());
-                qDebug() << "xy: " << x<< " " << y;
-                QPointF point(x,y);
 
-                emit st->positionChangedInFormView(st, point);
-                //handleItemPositionChangedInDataModel(st, point);
-            }
-            catch(...)
-            {
-                qDebug() << "invalid input";
-                throw;
-            }
+                if(xy.count()==2)
+                {
+                    QString xStr = xy.at(0);
+                    QString yStr = xy.at(1);
+                    bool xConfirm;
+                    bool yConfirm;
+
+                    int x = xStr.toInt(&xConfirm);
+                    int y = yStr.toInt(&yConfirm);
+
+                    if(xConfirm && yConfirm)
+                    {
+                        qDebug() << "xy: " << x<< " " << y;
+                        QPointF point(x,y);
+
+                        emit st->positionChangedInFormView(st, point);
+                    }
+                    else
+                        failed = true;
+                }
+                else
+                    failed = true;
+
+                if(failed)
+                {
+                    propertyTableSetText(propertyTableIndexOf("position"), st->attributes.value("position")->asString());
+                    sendMessage("Error: Invalid Position","Please enter coordinates: \"x,y\"");
+                }
+
+
         }
+        else if(key == "size")
+        {
 
+            bool failed = false;
+            QStringList xy = value.split(",");
+
+            if(xy.count()==2)
+            {
+                QString xStr = xy.at(0);
+                QString yStr = xy.at(1);
+                bool xConfirm;
+                bool yConfirm;
+
+                int x = xStr.toInt(&xConfirm);
+                int y = yStr.toInt(&yConfirm);
+
+                if(xConfirm && yConfirm && x>0 && y>0)
+                {
+                    qDebug() << "xy: " << x<< " " << y;
+                    QPointF point(x,y);
+
+                    emit st->sizeChangedInFormView(st, point);
+                }
+                else
+                    failed = true;
+            }
+            else
+                failed = true;
+
+            if(failed)
+            {
+                propertyTableSetText(propertyTableIndexOf("size"), st->attributes.value("size")->asString());
+                sendMessage("Error: Invalid Size","Please enter width and height \"w,h\"");
+            }
+
+
+
+
+
+        }
         else    // some other property was updated
         {
             st->attributes.value(key)->setValue(value);
@@ -316,13 +373,23 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
     }
 }
 
+/**
+ * @brief SCFormView::updateTransitionEvent
+ * @param trans
+ * @param eventName
+ *
+ * called by handleCellPropertyChanged for the "event" attribute of a transition
+ *
+ * this updates the tree and property table
+ *
+ */
 void SCFormView::updateTransitionEvent(SCTransition* trans, QString eventName)
 {
     qDebug() << "transition name was changed";
     if(trans)
     {
         // update the data model
-        trans->attributes.value("event")->setValue(eventName);
+        // trans->attributes.value("event")->setValue(eventName);
 
         // update the tree
         QTreeWidgetItem* treeItem = findItem(trans);
@@ -331,18 +398,11 @@ void SCFormView::updateTransitionEvent(SCTransition* trans, QString eventName)
         // update the property table (if necessary)
         if(isCurrentlySelectedEqualTo(trans))
         {
-            for(int i = 0 ; i < propertyTable->rowCount();i++)
-            {
-                if(propertyTable->item(i,0)->text() == "event")
-                {
-                    propertyTable->item(i,1)->setText(eventName);
-                    break;
-                }
-            }
+            propertyTableSetText(propertyTableIndexOf("event"), eventName);
         }
 
         // update the selectable text box
-        trans->setText(eventName);
+        // trans->setText(eventName);
     }
 }
 

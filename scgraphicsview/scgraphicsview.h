@@ -71,8 +71,13 @@ private slots:
     void handleNewTextBlock(SCTransition*, QString);
     //void handleStatePositionChangedInDataModel(SCState* state, QPointF position);
     void handleStatePositionChangedInFormView(SCState* state, QPointF position);
+    void handleStateSizeChangedInFormView(SCState* state, QPointF size);
 
 private:
+
+    void connectState(SCState*);
+    void connectTransition(SCTransition*);
+
 
     // private data
 

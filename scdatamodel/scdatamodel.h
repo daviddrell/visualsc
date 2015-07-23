@@ -133,10 +133,18 @@ private slots:
     void handleMakeANewTransitionProperty(const QString name);
     void handleStateNameChangedInFormView(SCState*, QString);
     void handleStatePositionChangedInFormView(SCState*, QPointF);
+    void handleStateSizeChangedInFormView(SCState*, QPointF);
+
+    void handleEventNameChangedInFormView(SCTransition*, QString);
+    void handleEventPositionChangedInFormView(SCTransition*, QString);
+    void handleEventSizeChangedInFormView(SCTransition*, QString);
+
 
 private:
 
 
+    void connectState(SCState*);
+    void connectTransition(SCTransition*);
 
     SCXMLReader     _reader;
     QXmlStreamWriter *_writer;

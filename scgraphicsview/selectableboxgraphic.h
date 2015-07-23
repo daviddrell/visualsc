@@ -52,6 +52,7 @@ public:
 
 
     void setPosAndUpdateAnchors(QPointF newPos);
+    void setSizeAndUpdateAnchors(QPointF size);
     virtual void setSize(QPointF size); ///< set the size of this object
     void    increaseWidth(int inc);
     QString getPositionAsString();
@@ -77,7 +78,7 @@ public:
 
 signals:
     void stateBoxMoved(QPointF);    // this signal activates when the statebox graphic is moved or resized to alert the transition graphic to be updated as to remained anchored to its target state. Although the sink anchor is still a child of the source state graphic, it should behave like a child of its target state.
-    void stateBoxResized(QRectF, QRectF, int corner);
+    void stateBoxResized(QRectF oldBox, QRectF newBox, int corner);
 
 protected:
 

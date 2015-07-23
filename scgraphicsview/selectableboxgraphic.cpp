@@ -348,7 +348,8 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
             qDebug() << "ERROR there was no hovered corner, should not be allowed";
         else
         {
-            //qDebug() << "new Box: " << newBox;
+            //qDebug() << "the corner used: " << corner;
+            qDebug() <<"old box: " <<oldBox << "new Box: " << newBox;
             emit stateBoxResized(oldBox, newBox, corner);
         }
         this->update();
@@ -444,6 +445,26 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     }
 
     this->setPos(location);
+}
+
+/**
+ * @brief SelectableBoxGraphic::setSizeAndUpdateAnchors
+ * @param size
+ *
+ * in addition to setting the size, update the anchors attached to this state
+ *
+ */
+void SelectableBoxGraphic::setSizeAndUpdateAnchors(QPointF size)
+{
+    QRectF oldBox(pos(), getSize());
+    QRectF newBox(pos(), size);
+
+    this->setSize(size);
+    this->update();
+    emit stateBoxResized(oldBox, newBox, 2);    // treat as if the bottom rightcorner was manipulated
+
+
+
 }
 
 /**

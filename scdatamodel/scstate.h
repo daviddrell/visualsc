@@ -183,9 +183,11 @@ signals:
      void attributeChangedSignal(IAttribute*);
      void nameChangedInDataModel(SCState*,QString);
      void positionChangedInDataModel(SCState*, QPointF);
+     void sizeChangedInDataModel(SCState*, QPointF);
+
      void nameChangedInFormView(SCState*,QString);
      void positionChangedInFormView(SCState*, QPointF);
-     void sizeChangedInDataModel(SCState*, QPointF);
+     void sizeChangedInFormView(SCState*, QPointF);
 
 
 

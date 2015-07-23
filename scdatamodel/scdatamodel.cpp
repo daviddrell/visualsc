@@ -350,11 +350,7 @@ SCState* SCDataModel::insertNewState(SCState *parent)
 {
     // SCState connects. 1 of 2 places. this is for any newly created state
     SCState * state = new SCState (parent);
-    connect(state,SIGNAL(nameChangedInFormView(SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
-
-    // connect changing the state position in the property table of the form view to changing the position in the data model
-    connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)),this,SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
-
+    connectState(state);
     //
     //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), );
 
@@ -561,10 +557,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
         qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
 
         // SCState connects. 1 of 2 places where the SCState connects are set up. this is for loading states through the xml
-        connect(state,SIGNAL(nameChangedInFormView(SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
-
-        connect(state,SIGNAL(positionChangedInFormView(SCState*,QPointF)),this,SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
-
+        connectState(state);
     }
 
 
@@ -674,6 +667,40 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
     }
     return false;    // should not reach this
 
+}
+
+void SCDataModel::connectState(SCState* state)
+{
+    connect(state, SIGNAL(nameChangedInFormView(SCState*,QString)),     this, SLOT(handleStateNameChangedInFormView(SCState*,QString)));
+    connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
+    connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)),     this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
+}
+
+void SCDataModel::connectTransition(SCTransition* trans)
+{
+    connect(trans, SIGNAL(eventChangedInFormView(SCTransition*,QString)), this, SLOT(handleEventNameChangedInFormView(SCTransition*,QString)));
+}
+
+void SCDataModel::handleEventNameChangedInFormView(SCTransition * trans, QString eventName)
+{
+    qDebug() << "SCDataModel::handleEventNameChangedInFormView";
+    trans->setText(eventName);
+}
+
+void SCDataModel::handleEventSizeChangedInFormView(SCTransition *, QString)
+{
+
+}
+
+void SCDataModel::handleEventPositionChangedInFormView(SCTransition *, QString)
+{
+
+}
+
+void SCDataModel::handleStateSizeChangedInFormView(SCState *state, QPointF size)
+{
+    qDebug() << "SCDataModel::handleStateSizeChangeInFormView";
+    state->setSize(size);
 }
 
 /**
