@@ -288,18 +288,12 @@ void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
     LineSegmentGraphic* one = elbow->getSegment(0);
     if(one) // check if object exists
     {
-        // update start and end?
-       // one->update(50,50,200,10);
         one->enclosePathInElbows();
-        //qDebug() << "updated one";
     }
     LineSegmentGraphic* two = elbow->getSegment(1);
     if(two) // check if object exists
     {
-        // update start and end?
-        //two->update(50,50,200,10);
         two->enclosePathInElbows();
-        //qDebug() << "updated two";
     }
 }
 
@@ -475,13 +469,55 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 ElbowGrabber* left = line->getElbow(0);
                 ElbowGrabber* right = line->getElbow(1);
                 QPointF mouseInScene = mapToScene(mevent->pos());
+
+                // update the position relative to the mouse event's position
                 left->setPos(mapFromScene(mouseInScene) - line->leftElbowOffset);
                 right->setPos(mapFromScene(mouseInScene) - line->rightElbowOffset);
+
+                // update the three line segments that touch these two elbows
                 line->enclosePathInElbows();
                 left->getSegment(0)->enclosePathInElbows();
                 right->getSegment(1)->enclosePathInElbows();
 
+                // update the data model
                 this->update();
+            }
+            else     // an anchored line segment is being dragged
+            {
+                if(line->getElbow(0)->isAnchor())   // is this a source anchor?
+                {
+                    ElbowGrabber* left = line->getElbow(0);
+                    ElbowGrabber* right = line->getElbow(1);
+                    QPointF mouseInScene = mapToScene(mevent->pos());
+
+                    // snap the source anchor to the state and set the other elbow's position
+                    emit left->anchorMoved((mouseInScene) - line->leftElbowOffset);
+                    right->setPos(mapFromScene(mouseInScene) - line->rightElbowOffset);
+
+                    // update the two line segments that are affected
+                    line->enclosePathInElbows();
+                    right->getSegment(1)->enclosePathInElbows();
+
+                    // update the datamodel
+                    this->update();
+                }
+                else        // this is a sink anchor
+                {
+                    ElbowGrabber* left = line->getElbow(0);
+                    ElbowGrabber* right = line->getElbow(1);
+                    QPointF mouseInScene = mapToScene(mevent->pos());
+
+                    // snap the sink anchor to the state and set the other elbow's position
+                    left->setPos(mapFromScene(mouseInScene) - line->leftElbowOffset);
+                    emit right->anchorMoved(mouseInScene - line->rightElbowOffset);
+
+                    // update the two line segments that are affected
+                    line->enclosePathInElbows();
+                    left->getSegment(0)->enclosePathInElbows();
+
+                    // update the datamodel
+                    this->update();
+                }
             }
         }
         return true;     // this is needed
@@ -1024,7 +1060,7 @@ void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF ne
  *
  * connect in scgraphicsview.cpp
  *
- * update all elbows except for the source anchor
+ * update all elbows except for the source anchor so that every elbow appears to be static
  *
  * this function is called when the parent state is moved
  */
