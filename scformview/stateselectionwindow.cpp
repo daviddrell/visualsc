@@ -41,6 +41,7 @@ StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
     // add the State Tree
 
     _targetStateSelectionTree = new QTreeWidget();
+    //_targetStateSelectionTree->setExpanded(0,1);
     connect ( _targetStateSelectionTree, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(handleTreeViewItemClicked(QTreeWidgetItem*,int)));
     _row2 = new QHBoxLayout();
     _row2->addWidget(_targetStateSelectionTree);
@@ -51,6 +52,7 @@ StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
 
 
     loadTree (NULL, states);
+    this->resize(402,650);
 }
 
 
@@ -98,7 +100,7 @@ void StateSelectionWindow::loadTree ( CustomTreeWidgetItem * parentItem , QList<
 
         item->setIcon(0,QIcon(":/SCFormView/statebutton.bmp"));
 
-
+        item->setExpanded(true);
         // get all substates of this state
         QList<SCState*> subStates;
 

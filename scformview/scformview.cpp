@@ -272,43 +272,40 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
         }
         else if (key == "position")
         {
-                bool failed = false;
-                QStringList xy = value.split(",");
+            bool failed = false;
+            QStringList xy = value.split(",");
 
-                if(xy.count()==2)
+            if(xy.count()==2)
+            {
+                QString xStr = xy.at(0);
+                QString yStr = xy.at(1);
+                bool xConfirm;
+                bool yConfirm;
+
+                int x = xStr.toInt(&xConfirm);
+                int y = yStr.toInt(&yConfirm);
+
+                if(xConfirm && yConfirm)
                 {
-                    QString xStr = xy.at(0);
-                    QString yStr = xy.at(1);
-                    bool xConfirm;
-                    bool yConfirm;
+                    qDebug() << "xy: " << x<< " " << y;
+                    QPointF point(x,y);
 
-                    int x = xStr.toInt(&xConfirm);
-                    int y = yStr.toInt(&yConfirm);
-
-                    if(xConfirm && yConfirm)
-                    {
-                        qDebug() << "xy: " << x<< " " << y;
-                        QPointF point(x,y);
-
-                        emit st->positionChangedInFormView(st, point);
-                    }
-                    else
-                        failed = true;
+                    emit st->positionChangedInFormView(st, point);
                 }
                 else
                     failed = true;
+            }
+            else
+                failed = true;
 
-                if(failed)
-                {
-                    propertyTableSetText(propertyTableIndexOf("position"), st->attributes.value("position")->asString());
-                    sendMessage("Error: Invalid Position","Please enter coordinates: \"x,y\"");
-                }
-
-
+            if(failed)
+            {
+                propertyTableSetText(propertyTableIndexOf("position"), st->attributes.value("position")->asString());
+                sendMessage("Invalid Position","Please enter coordinates: \"x,y\"");
+            }
         }
         else if(key == "size")
         {
-
             bool failed = false;
             QStringList xy = value.split(",");
 
@@ -338,13 +335,8 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
             if(failed)
             {
                 propertyTableSetText(propertyTableIndexOf("size"), st->attributes.value("size")->asString());
-                sendMessage("Error: Invalid Size","Please enter width and height \"w,h\"");
+                sendMessage("Invalid Size","Please enter width and height \"w,h\"");
             }
-
-
-
-
-
         }
         else    // some other property was updated
         {

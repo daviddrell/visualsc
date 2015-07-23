@@ -92,6 +92,8 @@ private:
     KeyController *_keyController;
     MouseController* _mouseController;
 
+    bool _rightAngleMode;
+
     //  private methods
 
     void increaseSizeOfAllAncestors (SCState * state);

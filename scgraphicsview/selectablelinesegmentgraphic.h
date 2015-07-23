@@ -56,6 +56,17 @@ public:
     SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition, TransitionGraphic* parentGraphic, KeyController* keys );
     SelectableLineSegmentGraphic(ElbowGrabber* startPoint, ElbowGrabber* endPoint, SCTransition* transition, TransitionGraphic* parentGraphic, KeyController* keys );
     ~SelectableLineSegmentGraphic();
+
+
+
+
+    void setMouseState(int);
+    int getMouseState();
+
+    qreal mouseDownX;
+    qreal mouseDownY;
+
+
     void setStartEndPosition(QPointF position);
     void setTerminator(bool);///< if true, this segment's end point is a terminator and should draw an arrow head
 
@@ -88,6 +99,7 @@ private:
     QPointF         _cornerDragStart;
     int             _XcornerGrabBuffer;
     int             _YcornerGrabBuffer;
+    int _mouseState;
 
     //QPointF         _lineEnd_0; // visible starting end
     //QPointF         _lineEnd_1; // visible finishing end

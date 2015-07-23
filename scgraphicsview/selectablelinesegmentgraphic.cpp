@@ -135,6 +135,16 @@ SelectableLineSegmentGraphic::~SelectableLineSegmentGraphic()
 
 }
 
+void SelectableLineSegmentGraphic::setMouseState(int state)
+{
+    _mouseState = state;
+}
+
+int SelectableLineSegmentGraphic::getMouseState()
+{
+    return _mouseState;
+}
+
 void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
 {
     TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> (attr);
@@ -181,11 +191,14 @@ void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
 
 
 /**
-  * This scene event filter has been registered with all four corner grabber items.
-  * When called, a pointer to the sending item is provided along with a generic
-  * event.  A dynamic_cast is used to determine if the event type is one of the events
-  * we are interrested in.
-  */
+ * @brief SelectableLineSegmentGraphic::sceneEventFilter
+ * @param watched
+ * @param event
+ * @return
+ *
+ * function promoted to transition graphic
+ *
+ */
 
 bool SelectableLineSegmentGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event )
 {

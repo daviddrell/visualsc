@@ -8,7 +8,8 @@ LineSegmentGraphic::LineSegmentGraphic()
 
 LineSegmentGraphic::LineSegmentGraphic(ElbowGrabber *startPoint, ElbowGrabber *endPoint, TransitionGraphic *parentGraphic, KeyController *keys):
     _keyController(keys),
-    _isHovered(false)
+    _isHovered(false),
+    _mouseState(ElbowGrabber::kMouseReleased)
 {
     this->setParentItem(parentGraphic);
     _elbows[0] = startPoint;
@@ -26,6 +27,50 @@ LineSegmentGraphic::~LineSegmentGraphic()
 {
 
 }
+
+
+bool LineSegmentGraphic::isAnchored()
+{
+    return (_elbows[0]->isAnchor() || _elbows[1]->isAnchor());
+}
+
+// we have to implement the mouse events to keep the linker happy,
+// but just set accepted to false since are not actually handling them
+
+/**
+ * @brief lineSegmentGraphic::setElbowOffsets
+ * @param position
+ * scene based position
+ */
+void LineSegmentGraphic::setElbowOffsets()
+{
+    QPointF leftInScene = mapToScene(_elbows[0]->pos());
+
+    qreal lxos = mouseDownX - leftInScene.x();
+    qreal lyos = mouseDownY - leftInScene.y();
+
+    QPointF leftos(lxos,lyos);
+    leftElbowOffset = leftos;
+
+    QPointF rightInScene = mapToScene(_elbows[1]->pos());
+
+    qreal rxos = mouseDownX - rightInScene.x();
+    qreal ryos = mouseDownY - rightInScene.y();
+
+    QPointF rightos(rxos, ryos);
+    rightElbowOffset = rightos;
+}
+
+void LineSegmentGraphic::setMouseState(int state)
+{
+    _mouseState = state;
+}
+
+int LineSegmentGraphic::getMouseState()
+{
+    return _mouseState;
+}
+
 
 void LineSegmentGraphic::setElbowAt(int index, ElbowGrabber *elb)
 {

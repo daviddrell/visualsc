@@ -41,7 +41,8 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     _mapStateToGraphic(),
     _hashStateToGraphic(),
     _keyController(new KeyController()),
-    _mouseController(new MouseController())
+    _mouseController(new MouseController()),
+    _rightAngleMode(false)
 
 
 

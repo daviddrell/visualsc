@@ -165,26 +165,31 @@ int ElbowGrabber::getMouseState()
 
 void ElbowGrabber::mouseMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
+    qDebug() <<"ElbowGraber::mouseMoveEvent QGraphicsSceneDragDropEvent";
     event->setAccepted(false);
 }
 
 void ElbowGrabber::mousePressEvent(QGraphicsSceneDragDropEvent *event)
 {
+    qDebug() <<"ElbowGraber::mousePressEvent QGraphicsSceneDragDropEvent";
     event->setAccepted(false);
 }
 
 void ElbowGrabber::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
+    qDebug() <<"ElbowGraber::mouseReleaseEvent QGraphicsSceneMouseEvent";
     event->setAccepted(true);
 }
 
 void ElbowGrabber::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
+    qDebug() <<"ElbowGraber::mousePressEvent QGraphicsSceneMouseEvent";
     event->setAccepted(false);
 }
 
 void ElbowGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
+    qDebug() << "ElbowGrabber::mouseMoveEvent QGraphicsSceneMouseEvent";
     event->setAccepted(false);
 }
 

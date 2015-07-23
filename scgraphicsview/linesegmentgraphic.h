@@ -16,11 +16,20 @@ class TransitionGraphic;
 class LineSegmentGraphic : public QObject, public QGraphicsPolygonItem
 {
 public:
+    int mouseDownX;
+    int mouseDownY;
+    QPointF leftElbowOffset;
+    QPointF rightElbowOffset;
     LineSegmentGraphic();
     LineSegmentGraphic(ElbowGrabber* startPoint, ElbowGrabber* endPoint, TransitionGraphic* parentGraphic, KeyController* keys);
     ~LineSegmentGraphic();
   //  void setTerminal(bool);
 
+
+    bool isAnchored();
+    void setElbowOffsets();
+    void setMouseState(int state);
+    int getMouseState();
     void enclosePathInSceneCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
     void enclosePathInItemCoordiates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
     void enclosePathInCoordindates(qreal lineStartX,qreal lineStartY, qreal lineEndX, qreal lineEndY  );
@@ -41,6 +50,9 @@ private:
 
     QPen            _pen;
     bool            _isHovered;
+    int _mouseState;
+
+
 
     /*
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
