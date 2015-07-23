@@ -147,7 +147,12 @@ private:
     void updateTransitionEvent(SCTransition*, QString);
     void updateStateName(SCState*, QString);
     bool isCurrentlySelectedEqualTo(SCItem*);
-    void reloadTree();
+    void replantTree();
+    void initTree();
+
+    void connectState(SCState*);
+    void connectTransition(SCTransition*);
+
 
     IAttributeContainer * getCurrentlySelectedAttributes();
     IAttributeContainer * getPreviouslySelectedAttributes();
@@ -168,9 +173,9 @@ private:
     QMenu *createColorMenu(const char *slot, QColor defaultColor);
     QIcon createColorToolButtonIcon(const QString &image, QColor color);
     QIcon createColorIcon(QColor color);
-    void loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states);
-    void loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransition*> & transitions);
-    void loadTree ( CustomTreeWidgetItem * parentItem , SCTextBlock* textBlock);
+    void loadTreeState ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states, bool connect);
+    void loadTreeTransition ( CustomTreeWidgetItem * parentItem , QList<SCTransition*> & transitions, bool connect);
+    void loadTreeTextBlock ( CustomTreeWidgetItem * parentItem , SCTextBlock* textBlock);
 
     void deleteItem(QObject * item);
     void setAttributeConnections(IAttributeContainer * atts, bool shouldConnect);

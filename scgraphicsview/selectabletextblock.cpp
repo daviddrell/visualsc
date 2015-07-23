@@ -205,6 +205,8 @@ void SelectableTextBlock::handleAttributeDeleted(IAttribute *)
  */
 void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 {
+    //TODO make these attributes do something
+
 //    FontFamilyAttribute * ff     = dynamic_cast<FontFamilyAttribute *> ( attr);
 //    FontSizeAttribute * fs       = dynamic_cast<FontSizeAttribute *> ( attr);
     FontColorAttribute * fc      = dynamic_cast<FontColorAttribute *> ( attr);
@@ -281,8 +283,10 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
  /**
  * @brief SelectableTextBlock::graphicHasChanged
  *
+ * SIGNAL
  *
- * update the datamodel to match the graphic when the graphic has changed
+ * update the datamodel to match the graphic when the text block graphic has changed
+ * additionally, notify the formview of this change to update the textblock property table
  *
  */
 void SelectableTextBlock::graphicHasChanged()

@@ -117,10 +117,29 @@ this->resize(600,1000);
 
    // _itemToTreeWidget;
 
-    loadTree (NULL, states);
+    //loadTree (NULL, states);
 
+    initTree();
 
 }
+
+/**
+ * @brief SCFormView::initTree
+ *
+ *
+ * this is the initial loadtree that will load the tree view widgets and set connections simultaenously
+ *
+ */
+void SCFormView::initTree()
+{
+    QList<SCState*> states;
+    states.append( _dm->getTopState());
+    loadTreeState(NULL, states, true);
+}
+
+
+
+
 
 /**
  * @brief SCFormView::handleNewTransition
@@ -136,9 +155,11 @@ void SCFormView::handleNewTransition(SCTransition*t)
     QList<SCState*> states;
     states.append( _dm->getTopState());
 
-    stateChartTreeView->clear();
+    //stateChartTreeView->clear();
 
-    loadTree (NULL, states);
+    connectTransition(t);
+    replantTree();
+    //loadTree (NULL, states);
 }
 
 /**
@@ -158,8 +179,12 @@ void SCFormView::handleNewState(SCState*s)
     QList<SCState*> states;
     states.append( _dm->getTopState());
 
-    stateChartTreeView->clear();
-    loadTree (NULL, states);
+    //stateChartTreeView->clear();
+
+    connectState(s);
+    replantTree();
+
+    //loadTree (NULL, states);
 }
 
 void SCFormView :: setSelectedTreeItem(QObject * q){
@@ -203,6 +228,11 @@ void SCFormView::updateStateName(SCState* state, QString name)
  * @param r
  * @param c
  *
+ * SLOT
+ * connect in SCFormView
+ * connect(propertyTable, cellChanged, SCFormView, handlePropertyCellChanged)
+ *
+ * When a cell in the propertyTable is changed, some attributes should update themselves as well
  *
  * will
  * update the attribute in SCItem
@@ -284,8 +314,6 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
             //handleItemNameChangedInDataModel(trans, value);
         }
     }
-
-
 }
 
 void SCFormView::updateTransitionEvent(SCTransition* trans, QString eventName)
@@ -323,9 +351,10 @@ void SCFormView::handleTextBlockDeleted(QObject *t)
     QList<SCState*> states;
     states.append( _dm->getTopState());
 
-    stateChartTreeView->clear();
+    //stateChartTreeView->clear();
 
-    loadTree (NULL, states);
+    replantTree();
+//    loadTree (NULL, states);
 }
 
 
@@ -339,9 +368,10 @@ void SCFormView::handleTransitionDeleted(QObject *t)
     QList<SCState*> states;
     states.append( _dm->getTopState());
 
-    stateChartTreeView->clear();
+ //   stateChartTreeView->clear();
 
-    loadTree (NULL, states);
+    replantTree();
+   // loadTree (NULL, states);
 }
 
 QObject* SCFormView::getNeighborState(QObject*s)
@@ -383,174 +413,133 @@ void SCFormView::handleStateDeleted(QObject *s)
     QList<SCState*> states;
     states.append( _dm->getTopState());
     stateChartTreeView->clear();
-    loadTree (NULL, states);
+    //loadTree (NULL, states);
+    replantTree();
 }
 
-void SCFormView::reloadTree()
+/**
+ * @brief SCFormView::connectState
+ * @param st
+ *
+ * sets up the connect call for the given state
+ * to alter the form view when the state is manipulated
+ *
+ *
+ */
+void SCFormView::connectState(SCState* st)
 {
+    // SCState connects
+    connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
+    connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
+    connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
+    connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
+    connect(st->getIDTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*, QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*, QPointF)));
+    connect(st->getIDTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));
+}
+
+void SCFormView::connectTransition(SCTransition* trans)
+{
+    connect(trans, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
+    connect(trans, SIGNAL(eventChangedInDataModel(SCTransition*, QString)), this, SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
+    connect(trans->getEventTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*,QPointF)));
+    connect(trans->getEventTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));
+}
+
+void SCFormView::replantTree()
+{
+    stateChartTreeView->clear();
+    _itemToTreeWidget.clear();
+    _itemToTextBlock.clear();
+    _treeWidgetToTextBlock.clear();
+
     QList<SCState*> states;
     states.append( _dm->getTopState());
-    stateChartTreeView->clear();
-    loadTree (NULL, states);
+    loadTreeState(NULL, states, false);
 }
 
-// recursively walk through the state tree and build the tree view
-// loadtreestates
-void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states)
+void SCFormView::loadTreeState(CustomTreeWidgetItem * parentItem, QList<SCState*> & states, bool connect)
 {
-    int c = states.count();
-    for(int i = 0; i < c; i++)
+    SCState* st;
+    CustomTreeWidgetItem* item;
+    for(int i = 0; i < states.count(); i++)
     {
-        SCState * st = states.at(i);
-        if (!st) continue;
+        st = states.at(i);
+        if(!st)
+            continue;
 
-        // if the SCState is deleted, call this protocol to remove it from the form view entirely
-        connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
+        if(connect)
+            connectState(st);
 
-        // connect SCState item changes to update the tree view / property table
-        // SCState connects
-        connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
-        //connect(st, SIGNAL(nameChangedInFormView(QString)), this,SLOT(handleStateNameChangedInFormView(QString)));     // MOVED TO when SCXML is read because it has scope of the SCDataModel handle function
-        connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
-        connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
-        connect(st->getIDTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*, QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*, QPointF)));
-        connect(st->getIDTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));
-
-        CustomTreeWidgetItem * item=0;
-        if (parentItem == 0)
+        if(parentItem==NULL)
         {
-            // if there is no parent item, then first create a top level state machine
             item = new CustomTreeWidgetItem();
-            item->setExpanded(true);
             stateChartTreeView->addTopLevelItem((QTreeWidgetItem*)item);
         }
         else
-        {
             item = new CustomTreeWidgetItem(parentItem);
-        }
 
-        // set up the tree widget to point to the SCState as its data source, set its text, set its icon, and insert it into the tree view
+        item->setExpanded(true);
+
+
         item->setData( st);
         item->setText(0, st->attributes.value("name")->asString());
         item->setIcon(0,QIcon(":/SCFormView/statebutton.bmp"));
         _itemToTreeWidget.insert(st, item);
 
-        // get all transitions in this state
-        QList<SCTransition*> transitions;
-        st->getTransitions(transitions);
-        loadTree (item, transitions);
+        // get the state's text block
+        SCTextBlock  * textBlock = st->getIDTextBlock();
+        _itemToTextBlock.insert(st,textBlock);
+        loadTreeTextBlock (item, textBlock);
 
         // get all substates of this state
         QList<SCState*> subStates;
         st->getStates(subStates);
-        loadTree (item, subStates);
+        loadTreeState (item, subStates, connect);
 
-        // get the state's text block
-        SCTextBlock  * textBlock = st->getIDTextBlock();
-        _itemToTextBlock.insert(st,textBlock);
-        loadTree (item, textBlock);
-
-    }   // end of for loop
-
-    // now re-selete the previously selected item
-    if ( parentItem)
-    {
-        QTreeWidgetItemIterator it(parentItem);
-        while (*it)
-        {
-            CustomTreeWidgetItem *customItem = dynamic_cast<CustomTreeWidgetItem*>(*it);
-            if (customItem==0)break;
-            if ( customItem->data() == _currentlySelected)
-            {
-                customItem->setSelected(true);
-                handleTreeViewItemClicked(customItem,0);
-                break;
-            }
-            ++it;
-        }
-        parentItem->setExpanded(true);
+        // get all transitions in this state
+        QList<SCTransition*> transitions;
+        st->getTransitions(transitions);
+        loadTreeTransition (item, transitions, connect);
     }
 }
 
-// TODO update the textblock load to only affect the second property table
-//loadtreetextblock
-void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , SCTextBlock* textBlock)
+void SCFormView::loadTreeTextBlock(CustomTreeWidgetItem * parentItem , SCTextBlock* textBlock)
 {
-    /*
-    CustomTreeWidgetItem * item=0;
-
-    connect(textBlock, SIGNAL(destroyed(QObject*)), this, SLOT(handleTextBlockDeleted(QObject*)), Qt::QueuedConnection);
-
-    item = new CustomTreeWidgetItem(parentItem);
-    item->setData(textBlock);
-
-    QString text = textBlock->getText();
-    item->setText(0, text);
-
-    item->setIcon(0,QIcon(":/SCFormView/textblock.bmp"));
-
-    */
-
     connect(textBlock, SIGNAL(destroyed(QObject*)), this, SLOT(handleTextBlockDeleted(QObject*)), Qt::QueuedConnection);
     _treeWidgetToTextBlock.insert(parentItem, textBlock);
-    //_itemToTextBlock.insert()
-    //IAttributeContainer* atts = textBlock->getAttributes();
-
-
 }
 
-//loadtreetransitions
-void SCFormView::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCTransition*> & transitions)
+void SCFormView::loadTreeTransition(CustomTreeWidgetItem * parentItem , QList<SCTransition*> &transitions, bool connect)
 {
-    int c = transitions.count();
-    for(int i = 0; i < c; i++)
+    SCTransition* tr;
+    CustomTreeWidgetItem* item;
+    for(int i = 0; i < transitions.count();i++)
     {
-        SCTransition * tr = transitions.at(i);
-        if (!tr) continue;
+        tr = transitions.at(i);
+        if(!tr)
+            continue;
 
-        // SCTransition connects
-        // set up the transition connects for a loaded transition
-        connect(tr, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)), Qt::QueuedConnection);
-        connect(tr, SIGNAL(eventChangedInDataModel(SCTransition*,QString)),this,SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
+        if(connect)
+            connectTransition(tr);
 
+       item = new CustomTreeWidgetItem(parentItem);
+       item->setData(tr);
 
-        CustomTreeWidgetItem * item=0;
+       item->setText(0, tr->attributes.value("event")->asString());
+       item->setIcon(0,QIcon(":/SCFormView/transitionbutton.bmp"));
 
-        item = new CustomTreeWidgetItem(parentItem);
+       // connect the transition and tree widget item to the hashtable
+       _itemToTreeWidget.insert(tr, item);
 
-        item->setData( tr);
-
-        // set the tree object's text
-        //item->setText(0, tr->attributes.value("target")->asString());
-        item->setText(0,tr->attributes.value("event")->asString());
-
-        item->setIcon(0,QIcon(":/SCFormView/transitionbutton.bmp"));
-
-        // connect the transition and tree widget item to the hashtable
-        _itemToTreeWidget.insert(tr, item);
-
-        // load the transition's text blocks
-
-
-        // load the event text block for the transiton
-        SCTextBlock  * textBlock = tr->getEventTextBlock();
-        _itemToTextBlock.insert(tr,textBlock);
-        loadTree (item, textBlock);
-
-/*
-        for(int i = 0; i < tr->getTextBlocks().count();i++)
-        {
-            SCTextBlock  * textBlock = tr->getTextBlocks().at(i);
-            loadTree (item, textBlock);
-        }
-*/
-        // TODO
-        //connect(tr, SIGNAL(transitionAddTextBlock(SCTextBlock*)), parentItem, SLOT(treeAddTextBlock(SCTextBlock*)));        // connect the transition to the tree when creating a new text block
-        // connect(tr, SIGNAL(transitionAddTextBlock(SCTextBlock*)),
-
+       // load the event text block for the transiton
+       SCTextBlock  * textBlock = tr->getEventTextBlock();
+       _itemToTextBlock.insert(tr,textBlock);
+       loadTreeTextBlock(item, textBlock);
     }
-
 }
+
+
+
 
 
 IAttributeContainer * SCFormView::getCurrentlySelectedAttributes()
@@ -1402,8 +1391,6 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* target, QStrin
     SCTransition* trans = _dm->insertNewTransition(st, target);
 
     // SCTransition connects for newly created transition
-    connect(trans, SIGNAL(eventChangedInDataModel(SCTransition*, QString)), this, SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
-
 
     _targetStateSelectionWindow->close();
 
@@ -1433,14 +1420,6 @@ void SCFormView::insertState()
     _dm->insertNewState(st);
 
     // SCState connects
-    connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
-
-    // connect the state changing its name to updating the name across the formview, data model, and graphics view
-    connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
-    connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
-    connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
-    connect(st->getIDTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*, QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*, QPointF)));
-    connect(st->getIDTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));
 }
 
 void SCFormView::sendToBack()
@@ -1604,7 +1583,7 @@ void SCFormView::textBlockPropertyTableSetText(int index, QString text)
  */
 void SCFormView::handleItemPositionChangedInDataModel(SCTextBlock* tb, QPointF point)
 {
-    qDebug() << "SCFormView:: handle tb position changed in data model";
+    //qDebug() << "SCFormView:: handle tb position changed in data model";
 
     SCState* state = dynamic_cast<SCState*>(_currentlySelected);
 
@@ -1612,8 +1591,7 @@ void SCFormView::handleItemPositionChangedInDataModel(SCTextBlock* tb, QPointF p
 
     if(state)
     {
-        qDebug() << "this tb belongs to a state";
-
+        qDebug() << "SCFormView:: updating state textblock position";
         // check that this textBlock is the currently selected one's
         if(state->getIDTextBlock() == tb)
         {
@@ -1623,7 +1601,7 @@ void SCFormView::handleItemPositionChangedInDataModel(SCTextBlock* tb, QPointF p
     }
     else if(trans)
     {
-        qDebug( )<< "this tb belongs to a transition";
+        qDebug() << "SCFormView:: updating transition textblock position";
         if(trans->getEventTextBlock() == tb)
         {
             textBlockPropertyTableSetText(textBlockPropertyTableIndexOf("position"), trans->getEventTextBlock()->attributes.value("position")->asString());
@@ -1635,15 +1613,26 @@ void SCFormView::handleItemPositionChangedInDataModel(SCTextBlock* tb, QPointF p
     }
 }
 
+/**
+ * @brief SCFormView::handleItemSizeChangedInDataModel
+ * @param tb
+ * @param size
+ *
+ * SLOT
+ * connect in SCFormView
+ *
+ * when the selectabletextblock for the textbox in the graphics view calls graphicsHasChanged, this function will update the size value shown in the textblock propery table
+ *
+ */
 void SCFormView::handleItemSizeChangedInDataModel(SCTextBlock *tb, QPointF size)
 {
-    qDebug() << "SCFormView:: handle tb size changed in data model";
+    //qDebug() << "SCFormView:: handle tb size changed in data model";
     SCState* state = dynamic_cast<SCState*>(_currentlySelected);
     SCTransition* trans = dynamic_cast<SCTransition*>(_currentlySelected);
 
     if(state)
     {
-        qDebug() << "this tb belongs to a state";
+        qDebug() << "SCFormView:: updating state textblock size";
 
         // check that this textBlock is the currently selected one's
         if(state->getIDTextBlock() == tb)
@@ -1654,7 +1643,7 @@ void SCFormView::handleItemSizeChangedInDataModel(SCTextBlock *tb, QPointF size)
     }
     else if(trans)
     {
-        qDebug( )<< "this tb belongs to a transition";
+        qDebug() << "SCFormView:: updating transition textblock size";
         if(trans->getEventTextBlock() == tb)
         {
             textBlockPropertyTableSetText(textBlockPropertyTableIndexOf("size"), trans->getEventTextBlock()->attributes.value("size")->asString());
