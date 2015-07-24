@@ -111,7 +111,7 @@ this->resize(618,1000);
     QList<SCState*> states;
     states.append( _dm->getTopState());
 
-    connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
+    connect (_dm, SIGNAL(formViewInsertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
     // TODO make a handle new textblock for scformview
 

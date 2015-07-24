@@ -330,6 +330,7 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
  * @param t
  *
  * Creation of a new transition graphic from the user creating a new transition or a transition being loaded in from the scxml file.
+ * differs from the handleNewTransitionFormView in that this transition may not necessarily know its target state when it is created, so the connectTransition function to set up the connect()s is called after all states have been loaded
  */
 void SCGraphicsView::handleNewTransition (SCTransition * t)
 {
@@ -363,10 +364,16 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
 
 }
 
+/**
+ * @brief SCGraphicsView::handleNewTransitionFormView
+ * @param t
+ *
+ * this creates a new transition graphic specifically when the formview insert new transition button is pressed
+ * it differs from the scxml handleNewTransition in that this transition will already know its target state, so it can immediately proceed to setting its connections here.
+ *
+ */
 void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
 {
-
-
     // get the parent state graphic
     SCState *parentState = dynamic_cast<SCState *>(t->parent());
     StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
@@ -379,7 +386,6 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
         return;
     }
 
-
     TransitionAttributes::TransitionPositionAttribute * pos =
             dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> (  t->attributes.value("position"));
     QPointF position(0,0);
@@ -389,32 +395,19 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
         position = pos->asQPointF();
 
     TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
-    StateBoxGraphic * targetGraphic  = lookUpTargetStateGraphic( targetName->asString() );
+    StateBoxGraphic * targetGraphic = lookUpTargetStateGraphic( targetName->asString() );
 
     // create a transition graphic
     TransitionGraphic * transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController,_mouseController);
-
-
-
 
     // add the transitiongraphic to the map of transition graphics
     _mapTransitionToGraphic.insert(t, transGraphic);
     _hashTransitionToGraphic.insert(t, transGraphic);
 
-    //targetGraphic->
+    // set the event text box position of this transition
     PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
-    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
     transGraphic->setTextPos(textPos->asPointF());
-    //transGraphic->setTextSize();
 
-
-    QMapIterator<QString, IAttribute* > i(t->getEventTextBlock()->attributes);
-
-    while(i.hasNext())
-    {
-        i.next();
-        qDebug() << "SCGPVH && textblock key: " << i.key() << " value: " << i.value()->asString();
-    }
 
     connectTransition(t);
 
@@ -515,6 +508,16 @@ void SCGraphicsView::connectState(SCState* state)
     connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
 }
 
+
+/**
+ * @brief SCGraphicsView::connectTransition
+ * @param trans
+ *
+ * calls all graphics related connects for transition graphics, their elbows, and the transition deconstructors
+ *
+ * additionally, repositions the anchors to their target states
+ *
+ */
 void SCGraphicsView::connectTransition(SCTransition* trans)
 {
 

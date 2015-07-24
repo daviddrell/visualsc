@@ -21,10 +21,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
     this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
-    //this->acceptHoverEvents();            // a Transition graphic has no dimensions, its invididual elbows and line segments will have hover events
-    //this->setParent(targetGraphic);
-    //_eventText = new SelectableTextBlock(parentGraphic, t->getEventTextBlock());
-
 
     TransitionAttributes::TransitionPathAttribute * p =
             dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
@@ -40,6 +36,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     // otherwise this is a transition graphic being loaded in, so add elbows according to its path list
     if(pointList.count() < 2 && targetGraphic != NULL )
     {
+        qDebug() << "new transition Grahpic!";
         // create two new elbows, these are the anchors attached to the source and sink state
         _anchors[0] = new ElbowGrabber(this,_keyController);
         _anchors[0]->installSceneEventFilter(this);
@@ -63,8 +60,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         QPointF targetAnchor = (_targetStateGraphic->getSideCenterPointInSceneCoord(targetSide));
 
         // use the statebox function handleTransitionLineStartMoved & handleTransitionLineEndMoved to update the anchors to this position and snap them to the box border.
-        //_anchors[0]->setPos(mapFromScene(sourceAnchor));
-        //_anchors[1]->setPos(mapFromScene(targetAnchor));
+       // _anchors[0]->setPos(mapFromScene(sourceAnchor));
+       // _anchors[1]->setPos(mapFromScene(targetAnchor));
 
 
 
@@ -86,12 +83,15 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _anchors[0]->setAnchor(true);
         _anchors[1]->setAnchor(true);
 
+        /* moved to scgraphics view
         connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
         connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
 
         //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
+        emit _anchors[0]->anchorMoved(sourceAnchor);
+        emit _anchors[1]->anchorMoved(targetAnchor);
 
-
+*/
 
 
 
@@ -105,11 +105,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         //_anchors[0]->setPos(this->mapFromScene(sourceAnchor));
         //_anchors[1]->setPos(this->mapFromScene(targetAnchor));
 
-        emit _anchors[0]->anchorMoved(sourceAnchor);
-        emit _anchors[1]->anchorMoved(targetAnchor);
 
 
-        segment->enclosePathInElbows();
+        //segment->enclosePathInElbows();
 
 
        // TextItem.setPos(25,10);
@@ -482,12 +480,14 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
         // update the segment and its elbows and its elbows' segments if it is being dragged
         if ( line->getMouseState() == ElbowGrabber::kMouseMoving && mevent)
         {
+            ElbowGrabber* left = line->getElbow(0);
+            ElbowGrabber* right = line->getElbow(1);
+            QPointF mouseInScene = mapToScene(mevent->pos());
+
             if(!line->isAnchored())
             {
                 // give the scene scope position of the mouse and update the elbow that triggered the scene event
-                ElbowGrabber* left = line->getElbow(0);
-                ElbowGrabber* right = line->getElbow(1);
-                QPointF mouseInScene = mapToScene(mevent->pos());
+
 
                 // update the position relative to the mouse event's position
                 left->setPos(mapFromScene(mouseInScene) - line->leftElbowOffset);
@@ -512,11 +512,17 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             }
             else     // an anchored line segment is being dragged
             {
-                if(line->getElbow(0)->isAnchor())   // is this a source anchor?
+                if(left->isAnchor() && right->isAnchor())    // check if both elbows of this line are anchors
                 {
-                    ElbowGrabber* left = line->getElbow(0);
-                    ElbowGrabber* right = line->getElbow(1);
-                    QPointF mouseInScene = mapToScene(mevent->pos());
+                    // then there is only one line in this transition
+                    emit left->anchorMoved((mouseInScene) - line->leftElbowOffset);
+                    emit right->anchorMoved(mouseInScene - line->rightElbowOffset);
+                    line->enclosePathInElbows();
+                    this->update();
+                }
+                else if(line->getElbow(0)->isAnchor())   // is this a source anchor?
+                {
+
 
                     // snap the source anchor to the state and set the other elbow's position
                     emit left->anchorMoved((mouseInScene) - line->leftElbowOffset);
@@ -531,9 +537,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 }
                 else        // this is a sink anchor
                 {
-                    ElbowGrabber* left = line->getElbow(0);
-                    ElbowGrabber* right = line->getElbow(1);
-                    QPointF mouseInScene = mapToScene(mevent->pos());
+
 
                     // snap the sink anchor to the state and set the other elbow's position
                     left->setPos(mapFromScene(mouseInScene) - line->leftElbowOffset);
