@@ -257,6 +257,103 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
     //qDebug()<<"htls moved";
     // this method keeps the starting position of a line snapped to the outter edge of the box
 
+
+    ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
+
+    int grid = getGridLocation(newPos);
+    QPointF mts = (pos());
+
+    qreal x = mts.x();
+    qreal y = mts.y();
+
+    qreal w = this->getSize().x();
+    qreal h = this->getSize().y();
+    qreal nx, ny;
+    qDebug() << "box position: " << mts <<" newPos: "<<newPos<<"the elbow is in grid: " << grid;
+    int wall;
+    switch (grid) {
+    case UL:
+        nx = x;
+        ny = y;
+        elbow->setSnappedSide(NORTH);
+        break;
+    case U:
+        nx = newPos.x();
+        ny = y;
+        elbow->setSnappedSide(NORTH);
+        break;
+
+    case UR:
+        nx = x+w;
+        ny = y;
+        elbow->setSnappedSide(NORTH);
+        break;
+    case R:
+        nx = x+w;
+        ny = newPos.y();
+        elbow->setSnappedSide(EAST);
+        break;
+    case DR:
+        nx = x+w;
+        ny = y+h;
+        elbow->setSnappedSide(SOUTH);
+        break;
+    case D:
+        nx = newPos.x();
+        ny = y+h;
+        elbow->setSnappedSide(SOUTH);
+        break;
+    case DL:
+        nx = x;
+        ny = y+h;
+        elbow->setSnappedSide(SOUTH);
+        break;
+    case L:
+        nx = x;
+        ny = newPos.y();
+        elbow->setSnappedSide(WEST);
+        break;
+    case C:
+        wall = returnClosestWallFace(newPos);
+        elbow->setSnappedSide(wall);
+        switch(wall)
+        {
+        case NORTH:
+            nx = newPos.x();
+            ny = y;
+            break;
+        case EAST:
+            nx = x+w;
+            ny = newPos.y();
+            break;
+
+        case SOUTH:
+            nx = newPos.x();
+            ny = y+h;
+            break;
+        case WEST:
+            nx = x;
+            ny = newPos.y();
+            break;
+        }
+
+        break;
+    default:
+        break;
+    }
+
+
+    _intersection.setX(nx);
+    _intersection.setY(ny);
+    StateBoxGraphic* parentState = elbow->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic();
+    QPointF parentOffset = (parentState->pos());
+    QPointF test(_intersection - parentOffset);             // modify the intersection by the total offset
+
+     elbow->setPos(test);
+
+
+if(false)
+{
     ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
     QPointF cursorPos = mapFromScene(newPos);
 
@@ -322,7 +419,122 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
 
     _intersection.setX(x);
     _intersection.setY(y);
+
     elbow->setPos(_intersection);
+    }
+}
+
+bool StateBoxGraphic::isBetween(qreal start, qreal end, qreal point)
+{
+    return (point>=start)&&(point<=end);
+}
+
+int StateBoxGraphic::getGridLocation(QPointF point)
+{
+    qreal px = point.x();
+    qreal py = point.y();
+
+    QPointF mts = (pos());
+
+    qreal x = mts.x();
+    qreal y = mts.y();
+
+    qreal w = this->getSize().x();
+    qreal h = this->getSize().y();
+
+    // above the box
+    if(py < y )
+    {
+        // directly above
+        if(isBetween(x,x+w,px))
+            return U;
+
+        else if(px<x)
+            return UL;
+
+        else
+            return UR;
+    }
+
+    // below
+    else if( py > (y+h) )
+    {
+        //directly below
+        if(isBetween(x,x+w,px))
+            return D;
+        else if(px < x)
+            return DL;
+        else
+            return DR;
+    }
+
+    // directly right of the box
+    else if( px > (x+w) && isBetween(y,y+h,py))
+    {
+        return R;
+    }
+
+    // directly left of the box
+    else if( px < x && isBetween(y,y+h,py))
+    {
+        return L;
+    }
+
+    else    // otherwise it is in the center of the box
+        return C;
+
+}
+
+/**
+ * @brief StateBoxGraphic::returnClosestWallFace
+ * @param newPos
+ * @return
+ *
+ * returns the wall closest to the point given, used when the point is inside the rectangle of the state box and we want to know which wall its closest to to set its anchor
+ *
+ */
+int StateBoxGraphic::returnClosestWallFace(QPointF newPos)
+{
+    QPointF mts = (pos());
+
+    qreal x = mts.x();
+    qreal y = mts.y();
+
+    qreal w = this->getSize().x();
+    qreal h = this->getSize().y();
+
+    qreal dn, dr, dd, dl;
+    dn = fabs(y - newPos.y());
+    dr = fabs(x+w-newPos.x());
+    dl = fabs(x - newPos.x());
+    dd = fabs(y+h-newPos.y());
+
+    if(dn < dr && dn < dd && dn < dl)
+        return NORTH;
+
+    else if(dr < dn && dr < dd && dr < dl)
+        return EAST;
+
+    else if(dd < dn && dd < dr && dd < dl)
+        return SOUTH;
+
+    else
+        return WEST;
+}
+
+int StateBoxGraphic::returnClosestWallFace(qreal a, qreal b, qreal c, qreal d)
+{
+    if(a < b && a < c && a < d)
+        return NORTH;
+
+    else if(b < a && b < c && b < d)
+        return EAST;
+
+    else if(c < a && c < b && c < d)
+        return SOUTH;
+
+    else
+        return WEST;
 }
 
 /**
@@ -333,6 +545,114 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
  * place of a regular setPos to snap the elbow to its anchored state.
  */
 void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
+{
+    ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
+
+    int grid = getGridLocation(newPos);
+    QPointF mts = (pos());
+
+    qreal x = mts.x();
+    qreal y = mts.y();
+
+    qreal w = this->getSize().x();
+    qreal h = this->getSize().y();
+    qreal nx, ny;
+    qDebug() << "box position: " << mts <<" newPos: "<<newPos<<"the elbow is in grid: " << grid;
+    int wall;
+    switch (grid) {
+    case UL:
+        nx = x;
+        ny = y;
+        elbow->setSnappedSide(NORTH);
+        break;
+    case U:
+        nx = newPos.x();
+        ny = y;
+        elbow->setSnappedSide(NORTH);
+        break;
+
+    case UR:
+        nx = x+w;
+        ny = y;
+        elbow->setSnappedSide(NORTH);
+        break;
+    case R:
+        nx = x+w;
+        ny = newPos.y();
+        elbow->setSnappedSide(EAST);
+        break;
+    case DR:
+        nx = x+w;
+        ny = y+h;
+        elbow->setSnappedSide(SOUTH);
+        break;
+    case D:
+        nx = newPos.x();
+        ny = y+h;
+        elbow->setSnappedSide(SOUTH);
+        break;
+    case DL:
+        nx = x;
+        ny = y+h;
+        elbow->setSnappedSide(SOUTH);
+        break;
+    case L:
+        nx = x;
+        ny = newPos.y();
+        elbow->setSnappedSide(WEST);
+        break;
+    case C:
+        wall = returnClosestWallFace(newPos);
+        elbow->setSnappedSide(wall);
+        switch(wall)
+        {
+        case NORTH:
+            nx = newPos.x();
+            ny = y;
+            break;
+        case EAST:
+            nx = x+w;
+            ny = newPos.y();
+            break;
+
+        case SOUTH:
+            nx = newPos.x();
+            ny = y+h;
+            break;
+        case WEST:
+            nx = x;
+            ny = newPos.y();
+            break;
+        }
+
+        break;
+    default:
+        break;
+    }
+
+
+    _intersection.setX(nx);
+    _intersection.setY(ny);
+
+   // update the elbow to the intersection
+
+
+
+    // this is how to handle snapping children states of one state to any other state outside of its parent
+    StateBoxGraphic* parentState = elbow->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic();       // find the next highest parent of this state
+    QPointF parentOffset = (parentState->pos());                                                            // add its position to the total offset
+    while(parentState->parentItem())                                // while this parent still has parents, continue adding each next higher level state's offset
+    {
+        parentState = dynamic_cast<StateBoxGraphic*>(parentState->parentItem());
+        parentOffset+=parentState->pos();
+    }
+
+    QPointF test(_intersection - parentOffset);             // modify the intersection by the total offset
+    // qDebug() << "test: " << test;
+    elbow->setPos(test);
+
+
+if(false)
 {
     // qDebug() << "htle moved";
     // this method keeps the starting position of a line snapped to the outter edge of the box
@@ -449,6 +769,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
     elbow->setPos(test);                                    // set the elbow's position
 }
 
+}
 StateBoxGraphic* StateBoxGraphic::parentItemAsStateBoxGraphic()
 {
     if(this==NULL)

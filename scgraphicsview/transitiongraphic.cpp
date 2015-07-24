@@ -269,7 +269,9 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
     }
     // change the elbow's coordinates to the specified x and y
     else
+    {
         elbow->setPos(mapFromScene(newPos));
+    }
 
     // update the polygon of the segments
     updateLineSegments(elbow);
@@ -394,6 +396,8 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 //this->updateElbow(this->mapFromItem(elbow, mevent->pos()), elbow);
                 //this->update();
                 updateElbow(elbow->mapToScene(mevent->pos()),elbow);
+
+
             }
             return true;     // this is needed
 
@@ -461,7 +465,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
         }
 
         // update the segment and its elbows and its elbows' segments if it is being dragged
-        if ( line->getMouseState() == ElbowGrabber::kMouseMoving )
+        if ( line->getMouseState() == ElbowGrabber::kMouseMoving && mevent)
         {
             if(!line->isAnchored())
             {
@@ -474,10 +478,19 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 left->setPos(mapFromScene(mouseInScene) - line->leftElbowOffset);
                 right->setPos(mapFromScene(mouseInScene) - line->rightElbowOffset);
 
+                bool rightAngleMode = false;
+                if(rightAngleMode)
+                {
+                    bindNeighborElbows(left);
+                    bindNeighborElbows(right);
+                }
+
                 // update the three line segments that touch these two elbows
                 line->enclosePathInElbows();
                 left->getSegment(0)->enclosePathInElbows();
                 right->getSegment(1)->enclosePathInElbows();
+
+
 
                 // update the data model
                 this->update();
@@ -523,198 +536,51 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
         return true;     // this is needed
     }
 
-
-
- if(false)
- {
-    if(hevent)
-    {
-        switch(event->type())
-        {
-         case QEvent::GraphicsSceneHoverEnter:
-            qDebug() << "Hover Enter";
-            if(elbow!=NULL)
-            {
-                //elbow->forceLineHoverLeaveEvent();    no longer necessary
-                elbow->forceHoverEnterEvent();
-
-            }
-            else if(line!=NULL)
-            {
-                line->forceHoverEnterEvent();
-                //_transitionTextBox->setVisible(true);
-            }
-
-
-            break;
-        case QEvent::GraphicsSceneHoverLeave:
-            qDebug() << "Hover Leave";
-            if(elbow!=NULL)
-            {
-                elbow->forceHoverLeaveEvent();
-            }
-            else if(line!=NULL)
-            {
-                line->forceHoverLeaveEvent();
-                //_transitionTextBox->setVisible(false);
-                _hasMovedSinceCreatingElbow = true;     // elbows can be created again after unhovering the segment
-            }
-
-            break;
-        }
-    }
-    else if(mevent && elbow)
-    {
-        switch(event->type())
-        {
-            // if the mouse went down, record the x,y coords of the press, record it inside the corner object
-            case QEvent::GraphicsSceneMousePress:
-            {
-                qDebug() << "mouse press";
-                elbow->setMouseState(ElbowGrabber::kMouseDown);
-
-                QPointF scenePosition =  elbow->mapToScene(mevent->pos());
-                elbow->mouseDownY = scenePosition.y();
-                elbow->mouseDownX = scenePosition.x();
-
-
-
-                //_cornerGrabbed = true;
-                qDebug() << "Corner Position: " << elbow->mouseDownX<<" ," << elbow->mouseDownY;
-
-                LineSegmentGraphic* segOne = elbow->getSegment(0);
-                LineSegmentGraphic* segTwo = elbow->getSegment(1);
-                if(segOne && segOne->isHovered())
-                {
-                    segOne->forceHoverLeaveEvent(); // a mouse press should switch focus to elbows, so force the segments for this elbow to be unhovered
-                }
-                if(segTwo && segTwo->isHovered())
-                {
-
-                    segTwo->forceHoverLeaveEvent();
-                }
-                elbow->forceHoverEnterEvent(); // old elbow hover events will trigger for mouse press and releases
-
-            }
-            break;
-
-
-        case QEvent::GraphicsSceneMouseRelease:
-            {
-                qDebug() << "mouse release";
-                //_cornerGrabbed = false;
-
-                elbow->setMouseState(ElbowGrabber::kMouseReleased);
-                updateModel();                  // update the transition datamodel for this path
-                elbow->forceHoverLeaveEvent();  // old elbow hover events will trigger for mouse press and releases
-            }
-            break;
-
-
-        case QEvent::GraphicsSceneMouseMove:
-            {
-                qDebug() << "mouse moving";
-                elbow->setMouseState(ElbowGrabber::kMouseMoving );
-            }
-            break;
-
-
-        default:
-            // we dont care about the rest of the events
-            return false;
-            break;
-
-
-        }
-
-        if ( elbow->getMouseState() == ElbowGrabber::kMouseMoving )
-        {
-            // give the scene scope position of the mouse and update the elbow that triggered the scene event
-            this->updateElbow(elbow->mapToScene(mevent->pos()), elbow);
-            //this->updateElbow(this->mapFromItem(elbow, mevent->pos()), elbow);
-            //this->update();
-        }
-
-        return true;// true => do not send event to watched - we are finished with this event
-
-    }
-
-
-    if(line)
-    {
-        qDebug() << "event type: "<<event->type() <<" LINE";
-    }
- }
-    /*
-    else if( mevent && line)
-    {
-        qDebug() << "line mevent; " << event->type() << "\tlinemousestaet: "<<line->getMouseState();
-        switch(event->type())
-        {
-            // if the mouse went down, record the x,y coords of the press, record it inside the corner object
-        case QEvent::GraphicsSceneMouseDoubleClick:
-        {
-            qDebug() << "you have double clicked a line segment";
-            //_transitionTextBox->setVisible(!_transitionTextBox->isVisible());
-        }
-            break;
-
-        // if the mouse went down, record the x,y coords of the press, record it inside the corner object
-        case QEvent::GraphicsSceneMousePress:
-        {
-            qDebug() << "you have mouse pressed on a line segment";
-            line->setMouseState(ElbowGrabber::kMouseDown);
-
-            QPointF scenePosition = line->mapToScene(mevent->pos());
-            line->mouseDownX = scenePosition.x();
-            line->mouseDownY = scenePosition.y();
-        }
-            break;
-
-        case QEvent::GraphicsSceneMouseRelease:
-        {
-            qDebug () << "you have released a line segment";
-            line->setMouseState(ElbowGrabber::kMouseReleased);
-            updateModel();
-            line->forceHoverLeaveEvent();
-        }
-            break;
-
-        case QEvent::GraphicsSceneMouseMove:
-        {
-            qDebug( )<< "mouse moving on line";
-            line->setMouseState(ElbowGrabber::kMouseMoving);
-        }
-            break;
-
-        default:
-            return false; // we do not care about the reset of the events
-            break;
-        }
-
-        if(line->getMouseState() == ElbowGrabber::kMouseMoving)
-        {
-            qDebug() << "the line is moving, so update it";
-            ElbowGrabber* left = line->getElbow(0);
-            ElbowGrabber* right = line->getElbow(1);
-
-            updateElbow(left->mapToScene(mevent->pos()), left);
-            updateElbow(right->mapToScene(mevent->pos()),right);
-        }
-
-    }*/
-
-
-
-
-
-
-
-
-    return false;
-
+    return false; // we don't care about the rest of the events
 }
 
+void TransitionGraphic::bindNeighborElbows(ElbowGrabber* elbow)
+{
+    if(elbow->isAnchor())
+    {
+
+    }
+    else    // not an anchor elbow
+    {
+        ElbowGrabber* left = elbow->getSegment(0)->getElbow(0);
+        qreal xDist = fabs(left->x() - elbow->x());
+        qreal yDist = fabs(left->y() - elbow->y());
+
+        if(xDist < yDist)
+        {
+            left->setX(elbow->x());
+        }
+        else
+        {
+            left->setY(elbow->y());
+        }
+
+        if(left->isAnchor())
+            emit left->anchorMoved(left->pos());
+
+        ElbowGrabber* right = elbow->getSegment(1)->getElbow(1);
+        qreal rxDist = fabs(right->x() - elbow->x());
+        qreal ryDist = fabs(right->y() - elbow->y());
+
+        if(rxDist < ryDist)
+        {
+            right->setX(elbow->x());
+        }
+        else
+        {
+            right->setY(elbow->y());
+        }
+
+        if(right->isAnchor())
+            emit right->anchorMoved(right->pos());
+
+    }
+}
 
 void TransitionGraphic::createCustomPath(QPointF mouseLocation, ElbowGrabber* elbow)
 {//TODO

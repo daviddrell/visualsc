@@ -49,7 +49,8 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         _currentlySelected(NULL),
         _previouslySelected(NULL)
 {
-this->resize(600,1000);
+this->resize(618,1000);
+
     createActions();
     createMenus();
     createToolbars();

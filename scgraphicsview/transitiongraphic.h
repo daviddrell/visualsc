@@ -79,6 +79,7 @@ protected:
 private :
 
         // private methods
+    void bindNeighborElbows(ElbowGrabber* elbow);
     void updateElbow(QPointF newPos, ElbowGrabber* elbow);
     void updateLineSegments(ElbowGrabber* elbow);
     void getClosestSides(int* sourceSide, int* targetSide);
