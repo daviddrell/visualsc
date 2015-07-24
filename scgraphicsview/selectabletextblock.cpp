@@ -305,5 +305,4 @@ void SelectableTextBlock::graphicHasChanged()
 
     emit _textBlockModel->sizeChangedInDataModel(_textBlockModel, sz);
     emit _textBlockModel->positionChangedInDataModel(_textBlockModel, ps);
-
 }

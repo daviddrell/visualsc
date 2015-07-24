@@ -61,7 +61,12 @@ SCState::~SCState()
 {
     // remove all the transitions into this state
     // scdatamodel will handle disconnections other transitions related to this state
-    removeAllTransitionsIn();
+    // handled by linked deconstructors  // delete outgoing transitions
+
+    removeTargetsTransitionIn();
+    removeSourcesTransitionOut();
+
+    removeAllTransitionsIn();       // delete incoming transitions
     _transitingTransitionsIn.clear();
     _transitingTransitionsOut.clear();
     _transitionsTerminatingHere.clear();
@@ -338,12 +343,28 @@ void SCState::removeTargetsTransitionIn()
     qDebug() <<"SCState::removeTargetsTransitonIn";
     SCTransition* trans;
     SCState* target;
-    qDebug() << "_transitingTransitionsOut: " << _transitingTransitionsOut.count();
     for(int i = 0; i < _transitingTransitionsOut.count();i++)
     {
         trans = _transitingTransitionsOut.at(i);
         target = trans->targetState();
         target->removeTransitionIn(trans);
+        //  qDebug() << "... removing " << _transitingTransitionsOut.count() << " Out Transitions for state: " <<target->objectName();
+
+    }
+}
+
+void SCState::removeSourcesTransitionOut()
+{
+    qDebug() << "SCState::removeSourcesTransitionIn";
+    SCTransition* trans;
+    SCState* source;
+
+    for(int i = 0; i < _transitingTransitionsIn.count(); i++)
+    {
+        trans = _transitingTransitionsIn.at(i);
+        source = trans->parentSCState();
+        source->removeTransitionOut(trans);
+        qDebug() << "... removing out transition for state: " <<  source->objectName();
     }
 }
 

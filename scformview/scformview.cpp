@@ -113,6 +113,7 @@ this->resize(618,1000);
 
     connect (_dm, SIGNAL(formViewInsertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
+    connect (_dm, SIGNAL(transitionsReadyToConnect(SCTransition*)), this, SLOT(handleMakeTransitionConnections(SCTransition*)));
     // TODO make a handle new textblock for scformview
 
 
@@ -140,6 +141,10 @@ void SCFormView::initTree()
 
 
 
+void SCFormView::handleMakeTransitionConnections(SCTransition* trans)
+{
+    connectTransition(trans);
+}
 
 
 /**
@@ -151,7 +156,7 @@ void SCFormView::initTree()
  */
 void SCFormView::handleNewTransition(SCTransition*t)
 {
-
+    qDebug()<<"SCFormView::handleNewTransition";
     (void)t;
     QList<SCState*> states;
     states.append( _dm->getTopState());
@@ -160,7 +165,9 @@ void SCFormView::handleNewTransition(SCTransition*t)
 
     connectTransition(t);
     replantTree();
-    findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
+
+    if(_currentlySelected)
+        findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
 
     //loadTree (NULL, states);
 }
@@ -186,7 +193,9 @@ void SCFormView::handleNewState(SCState*s)
 
     connectState(s);
     replantTree();
-    findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
+
+    if(_currentlySelected)
+        findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
 
 
     //loadTree (NULL, states);
@@ -362,6 +371,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
             updateTransitionEvent(trans, value);
 
             // update the data model and graphics view
+           qDebug() << "emit trans->eventChangedInFormView(trans, value);";
             emit trans->eventChangedInFormView(trans, value);
 
             //updateTransitionEvent(trans, value);
@@ -496,6 +506,7 @@ void SCFormView::connectState(SCState* st)
 
 void SCFormView::connectTransition(SCTransition* trans)
 {
+    qDebug() << "SCFormView::connectTransition for " << trans->attributes.value("event")->asString();
     connect(trans, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
     connect(trans, SIGNAL(eventChangedInDataModel(SCTransition*, QString)), this, SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
     connect(trans->getEventTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*,QPointF)));
@@ -912,7 +923,8 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
 
     // delete the old attribute connects
     IAttributeContainer * previousAttributes = getPreviouslySelectedAttributes();
-    setAttributeConnections(previousAttributes, false);
+    if(previousAttributes)  // may be null
+        setAttributeConnections(previousAttributes, false);
 
     // load the new attributes
     IAttributeContainer * currentAttributes =  getCurrentlySelectedAttributes();
@@ -1448,6 +1460,7 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* target, QStrin
     SCTransition* trans = _dm->insertNewTransition(st, target);
 
     // SCTransition connects for newly created transition
+    //connectTransition(trans);
 
     _targetStateSelectionWindow->close();
 
@@ -1726,7 +1739,7 @@ void SCFormView::handleItemSizeChangedInDataModel(SCTextBlock *tb, QPointF size)
  */
 void SCFormView::handleItemNameChangedInDataModel(SCTransition* trans, QString eventName)
 {
-    qDebug() << "transition event name was changed in the data model";
+    qDebug() << "SCFormView::handleItemNameChangedInDataModel transition event name was changed in the data model";
 
     if(trans)
     {

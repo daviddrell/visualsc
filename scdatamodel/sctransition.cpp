@@ -80,6 +80,8 @@ SCTransition::SCTransition(QObject * parent):
 
 SCTransition::~SCTransition()
 {
+    qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
+
     SCState* source = parentSCState();
     SCState* target = targetState();
     if(source)
@@ -88,7 +90,6 @@ SCTransition::~SCTransition()
     if(target)
         target->removeTransitionIn(this);
 
-    qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
     delete _eventTextBlock;
 }
 
@@ -102,13 +103,24 @@ void SCTransition::setText(QString eventText)
     _eventTextBlock->setText(eventText);
 }
 
+/**
+ * @brief SCTransition::handleTextBlockChanged
+ *
+ * SLOT
+ *
+ * signal
+ * connect in scformview
+ *
+ */
 void SCTransition::handleTextBlockChanged()
 {
+    qDebug() << "SCTransition::handleTextBlockChanged";
     IAttribute* event = attributes.value("event");
     QString eventText = _eventTextBlock->getText();
 
     this->setObjectName(eventText);
     event->setValue(eventText);
+    qDebug() << "event changed in data model:  emit eventChangedInDataModel(this, eventText);" << eventText;
     emit eventChangedInDataModel(this, eventText);
 }
 

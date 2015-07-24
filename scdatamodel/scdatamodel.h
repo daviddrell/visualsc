@@ -125,6 +125,7 @@ signals:
     void transitionsReadyToConnect(SCTransition*);
     void formViewInsertNewTransitionSignal(SCTransition*);
 
+
 private slots:
 
     void handleMakeANewState(StateAttributes*);

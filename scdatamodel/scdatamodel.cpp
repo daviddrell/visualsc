@@ -50,7 +50,6 @@ void SCDataModel::connectDataModel()
     connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransitionTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewEventTextBlock(TextBlockAttributes*)));
-
 }
 
 SCDataModel * SCDataModel::singleton()
@@ -84,6 +83,7 @@ void SCDataModel::reset()
         {
             SCState *st = list.at(i);
             st->removeTargetsTransitionIn();
+            st->removeSourcesTransitionOut();
         }
 
         // delete highest level states, this will automatically delete all sub states
@@ -264,6 +264,7 @@ void SCDataModel::openFile(QString fileName)
        // set up the transition connections in the graphics
        for(int i = 0; i < _transitions.count(); i++)
        {
+           // alert the graphics view and formview that the transition is ready to set up its connections
            emit transitionsReadyToConnect(_transitions.at(i));
        }
 
@@ -373,10 +374,47 @@ void SCDataModel::getStates(QList<SCState *>& list)
  *
  */
 
+
+
+
 // TODO this can be optimized.
 bool SCDataModel::deleteItem(QObject * item)
 {
+    SCState* state = dynamic_cast<SCState*>(item);
+    SCTransition* trans = dynamic_cast<SCTransition*>(item);
 
+    if(state)
+    {
+        qDebug() << "SCDataModel::deleteItem state: " << state->objectName() << " the top state is: " <<_topState->objectName();
+        /*QList<SCState*> list;
+        _topState->getAllStates(list);
+
+        // unhook target state's in transitions
+        state->removeTargetsTransitionIn();
+        state->removeSourcesTransitionOut();
+
+        QList<SCState*> childrenStates;
+
+        state->getAllStates(childrenStates);
+        SCState* child;
+        for(int i = 0 ; i < childrenStates.count(); i++)
+        {
+            child = childrenStates.at(i);
+
+        }*/
+        delete state;
+    }
+    else if(trans)
+    {
+        delete trans;
+    }
+    else // unexpected item
+    {
+        qDebug( )<< "ERROR: given an unexpected item to delete!";
+    }
+
+    if(false)
+    {
     QList<SCState *> list;
 
     list.append(_topState);
@@ -390,6 +428,7 @@ bool SCDataModel::deleteItem(QObject * item)
         {
 
             st->removeTargetsTransitionIn();
+
             //deleteInTransitions(st);
 
             int i = list.indexOf(st);
@@ -408,6 +447,13 @@ bool SCDataModel::deleteItem(QObject * item)
         SCTransition *tr = tlist.at(i);
         if ( tr == item)
         {
+            SCState* source = tr->parentSCState();
+            SCState* target = tr->targetState();
+            if(source)
+                source->removeTransitionOut(tr);
+
+            if(target)
+                target->removeTransitionIn(tr);
             // unhook the transition from the references of the state.
             int i = tlist.indexOf(tr);
             tlist.removeAt(i);
@@ -417,6 +463,7 @@ bool SCDataModel::deleteItem(QObject * item)
     }
 
     return false;
+    }
 }
 
 /**
@@ -930,7 +977,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     source->addTransitionReference(transition, SCState::kTransitOut);
     transition->setTargetState(target);
 
-
+    connectTransition(transition);
     _transitions.append(transition);
 
     qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
@@ -969,6 +1016,8 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     transition->attributes.setAttributes(*ta);
     transition->setText(transition->attributes.value("event")->asString());
 
+    connectTransition(transition);
+
     _currentTransition = transition;
     _currentState->addTransistion(transition);
 
@@ -977,6 +1026,8 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     delete ta;
 
     qDebug() << "leave handleMakeANewTransition, : "  ;
+
+
 
 }
 /*

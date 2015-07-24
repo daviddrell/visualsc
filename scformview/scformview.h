@@ -82,6 +82,7 @@ public:
 
 
 private slots:
+    void handleMakeTransitionConnections(SCTransition* trans);
     void backgroundButtonGroupClicked(QAbstractButton *button);
     void buttonGroupClicked(int id);
     void deleteItem();

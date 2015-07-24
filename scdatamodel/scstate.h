@@ -86,6 +86,8 @@ public:
 
 
     void removeTargetsTransitionIn();
+    void removeSourcesTransitionOut();
+
 
     QList<SCTransition*> getTransitionsIn();
     QList<SCTransition*> getTransitionsTerminating();

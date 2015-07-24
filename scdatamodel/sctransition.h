@@ -84,6 +84,7 @@ public:
     void setTargetState(SCState*);
 
 signals:
+
     void eventChangedInFormView(SCTransition*, QString);
     void eventChangedInDataModel(SCTransition*, QString);
     void selected();
