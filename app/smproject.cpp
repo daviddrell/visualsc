@@ -31,7 +31,8 @@ SMProject::SMProject(QWidget *parentWidget): QObject(parentWidget),
         _graphicsView( NULL ),
         _parentWidget(parentWidget)
 {
-
+        _dm->initializeEmptyStateMachine();
+        _dm->connectDataModel();
 }
 
 SMProject::~SMProject()
@@ -39,6 +40,7 @@ SMProject::~SMProject()
     close();
     if (_graphicsView) delete _graphicsView;
 }
+
 
 SCDataModel * SMProject::getDM()
 {
@@ -56,6 +58,7 @@ QGraphicsView * SMProject::getQGraphicsView()
     return  _graphicsView->getQGraphicsView();
 }
 
+// deprecated function
 void SMProject::initNewSM()
 {
     _dm->initializeEmptyStateMachine();

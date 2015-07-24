@@ -39,6 +39,20 @@ SCDataModel::SCDataModel(QObject * parent) :
 
 }
 
+
+void SCDataModel::connectDataModel()
+{
+    connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(makeANewIDTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewIDTextBlock(TextBlockAttributes*)), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
+    connect(&_reader, SIGNAL(makeANewTransitionTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewEventTextBlock(TextBlockAttributes*)));
+
+}
+
 SCDataModel * SCDataModel::singleton()
 {
     static SCDataModel * instance=NULL;
@@ -46,6 +60,45 @@ SCDataModel * SCDataModel::singleton()
         instance = new SCDataModel(NULL);
 
     return instance;
+}
+
+/**
+ * @brief SCDataModel::reset
+ * will reset the datamodel, clearing all transitions and states bar the Root Machine State
+ */
+void SCDataModel::reset()
+{
+    _currentState = _topState;
+    _topLevel =_level = 0;
+    _topState->setLevel(_level);
+    {
+
+        QList<SCState *> list;
+        //list.append(_topState);
+        _topState->getAllStates(list);
+
+
+
+         // first delete transitions and disconnect them from the states
+        for(int i =0; i < list.count(); i++)
+        {
+            SCState *st = list.at(i);
+            st->removeTargetsTransitionIn();
+        }
+
+        // delete highest level states, this will automatically delete all sub states
+        QList<SCState*> directChildren;
+        _topState->getStates(directChildren);
+        for(int i = 0 ; i < directChildren.count(); i++)
+        {
+            SCState* st = directChildren.at(i);
+
+                qDebug() << "removing state: " << st->attributes.value("name")->asString();
+                delete st;
+        }
+    }
+    _transitions.clear();
+    qDebug() << "AFTER A RESET, YOU HAVE " << _transitions.count() << " TRANSITIONS LISTED IN _transitions";
 }
 
 void SCDataModel::logError(QString message)
@@ -58,7 +111,6 @@ void SCDataModel::logError(QString message)
 void SCDataModel::logInfo(QString message)
 {
     // TBD: put on a message list that can be displayed or or viewed in the application
-
     qDebug()<<message;
 }
 
@@ -112,9 +164,7 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     }
 
     _writer = new QXmlStreamWriter(&file);
-
     _writer->setAutoFormatting(true);
-
     _writer->writeStartDocument();
 
     // the top level state should be of type 'machine', and is a special type of state element called 'scxml'
@@ -144,6 +194,8 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
 }
 
 /**
+
+
  * @brief SCDataModel::open
  * @param file
  *
@@ -151,21 +203,14 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
  *
  * will read from an scxml file and create a the datamodel
  *
+ *
+ *
+ * DEPRECATED FUNCTION
  */
 void SCDataModel::open(QString file)
 {
 
-    connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::DirectConnection);
-    connect(&_reader, SIGNAL(enterStateElement()), this, SLOT(handleTransitDown()), Qt::DirectConnection);
-    connect(&_reader, SIGNAL(leaveStateElement()), this, SLOT(handleTransitUp()), Qt::DirectConnection);
 
-    connect(&_reader, SIGNAL(makeANewIDTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewIDTextBlock(TextBlockAttributes*)), Qt::DirectConnection);
-
-    connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)), Qt::DirectConnection);
-    connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::DirectConnection);
-    connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
-
-    connect(&_reader, SIGNAL(makeANewTransitionTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewEventTextBlock(TextBlockAttributes*)));
 
     _reader.readFile(file);
 
@@ -189,6 +234,46 @@ void SCDataModel::open(QString file)
 
 }
 
+/**
+ * @brief SCDataModel::openFile
+ * @param fileName
+ *
+ * called in MainWindow::handleFileOpenClick()
+ * the datamodel is reset and then open file is called to reload the datamodel
+ *
+ * sets the filename for the reader and runs the reader
+ *
+ *
+ *
+ */
+void SCDataModel::openFile(QString fileName)
+{
+    _reader.readFile(fileName);
+    _reader.run();
+
+    bool ok;
+    QStringList messages;
+    _reader.getReadResult(ok, messages);
+
+    qDebug()<<"% ok message : " << ok;
+    if(ok);
+    {
+       // set up the transition connections in the data model
+       connectTransitionsToStatePath();
+
+       // set up the transition connections in the graphics
+       for(int i = 0; i < _transitions.count(); i++)
+       {
+           emit transitionsReadyToConnect(_transitions.at(i));
+       }
+
+    }
+
+}
+
+
+
+
 void SCDataModel::connectTransitionsToStatePath()
 {
     QList<SCTransition *> tlist;
@@ -198,14 +283,11 @@ void SCDataModel::connectTransitionsToStatePath()
     for (int t = 0; t < tlist.count(); t++)
     {
         SCTransition* trans = tlist.at(t);
-
         QString targetStr = trans->attributes["target"]->asString();
-
         SCState * targetState = _topState->getStateByName(targetStr);
         qDebug() << "target String: " << targetStr << " targetState; " << targetState->objectName();
         if ( targetState )
         {
-
             makeTransitionConnections(targetState, trans);
         }
     }
@@ -290,6 +372,8 @@ void SCDataModel::getStates(QList<SCState *>& list)
  * returns false if item was not found
  *
  */
+
+// TODO this can be optimized.
 bool SCDataModel::deleteItem(QObject * item)
 {
 
@@ -434,8 +518,15 @@ void SCDataModel::handleTransitUp()
 }
 
 
+// TODO change "Root Machine" to name of file
+
+/**
+ * @brief SCDataModel::initializeEmptyStateMachine
+ */
+
 void SCDataModel::initializeEmptyStateMachine()
 {
+
     if ( _topState != 0 )
     {
         delete _topState;
@@ -451,7 +542,7 @@ void SCDataModel::initializeEmptyStateMachine()
     StateString *nsp = new StateString(NULL,"xmlns","http://www.w3.org/2005/07/scxml");
     stateAttributes->addItem(nsp);
 
-    StateName *nm = new StateName(NULL,"name", "Root Machine");
+    StateName *nm = new StateName(NULL,"name", "Root State Machine");
     stateAttributes->addItem(nm);
 
     _topState = new SCState(true);
@@ -461,9 +552,9 @@ void SCDataModel::initializeEmptyStateMachine()
 
     _currentState  = _topState;
 
-    emit newStateSignal(_topState);
+    //emit newStateSignal(_topState);
 
-
+    qDebug() << "initialized empty state machine! " << "_currentState: " <<nm->asString()<<" on level: "<<_level;
     delete sa;
 
 }
@@ -478,9 +569,72 @@ void SCDataModel::initializeEmptyStateMachine()
  * connected to SCXMLReader
  * this function is only used when creating states from the xml file.
  *
+ *
+ * SIGNAL
+ *
+ * signals the graphicsview and form view
+ *
  */
 void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 {
+    qDebug() << "SCDataModel::handleMakeANewState on level " << _level;
+    SCState* state = NULL;
+    state = new SCState(_currentState);
+    state->attributes.setAttributes( *sa);
+    state->setLevel(_level);
+
+
+    /*PositionAttribute * position =dynamic_cast<PositionAttribute*> ((IAttribute*)state->attributes.value("position"));
+    QPointF ps = position->asPointF();
+    state->setPosition(ps);
+*/
+    QString name ;
+    if (! sa->contains("name"))
+    {
+        // is this an initial state?
+        if ( sa->value("type")->asString() == "initial")
+        {
+            name =     _currentState->objectName() + "_initial" ;
+        }
+        else if ( sa->value("type")->asString() == "final")
+        {
+            name =     _currentState->objectName() + "_final" ;
+        }
+        else
+        {
+            name = _currentState->objectName() + "_" + QString::number( _currentState->children().count() );
+        }
+
+        StateName *nm = new StateName(NULL,"name",name);
+        state->attributes.addItem(nm);
+    }
+    else
+    {
+        name = sa->value("name")->asString();
+    }
+
+    state->setObjectName( name );
+    state->setText(name);
+
+    qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
+
+    // SCState connects. 1 of 2 places where the SCState connects are set up. this is for loading states through the xml
+    connectState(state);
+
+    _currentState  = state;
+
+
+    // connected to scformview slot handleNewState
+    // connected to scgraphicsview slot handleNewState
+    emit newStateSignal(state);
+
+
+    delete sa;
+
+
+    if(false)
+    {
+    qDebug() <<" SCDataModel::handleMakeANewState " << _level;
     SCState * state = NULL;
 
     if ( _currentState == 0 )
@@ -571,6 +725,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 
     delete sa;
+    }
 
 }
 
@@ -756,8 +911,9 @@ void SCDataModel::handleStatePositionChangedInFormView(SCState* state, QPointF p
  * creates a new SCTransition object and then emits a newTransitionSignal
  * which will show the new transition in the tree view and in the graphics view
  *
- * also adds two connection references for the states
+ * also adds two connection references for the states and sets the target state for the transition
  *
+ * signal
  *
  */
 SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target )
@@ -768,14 +924,21 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
 
     transition->setAttributeValue("target", target->attributes.value("name")->asString());
     transition->setAttributeValue("event", "event");
-    transition->setObjectName("Transition");
+    transition->setObjectName("event");
     target->addTransitionReference(transition, SCState::kTransitIn);
-    qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
     source->addTransitionReference(transition, SCState::kTransitOut);
+    transition->setTargetState(target);
+
+
+    _transitions.append(transition);
+
+    qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
+
 
     //connect(transition,SIGNAL((SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
-
-    emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition and scformview's handle new transition
+    //emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition and scformview's handle new transition
+    //emit transitionsReadyToConnect(transition);
+    emit formViewInsertNewTransitionSignal(transition);
 
     return transition;
 }
@@ -784,15 +947,19 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
  * @brief SCDataModel::handleMakeANewTransition
  * @param ta
  *
+ *
+ * called by the scxmlreader
+ * this function is used when adding transitions read from an scxml file
+ *
  * SLOT
  * connect(scxmlreader, makeANewTransition, scdatamodel, handleMakeANewTransition)
  *
  */
 void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
 {
-    /*
+
     qDebug() << "handleMakeANewTransition, : "  + ta->value("target")->asString() << "\t" << ta->value("event")->asString();
-*/
+
     SCTransition * transition = new SCTransition(_currentState);
 
     if ( _currentState == 0)
@@ -803,14 +970,27 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
 
     _currentTransition = transition;
     _currentState->addTransistion(transition);
-    //transition->setTargetState();
-    //transition->setTargetState(transition);
+
+    _transitions.append(transition);
 
     delete ta;
 
     qDebug() << "leave handleMakeANewTransition, : "  ;
 
 }
+/*
+void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta, SCState* sourceState)
+{
+    SCTransition* trans = new SCTransition(sourceState);
+
+    // load the transition attributes and set the transition's text box to the string in the event attribute
+    trans->attributes.setAttributes(*ta);
+    trans->setText(trans->attributes.value("event")->asString());
+
+    // add this transition to the list of outgoing transition held by the state.
+    sourceState->addTransistion(trans);
+}
+*/
 
 void SCDataModel::handleLeaveTransitionElement()
 {

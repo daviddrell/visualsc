@@ -84,6 +84,11 @@ SCTransition::~SCTransition()
     delete _eventTextBlock;
 }
 
+SCState* SCTransition::parentSCState()
+{
+    return dynamic_cast<SCState *>(this->parent());
+}
+
 void SCTransition::setText(QString eventText)
 {
     _eventTextBlock->setText(eventText);

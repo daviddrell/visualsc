@@ -546,6 +546,7 @@ int StateBoxGraphic::returnClosestWallFace(qreal a, qreal b, qreal c, qreal d)
  */
 void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 {
+    qDebug() << "StateBoxGraphic::handleTransitionLineEndMoved";
     ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
 
     int grid = getGridLocation(newPos);

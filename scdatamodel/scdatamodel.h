@@ -69,9 +69,12 @@ class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 
 
 public:
+    void connectDataModel();
+    void reset();
     static SCDataModel * singleton();
 
     // direct interface
+    void openFile(QString scxmlFileName);
     void open(QString scxmlFile);
 
     bool save(QString scxmlFile, QString & message);
@@ -119,6 +122,8 @@ signals:
     void newStateSignal(SCState * newState);
     void newTransitionSignal(SCTransition * newTransition);
     void newTextBlockSignal(SCTransition*, QString);
+    void transitionsReadyToConnect(SCTransition*);
+    void formViewInsertNewTransitionSignal(SCTransition*);
 
 private slots:
 
@@ -155,7 +160,7 @@ private:
     SCState         *_topState;
     QGraphicsScene * _scene;
     //QList<SCState*> _states;
-    //QList<SCTransition*> _transitions;
+    QList<SCTransition*> _transitions;
 
 
 

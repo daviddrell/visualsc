@@ -39,7 +39,15 @@ void SCXMLReader::readFile(QString infile)
     _file = infile;
 }
 
-
+/**
+ * @brief SCXMLReader::run
+ *
+ * attempts to read the file in _file
+ * runs with loading the data model with states, transitions, and textblocks until the last end element is hit
+ *
+ * uses handleMakeANewState in scdatamodel
+ *
+ */
 void SCXMLReader::run()
 {
 
@@ -54,7 +62,6 @@ void SCXMLReader::run()
     }
 
     _reader.setDevice(&file);
-
     _reader.readNext();
 
     while ( ! _reader.atEnd())
@@ -67,6 +74,7 @@ void SCXMLReader::run()
 
     file.close();
 
+    // not currently conected to anything
     emit done(_error, _resultMessages);
 }
 
@@ -91,11 +99,11 @@ void SCXMLReader::readElement()
 
     if (_reader.name() == "scxml")
     {
-        emit enterStateElement();
-        readState(kSTATE_TYPE_Machine);
+        qDebug() << "skipping scxml";
+        emit enterStateElement();           // increase the transit level
+        //readState(kSTATE_TYPE_Machine);   // disabled adding a state every time openFile happens
         enteredAStateElement = true;
     }
-
 
     if (_reader.name() == "state")
     {
@@ -199,6 +207,20 @@ void SCXMLReader::readElement()
 
 }
 
+/**
+ * @brief SCXMLReader::readState
+ * @param stateType
+ *
+ * uses the scxml data for a state element to create a stateattribute item for a new SCState in the data model
+ *
+ * SIGNAL
+ * makeANewState( stateAttributes);
+ *
+ * connect in SCDataModel
+ * connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::DirectConnection);
+ *
+ *
+ */
 void SCXMLReader::readState(STATE_TYPE stateType)
 {
     // make a parentless attribute container to hold all xml attributes.
@@ -272,9 +294,19 @@ void SCXMLReader::readState(STATE_TYPE stateType)
 
     // signal connected to handleMakeANewState in scdatamodel
     emit makeANewState( stateAttributes);
-
 }
 
+/**
+ * @brief SCXMLReader::readTransistion
+ *
+ * creates a new TransitionAttributes object and reads from the scxml
+ *
+ * then emits the makeANewTransitionSignal for the data model to create a new SCTransition
+ *
+ * SIGNAL
+ * connect(&_reader, SIGNAL(makeANewTransistion(TransitionAttributes*)), this, SLOT(handleMakeANewTransition(TransitionAttributes*)), Qt::DirectConnection);
+ *
+ */
 void SCXMLReader::readTransistion()
 {
     TransitionAttributes * ta = new TransitionAttributes(0,"TransitionAttributes");

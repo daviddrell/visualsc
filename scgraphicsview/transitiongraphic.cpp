@@ -198,6 +198,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
         //_anchors[1]->setAcceptHoverEvents(true);    // enable the sink anchor to be hovered
 
+        /* moved to transition connect
         connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
         connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
         //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
@@ -205,6 +206,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         // do this to set closest wall from default
         emit _anchors[0]->anchorMoved(mapToScene(_anchors[0]->pos()));
         emit _anchors[1]->anchorMoved(mapToScene(_anchors[1]->pos()));
+        */
 
         //TextItem.setPos(25,10);
         //TextItem.setParentItem(_anchors[1]);
@@ -227,7 +229,20 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
 }   // end of constructor
 
+ElbowGrabber* TransitionGraphic::getSourceAnchor()
+{
+    return _anchors[0];
+}
 
+ElbowGrabber* TransitionGraphic::getSinkAnchor()
+{
+    return _anchors[1];
+}
+
+void TransitionGraphic::setTargetStateGraphic(StateBoxGraphic *sbg)
+{
+    _targetStateGraphic = sbg;
+}
 
 /**
  * @brief TransitionGraphic::setGrabbersVisible

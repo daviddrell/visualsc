@@ -518,13 +518,18 @@ void SCState::getStates(QList<SCState *> & stateList)
 SCState* SCState::getStateByName(QString name)
 {
     SCState *target=NULL;
+    qDebug() <<"passed "<< name<<"getStateByName: " << name<< "num children: " << children().count();
     for (int c = 0; c < this->children().count(); c++)
     {
         SCState* state = dynamic_cast< SCState*>(this->children()[c]);
         if ( state )
         {
+            qDebug() <<"state object name: "<<state->objectName()<<" state attribute name: " <<state->attributes.value("name")->asString();
             if ( state->objectName() == name)
+            {
+                qDebug() <<"returning state as target... : "<<state->objectName();
                 return state;
+            }
             else
             {
                 target = state->getStateByName(name);

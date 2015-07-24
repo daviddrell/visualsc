@@ -54,6 +54,8 @@ public:
 
     ~SCTransition();
 
+    SCState* parentSCState();
+
 
     //void setTextPos(QPointF);
  //   void setTextSize(qreal w, qreal h);

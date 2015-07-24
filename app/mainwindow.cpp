@@ -58,7 +58,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setWindowTitle("Visual State Chart Editor");
 
-    this->resize(1290,1000);
+    this->resize(1272,1000);
+    this->move(633,0);
 
 /*
     _project = new SMProject(  ui->centralWidget );
@@ -90,6 +91,15 @@ MainWindow::MainWindow(QWidget *parent) :
     _project->readInputFile(fileName);
 
 #endif
+
+#ifndef AUTO_LOAD_FILE
+    _project = new SMProject(  ui->centralWidget );
+   // _project->initNewSM(); moved to constructor
+    ui->gridLayout->addWidget( _project->getQGraphicsView() );
+    _formEditorWindow = new SCFormView(0, _project->getDM());
+    _formEditorWindow->show();
+#endif
+
 }
 
 MainWindow::~MainWindow()
@@ -101,29 +111,51 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleFileOpenClick()
 {
-    QString prevFilePath=QDir::homePath();
-    QString fileName ;
 
-    if ( _settings->contains(_keyLastFilePath))
+    QString prevFilePath=QDir::homePath();
+    QString fileName;
+
+    if( _settings->contains(_keyLastFilePath))
     {
         prevFilePath = _settings->value(_keyLastFilePath).toString();
     }
 
-    fileName = QFileDialog::getOpenFileName(this,
-                                            tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
-
+    fileName = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
     _settings->setValue(_keyLastFilePath, fileName);
 
+    // reset the datamodel and user the reader to load the new scxml
+    _project->getDM()->reset();
+    _project->getDM()->openFile(fileName);
 
+
+
+
+
+
+
+
+
+    if(false)
+    {
+    if ( _project)
+    {
+        delete _project;
+        _project = NULL;
+    }
+    QString prevFilePath=QDir::homePath();
+    QString fileName;
+
+    if( _settings->contains(_keyLastFilePath))
+    {
+        prevFilePath = _settings->value(_keyLastFilePath).toString();
+    }
+
+    fileName = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
+    _settings->setValue(_keyLastFilePath, fileName);
     _project = new SMProject(  ui->centralWidget );
-
-
-
     connect (_project, SIGNAL(readInputFileCompleted(bool,QStringList)), this, SLOT(handleReadInputFileDone(bool,QStringList)) );
-
     _project->readInputFile(fileName);
-
-
+    }
 }
 
 
@@ -166,20 +198,19 @@ void MainWindow::handleFileSaveClick()
 
 void MainWindow::handleNewClick()
 {
-
-    if ( _project)
+    _project->getDM()->reset();
+    if(false)
     {
-        delete _project;
-        _project = NULL;
+        if ( _project)
+        {
+            delete _project;
+            _project = NULL;
+        }
+        _project = new SMProject(  ui->centralWidget );
+        //_project->initNewSM(); moved to constructor
+
+        ui->gridLayout->addWidget( _project->getQGraphicsView() );
+        //_formEditorWindow = new SCFormView(0, _project->getDM());
+        //_formEditorWindow->show();
     }
-
-    _project = new SMProject(  ui->centralWidget );
-
-    _project->initNewSM();
-
-    ui->gridLayout->addWidget( _project->getQGraphicsView() );
-
-    _formEditorWindow = new SCFormView(0, _project->getDM());
-    _formEditorWindow->show();
-
 }

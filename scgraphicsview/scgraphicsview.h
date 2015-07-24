@@ -72,6 +72,8 @@ private slots:
     //void handleStatePositionChangedInDataModel(SCState* state, QPointF position);
     void handleStatePositionChangedInFormView(SCState* state, QPointF position);
     void handleStateSizeChangedInFormView(SCState* state, QPointF size);
+    void handleMakeTransitionConnections(SCTransition*);
+    void handleNewTransitionFormView(SCTransition* t);
 
 private:
 
@@ -88,6 +90,7 @@ private:
     QMap<SCTransition*,TransitionGraphic *> _mapTransitionToGraphic;
 
     QHash<SCState*, StateBoxGraphic*> _hashStateToGraphic;
+    QHash<SCTransition*, TransitionGraphic* > _hashTransitionToGraphic;
 
     KeyController *_keyController;
     MouseController* _mouseController;

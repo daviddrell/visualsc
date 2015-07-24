@@ -35,6 +35,7 @@ public:
     StateBoxGraphic* parentItemAsStateBoxGraphic();
     ~TransitionGraphic();
 
+    void setTargetStateGraphic(StateBoxGraphic* sbg);
     void setTextPos(QPointF position);
     void setTextSize(qreal w, qreal h);
     void setCurrentlyHoveredLineSegment(LineSegmentGraphic* seg);
@@ -48,7 +49,8 @@ public:
     ElbowGrabber* getCurrentlyHoveredElbow();
 
     void setGrabbersVisible(bool visible);
-
+    ElbowGrabber* getSourceAnchor();
+    ElbowGrabber* getSinkAnchor();
 
 
 

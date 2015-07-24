@@ -53,7 +53,9 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
 
 
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
+    connect(_dm , SIGNAL(transitionsReadyToConnect(SCTransition*)),this,SLOT(handleMakeTransitionConnections(SCTransition*)));
     connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
+    connect(_dm, SIGNAL(formViewInsertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransitionFormView(SCTransition*)));
 
     //connect(_dm, SIGNAL(newTextBlockSignal(SCTransition*,QString)), this, SLOT(handleNewTextBlock(SCTransition,QString)));
 
@@ -77,6 +79,97 @@ SCGraphicsView::~SCGraphicsView()
     delete _scene ;
 }
 
+
+
+/**
+ * @brief SCGraphicsView::handleMakeTransitionConnections
+ *
+ * SLOT
+ * connect in SCGraphicsView
+ * connect(_dm , SIGNAL(transitionsReadyToConnect()),this,SLOT(handleMakeTransitionConnections()));
+ *
+ * this is called by openFile in the datamodel after the reader adds states and transitions to the datamodel from reading a file
+ * the transition connections may fail if they are attempted during the creation of the transition graphic because the target state may not have been loaded in when the transition was created.
+ *
+ * the solution to this problem is creating the connections after all states are made in the data model
+ *
+ *
+ *
+ */
+void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
+{
+    qDebug() << "Made it into: SCGraphicsView::handleMakeTransitionConnections for transition:"  << trans->attributes.value("event")->asString();
+
+    TransitionGraphic* transGraphic = _hashTransitionToGraphic.value(trans);
+
+    TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(trans->attributes.value("target"));
+
+    SCState* targetState = lookUpTargetState(targetName->asString());
+    StateBoxGraphic * targetGraphic  = _hashStateToGraphic.value(targetState);
+
+    SCState* parentState = trans->parentSCState();
+    StateBoxGraphic* parentGraphic = _hashStateToGraphic.value(parentState);
+
+    qDebug() << "targetGraphic: " << targetGraphic->objectName();
+
+    // set the targetState for the transition
+    trans->setTargetState(targetState);
+    transGraphic->setTargetStateGraphic(targetGraphic);
+
+    // add a transition reference for the target and source
+    targetState->addTransitionReference(trans, SCState::kTransitIn);
+    parentState->addTransitionReference(trans, SCState::kTransitOut);
+
+    // set the connects for the transition graphic
+    connect(trans, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
+    connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
+    // create the connection to automatically move anchor elbows when state graphics are moved.
+    connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
+    connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
+
+
+    connect(transGraphic->getSourceAnchor(),SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+    connect(transGraphic->getSinkAnchor(),SIGNAL(anchorMoved(QPointF)),targetGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+    //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
+
+    // do this to set closest wall from default
+    emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
+    emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
+
+
+    // create the connect to automatically move anchor elbows when state graphics are moved.
+    connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
+    connect(targetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleTargetStateGraphicResized(QRectF, QRectF, int)));
+
+    // connect this state box's grand parents update anchors when they are resized
+    StateBoxGraphic* grandParentGraphic = parentGraphic->parentItemAsStateBoxGraphic();
+    while(grandParentGraphic)
+    {
+        connect(grandParentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentStateGraphicResized(QRectF, QRectF, int)));
+        grandParentGraphic = grandParentGraphic->parentItemAsStateBoxGraphic();
+    }
+
+    // connect the target state box's grand parents to update the target anchors when they are resized
+    StateBoxGraphic* grandParentTargetGraphic = targetGraphic->parentItemAsStateBoxGraphic();
+    while(grandParentTargetGraphic)
+    {
+
+        connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
+        grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
+    }
+}
+
+/**
+ * @brief SCGraphicsView::reset
+ * will clear the graphics view
+ */
+
+/*
+void SCGraphicsView::reset()
+{
+
+}
+*/
 bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
 {
     // scene captures key presses in KeyController Object
@@ -276,6 +369,40 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
  */
 void SCGraphicsView::handleNewTransition (SCTransition * t)
 {
+    SCState* parentState = t->parentSCState();
+    StateBoxGraphic* parentGraphic = _hashStateToGraphic.value(parentState);
+
+    // block creating a transition if this is the root machine
+    if ( parentGraphic == NULL )
+    {
+        // no parent graphic means the user is adding a transition to the root machine
+        QMessageBox msgBox;
+        msgBox.setText("cannot add a transition from the root machine");
+        msgBox.exec();
+        return;
+    }
+
+    // create the transition graphic, stack its deconstructor, and create the link between the SCtransition to its graphic
+    TransitionGraphic* transGraphic = new TransitionGraphic(parentGraphic, NULL, t, _keyController, _mouseController);
+    //connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
+    //connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
+    _hashTransitionToGraphic.insert(t,transGraphic);
+
+    // set the text position of the event attribute
+    PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
+    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
+    transGraphic->setTextPos(textPos->asPointF());
+
+
+    qDebug()<<"SCGraphicsView::handleNewTransition inserted a new transition graphic with event name: " << t->attributes.value("event");
+
+
+}
+
+void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
+{
+
+
     // get the parent state graphic
     SCState *parentState = dynamic_cast<SCState *>(t->parent());
     StateBoxGraphic * parentGraphic =   _mapStateToGraphic[parentState];
@@ -316,6 +443,13 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
 
+    connect(transGraphic->getSourceAnchor(),SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+    connect(transGraphic->getSinkAnchor(),SIGNAL(anchorMoved(QPointF)),targetGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
+    //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
+
+    // do this to set closest wall from default
+    emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
+    emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
 
 
     // create the connect to automatically move anchor elbows when state graphics are moved.
@@ -357,8 +491,8 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
         i.next();
         qDebug() << "SCGPVH && textblock key: " << i.key() << " value: " << i.value()->asString();
     }
-}
 
+}
 
 
 /**
@@ -457,6 +591,18 @@ void SCGraphicsView::connectState(SCState* state)
 
 void SCGraphicsView::connectTransition(SCTransition* trans)
 {
+    /*
+    //connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
+    connect(trans, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
+    TransitionGraphic* transGraphic = _hashTransitionToGraphic.value(trans);
+    StateBoxGraphic * targetGraphic  = _hashStateToGraphic.value(trans->targetState());
+    transGraphic->setTargetGraphic(targetGraphic);
+
+
+    PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
+    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
+    transGraphic->setTextPos(textPos->asPointF());
+    */
 
 }
 
@@ -465,7 +611,7 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
  * @param newState
  *
  * generic add state for the graphics view:
- * called when the insert state button is pressed to create a new state and when loading the xml states
+ * called when the insert state button is pressed to create a new state graphic and when loading the xml states
  *
  * scformview::insertState -> scdatamodel::insertNewState, emit newStateSignal -> scgraphicsview::handleNewState
  * connected to signal newStateSignal in the SCDataModel
@@ -479,8 +625,6 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // SCState connects
 
     connectState(newState);
-
-
 
     StateString * type = dynamic_cast<StateString *> ( newState->attributes.value("type"));
     if ( type != 0 && (type->asString() == "machine"))
@@ -517,9 +661,6 @@ void SCGraphicsView::handleNewState (SCState *newState)
     connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 
     // quick look up of graphics from state model references
-
-   // qDebug() << "inserting new state into mapstate to graphic : " << newState->objectName();
-
     // link the SCState and StateBoxGraphic
     _mapStateToGraphic.insert(newState, stateGraphic);
     _hashStateToGraphic.insert(newState,stateGraphic);
@@ -533,8 +674,6 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     SizeAttribute * size = dynamic_cast<SizeAttribute*> (newState->attributes.value("size"));
     stateGraphic->setSize(size->asPointF());
-
-
     if ( ! parentGraphic )
     {
         _scene->addItem(stateGraphic);
