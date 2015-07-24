@@ -408,6 +408,10 @@ bool SCDataModel::deleteItem(QObject * item)
         SCTransition *tr = tlist.at(i);
         if ( tr == item)
         {
+            SCState* source = tr->parentSCState();
+            SCState* target = tr->targetState();
+            source->removeTransitionOut(tr);
+            target->removeTransitionIn(tr);
             int i = tlist.indexOf(tr);
             tlist.removeAt(i);
             delete tr;
