@@ -160,6 +160,8 @@ void SCFormView::handleNewTransition(SCTransition*t)
 
     connectTransition(t);
     replantTree();
+    findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
+
     //loadTree (NULL, states);
 }
 
@@ -184,6 +186,8 @@ void SCFormView::handleNewState(SCState*s)
 
     connectState(s);
     replantTree();
+    findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
+
 
     //loadTree (NULL, states);
 }
