@@ -102,12 +102,12 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _lineSegments.append(segment);
 
 
-        //_anchors[0]->setPos(this->mapFromScene(sourceAnchor));
-        //_anchors[1]->setPos(this->mapFromScene(targetAnchor));
+        _anchors[0]->setPos(this->mapFromScene(sourceAnchor));
+        _anchors[1]->setPos(this->mapFromScene(targetAnchor));
 
 
 
-        //segment->enclosePathInElbows();
+        segment->enclosePathInElbows();
 
 
        // TextItem.setPos(25,10);

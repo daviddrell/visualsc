@@ -80,6 +80,14 @@ SCTransition::SCTransition(QObject * parent):
 
 SCTransition::~SCTransition()
 {
+    SCState* source = parentSCState();
+    SCState* target = targetState();
+    if(source)
+        source->removeTransitionOut(this);
+
+    if(target)
+        target->removeTransitionIn(this);
+
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
     delete _eventTextBlock;
 }
