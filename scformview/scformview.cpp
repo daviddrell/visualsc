@@ -140,7 +140,18 @@ void SCFormView::initTree()
 }
 
 
+/**
+ * @brief SCFormView::handleMakeTransitionConnections
+ * @param trans
+ *
+ * SLOT
+ * connect in SCFormView
+ * connect (_dm, SIGNAL(transitionsReadyToConnect(SCTransition*)), this, SLOT(handleMakeTransitionConnections(SCTransition*)));
 
+ * called for scxml reader
+ * when all states and transitions are done being read, then we can safely set up the connection for this transition
+ *
+ */
 void SCFormView::handleMakeTransitionConnections(SCTransition* trans)
 {
     connectTransition(trans);

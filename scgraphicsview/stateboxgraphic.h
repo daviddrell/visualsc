@@ -107,7 +107,7 @@ public:
     SelectableTextBlock TextItem;    ///<  text to go in the title area.
 
 
-    int getGridLocation(QPointF point);
+    int getGridLocation(QPointF mts,QPointF point);
     bool isBetween(qreal start, qreal end, qreal point);
     void setGridSpace(int space);
     //void setTitle(QString t);
@@ -117,7 +117,8 @@ public:
     QPointF getSize();
     void setHighlighted(bool);
     SCState* getStateModel();
-
+    StateBoxGraphic* getHighestLevelParentItemAsStateBoxGraphic();
+    QPointF mapToHighestParent(QPointF pos);
     StateBoxGraphic* parentItemAsStateBoxGraphic();
 
 public slots:
@@ -146,7 +147,7 @@ private slots:
 
 private:
 
-    int returnClosestWallFace(QPointF newPos);
+    int returnClosestWallFace(QPointF mts,QPointF newPos);
     int returnClosestWallFace(qreal a, qreal b, qreal c, qreal d);
     //private data
 

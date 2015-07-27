@@ -291,7 +291,9 @@ void SCDataModel::connectTransitionsToStatePath()
         {
             makeTransitionConnections(targetState, trans);
         }
+
     }
+    qDebug() << "finished SCDataModel::connectTransitionsToStatePath";
 }
 
 
@@ -308,10 +310,9 @@ void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition*
     // add this transition to the target state's list of in transitions
     targetState->addTransitionReference(trans, SCState::kTransitIn);
 
-    SCState * sourceState = dynamic_cast<SCState *> ( trans->parent());
-
     // add this transition to the source state's list of out transitions
-    sourceState->addTransitionReference(trans,SCState::kTransitOut);
+    SCState * sourceState = dynamic_cast<SCState *> ( trans->parent());
+    sourceState->addTransitionReference(trans, SCState::kTransitOut);
 
     SCState *sourceTreeNode=NULL;
     SCState *targetTreeNode=NULL;
@@ -319,6 +320,8 @@ void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition*
     int sourceLevel =  sourceState->getLevel();
     int targetLevel = targetState->getLevel();
 
+     // change behavior to not promote transition references to parent
+    /*
    // example: targetStateLevel = 1, sourceStateLevel = 3
     while ( sourceLevel > targetLevel )
     {
@@ -331,7 +334,7 @@ void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition*
      while ( targetLevel >  sourceLevel)
      {
          targetTreeNode = targetState->getParentState();
-         targetTreeNode->addTransitionReference(trans, SCState::kTransitOut);
+         targetTreeNode->addTransitionReference(trans, SCState::kTransitIn);
          targetLevel =  targetTreeNode->getLevel();
      }
 
@@ -347,6 +350,10 @@ void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition*
         sourceTreeNode->addTransitionReference(trans, SCState::kTransitOut);
         sourceLevel =  sourceTreeNode->getLevel();
     }
+    */
+
+
+
 }
 
 

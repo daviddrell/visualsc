@@ -241,9 +241,9 @@ StateBoxGraphic * SCGraphicsView::lookUpTargetStateGraphic(QString stateId )
     if ( stateDM == NULL ) return NULL;
 
 
-    //qDebug()<< "The target state graphic was found. "<< stateDM->objectName();
+    qDebug()<< "The target state graphic was found. "<< stateDM->objectName();
     StateBoxGraphic* ret = _mapStateToGraphic.find(stateDM).value();
-    //qDebug() << "did we find anything? " << ret->objectName();
+    qDebug() << "did we find anything? " << ret->objectName();
 
     return _mapStateToGraphic.find(stateDM).value();
 
@@ -541,8 +541,14 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
 
     // do this to set closest wall from default
-    emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
-    emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
+
+
+        emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
+        emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
+
+
+
+
 
 
     // create the connect to automatically move anchor elbows when state graphics are moved.
