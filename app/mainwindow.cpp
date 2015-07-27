@@ -130,7 +130,7 @@ void MainWindow::handleFileOpenClick()
 
     //_formEditorWindow->reset();
     _project->getDM()->openFile(fileName);
-    //_formEditorWindow->highlightRootItem();
+    _formEditorWindow->highlightRootItem();
   //  _formEditorWindow->reset();
 
 
@@ -208,7 +208,9 @@ void MainWindow::handleNewClick()
 
 
     _project->getDM()->reset();
+    _formEditorWindow->highlightRootItem();
   //  _formEditorWindow->reset();
+
 
     if(false)
     {

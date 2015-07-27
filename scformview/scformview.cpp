@@ -133,8 +133,42 @@ this->resize(618,1000);
  */
 void SCFormView::highlightRootItem()
 {
-    CustomTreeWidgetItem* twid = findItem(_currentlySelected);
     _currentlySelected = _previouslySelected = _dm->getTopState();
+    CustomTreeWidgetItem* twid = findItem(_currentlySelected);
+    twid->setSelected(true); // rehighlight the item that was highlighted
+    handleTreeViewItemClicked((QTreeWidgetItem*)twid, 0);
+}
+
+
+/**
+ * @brief SCFormView::highlightPreviousItem
+ *
+ * called in the slot functions for handleState/Transition/TextBlock deleted
+ *
+ * when a tree object is deleted, set the highlighted object to be the last highlighted object, or the root machine if nothing is found
+ *
+ */
+void SCFormView::highlightPreviousItem()
+{
+
+    SCState* st = dynamic_cast<SCState*>(_currentlySelected);
+    SCTransition* trans = dynamic_cast<SCTransition*>(_currentlySelected);
+
+    if(st && st->getParentState())
+    {
+        _currentlySelected = _previouslySelected = st->getParentState();
+    }
+    else if(trans)
+    {
+        _currentlySelected = _previouslySelected = trans->parentSCState();
+    }
+    else
+    {
+        qDebug() << "SCFormView::highlightPreviousItem Unsure of what is currently selected, so defaulting to root machine.";
+        _currentlySelected = _previouslySelected = _dm->getTopState();
+    }
+
+    CustomTreeWidgetItem* twid = findItem(_currentlySelected);
     twid->setSelected(true); // rehighlight the item that was highlighted
     handleTreeViewItemClicked((QTreeWidgetItem*)twid, 0);
 }
@@ -485,6 +519,7 @@ void SCFormView::handleTextBlockDeleted(QObject *t)
 
     replantTree();
 //    loadTree (NULL, states);
+    highlightRootItem();
 }
 
 
@@ -502,6 +537,7 @@ void SCFormView::handleTransitionDeleted(QObject *t)
 
     replantTree();
    // loadTree (NULL, states);
+    highlightRootItem();
 }
 
 QObject* SCFormView::getNeighborState(QObject*s)
@@ -545,6 +581,8 @@ void SCFormView::handleStateDeleted(QObject *s)
     stateChartTreeView->clear();
     //loadTree (NULL, states);
     replantTree();
+    highlightRootItem();
+
 }
 
 /**
@@ -1457,7 +1495,7 @@ void SCFormView::deleteItem(QObject * item)
 {
 
     _dm->deleteItem(item);
-
+   // highlightRootItem();
 }
 
 void SCFormView::pointerGroupClicked(int)

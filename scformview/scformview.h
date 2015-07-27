@@ -81,6 +81,7 @@ public:
     explicit SCFormView(QWidget *parent = 0, SCDataModel * dm=0);
     void reset();
     void highlightRootItem();
+    void highlightPreviousItem();
 
 private slots:
     void handleMakeTransitionConnections(SCTransition* trans);
