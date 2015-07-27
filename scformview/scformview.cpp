@@ -126,6 +126,35 @@ this->resize(618,1000);
 }
 
 /**
+ * @brief SCFormView::highlightRootItem
+ *
+ * used to reselect the root machine item
+ * called when open file is called;
+ */
+void SCFormView::highlightRootItem()
+{
+    CustomTreeWidgetItem* twid = findItem(_currentlySelected);
+    _currentlySelected = _previouslySelected = _dm->getTopState();
+    twid->setSelected(true); // rehighlight the item that was highlighted
+    handleTreeViewItemClicked((QTreeWidgetItem*)twid, 0);
+}
+
+/**
+ * @brief SCFormView::reset
+ *
+ * clears out the tree view and property table and awaits the data model to update
+ *
+ */
+void SCFormView::reset()
+{
+    _currentlySelected = _previouslySelected = _dm->getTopState();
+    replantTree();
+    CustomTreeWidgetItem* twid = findItem(_currentlySelected);
+    twid->setSelected(true); // rehighlight the item that was highlighted
+    handleTreeViewItemClicked((QTreeWidgetItem*)twid, 0);
+}
+
+/**
  * @brief SCFormView::initTree
  *
  *
@@ -134,11 +163,24 @@ this->resize(618,1000);
  */
 void SCFormView::initTree()
 {
+     _currentlySelected = _previouslySelected = _dm->getTopState();
     QList<SCState*> states;
     states.append( _dm->getTopState());
     loadTreeState(NULL, states, true);
+    CustomTreeWidgetItem* twid = findItem(_currentlySelected);
+    twid->setSelected(true); // rehighlight the item that was highlighted
+    handleTreeViewItemClicked((QTreeWidgetItem*)twid, 0);
 }
 
+CustomTreeWidgetItem* SCFormView::findItem(QObject * object)
+{
+    SCItem* item = dynamic_cast<SCItem*>(object);
+    if(item)
+    {
+        qDebug() << "SCFormView::findItem Item Found from a QObject";
+        return _itemToTreeWidget.value(item);
+    }
+}
 
 /**
  * @brief SCFormView::handleMakeTransitionConnections
@@ -205,8 +247,18 @@ void SCFormView::handleNewState(SCState*s)
     connectState(s);
     replantTree();
 
-    if(_currentlySelected)
-        findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
+    if(!_currentlySelected)
+    {
+        setSelectedTreeItem(_dm->getTopState());
+    }
+    CustomTreeWidgetItem* twid = findItem(_currentlySelected); // rehighlight the item that was highlighted
+    if(twid)
+    {
+        twid->setSelected(true);
+        handleTreeViewItemClicked((QTreeWidgetItem*)twid,0);
+    }
+
+
 
 
     //loadTree (NULL, states);
@@ -527,6 +579,9 @@ void SCFormView::connectTransition(SCTransition* trans)
 void SCFormView::replantTree()
 {
     stateChartTreeView->clear();
+    propertyTable->clear();
+    textBlockPropertyTable->clear();
+
     _itemToTreeWidget.clear();
     _itemToTextBlock.clear();
     _treeWidgetToTextBlock.clear();
@@ -563,7 +618,9 @@ void SCFormView::loadTreeState(CustomTreeWidgetItem * parentItem, QList<SCState*
         item->setData( st);
         item->setText(0, st->attributes.value("name")->asString());
         item->setIcon(0,QIcon(":/SCFormView/statebutton.bmp"));
-        _itemToTreeWidget.insert(st, item);
+
+        SCItem* stateToItem = st;
+        _itemToTreeWidget.insert(stateToItem, item);
 
         // get the state's text block
         SCTextBlock  * textBlock = st->getIDTextBlock();
@@ -853,6 +910,8 @@ void SCFormView::setAttributeConnections(IAttributeContainer * atts, bool should
         }
     }
 }
+
+
 
 /**
  * @brief SCFormView::clearPropertyTable
@@ -1534,7 +1593,10 @@ CustomTreeWidgetItem* SCFormView::findItem(SCTransition* item)
 CustomTreeWidgetItem* SCFormView::findItem(SCState* item)
 {
     CustomTreeWidgetItem* find = _itemToTreeWidget.value(dynamic_cast<SCItem*>(item));
-    qDebug() << "findItem for SCItem to CustomTreeWidgetItem: " << find->text(0);
+    if(find)
+         qDebug() << "findItem for SCItem to CustomTreeWidgetItem: " << find->text(0);
+    else
+        qDebug() << "could not find item for item: ";
 
     return find;
 }

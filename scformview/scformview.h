@@ -79,7 +79,8 @@ class SCFORMVIEWSHARED_EXPORT SCFormView : public QMainWindow
     Q_OBJECT
 public:
     explicit SCFormView(QWidget *parent = 0, SCDataModel * dm=0);
-
+    void reset();
+    void highlightRootItem();
 
 private slots:
     void handleMakeTransitionConnections(SCTransition* trans);
@@ -192,6 +193,7 @@ private:
 
     CustomTreeWidgetItem* findItem(SCState*);
     CustomTreeWidgetItem* findItem(SCTransition* item);
+    CustomTreeWidgetItem* findItem(QObject * object);
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;

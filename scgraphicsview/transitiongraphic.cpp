@@ -1119,6 +1119,7 @@ void TransitionGraphic::deleteHoveredElbow()
 
         leftLine->enclosePathInElbows();    // redraw the line segment's hover box
 
+
         delete elb;
         delete deadLine;
 

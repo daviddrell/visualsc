@@ -158,6 +158,7 @@ private:
     bool    _diagLineDrawIt;
     QPointF _intersection;
 
+
 };
 
 #endif // STATEBOX_H

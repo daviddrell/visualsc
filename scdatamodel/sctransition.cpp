@@ -85,10 +85,10 @@ SCTransition::~SCTransition()
     SCState* source = parentSCState();
     SCState* target = targetState();
     if(source)
-        source->removeTransitionOut(this);
+        source->removeTransitionReferenceOut(this);
 
     if(target)
-        target->removeTransitionIn(this);
+        target->removeTransitionReferenceIn(this);
 
     delete _eventTextBlock;
 }

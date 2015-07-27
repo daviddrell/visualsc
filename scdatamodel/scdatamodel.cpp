@@ -68,6 +68,7 @@ SCDataModel * SCDataModel::singleton()
 void SCDataModel::reset()
 {
     _currentState = _topState;
+    _currentTransition = NULL;
     _topLevel =_level = 0;
     _topState->setLevel(_level);
     {
@@ -79,12 +80,12 @@ void SCDataModel::reset()
 
 
          // first delete transitions and disconnect them from the states
-        for(int i =0; i < list.count(); i++)
+        /*for(int i =0; i < list.count(); i++)
         {
             SCState *st = list.at(i);
             st->removeTargetsTransitionIn();
             st->removeSourcesTransitionOut();
-        }
+        }*/
 
         // delete highest level states, this will automatically delete all sub states
         QList<SCState*> directChildren;
@@ -409,6 +410,7 @@ bool SCDataModel::deleteItem(QObject * item)
             child = childrenStates.at(i);
 
         }*/
+
         delete state;
     }
     else if(trans)
@@ -457,10 +459,10 @@ bool SCDataModel::deleteItem(QObject * item)
             SCState* source = tr->parentSCState();
             SCState* target = tr->targetState();
             if(source)
-                source->removeTransitionOut(tr);
+                source->removeTransitionReferenceOut(tr);
 
             if(target)
-                target->removeTransitionIn(tr);
+                target->removeTransitionReferenceIn(tr);
             // unhook the transition from the references of the state.
             int i = tlist.indexOf(tr);
             tlist.removeAt(i);
@@ -597,7 +599,7 @@ void SCDataModel::initializeEmptyStateMachine()
     StateString *nsp = new StateString(NULL,"xmlns","http://www.w3.org/2005/07/scxml");
     stateAttributes->addItem(nsp);
 
-    StateName *nm = new StateName(NULL,"name", "Root State Machine");
+    StateName *nm = new StateName(NULL,"name", "State Machine");
     stateAttributes->addItem(nm);
 
     _topState = new SCState(true);

@@ -92,8 +92,8 @@ public:
     QList<SCTransition*> getTransitionsIn();
     QList<SCTransition*> getTransitionsTerminating();
 
-    void removeTransitionIn(SCTransition* trans);
-    void removeTransitionOut(SCTransition* trans);
+    void removeTransitionReferenceIn(SCTransition* trans);
+    void removeTransitionReferenceOut(SCTransition* trans);
     void removeAllTransitionsIn();
 
     /**

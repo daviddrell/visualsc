@@ -59,18 +59,11 @@ SCState::SCState( bool topState) :
 
 SCState::~SCState()
 {
-    // remove all the transitions into this state
-    // scdatamodel will handle disconnections other transitions related to this state
-    // handled by linked deconstructors  // delete outgoing transitions
+    // moved transition reference deletion to the deconstructor for the transition
 
-    removeTargetsTransitionIn();
-    removeSourcesTransitionOut();
+    // also delete any transitions that were transiting in and their reference to the source state
 
-    removeAllTransitionsIn();       // delete incoming transitions
-    _transitingTransitionsIn.clear();
-    _transitingTransitionsOut.clear();
-    _transitionsTerminatingHere.clear();
-
+    this->removeAllTransitionsIn();
     delete _IdTextBlock;
 }
 
@@ -338,6 +331,7 @@ QList<SCTransition*> SCState::getTransitionsTerminating()
  * for any state targeted, remove the transition targeting that state from its inbound transitions list
  *
  */
+
 void SCState::removeTargetsTransitionIn()
 {
     qDebug() <<"SCState::removeTargetsTransitonIn";
@@ -347,7 +341,7 @@ void SCState::removeTargetsTransitionIn()
     {
         trans = _transitingTransitionsOut.at(i);
         target = trans->targetState();
-        target->removeTransitionIn(trans);
+        target->removeTransitionReferenceIn(trans);
         //  qDebug() << "... removing " << _transitingTransitionsOut.count() << " Out Transitions for state: " <<target->objectName();
 
     }
@@ -363,8 +357,13 @@ void SCState::removeSourcesTransitionOut()
     {
         trans = _transitingTransitionsIn.at(i);
         source = trans->parentSCState();
-        source->removeTransitionOut(trans);
+        source->removeTransitionReferenceOut(trans);
         qDebug() << "... removing out transition for state: " <<  source->objectName();
+        if(trans)
+        {
+            qDebug() << "deleting trans: " << trans;
+            delete trans;
+        }
     }
 }
 
@@ -376,7 +375,7 @@ void SCState::removeSourcesTransitionOut()
  *
  *
  */
-void SCState::removeTransitionIn(SCTransition* trans)
+void SCState::removeTransitionReferenceIn(SCTransition* trans)
 {
     int k = _transitingTransitionsIn.indexOf(trans);
     if(k!=-1)
@@ -389,7 +388,7 @@ void SCState::removeTransitionIn(SCTransition* trans)
 
 
 
-void SCState::removeTransitionOut(SCTransition* trans)
+void SCState::removeTransitionReferenceOut(SCTransition* trans)
 {
     int k = _transitingTransitionsOut.indexOf(trans);
     if(k!=-1)
@@ -438,19 +437,10 @@ void SCState::removeAllTransitionsIn()
     QList<SCTransition*> dest = state->getTransitionsIn();
     qDebug() << "Deleting destination transitions for state: " << state->attributes.value("name")->asString() << " with # inbound transitions "<<dest.count();
     SCTransition* tr;
-    int k;
     for(int i = 0; i < dest.count(); i++)
     {
-        tr = dest.at(i);
-        k = _transitingTransitionsIn.indexOf(tr);
-        if(k!=-1)
-        {
-            qDebug() << "deleting in transition " << tr->attributes.value("target")->asString();
-            qDebug() << "tth size before: " << _transitingTransitionsIn.count();
-            _transitingTransitionsIn.removeAt(k);
-            qDebug() << "tth size after: " << _transitingTransitionsIn.count();
-        }
-        dest.removeAt(i);
+        tr = dest.at(i); 
+        qDebug() << "deleting transition: tr " << tr->attributes.value("event")->asString();
         delete tr;
     }
 }

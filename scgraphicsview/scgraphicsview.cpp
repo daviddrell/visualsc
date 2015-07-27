@@ -76,7 +76,7 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
 
 SCGraphicsView::~SCGraphicsView()
 {
-    delete _scene ;
+    delete _scene;
 }
 
 
@@ -117,8 +117,8 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
     transGraphic->setTargetStateGraphic(targetGraphic);
 
     // add a transition reference for the target and source
-    targetState->addTransitionReference(trans, SCState::kTransitIn);
-    parentState->addTransitionReference(trans, SCState::kTransitOut);
+    //targetState->addTransitionReference(trans, SCState::kTransitIn);
+    //parentState->addTransitionReference(trans, SCState::kTransitOut);
 
     connectTransition(trans);
 }
@@ -297,6 +297,7 @@ void SCGraphicsView::handleTransitionGraphicDeleted(QObject *tg)
         if ( i.value() == trans)
         {
             _mapTransitionToGraphic.remove(i.key());
+            _hashTransitionToGraphic.remove(i.key());
         }
     }
 }
@@ -309,6 +310,19 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
 
     SCTransition * trans = (SCTransition *)tr;
 
+    qDebug () <<"SCGraphicsView::handleTransitionDeleted";
+
+
+    TransitionGraphic* trGraph = _hashTransitionToGraphic.value(trans);
+
+    delete trGraph;
+
+    _mapTransitionToGraphic.remove(trans);
+    _hashTransitionToGraphic.remove(trans);
+
+
+
+/*
     QMapIterator<SCTransition*,TransitionGraphic*> i(_mapTransitionToGraphic);
     while (i.hasNext())
     {
@@ -316,11 +330,13 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
 
         if ( i.key() == trans)
         {
+            qDebug() << "deleting transition graphic for: " << i.key();
             delete i.value(); //delete the transition graphic associated with this transition
             _mapTransitionToGraphic.remove(i.key());
+            _hashTransitionToGraphic.remove(i.key());
         }
     }
-
+*/
 }
 
 
@@ -351,8 +367,10 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     TransitionGraphic* transGraphic = new TransitionGraphic(parentGraphic, NULL, t, _keyController, _mouseController);
     //connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
     //connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
-    _hashTransitionToGraphic.insert(t,transGraphic);
 
+    // add the transitiongraphic to the map of transition graphics
+    _mapTransitionToGraphic.insert(t, transGraphic);
+    _hashTransitionToGraphic.insert(t, transGraphic);
     // set the text position of the event attribute
     PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
     qDebug()<< "handle new transition text pos: " << textPos->asPointF();
@@ -441,7 +459,8 @@ void SCGraphicsView::handleStateDeleted(QObject *state)
                 this->handleStateDeleted( (SCState*)(children.at(i)) );
             }
 
-            delete i.value();// delete the graphic and all its children
+            delete i.value();
+                    ;// delete the graphic and all its children
             _mapStateToGraphic.remove(i.key());
         }
     }

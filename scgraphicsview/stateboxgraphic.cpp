@@ -63,7 +63,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
 StateBoxGraphic::~StateBoxGraphic()
 {
-
+    qDebug () << "stateboxgraphic deconstructor:";
 }
 
 

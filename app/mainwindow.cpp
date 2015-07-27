@@ -112,6 +112,8 @@ MainWindow::~MainWindow()
 void MainWindow::handleFileOpenClick()
 {
 
+    _project->getDM()->reset();
+
     QString prevFilePath=QDir::homePath();
     QString fileName;
 
@@ -124,8 +126,13 @@ void MainWindow::handleFileOpenClick()
     _settings->setValue(_keyLastFilePath, fileName);
 
     // reset the datamodel and user the reader to load the new scxml
-    _project->getDM()->reset();
+
+
+    //_formEditorWindow->reset();
     _project->getDM()->openFile(fileName);
+    //_formEditorWindow->highlightRootItem();
+  //  _formEditorWindow->reset();
+
 
 
 
@@ -198,7 +205,11 @@ void MainWindow::handleFileSaveClick()
 
 void MainWindow::handleNewClick()
 {
+
+
     _project->getDM()->reset();
+  //  _formEditorWindow->reset();
+
     if(false)
     {
         if ( _project)
