@@ -572,6 +572,8 @@ void SCFormView::handleTransitionDeleted(QObject *t)
     CustomTreeWidgetItem* transTreeItem = _itemToTreeWidget.value(trans);
     qDebug() << "SCFormView::handleTransitionDeleted: " << transTreeItem->text(0);
     _itemToTreeWidget.remove(trans);
+    _itemToTextBlock.remove(trans);
+    _treeWidgetToTextBlock.remove(transTreeItem);
     delete transTreeItem;
 
     // unselect any selected item;
@@ -606,7 +608,8 @@ void SCFormView::handleStateDeleted(QObject *s)
     CustomTreeWidgetItem* stateTreeItem = _itemToTreeWidget.value(state);
     qDebug() << "SCFormView::handleStateDeleted" << stateTreeItem->text(0);
     _itemToTreeWidget.remove(state);
-
+    _itemToTextBlock.remove(state);
+    _treeWidgetToTextBlock.remove(stateTreeItem);
     delete stateTreeItem;
 
     // unselect any selected item;
