@@ -154,8 +154,6 @@ SCTextBlock * SCDataModel::getAsTextBlock(QObject*o)
  */
 bool SCDataModel::save(QString fileName, QString& errorMessage)
 {
-
-
     QFile file(fileName);
 
     if ( ! file.open(QIODevice::WriteOnly))
@@ -193,6 +191,27 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     errorMessage = QString("sucess");
     return true;
 }
+
+bool SCDataModel::exportToCode(QString fileName, QString &errorMessage)
+{
+
+    // get the file name minus cpp and add h
+    QString hFileName = fileName.mid(0,fileName.size()-3) + "h";
+
+
+    qDebug() << "time to save files " << fileName<<"\t and  " << hFileName;
+
+
+
+    CodeWriter cw(fileName, hFileName);
+    //cw.helloWorld();
+    cw.writeHFile();
+    cw.writeCppFile();
+
+
+    return true;
+}
+
 
 /**
 
@@ -411,7 +430,7 @@ bool SCDataModel::deleteItem(QObject * item)
 
         }*/
 
-        delete state;
+         state->deleteLater();
     }
     else if(trans)
     {

@@ -29,7 +29,8 @@ SOURCES += scdatamodel.cpp \
     positionattribute.cpp \
     idattribute.cpp \
     scitem.cpp \
-    textblock.cpp
+    textblock.cpp \
+    codewriter.cpp
 
 HEADERS += scdatamodel.h\
     SCDataModel_global.h \
@@ -44,7 +45,8 @@ HEADERS += scdatamodel.h\
     positionattribute.h \
     textblock.h \
     idattribute.h \
-    scitem.h
+    scitem.h \
+    codewriter.h
 
 OTHER_FILES += \
     COPYING.txt

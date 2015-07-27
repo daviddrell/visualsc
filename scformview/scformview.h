@@ -141,6 +141,7 @@ private slots:
 
 private:
 
+    void deleteTreeItem(SCItem*);
 
     int propertyTableIndexOf(QString propertyName);
     int textBlockPropertyTableIndexOf(QString propertyName);

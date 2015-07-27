@@ -27,6 +27,9 @@
 #include <QList>
 #include "scxmlreader.h"
 #include <QXmlStreamWriter>
+#include <QTextStream>
+#include <codewriter.h>
+
 class QGraphicsScene;
 
 /**
@@ -69,6 +72,9 @@ class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 
 
 public:
+
+
+
     void connectDataModel();
     void reset();
     static SCDataModel * singleton();
@@ -78,6 +84,8 @@ public:
     void open(QString scxmlFile);
 
     bool save(QString scxmlFile, QString & message);
+    bool exportToCode(QString cName, QString &message);
+
     void initializeEmptyStateMachine();
 
     bool deleteItem(QObject * item);

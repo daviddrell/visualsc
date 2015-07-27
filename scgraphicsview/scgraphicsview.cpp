@@ -436,15 +436,21 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
  * @brief SCGraphicsView::handleStateDeleted
  * @param state
  *
- * if the SCState is destroyed, delete it from the graphics view.
+ * SLOT
+ * connect in SCGraphicsView
+ * connect(state, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
+
+ *
+ * if the SCState is destroyed, remove it and its children from the graphics view
  */
 void SCGraphicsView::handleStateDeleted(QObject *state)
 {
     // use a direct cast because dynamic_cast<State*> will not result in a
     // state because the state has already been destructed
-    // and we are getting the destructor signal on the base QObject clas
+    // and we are getting the destructor signal on the base QObject class
 
     SCState * st = (SCState*)state;
+    qDebug() <<"SCGraphicsView::handleStateDeleted for state: " << st->objectName();
 
     QMapIterator<SCState*,StateBoxGraphic*> i(_mapStateToGraphic);
     while (i.hasNext())

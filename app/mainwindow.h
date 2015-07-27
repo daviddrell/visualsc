@@ -59,6 +59,7 @@ private:
 private slots:
     void handleFileOpenClick();
     void handleFileSaveClick();
+    void handleExportCodeClick();
     void handleNewClick();
     void handleReadInputFileDone(bool,QStringList);
 };

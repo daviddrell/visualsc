@@ -64,6 +64,13 @@ void SMProject::initNewSM()
     _dm->initializeEmptyStateMachine();
 }
 
+/**
+ * @brief SMProject::readInputFile
+ * @param file
+ *
+ * Not currently in use due to multiple connects with multiple open calls
+ *
+ */
 void SMProject::readInputFile(QString file)
 {
     connect( _dm, SIGNAL(openCompleted(bool,QStringList)), this, SLOT(handleOpenCompleted(bool,QStringList)));
@@ -84,6 +91,11 @@ void SMProject::save(QString fileName)
     _dm->save(fileName, errorMsg);
 }
 
+void SMProject::exportToCode(QString fileName)
+{
+    QString errorMessage;
+    _dm->exportToCode(fileName, errorMessage);
+}
 
 void SMProject::close()
 {

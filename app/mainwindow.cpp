@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect ( ui->actionOpen, SIGNAL(triggered()), this, SLOT(handleFileOpenClick()));
     connect ( ui->actionSave, SIGNAL(triggered()), this, SLOT(handleFileSaveClick()));
+    connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
 
     _textFormatToolBar = new TextFormatToolBar();
@@ -112,6 +113,7 @@ MainWindow::~MainWindow()
 void MainWindow::handleFileOpenClick()
 {
 
+    // clear out the data model
     _project->getDM()->reset();
 
     QString prevFilePath=QDir::homePath();
@@ -129,7 +131,11 @@ void MainWindow::handleFileOpenClick()
 
 
     //_formEditorWindow->reset();
+
+    // open the file
     _project->getDM()->openFile(fileName);
+
+    // reselect the new root machine tree widget in the tree view
     _formEditorWindow->highlightRootItem();
   //  _formEditorWindow->reset();
 
@@ -194,21 +200,44 @@ void MainWindow::handleFileSaveClick()
     }
 
     fileName = QFileDialog::getSaveFileName(this,
-                                            tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
+                                            tr("Save as SCXML File"), prevFilePath, tr("SCXML Files (*.scxml)"));
 
     _settings->setValue(_keyLastFilePath, fileName);
-
+    qDebug() << "the file name is " << fileName;
     _project->save(fileName);
 }
 
+void MainWindow::handleExportCodeClick()
+{
+    if(_project==NULL)
+        return;
+
+    if ( _project == NULL) return;
+
+    QString prevFilePath=QDir::homePath();
+    QString fileName ;
+
+    if ( _settings->contains(_keyLastFilePath))
+    {
+        prevFilePath = _settings->value(_keyLastFilePath).toString();
+    }
+
+    fileName = QFileDialog::getSaveFileName(this,
+                                            tr("Save as .cpp and .h Files"), prevFilePath, tr("C++ and Header (*.cpp)"));
+
+    _settings->setValue(_keyLastFilePath, fileName);
+    //_project->save(fileName);
+    qDebug() << "export to code file name: " << fileName;
+    _project->exportToCode(fileName);
+}
 
 
 void MainWindow::handleNewClick()
 {
 
 
-    _project->getDM()->reset();
-    _formEditorWindow->highlightRootItem();
+    _project->getDM()->reset(); // clean out the data model except for the root machine, this will cause the graphicsview and formview to reset as well
+    _formEditorWindow->highlightRootItem(); // select the root machine in the tree view
   //  _formEditorWindow->reset();
 
 

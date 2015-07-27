@@ -49,6 +49,7 @@ public:
 
     void readInputFile(QString file);
     void save(QString file);
+    void exportToCode(QString file);
     QGraphicsView * getQGraphicsView();
     SCDataModel  * getDM();
 
