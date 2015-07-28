@@ -265,8 +265,9 @@ void SCFormView::handleNewTransition(SCTransition* tr)
 */
 
     connectTransition(tr);
-    replantTree();
-/*
+
+
+
     SCState* parent = tr->parentSCState();
     CustomTreeWidgetItem* parentTreeWidget = findItem(parent);
 
@@ -284,13 +285,14 @@ void SCFormView::handleNewTransition(SCTransition* tr)
     SCTextBlock  * textBlock = tr->getEventTextBlock();
     _itemToTextBlock.insert(tr,textBlock);
     loadTreeTextBlock(item, textBlock);
-*/
+
    /*
+    * //    replantTree();
     if(_currentlySelected)
         findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
 */
 
-    highlightRootItem();
+ //   highlightRootItem();
 }
 
 /**
@@ -304,15 +306,17 @@ void SCFormView::handleNewTransition(SCTransition* tr)
  */
 void SCFormView::handleNewState(SCState*s)
 {
-    (void)s;
+    //(void)s;
     // pass the loadTree function a list of top-level states and starting node
     // the top node (NULL) has only one top state
-    QList<SCState*> states;
-    states.append( _dm->getTopState());
+    //QList<SCState*> states;
+    //states.append( _dm->getTopState());
 
     //stateChartTreeView->clear();
 
     connectState(s);
+
+
     replantTree();
 
     if(!_currentlySelected)
@@ -326,10 +330,6 @@ void SCFormView::handleNewState(SCState*s)
         handleTreeViewItemClicked((QTreeWidgetItem*)twid,0);
     }
 
-
-
-
-    //loadTree (NULL, states);
 }
 
 /**
