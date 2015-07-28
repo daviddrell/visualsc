@@ -3,25 +3,41 @@
 
 #include <QTextStream>
 #include <QFile>
+#include <scstate.h>
 
 class CodeWriter
 {
 public:
-    CodeWriter(QString, QString);
+    CodeWriter(SCState*,QString, QString);
     ~CodeWriter();
 
     bool helloWorld();
     bool writeHFile();
     bool writeCppFile();
 
+    void addStateMachine(SCState*);
+    void setRootMachine(SCState*);
+    void addState(SCState*);
+    void setChildren(QList<SCState*>);
+
 private:
+
+    void hPrint(QString);
+    void hPrintln(QString);
+    void hPrintln(QString, int);
+    void cPrint(QString);
+    void cPrintln(QString);
+    void cPrintln(QString, int);
+
     QString className;
     QFile cFile;
     QFile hFile;
     QTextStream cOut;
     QTextStream hOut;
 
-
+    SCState* _rootMachine;
+    QList<SCState*> _children;
+    QList<SCState*> _childrenMachines;
 };
 
 #endif // CODEWRITER_H

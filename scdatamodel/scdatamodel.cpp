@@ -50,6 +50,8 @@ void SCDataModel::connectDataModel()
     connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransitionTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewEventTextBlock(TextBlockAttributes*)));
+
+    connect(&_reader, SIGNAL(changeStateMachineName(QString)), this, SLOT(handleStateMachineNameLoad(QString)));
 }
 
 SCDataModel * SCDataModel::singleton()
@@ -59,6 +61,14 @@ SCDataModel * SCDataModel::singleton()
         instance = new SCDataModel(NULL);
 
     return instance;
+}
+
+void SCDataModel::handleStateMachineNameLoad(QString machineName)
+{
+    // change the value in the data model and alert the formview that this happened to update the tree and property table
+    _topState->attributes.value("name")->setValue(machineName);
+    emit _topState->nameChangedInDataModel(_topState,machineName); // connected to SCFormView::handleItemNameChangedInDataModel()
+
 }
 
 /**
@@ -99,6 +109,11 @@ void SCDataModel::reset()
         }
     }
     _transitions.clear();
+
+    // reset the name of the state machine and alert the formview that this happened
+    _topState->attributes.value("name")->setValue("State Machine");
+    emit _topState->nameChangedInDataModel(_topState,"State Machine"); // connected to SCFormView::handleItemNameChangedInDataModel()
+
     qDebug() << "AFTER A RESET, YOU HAVE " << _transitions.count() << " TRANSITIONS LISTED IN _transitions";
 }
 
@@ -172,6 +187,7 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     if ( type  && ( type->asString() == "machine"))
     {
         _writer->writeStartElement("scxml");
+        _writer->writeAttribute("name", _topState->attributes.value("name")->asString());
         _writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
     }
 
@@ -203,7 +219,13 @@ bool SCDataModel::exportToCode(QString fileName, QString &errorMessage)
 
 
 
-    CodeWriter cw(fileName, hFileName);
+    CodeWriter cw(this->getTopState(),fileName, hFileName);
+    QList<SCState *> list;
+    //list.append(_topState);
+    _topState->getAllStates(list);
+    cw.setChildren(list);
+
+
     //cw.helloWorld();
     cw.writeHFile();
     cw.writeCppFile();
@@ -276,7 +298,7 @@ void SCDataModel::openFile(QString fileName)
     _reader.getReadResult(ok, messages);
 
     qDebug()<<"% ok message : " << ok;
-    if(ok);
+    if(ok)
     {
        // set up the transition connections in the data model
        connectTransitionsToStatePath();
@@ -287,7 +309,6 @@ void SCDataModel::openFile(QString fileName)
            // alert the graphics view and formview that the transition is ready to set up its connections
            emit transitionsReadyToConnect(_transitions.at(i));
        }
-
     }
 
 }
@@ -333,13 +354,13 @@ void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition*
     // add this transition to the source state's list of out transitions
     SCState * sourceState = dynamic_cast<SCState *> ( trans->parent());
     sourceState->addTransitionReference(trans, SCState::kTransitOut);
-
+/*
     SCState *sourceTreeNode=NULL;
     SCState *targetTreeNode=NULL;
 
     int sourceLevel =  sourceState->getLevel();
     int targetLevel = targetState->getLevel();
-
+*/
      // change behavior to not promote transition references to parent
     /*
    // example: targetStateLevel = 1, sourceStateLevel = 3
@@ -627,6 +648,9 @@ void SCDataModel::initializeEmptyStateMachine()
 
 
     _currentState  = _topState;
+
+    // connect the top state
+    connectState(_topState);
 
     //emit newStateSignal(_topState);
 

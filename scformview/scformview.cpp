@@ -108,8 +108,8 @@ this->resize(618,1000);
     setWindowTitle(tr("State Chart Tree Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
 
-    QList<SCState*> states;
-    states.append( _dm->getTopState());
+   // QList<SCState*> states;
+   // states.append( _dm->getTopState());
 
     connect (_dm, SIGNAL(formViewInsertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
@@ -121,6 +121,7 @@ this->resize(618,1000);
 
     //loadTree (NULL, states);
 
+    // connect the top state
     initTree();
 
 }
@@ -500,6 +501,27 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
 
             //updateTransitionEvent(trans, value);
             //handleItemNameChangedInDataModel(trans, value);
+        }
+    }
+    else if(getCurrentlySelectedType().toLower() == "machine")
+    {
+        SCState* st = dynamic_cast<SCState*>(_currentlySelected);
+        qDebug() << "got into state machine*!@";
+
+        QString key = propertyTable->item(r,0)->text();
+        QString value = propertyTable->item(r,1)->text();
+        if(key == "name")
+        {
+            // update the state name in the form view and the transitions that target it
+            // update the tree and table if necessary
+            QTreeWidgetItem* treeItem = findItem(st);
+            treeItem->setText(0, value);  // update the tree
+
+            // now signal the datamodel and graphicsview that the state name was changed here
+            //emit st->nameChangedInFormView(st, value);
+
+            // then signal that a state was change in the form view (this is done in SCDataModel already with SCState::setText)
+
         }
     }
 }

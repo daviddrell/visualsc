@@ -84,12 +84,28 @@ MainWindow::MainWindow(QWidget *parent) :
 //#define AUTO_LOAD_FILE
 
 #ifdef AUTO_LOAD_FILE
-    #define DEFAULT_FILE "C:/xml/w.scxml";
+
+    #define DEFAULT_FILE "C:/xml/abc triangle.scxml";
     QString fileName =DEFAULT_FILE;
     _settings->setValue(_keyLastFilePath, fileName);
+    /*
     _project = new SMProject(  ui->centralWidget );
     connect (_project, SIGNAL(readInputFileCompleted(bool,QStringList)), this, SLOT(handleReadInputFileDone(bool,QStringList)) );
     _project->readInputFile(fileName);
+    */
+
+    _project = new SMProject(  ui->centralWidget );
+   // _project->initNewSM(); moved to constructor
+    ui->gridLayout->addWidget( _project->getQGraphicsView() );
+    _formEditorWindow = new SCFormView(0, _project->getDM());
+    _formEditorWindow->show();
+
+
+    // open the file
+    _project->getDM()->openFile(fileName);
+
+    // reselect the new root machine tree widget in the tree view
+    _formEditorWindow->highlightRootItem();
 
 #endif
 

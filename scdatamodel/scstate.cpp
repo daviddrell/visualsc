@@ -67,6 +67,12 @@ SCState::~SCState()
     delete _IdTextBlock;
 }
 
+/**
+ * @brief SCState::initCommon
+ *
+ * called when a SCState is created
+ *
+ */
 void SCState::initCommon()
 {
    // _stateBoxGraphic = NULL;
@@ -85,17 +91,17 @@ void SCState::initCommon()
     }
 
 
-    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"onEntryAction"<<"onExitAction"<<"finalState"<<"initialState"; // type is added to the state in scxml reader.
+    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"finalState"<<"initialState"; // type is added to the state in scxml reader.
 
+    // set the initial attributes and size
     StateName * name = new StateName (this, "name",defaultName);
     SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
     StateString * type = new StateString(this, "type", "default type");
-    StateString * onEntryAction = new StateString(this, "onEntryAction","default entry action");
-    StateString * onExitAction = new StateString(this, "onExitAction", "default exit action");
+    StateString * onEntryAction = new StateString(this, "entryAction","default entry action");
+    StateString * onExitAction = new StateString(this, "exitAction", "default exit action");
     StateString * finalState = new StateString(this, "finalState", "false");
     StateString * initialState = new StateString(this, "initialState", "false");
-
 
     attributes.addItem(name);
     attributes.addItem(size);
@@ -142,6 +148,8 @@ void SCState::initCommon()
 void SCState::setText(QString text)
 {
     _IdTextBlock->setText(text);
+
+    // this is in SCTextBlock's setText
     /*if  ( text != _text)
     {
          _text = text;
@@ -471,6 +479,13 @@ void SCState::addState(SCState * s)
 
 }
 
+/**
+* @brief SCState::getAllTransitions
+* @param transitionList
+*
+* recursively get all transitions that belong to this state and any children state
+*
+*/
 void SCState::getAllTransitions(QList<SCTransition*> & transitionList)
 {
 
@@ -493,6 +508,13 @@ void SCState::getAllTransitions(QList<SCTransition*> & transitionList)
 
 }
 
+/**
+ * @brief SCState::getTransitions
+ * @param transitionList
+ *
+ * gets all outgoing states owned by this state
+ *
+ */
 void SCState::getTransitions(QList<SCTransition*> & transitionList)
 {
 
