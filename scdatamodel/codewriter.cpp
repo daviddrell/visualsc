@@ -287,7 +287,7 @@ void CodeWriter::cWriteEntryExitSlots()
         {
             cPrintln("emit "+actionSignal+";",1);
         }
-        cPrintln("}");
+        cPrintln("}\n");
 
 
         cPrintln("void "+className+"::"+_stateToExitRelaySlot.value(state)+"()");
