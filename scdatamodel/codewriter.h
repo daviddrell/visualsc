@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <scstate.h>
+#include <sctransition.h>
 
 class CodeWriter
 {
@@ -22,6 +23,8 @@ public:
 
 private:
 
+    void hWriteEventSlots();
+    QString toCamelCase(QString);
     void hPrint(QString);
     void hPrintln(QString);
     void hPrintln(QString, int);

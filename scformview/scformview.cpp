@@ -254,22 +254,43 @@ void SCFormView::handleMakeTransitionConnections(SCTransition* trans)
  * reloads the tree form to show the newly added sctransition that was added to the data model
  *
  */
-void SCFormView::handleNewTransition(SCTransition*t)
+void SCFormView::handleNewTransition(SCTransition* tr)
 {
     qDebug()<<"SCFormView::handleNewTransition";
-    (void)t;
+/*    (void)t;
+
     QList<SCState*> states;
     states.append( _dm->getTopState());
 
-    //stateChartTreeView->clear();
+*/
 
-    connectTransition(t);
+    connectTransition(tr);
     replantTree();
+/*
+    SCState* parent = tr->parentSCState();
+    CustomTreeWidgetItem* parentTreeWidget = findItem(parent);
 
+    CustomTreeWidgetItem* item = new CustomTreeWidgetItem(parentTreeWidget);
+    item->setData(tr);
+
+    item->setText(0, tr->attributes.value("event")->asString());
+    item->setIcon(0,QIcon(":/SCFormView/transitionbutton.bmp"));
+
+
+    // connect the transition and tree widget item to the hashtable
+    _itemToTreeWidget.insert(tr, item);
+
+    // load the event text block for the transiton
+    SCTextBlock  * textBlock = tr->getEventTextBlock();
+    _itemToTextBlock.insert(tr,textBlock);
+    loadTreeTextBlock(item, textBlock);
+*/
+   /*
     if(_currentlySelected)
         findItem((SCState*)_currentlySelected)->setSelected(true); // rehighlight the item that was highlighted
+*/
 
-    //loadTree (NULL, states);
+    highlightRootItem();
 }
 
 /**
@@ -592,7 +613,7 @@ void SCFormView::handleTransitionDeleted(QObject *t)
 
     SCTransition* trans = (SCTransition*)t;
     CustomTreeWidgetItem* transTreeItem = _itemToTreeWidget.value(trans);
-    qDebug() << "SCFormView::handleTransitionDeleted: " << transTreeItem->text(0);
+    //qDebug() << "SCFormView::handleTransitionDeleted: " << transTreeItem->text(0);
     _itemToTreeWidget.remove(trans);
     _itemToTextBlock.remove(trans);
     _treeWidgetToTextBlock.remove(transTreeItem);
@@ -628,7 +649,7 @@ void SCFormView::handleStateDeleted(QObject *s)
 
     SCState* state = (SCState*) s;
     CustomTreeWidgetItem* stateTreeItem = _itemToTreeWidget.value(state);
-    qDebug() << "SCFormView::handleStateDeleted" << stateTreeItem->text(0);
+    //qDebug() << "SCFormView::handleStateDeleted" << stateTreeItem->text(0);
     _itemToTreeWidget.remove(state);
     _itemToTextBlock.remove(state);
     _treeWidgetToTextBlock.remove(stateTreeItem);

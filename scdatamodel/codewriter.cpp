@@ -169,18 +169,20 @@ bool CodeWriter::writeHFile()
 
 // private members
     hPrintln("\nprivate:\n");
+
+
     //write the statemachine and states
     if(_rootMachine)
     {
-        hPrintln("QStateMachine*    _"+_rootMachine->attributes.value("name")->asString()+";",1);
+        hPrintln("QStateMachine*    _" + toCamelCase(_rootMachine->attributes.value("name")->asString())+";",1);
     }
     for(int i = 0 ; i < _childrenMachines.count(); i++)
     {
-        hPrintln("QStateMachine*    _"+_childrenMachines.at(i)->attributes.value("name")->asString()+";",1);
+        hPrintln("QStateMachine*    _" + toCamelCase(_childrenMachines.at(i)->attributes.value("name")->asString())+";",1);
     }
     for(int i = 0 ; i < _children.count(); i++)
     {
-        hPrintln("QState*    _"+_children.at(i)->attributes.value("name")->asString()+";",1);
+        hPrintln("QState*    _"+ toCamelCase(_children.at(i)->attributes.value("name")->asString())+";",1);
     }
 
 // end if define
@@ -189,6 +191,50 @@ bool CodeWriter::writeHFile()
     // true if no complications
     return true;
 
+}
+
+/**
+ * @brief CodeWriter::toCamelCase
+ * @param text
+ * @return
+ * converts any space separated string of words and returns a camel case string
+ */
+QString CodeWriter::toCamelCase(QString text)
+{
+    QStringList qls = text.split(" ");
+    //if(qls.size()==1)
+      //  return text;
+
+    QString ret;
+    QString part;
+
+    ret+=qls.at(0).toLower();
+    for(int i = 1 ; i < qls.size(); i++)
+    {
+        part = qls.at(i).toLower();
+        ret+= part.at(0).toUpper();
+        ret+= part.mid(1,part.size());
+    }
+    return ret;
+}
+
+void CodeWriter::hWriteEventSlots()
+{
+    SCState* state;
+    SCTransition* trans;
+    QList<SCTransition*> transitions;
+    for(int i = 0 ; i < _children.count();i++)
+    {
+        // if we go through all out transitions, all transitions will be covered.
+        state = _children.at(i);
+        transitions.clear();
+        state->getTransitions(transitions);
+        for(int k = 0; k < transitions.count(); k++)
+        {
+            trans = transitions.at(k);
+            hPrintln("Event_"+toCamelCase(trans->attributes.value("event")->asString())+"();");
+        }
+    }
 }
 
 void CodeWriter::hPrint(QString text)

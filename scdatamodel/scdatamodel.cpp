@@ -39,7 +39,12 @@ SCDataModel::SCDataModel(QObject * parent) :
 
 }
 
-
+/**
+ * @brief SCDataModel::connectDataModel
+ *
+ * called by the smproject that holds a datamodel, will connect the scxml reader to the data model
+ *
+ */
 void SCDataModel::connectDataModel()
 {
     connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::DirectConnection);
@@ -51,6 +56,7 @@ void SCDataModel::connectDataModel()
     connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransitionTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewEventTextBlock(TextBlockAttributes*)));
 
+    // connects scxml reader to changing the state machine's name
     connect(&_reader, SIGNAL(changeStateMachineName(QString)), this, SLOT(handleStateMachineNameLoad(QString)));
 }
 
@@ -63,6 +69,19 @@ SCDataModel * SCDataModel::singleton()
     return instance;
 }
 
+/**
+ * @brief SCDataModel::handleStateMachineNameLoad
+ * @param machineName
+ *
+ * SLOT
+ * connect in SCDataModel
+ * connect(&_reader, SIGNAL(changeStateMachineName(QString)), this, SLOT(handleStateMachineNameLoad(QString)));
+ *
+ * called when the scxml reader reads a scxml file and changes the datamodel state machine's name
+ * addtionally signals the formview to update the root state machine there
+ *
+ *
+ */
 void SCDataModel::handleStateMachineNameLoad(QString machineName)
 {
     // change the value in the data model and alert the formview that this happened to update the tree and property table

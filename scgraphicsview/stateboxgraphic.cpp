@@ -458,13 +458,13 @@ int StateBoxGraphic::returnClosestWallFace(QPointF mts,QPointF newPos)
     dl = fabs(x - newPos.x());
     dd = fabs(y+h-newPos.y());
 
-    if(dn < dr && dn < dd && dn < dl)
+    if(dn <= dr && dn <= dd && dn <= dl)
         return NORTH;
 
-    else if(dr < dn && dr < dd && dr < dl)
+    else if(dr <= dn && dr <= dd && dr <= dl)
         return EAST;
 
-    else if(dd < dn && dd < dr && dd < dl)
+    else if(dd <= dn && dd <= dr && dd <= dl)
         return SOUTH;
 
     else
