@@ -9,7 +9,7 @@
 class CodeWriter
 {
 public:
-    CodeWriter(SCState*,QString, QString);
+    CodeWriter(SCState*,QString,QString, QString);
     ~CodeWriter();
 
     bool helloWorld();
@@ -20,11 +20,25 @@ public:
     void setRootMachine(SCState*);
     void addState(SCState*);
     void setChildren(QList<SCState*>);
+    void createSignalsAndSlots();
 
 private:
 
+
+
+    void cWriteConstructor();
+    void cWriteDeconstructor();
+    void cWriteEventSlots();
+    void cWriteEntryExitSlots();
+
     void hWriteEventSlots();
-    QString toCamelCase(QString);
+    void hWriteActionSignals();
+    void hWriteStateChangeSignals();
+    void hWriteEventRelaySignals();
+    void hWriteActionRelaySlots();
+    void hWriteStates();
+
+    QString toCamel(QString);
     void hPrint(QString);
     void hPrintln(QString);
     void hPrintln(QString, int);
@@ -41,6 +55,16 @@ private:
     SCState* _rootMachine;
     QList<SCState*> _children;
     QList<SCState*> _childrenMachines;
+
+    //QHash<SCState*, QHash<QString, QString>*> _sAndS;
+    QHash<SCState*, QString> _stateToName;
+    QHash<SCTransition*, QString> _transitionToRelaySignal;
+    QHash<SCTransition*, QString> _transitionToEvent;
+    QHash<SCState*, QString> _stateToEntryRelaySlot;
+    QHash<SCState*, QString> _stateToExitRelaySlot;
+    QHash<SCState*, QString> _stateToEntryAction;
+    QHash<SCState*, QString> _stateToExitAction;
+    //QHash<SCTransition*, QString> _transitionTo
 };
 
 #endif // CODEWRITER_H

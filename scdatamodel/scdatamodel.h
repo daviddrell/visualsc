@@ -159,6 +159,8 @@ private slots:
 private:
 
 
+    QString toClassName(QString);
+    QString toClassFileName(QString);
     void connectState(SCState*);
     void connectTransition(SCTransition*);
 

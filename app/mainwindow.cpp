@@ -85,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #ifdef AUTO_LOAD_FILE
 
-    #define DEFAULT_FILE "C:/xml/abc triangle.scxml";
+    #define DEFAULT_FILE "C:/xml/test manager state machine.scxml";
     QString fileName =DEFAULT_FILE;
     _settings->setValue(_keyLastFilePath, fileName);
     /*

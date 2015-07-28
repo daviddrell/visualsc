@@ -227,24 +227,68 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     return true;
 }
 
+
+QString SCDataModel::toClassFileName(QString className)
+{
+    QStringList qsl = className.split(" ");
+    QString ret;
+    for(int i = 0; i < qsl.size(); i++)
+    {
+        ret += qsl.at(i).toLower();
+    }
+    return ret;
+}
+
+QString SCDataModel::toClassName(QString className)
+{
+    QStringList qsl = className.split(" ");
+    QString ret;
+    QString word;
+    for(int i = 0; i < qsl.size(); i++)
+    {
+        word = qsl.at(i);
+        ret += word.at(0).toUpper() + word.mid(1,word.size()).toLower();
+    }
+    return ret;
+}
+
+
 bool SCDataModel::exportToCode(QString fileName, QString &errorMessage)
 {
+qDebug() << "time to save files " << fileName;
 
+QString hFileName;
+QString cppFileName;
+#define FORCE_STATE_MACHINE_NAME
+#ifndef FORCE_STATE_MACHINE_NAME
     // get the file name minus cpp and add h
-    QString hFileName = fileName.mid(0,fileName.size()-3) + "h";
+    hFileName = fileName.mid(0,fileName.size()-3) + "h";
 
+#endif
 
-    qDebug() << "time to save files " << fileName<<"\t and  " << hFileName;
+#ifdef FORCE_STATE_MACHINE_NAME
+    QStringList qsl = fileName.split("/");
+    QString smFileName;
+    for(int i = 0; i < qsl.count() -1; i++)
+    {
+        smFileName+=qsl.at(i)+"/";
+    }
+    // Test State Machine -> ./teststatemachine.cpp
+    QString classFileName = toClassFileName(_topState->attributes.value("name")->asString());
+    cppFileName = smFileName+classFileName+".cpp";
+    hFileName = smFileName+classFileName+".h";
 
+    // Test State Machine -> TestStateMachine
+    QString className = toClassName(_topState->attributes.value("name")->asString());
+#endif
 
-
-    CodeWriter cw(this->getTopState(),fileName, hFileName);
+    CodeWriter cw(this->getTopState(), className, cppFileName, hFileName);
     QList<SCState *> list;
     //list.append(_topState);
     _topState->getAllStates(list);
     cw.setChildren(list);
 
-
+    cw.createSignalsAndSlots();
     //cw.helloWorld();
     cw.writeHFile();
     cw.writeCppFile();

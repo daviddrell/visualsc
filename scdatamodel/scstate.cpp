@@ -98,8 +98,8 @@ void SCState::initCommon()
     SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
     StateString * type = new StateString(this, "type", "default type");
-    StateString * onEntryAction = new StateString(this, "entryAction","default entry action");
-    StateString * onExitAction = new StateString(this, "exitAction", "default exit action");
+    StateString * onEntryAction = new StateString(this, "entryAction","");
+    StateString * onExitAction = new StateString(this, "exitAction", "");
     StateString * finalState = new StateString(this, "finalState", "false");
     StateString * initialState = new StateString(this, "initialState", "false");
 

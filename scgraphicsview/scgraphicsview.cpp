@@ -104,7 +104,7 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
 
     TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(trans->attributes.value("target"));
 
-    SCState* parentState = trans->parentSCState();
+    //SCState* parentState = trans->parentSCState();
     SCState* targetState = lookUpTargetState(targetName->asString());
     StateBoxGraphic * targetGraphic  = _hashStateToGraphic.value(targetState);
 
