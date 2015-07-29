@@ -95,6 +95,7 @@ void SCState::initCommon()
     StateString * onExitAction = new StateString(this, "onExitAction", "default exit action");
     StateString * finalState = new StateString(this, "finalState", "false");
     StateString * initialState = new StateString(this, "initialState", "false");
+    StateString * isParallelState = new StateString(this, "isParallelState", "false");
 
 
     attributes.addItem(name);
@@ -105,6 +106,7 @@ void SCState::initCommon()
     attributes.addItem(onExitAction);
     attributes.addItem(finalState);
     attributes.addItem(initialState);
+    attributes.addItem(isParallelState);
 
     this->setObjectName(defaultName);// to support debug tracing
 

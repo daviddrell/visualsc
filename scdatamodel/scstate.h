@@ -58,8 +58,6 @@ public:
     SCState(bool topState=false);
     ~SCState();
 
-   // void setGraphic(StateBoxGraphic*);
-
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
 
     enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };
@@ -68,7 +66,6 @@ public:
     void setStateName(QString n);
     void addTransistion(SCTransition*);
     void addState(SCState *);
-   // void makeTargetConnections(QList<SCTransition*> & transitionList);
 
     void setAttributeValue(QString key, QString value);
     void addAttribute(QString key, QString value);
@@ -190,8 +187,6 @@ signals:
      void nameChangedInFormView(SCState*,QString);
      void positionChangedInFormView(SCState*, QPointF);
      void sizeChangedInFormView(SCState*, QPointF);
-
-
 
 
 public slots:
