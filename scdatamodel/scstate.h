@@ -58,6 +58,7 @@ public:
     SCState(bool topState=false);
     ~SCState();
 
+    void prepareForDelete();
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
 
     enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };
@@ -178,6 +179,7 @@ public:
 
 signals:
 
+     void aboutToBeDeleted(QObject*);
      void changed();
      void attributeChangedSignal(IAttribute*);
      void nameChangedInDataModel(SCState*,QString);

@@ -68,6 +68,16 @@ SCState::~SCState()
 }
 
 /**
+ * @brief SCState::prepareForDelete
+ * Call this to delete and do not call deleteLater
+ */
+void SCState::prepareForDelete()
+{
+    emit aboutToBeDeleted(this);
+    this->deleteLater();
+}
+
+/**
  * @brief SCState::initCommon
  *
  * called when a SCState is created

@@ -514,7 +514,8 @@ bool SCDataModel::deleteItem(QObject * item)
 
         }*/
 
-         state->deleteLater();
+         //state->deleteLater();
+        state->prepareForDelete();
     }
     else if(trans)
     {

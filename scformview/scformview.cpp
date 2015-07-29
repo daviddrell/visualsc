@@ -648,13 +648,31 @@ void SCFormView::handleStateDeleted(QObject *s)
     // and we are getting the destructor signal on the base QObject class
 
     SCState* state = (SCState*) s;
-    CustomTreeWidgetItem* stateTreeItem = _itemToTreeWidget.value(state);
-    //qDebug() << "SCFormView::handleStateDeleted" << stateTreeItem->text(0);
-    _itemToTreeWidget.remove(state);
-    _itemToTextBlock.remove(state);
-    _treeWidgetToTextBlock.remove(stateTreeItem);
-    delete stateTreeItem;
+    if ( _itemToTreeWidget.contains(state))
+    {
+        // forget about all the children states
 
+        QList<SCState*> children;
+        state->getAllStates(children);
+        for(int i = children.count()-1; i >= 0; i--)
+        {
+            if ( _itemToTreeWidget.contains(children.at(i)))
+            {
+                CustomTreeWidgetItem* stateTreeItem = _itemToTreeWidget.value(children.at(i));
+                _itemToTreeWidget.remove(children.at(i));
+                _itemToTextBlock.remove(children.at(i));
+                _treeWidgetToTextBlock.remove(stateTreeItem);
+            }
+        }
+
+        // remove the parent tree item
+        CustomTreeWidgetItem* stateTreeItem = _itemToTreeWidget.value(state);
+        qDebug() << "SCFormView::handleStateDeleted" << stateTreeItem->text(0);
+        _itemToTreeWidget.remove(state);
+        _itemToTextBlock.remove(state);
+        _treeWidgetToTextBlock.remove(stateTreeItem);
+        delete stateTreeItem;
+    }
     // unselect any selected item;
      QList<QTreeWidgetItem*> selected = stateChartTreeView->selectedItems();
      qDebug() << "v2 there are " << selected.size()<<" selected items.";
@@ -721,7 +739,7 @@ QObject* SCFormView::getNeighborState(QObject*s)
 void SCFormView::connectState(SCState* st)
 {
     // SCState connects
-    connect(st, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
+    connect(st, SIGNAL(aboutToBeDeleted(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
     connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
     connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
     connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));

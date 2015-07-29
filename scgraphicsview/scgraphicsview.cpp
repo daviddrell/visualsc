@@ -528,7 +528,7 @@ void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
 void SCGraphicsView::connectState(SCState* state)
 {
     // connect formview and graphics view to update the graphics view if the box is changed by property value
-    connect(state, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
+    connect(state, SIGNAL(aboutToBeDeleted(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
     connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
     connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
 }
