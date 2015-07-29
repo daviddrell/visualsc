@@ -5,6 +5,8 @@
 #include <QFile>
 #include <scstate.h>
 #include <sctransition.h>
+#include <cwstate.h>
+#include <cwtransition.h>
 
 class CodeWriter
 {
@@ -12,7 +14,7 @@ public:
     CodeWriter(SCState*,QString,QString, QString);
     ~CodeWriter();
 
-    bool helloWorld();
+
     bool writeHFile();
     bool writeCppFile();
 
@@ -56,15 +58,9 @@ private:
     QList<SCState*> _children;
     QList<SCState*> _childrenMachines;
 
-    //QHash<SCState*, QHash<QString, QString>*> _sAndS;
-    QHash<SCState*, QString> _stateToName;
-    QHash<SCTransition*, QString> _transitionToRelaySignal;
-    QHash<SCTransition*, QString> _transitionToEvent;
-    QHash<SCState*, QString> _stateToEntryRelaySlot;
-    QHash<SCState*, QString> _stateToExitRelaySlot;
-    QHash<SCState*, QString> _stateToEntryAction;
-    QHash<SCState*, QString> _stateToExitAction;
-    //QHash<SCTransition*, QString> _transitionTo
+    QHash<SCState*, CWState*> _states;
+    QHash<SCTransition*, CWTransition*> _transitions;
+
 };
 
 #endif // CODEWRITER_H

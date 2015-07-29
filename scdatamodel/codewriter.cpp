@@ -25,101 +25,74 @@ CodeWriter::CodeWriter(SCState* rootMachine, QString classNameString,QString cFi
 void CodeWriter::createSignalsAndSlots()
 {
     // link the root machine's state name
-    _stateToName.insert(_rootMachine, "_" + toCamel(_rootMachine->attributes.value("name")->asString()));
+    QString stateName;          // _stateName                       state's name in camel case and preceeding "_"
+    QString entryRelaySlot;     // Slot_StateEntry_stateName        QState's private corresponding entry slot called when a transition leads to this state
+    QString exitRelaySlot;      // Slot_StateExit_stateName         QState's private corresponding exit slot called when a transition exits this state
+    QString entryRelaySignal;   // Signal_StateEntry_stateName      QState's public signal connected to its private entered() signal
+    QString exitRelaySignal;    // Signal_StateExit_stateName       QState's public signal connected to its private exited() signal
+    QString entryAction;        // EntryAction_eventName            signal that is emitted in the entry relay slot
+    QString exitAction;         // ExitAction_eventName             signal that is emitted in the exit relay slot
 
     SCState* state;
+    CWState* cwState;
+
+
     QList<SCTransition*> transitions;
     SCTransition* trans;
-    //QHash<QString,QString>* ssht;
     QString eventName;
-    QString entryAction;
-    QString exitAction;
-    QString stateName;
-    for(int i = 0; i < _children.size(); i++)
+    QString relaySignal;
+    CWTransition* cwTransition;
+
+    // for each child state, determine its QState name, its relay slot function name, and its relay slot signal name.
+    // also for each of the out transitions of each child, determine the transition's event name and relay signal name
+    for(int i = 0 ; i < _children.size();i++)
     {
-        // link the state to its name
         state = _children.at(i);
-        stateName = toCamel("_"+toCamel(state->attributes.value("name")->asString()));
-        _stateToName.insert(state, stateName);
+        stateName =         "_" + toCamel(state->attributes.value("name")->asString());
 
+        entryRelaySignal =  "Signal_StateEntry"+stateName+"()";
+        exitRelaySignal =   "Signal_StateExit"+stateName+"()";
+
+        entryRelaySlot =    "Slot_StateEntry" + stateName+"()";
+        exitRelaySlot =     "Slot_StateExit"+ stateName+"()";
+
+        entryAction = state->attributes.value("entryAction")->asString();
+
+        if(!entryAction.isEmpty())
+        {
+            qDebug()<<"writing entry action: " <<entryAction;
+            entryAction =   "EntryAction_"+toCamel(entryAction)+"()";
+            qDebug()<<"here's entry action: " <<entryAction;
+        }
+
+        exitAction = state->attributes.value("exitAction")->asString();
+        if(!exitAction.isEmpty())
+        {
+            exitAction =    "ExitAction_" +toCamel(exitAction)+"()";
+        }
+
+        // create this codewriter state and link them using a QHash
+        cwState = new CWState(stateName,entryRelaySlot,exitRelaySlot,entryRelaySignal,exitRelaySignal,entryAction,exitAction);
+        _states.insert(state,cwState);
+
+
+        // for each out transition, determine the transition's event name and relay signal name
         transitions.clear();
-        //ssht = new QHash<QString,QString>();
-        //_sAndS.insert(state, ssht);
         state->getTransitions(transitions);
-
-        // add transitions and relay signals for them
         for(int k = 0 ; k < transitions.size(); k++)
         {
             trans = transitions.at(k);
             eventName = "Event_"+toCamel(trans->attributes.value("event")->asString())+"()";
-            //ssht->insert("slot",eventName);
-            //ssht->insert("relayslot","RelaySlot_"+eventName);
-            _transitionToEvent.insert(trans, eventName);
-            _transitionToRelaySignal.insert(trans,"RelaySlot_"+eventName );
+            relaySignal = "Relay_"+eventName;
 
+            // create a new codewriter transition and link them with a QHash
+            cwTransition = new CWTransition(eventName, relaySignal);
+            _transitions.insert(trans, cwTransition);
         }
-
-
-        // add entry/exit relay slots
-        entryAction = state->attributes.value("entryAction")->asString();
-        if(!entryAction.isEmpty())
-        {
-            _stateToEntryAction.insert(state,"EntryAction_"+toCamel(entryAction)+"()");
-        }
-
-
-        exitAction = state->attributes.value("exitAction")->asString();
-        if(!exitAction.isEmpty())
-        {
-            _stateToExitAction.insert(state, "ExitAction_" +toCamel(exitAction)+"()");
-        }
-
-        _stateToEntryRelaySlot.insert(state, "RelaySlot_StateEntry"+_stateToName.value(state));
-        _stateToExitRelaySlot.insert(state, "RelaySlot_StateExit"+_stateToName.value(state));
-
-        /*
-        entryAction = state->attributes.value("entryAction")->asString();
-        if(!entryAction.isEmpty())
-        {
-            ssht->insert("signal","EntryAction_"+toCamel(entryAction)+"()");
-            ssht->insert("relaysignal","RelaySignal_EntryAction_"+toCamel(entryAction)+"()");
-
-        }
-
-
-        exitAction = state->attributes.value("exitAction")->asString();
-        if(!exitAction.isEmpty())
-        {
-            ssht->insert("signal","EntryAction_"+toCamel(exitAction)+"()");
-            ssht->insert("relaysignal","RelaySignal_EntryAction_"+toCamel(exitAction)+"()");
-
-        }
-
-
-        // add default entry/exit actions
-        ssht->insert("signal", "StateEntry_"+stateName+"()");
-        ssht->insert("signal","StateExit_"+stateName+"()");
-        ssht->insert("relaysignal", "RelaySignal_StateEntry_"+stateName+"()");
-        ssht->insert("relaysignal","RelaySignal_StateExit_"+stateName+"()");
-        */
-
     }
 }
 
-bool CodeWriter::helloWorld()
-{
-    if(!cFile.open(QIODevice::WriteOnly|QIODevice::Text))
-        return false;
 
-    if(!hFile.open(QIODevice::WriteOnly|QIODevice::Text))
-        return false;
-
-    cOut << "//This is a cpp file\n\nvoid helloWorld()\n{\n\n}\n";
-
-    hOut << "//This is an h file\n\nvoid helloWorld()\n{\n\n}\n";
-
-    return true;
-}
 
 void CodeWriter::addState(SCState* state)
 {
@@ -174,7 +147,7 @@ void CodeWriter::cWriteConstructor()
     }
 
     cPrintln("\n//",1);
-    cPrintln("//    connect state transitions",1);
+    cPrintln("//    add transitions for the QStates using the transitions' private relay signals",1);
     cPrintln("//",1);
 
     QString childName;
@@ -192,7 +165,9 @@ void CodeWriter::cWriteConstructor()
         for(int k = 0; k < transitions.size();k++)
         {
             trans = transitions.at(k);
-            cPrintln(_stateToName.value(state)+"->addTransition(this,SIGNAL("+_transitionToRelaySignal.value(trans)+"),"+_stateToName.value( trans->targetState())+");",1);
+            cPrintln(_states.value(state)->stateName+"->addTransition(this,SIGNAL("+_transitions.value(trans)->relaySignal+"),"+ _states.value(trans->targetState())->stateName+");",1);
+
+
         }
 
         // connect state entered/exit signals to the StateEntry/StateExit signals
@@ -202,14 +177,14 @@ void CodeWriter::cWriteConstructor()
     }
 
 // RELAY the state's enter/exit signal to the public signal
-    cPrintln("\n//    relay the private SM signals to the public facing signals",1);
+    cPrintln("\n//    Propogate the private QState signals to public signals",1);
 
     for(int i = 0 ; i < _children.size(); i++)
     {
         state = _children.at(i);
         childName = "_"+toCamel(state->attributes.value("name")->asString());
-        cPrintln("connect("+_stateToName.value(state)+", SIGNAL(entered()), this, SIGNAL(StateEntry"+_stateToName.value(state)+"()));",1);
-        cPrintln("connect("+_stateToName.value(state)+", SIGNAL(exited()), this, SIGNAL(StateExit"+_stateToName.value(state)+"()));",1);
+        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(entered()), this, SIGNAL(StateEntry"+_states.value(state)->stateName+"()));",1);
+        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(exited()), this, SIGNAL(StateExit"+_states.value(state)->stateName+"()));",1);
 
 
     }
@@ -220,13 +195,14 @@ void CodeWriter::cWriteConstructor()
 
 
 // Connect the private QState entry/exit signals to their own private entry/exit slots
-    cPrintln("\n//    private state transition handlers to take actions",1);
+    cPrintln("\n//    Connect the private QState signals to private slots for entry/exit handlers",1);
 
     for(int i = 0; i < _children.size(); i++)
     {
         state = _children.at(i);
-        cPrintln("connect("+_stateToName.value(state)+", SIGNAL(entered()), this, SLOT(StateEntry"+_stateToEntryRelaySlot.value(state)+");",1);
-        cPrintln("connect("+_stateToName.value(state)+", SIGNAL(exited()), this, SLOT(StateExit"+_stateToExitRelaySlot.value(state)+");",1);
+        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(entered()), this, SLOT(StateEntry"+_states.value(state)->entryRelaySlot+");",1);
+        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(exited()), this, SLOT(StateExit"+_states.value(state)->exitRelaySlot+");",1);
+
 
     }
 
@@ -259,9 +235,10 @@ void CodeWriter::cWriteEventSlots()
         for(int k = 0; k < transitions.size(); k++)
         {
             trans = transitions.at(k);
-            cPrintln("void "+className+"::"+_transitionToEvent.value(trans));
+            cPrintln("void "+className+"::"+_transitions.value(trans)->eventName);
+
             cPrintln("{");
-            cPrintln("emit "+_transitionToRelaySignal.value(trans)+";",1);
+            cPrintln("emit "+_transitions.value(trans)->relaySignal+";",1);
             cPrintln("}\n");
         }
     }
@@ -280,9 +257,10 @@ void CodeWriter::cWriteEntryExitSlots()
     for(int i = 0; i < _children.size(); i++)
     {
         state = _children.at(i);
-        cPrintln("void "+className+"::"+_stateToEntryRelaySlot.value(state)+"()");
+        cPrintln("void "+className+"::"+_states.value(state)->entryRelaySlot+"()");
         cPrintln("{");
-        actionSignal = _stateToEntryAction.value(state);
+        actionSignal = _states.value(state)->entryAction;
+
         if(!actionSignal.isEmpty())
         {
             cPrintln("emit "+actionSignal+";",1);
@@ -290,9 +268,10 @@ void CodeWriter::cWriteEntryExitSlots()
         cPrintln("}\n");
 
 
-        cPrintln("void "+className+"::"+_stateToExitRelaySlot.value(state)+"()");
+        cPrintln("void "+className+"::"+_states.value(state)->exitRelaySlot+"()");
         cPrintln("{");
-        actionSignal = _stateToExitAction.value(state);
+        actionSignal = _states.value(state)->exitAction;
+
         if(!actionSignal.isEmpty())
         {
             cPrintln("emit "+actionSignal+";",1);
@@ -314,29 +293,41 @@ bool CodeWriter::writeCppFile()
         return false;
     }
 
-    /*
-    // write a code generated message
-    cOut << "// This .cpp file was generated using VisualSC's Export Code Function\n\n";
-
-    // write include statement
-    cOut << "#include \"" << className << ".h\"\n\n";
-
-    // write constructor
-    cOut << className <<"::"<<className<<"()\n{\n\n}\n";
-
-    // write deconstructor
-    cOut << className <<"::~"<<className<<"()\n{\n\n}\n";
-*/
-
-// intro
+    // intro
     cPrintln("// This .cpp file was generated using VisualSC's Export Code Function\n");
+    cPrintln("/*\nABOUT");
+    cPrintln("the state machine class is modeled as a QStateMachine and encapsulates a hierarchical state machine by holding QStates for each state");
+    cPrintln("every state has its own pair of private entry and exit slots AND pair of public entry and exit signals that are connected to the QState's");
+    cPrintln("entered() and exited() signals (represents a private handler for each state's entry and exit operations AND public signals for entry and ");
+    cPrintln("exit events visible to outside classes). These slots are empty by default. any text in entryAction or exitAction will have the");
+    cPrintln("corresponding function emit a signal with the value found in these attributes.\n");
+    cPrintln(" every state will");
+    cPrintln("connect its private entered()/exited() signals to the public pair of                                        StateEntry_stateName()          StateExit_stateName()",1);
+    cPrintln("connect its private entered()/exited() signals to private entry and exit slots                              Slot_StateEntry_stateName()     Slot_StateExit_stateName()",1);
+    cPrintln("*for any entryActions and exitActions attributes: have the private entry and exit slots emit a signal       EntryAction_entryActionValue()  ExitAction_exitActionValue()",1);
+    cPrintln("addTransition for each outgoing transition using private signals specific to each transition                Relay_Event_eventName()\n",1);
+    cPrintln("every transition has its own public slot that emits a private (RELAY)signal named after the slot/transition (this signal is also what is ");
+    cPrintln("registered when using addTransition to trigger transitions between the QStates), and represents an external event triggering a transition between states.");
+    cPrintln(" every transition will");
+    cPrintln("have its own public slot    Event_eventName()",1);
+    cPrintln("emit a private signal       Relay_Event_eventName()\n",1);
+    cPrintln("*/");
+
+    // include statements
     cPrintln("#include \""+className.toLower()+".h\"");
     cPrintln("#include <QDebug>\n");
-    this->cWriteConstructor();
-    this->cWriteDeconstructor();
-    this->cWriteEventSlots();
-    this->cWriteEntryExitSlots();
 
+    // write the constructor
+    this->cWriteConstructor();
+
+    // write the deconstructor
+    this->cWriteDeconstructor();
+
+    // write the public event slots
+    this->cWriteEventSlots();
+
+    // write the private slots
+    this->cWriteEntryExitSlots();
 
     // true if no complications
     return true;
@@ -385,14 +376,15 @@ bool CodeWriter::writeHFile()
 
 // public slots
     hPrintln("\npublic slots:");
+
     this->hWriteEventSlots();
 
 // signals
-    hPrintln("\nsignals:\n");
+    hPrintln("\nsignals:");
     hPrintln("//",1);
     hPrintln("//    OUTPUT ACTION SIGNALS",1);
     hPrintln("//",1);
-    hPrintln("//    Connect to these signals to take actions",1);
+    hPrintln("//    Connect to these signals to a slot corresponding to a entryAction or exitAction",1);
     hPrintln("//",1);
 
     this->hWriteActionSignals();
@@ -519,7 +511,7 @@ void CodeWriter::hWriteEventSlots()
         for(int k = 0; k < transitions.count(); k++)
         {
             trans = transitions.at(k);
-            hPrintln("void Event_"+toCamel(trans->attributes.value("event")->asString())+"();",1);
+            hPrintln("void "+_transitions.value(trans)->eventName+";",1);
         }
     }
 }
@@ -538,18 +530,18 @@ void CodeWriter::hWriteActionSignals()
     for(int i = 0 ; i < _children.count(); i++)
     {
         state = _children.at(i);
-        entryAction = state->attributes.value("entryAction")->asString();
+        entryAction = _states.value(state)->entryAction;
 
         if(entryAction!="")
         {
-            hPrintln("void EntryAction_"+toCamel(entryAction)+"();",1);
+            hPrintln("void "+entryAction+";",1);
         }
 
-        exitAction = state->attributes.value("exitAction")->asString();
+        exitAction = _states.value(state)->exitAction;
 
         if(exitAction!="")
         {
-            hPrintln("void ExitAction_"+toCamel(exitAction)+"();",1);
+            hPrintln("void "+exitAction+";",1);
         }
     }
 }
@@ -563,14 +555,13 @@ void CodeWriter::hWriteActionSignals()
 void CodeWriter::hWriteStateChangeSignals()
 {
     SCState* state;
-    QString stateName;
+
     for(int i = 0; i < _children.count(); i++)
     {
         state = _children.at(i);
-        stateName = toCamel(state->attributes.value("name")->asString());
 
-        hPrintln("void StateEntry_"+stateName+"();",1);
-        hPrintln("void StateExit_"+stateName+"();",1);
+        hPrintln("void "+_states.value(state)->entryRelaySignal+";",1);
+        hPrintln("void "+_states.value(state)->exitRelaySignal+";",1);
     }
 }
 
@@ -592,7 +583,7 @@ void CodeWriter::hWriteEventRelaySignals()
         for(int k = 0; k < transitions.count(); k++)
         {
             trans = transitions.at(k);
-            hPrintln("void RelaySignal_Event_"+toCamel(trans->attributes.value("event")->asString())+"();",1);
+            hPrintln("void "+_transitions.value(trans)->relaySignal+";",1);
         }
     }
 }
@@ -606,31 +597,12 @@ void CodeWriter::hWriteEventRelaySignals()
 void CodeWriter::hWriteActionRelaySlots()
 {
     SCState* state;
-    //QString entryAction;
-    //QString exitAction;
-    QString stateName;
     for(int i = 0 ; i < _children.count(); i++)
     {
         state = _children.at(i);
-        /*
-        entryAction = state->attributes.value("entryAction")->asString();
 
-        if(entryAction!="")
-        {
-            hPrintln("void RelaySlot_EntryAction_"+toCamel(entryAction)+"();",1);
-        }
-
-        exitAction = state->attributes.value("exitAction")->asString();
-
-        if(entryAction!="")
-        {
-            hPrintln("void RelaySlot_ExitAction_"+toCamel(entryAction)+"();",1);
-        }*/
-
-        stateName = toCamel(state->attributes.value("name")->asString());
-
-        hPrintln("void RelaySlot_StateEntry_"+stateName+"();",1);
-        hPrintln("void RelaySlot_StateExit_"+stateName+"();",1);
+        hPrintln("void "+_states.value(state)->entryRelaySlot+";",1);
+        hPrintln("void "+_states.value(state)->exitRelaySlot+";",1);
     }
 }
 
@@ -646,7 +618,7 @@ void CodeWriter::hWriteStates()
     }
     for(int i = 0 ; i < _children.count(); i++)
     {
-        hPrintln("QState*    _"+ toCamel(_children.at(i)->attributes.value("name")->asString())+";",1);
+        hPrintln("QState*    _"+ _states.value(_children.at(i))->stateName+";",1);
     }
 }
 
