@@ -39,7 +39,12 @@ SCDataModel::SCDataModel(QObject * parent) :
 
 }
 
-
+/**
+ * @brief SCDataModel::connectDataModel
+ *
+ * called by the smproject that holds a datamodel, will connect the scxml reader to the data model
+ *
+ */
 void SCDataModel::connectDataModel()
 {
     connect(&_reader, SIGNAL(makeANewState(StateAttributes*)), this, SLOT(handleMakeANewState(StateAttributes*)), Qt::DirectConnection);
@@ -50,6 +55,9 @@ void SCDataModel::connectDataModel()
     connect(&_reader, SIGNAL(leaveTransistionElement()), this, SLOT(handleLeaveTransitionElement()), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransistionPath(QString)), this, SLOT(handleMakeANewTransitionPath(QString)), Qt::DirectConnection);
     connect(&_reader, SIGNAL(makeANewTransitionTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewEventTextBlock(TextBlockAttributes*)));
+
+    // connects scxml reader to changing the state machine's name
+    connect(&_reader, SIGNAL(changeStateMachineName(QString)), this, SLOT(handleStateMachineNameLoad(QString)));
 }
 
 SCDataModel * SCDataModel::singleton()
@@ -59,6 +67,27 @@ SCDataModel * SCDataModel::singleton()
         instance = new SCDataModel(NULL);
 
     return instance;
+}
+
+/**
+ * @brief SCDataModel::handleStateMachineNameLoad
+ * @param machineName
+ *
+ * SLOT
+ * connect in SCDataModel
+ * connect(&_reader, SIGNAL(changeStateMachineName(QString)), this, SLOT(handleStateMachineNameLoad(QString)));
+ *
+ * called when the scxml reader reads a scxml file and changes the datamodel state machine's name
+ * addtionally signals the formview to update the root state machine there
+ *
+ *
+ */
+void SCDataModel::handleStateMachineNameLoad(QString machineName)
+{
+    // change the value in the data model and alert the formview that this happened to update the tree and property table
+    _topState->attributes.value("name")->setValue(machineName);
+    emit _topState->nameChangedInDataModel(_topState,machineName); // connected to SCFormView::handleItemNameChangedInDataModel()
+
 }
 
 /**
@@ -99,6 +128,11 @@ void SCDataModel::reset()
         }
     }
     _transitions.clear();
+
+    // reset the name of the state machine and alert the formview that this happened
+    _topState->attributes.value("name")->setValue("State Machine");
+    emit _topState->nameChangedInDataModel(_topState,"State Machine"); // connected to SCFormView::handleItemNameChangedInDataModel()
+
     qDebug() << "AFTER A RESET, YOU HAVE " << _transitions.count() << " TRANSITIONS LISTED IN _transitions";
 }
 
@@ -172,6 +206,7 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     if ( type  && ( type->asString() == "machine"))
     {
         _writer->writeStartElement("scxml");
+        _writer->writeAttribute("name", _topState->attributes.value("name")->asString());
         _writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
     }
 
@@ -192,18 +227,68 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     return true;
 }
 
+
+QString SCDataModel::toClassFileName(QString className)
+{
+    QStringList qsl = className.split(" ");
+    QString ret;
+    for(int i = 0; i < qsl.size(); i++)
+    {
+        ret += qsl.at(i).toLower();
+    }
+    return ret;
+}
+
+QString SCDataModel::toClassName(QString className)
+{
+    QStringList qsl = className.split(" ");
+    QString ret;
+    QString word;
+    for(int i = 0; i < qsl.size(); i++)
+    {
+        word = qsl.at(i);
+        ret += word.at(0).toUpper() + word.mid(1,word.size()).toLower();
+    }
+    return ret;
+}
+
+
 bool SCDataModel::exportToCode(QString fileName, QString &errorMessage)
 {
+qDebug() << "time to save files " << fileName;
 
+QString hFileName;
+QString cppFileName;
+#define FORCE_STATE_MACHINE_NAME
+#ifndef FORCE_STATE_MACHINE_NAME
     // get the file name minus cpp and add h
-    QString hFileName = fileName.mid(0,fileName.size()-3) + "h";
+    hFileName = fileName.mid(0,fileName.size()-3) + "h";
 
+#endif
 
-    qDebug() << "time to save files " << fileName<<"\t and  " << hFileName;
+#ifdef FORCE_STATE_MACHINE_NAME
+    QStringList qsl = fileName.split("/");
+    QString smFileName;
+    for(int i = 0; i < qsl.count() -1; i++)
+    {
+        smFileName+=qsl.at(i)+"/";
+    }
+    // Test State Machine -> ./teststatemachine.cpp
+    QString classFileName = toClassFileName(_topState->attributes.value("name")->asString());
+    cppFileName = smFileName+classFileName+".cpp";
+    hFileName = smFileName+classFileName+".h";
 
+    // Test State Machine -> TestStateMachine
+    QString className = toClassName(_topState->attributes.value("name")->asString());
+#endif
 
+    CodeWriter cw(this->getTopState(), className, cppFileName, hFileName);
+    QList<SCState *> list;
+    //list.append(_topState);
+    _topState->getAllStates(list);
+    cw.setChildren(list);
 
-    CodeWriter cw(fileName, hFileName);
+    cw.createSignalsAndSlots();
     //cw.helloWorld();
     cw.writeHFile();
     cw.writeCppFile();
@@ -276,7 +361,7 @@ void SCDataModel::openFile(QString fileName)
     _reader.getReadResult(ok, messages);
 
     qDebug()<<"% ok message : " << ok;
-    if(ok);
+    if(ok)
     {
        // set up the transition connections in the data model
        connectTransitionsToStatePath();
@@ -287,7 +372,6 @@ void SCDataModel::openFile(QString fileName)
            // alert the graphics view and formview that the transition is ready to set up its connections
            emit transitionsReadyToConnect(_transitions.at(i));
        }
-
     }
 
 }
@@ -333,13 +417,13 @@ void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition*
     // add this transition to the source state's list of out transitions
     SCState * sourceState = dynamic_cast<SCState *> ( trans->parent());
     sourceState->addTransitionReference(trans, SCState::kTransitOut);
-
+/*
     SCState *sourceTreeNode=NULL;
     SCState *targetTreeNode=NULL;
 
     int sourceLevel =  sourceState->getLevel();
     int targetLevel = targetState->getLevel();
-
+*/
      // change behavior to not promote transition references to parent
     /*
    // example: targetStateLevel = 1, sourceStateLevel = 3
@@ -627,6 +711,9 @@ void SCDataModel::initializeEmptyStateMachine()
 
 
     _currentState  = _topState;
+
+    // connect the top state
+    connectState(_topState);
 
     //emit newStateSignal(_topState);
 

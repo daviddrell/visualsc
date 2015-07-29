@@ -79,10 +79,28 @@ void SCXMLReader::run()
 }
 
 
+
 void SCXMLReader::getReadResult(bool &success, QStringList& message)
 {
     success  = !(_error);
     message = _resultMessages;
+}
+
+/**
+ * @brief SCXMLReader::readStateMachine
+ * Used to change the state machine's name in the data model when reading from this file
+ */
+void SCXMLReader::readStateMachine()
+{
+    for(int i = 0 ; i < _reader.attributes().count() ; i++)
+    {
+        QXmlStreamAttribute xmlAttr = _reader.attributes().at(i);
+        if(xmlAttr.name() == "name")
+        {
+            emit changeStateMachineName(xmlAttr.value().toString());
+        }
+    }
+
 }
 
 /**
@@ -101,6 +119,7 @@ void SCXMLReader::readElement()
     {
         qDebug() << "skipping scxml";
         emit enterStateElement();           // increase the transit level
+        readStateMachine();
         //readState(kSTATE_TYPE_Machine);   // disabled adding a state every time openFile happens
         enteredAStateElement = true;
     }

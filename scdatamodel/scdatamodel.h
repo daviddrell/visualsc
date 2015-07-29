@@ -153,10 +153,14 @@ private slots:
     void handleEventPositionChangedInFormView(SCTransition*, QString);
     void handleEventSizeChangedInFormView(SCTransition*, QString);
 
+    void handleStateMachineNameLoad(QString);
+
 
 private:
 
 
+    QString toClassName(QString);
+    QString toClassFileName(QString);
     void connectState(SCState*);
     void connectTransition(SCTransition*);
 

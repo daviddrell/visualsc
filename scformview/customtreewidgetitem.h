@@ -38,10 +38,9 @@ class SCTextBlock;
 
 class SCFORMVIEWSHARED_EXPORT CustomTreeWidgetItem : public QTreeWidgetItem, public QObject
 {
-    //Q_OBJECT
+   // Q_OBJECT
 public:
     CustomTreeWidgetItem(CustomTreeWidgetItem * parent=NULL);
-
     void setData(QObject* d);
     QObject * data();
 public slots:

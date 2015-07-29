@@ -58,6 +58,7 @@ signals:
      void enterStateElement();
      void leaveStateElement();
 
+     void changeStateMachineName(QString);
      void enterTransistionElement();
      void leaveTransistionElement();
      void makeANewTransistion(TransitionAttributes*);
@@ -88,6 +89,7 @@ private:
     void readFinal();
     void readOnEntry();
     void readOnExit();
+    void readStateMachine();
 
 
     //private data
