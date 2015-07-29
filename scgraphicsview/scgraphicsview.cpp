@@ -641,16 +641,15 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // create the stateboxgraphic
     stateGraphic = new StateBoxGraphic(parentGraphic, newState);
 
+    //
+    // if a parent state is a parallel state, then its children run in parallel.
+    // this is show by the children being drawn with dotted lines. So inform
+    // the children to watch the parent's isParallelAttribute
+    //
     IAttributeContainer * attrs = parentState->getAttributes();
     IAttribute * attr = attrs->value("isParallelState");
-    if ( attr->asString() == "true")
-    {
-        stateGraphic->setDrawBoxLineStyle(SelectableBoxGraphic::kDrawDotted);
-    }
-    else
-    {
-        stateGraphic->setDrawBoxLineStyle(SelectableBoxGraphic::kDrawSolid);
-    }
+    connect(attr, SIGNAL(changed(IAttribute*)),stateGraphic,SLOT(handleIsParallelStateChanged(IAttribute*)));
+    stateGraphic->handleIsParallelStateChanged(attr);
 
     // new states will be on top
     stateGraphic->setZValue(zVal++);
