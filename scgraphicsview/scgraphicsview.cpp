@@ -641,6 +641,17 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // create the stateboxgraphic
     stateGraphic = new StateBoxGraphic(parentGraphic, newState);
 
+    IAttributeContainer * attrs = parentState->getAttributes();
+    IAttribute * attr = attrs->value("isParallelState");
+    if ( attr->asString() == "true")
+    {
+        stateGraphic->setDrawBoxLineStyle(SelectableBoxGraphic::kDrawDotted);
+    }
+    else
+    {
+        stateGraphic->setDrawBoxLineStyle(SelectableBoxGraphic::kDrawSolid);
+    }
+
     // new states will be on top
     stateGraphic->setZValue(zVal++);
 

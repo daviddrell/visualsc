@@ -58,6 +58,11 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     //TextItem.setPos(position->asPointF());
 
     //connect(_stateModel, SIGNAL(positionChanged()))
+
+    IAttributeContainer * attrs = stateModel->getAttributes();
+    IAttribute * attr = attrs->value("isParallelState");
+    connect(attr, SIGNAL(changed(IAttribute*)),this,SLOT(handleIsParallelStateChanged(IAttribute*)));
+    handleIsParallelStateChanged(attr);
 }
 
 
@@ -66,6 +71,26 @@ StateBoxGraphic::~StateBoxGraphic()
     qDebug () << "stateboxgraphic deconstructor:";
 }
 
+void StateBoxGraphic::handleIsParallelStateChanged(IAttribute*attr)
+{
+    QList<QGraphicsItem*> directChildren = this->childItems();
+
+    for(int i=0; i < directChildren.count(); i++)
+    {
+        StateBoxGraphic * sb = dynamic_cast<StateBoxGraphic *>(directChildren.at(i));
+        if (sb)
+        {
+            if ( attr->asString() == "true")
+            {
+                sb->setDrawBoxLineStyle(kDrawDotted);
+            }
+            else
+            {
+                sb->setDrawBoxLineStyle(kDrawSolid);
+            }
+        }
+    }
+}
 
 SCState* StateBoxGraphic::getStateModel()
 {

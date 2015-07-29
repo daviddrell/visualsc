@@ -405,7 +405,7 @@ void SCFormView::deleteTreeItem(SCItem* item)
  */
 void SCFormView::handlePropertyCellChanged(int r, int c)
 {
-    qDebug() << "SCFormView::handlePropertyCelLChanged type is " <<this->getCurrentlySelectedType();
+    qDebug() << "SCFormView::handle PropertyCelLChanged type is " <<this->getCurrentlySelectedType();
 
     if ( c != 1 ) return;
 

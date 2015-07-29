@@ -55,9 +55,6 @@ public:
 
     ~StateAttributes() ;
 
-    virtual QString asString();
-    virtual void setValue(const QString);
-
 };
 
 class SCDATAMODELSHARED_EXPORT StateName :  public IAttribute
