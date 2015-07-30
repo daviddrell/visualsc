@@ -32,8 +32,10 @@
 #define SINK_ANCHOR_BUFFER 5.5
 #define SINK_ANCHOR_POS_BUFFER 8.5
 
+#include "sizeattribute.h"
 class SCState;
 class IAttribute;
+
 
 
 /*
@@ -124,6 +126,7 @@ public:
 public slots:
     void handleTransitionLineStartMoved(QPointF newPos);
     void handleTransitionLineEndMoved(QPointF newPos);
+    void handleAttributeChanged(SizeAttribute*);
 
 private:
 
@@ -146,7 +149,8 @@ private slots:
 
 
 private:
-
+    int call;
+    int update;
     int returnClosestWallFace(QPointF mts,QPointF newPos);
     int returnClosestWallFace(qreal a, qreal b, qreal c, qreal d);
     //private data

@@ -124,7 +124,7 @@ void SCDataModel::reset()
             SCState* st = directChildren.at(i);
 
                 qDebug() << "removing state: " << st->attributes.value("name")->asString();
-                delete st;
+                st->deleteSafely();
         }
     }
     _transitions.clear();
@@ -371,6 +371,8 @@ void SCDataModel::openFile(QString fileName)
        {
            // alert the graphics view and formview that the transition is ready to set up its connections
            emit transitionsReadyToConnect(_transitions.at(i));
+
+
        }
     }
 
@@ -393,6 +395,7 @@ void SCDataModel::connectTransitionsToStatePath()
         qDebug() << "target String: " << targetStr << " targetState; " << targetState->objectName();
         if ( targetState )
         {
+            qDebug() << "&&& HOOKING TRANSITION "+trans->attributes.value("event")->asString()+"TO TARGET! " << targetState->objectName();
             makeTransitionConnections(targetState, trans);
         }
 
@@ -514,67 +517,21 @@ bool SCDataModel::deleteItem(QObject * item)
 
         }*/
 
-         state->deleteLater();
+         //state->deleteLater();
+        state->deleteSafely();
+        return true;
+
     }
     else if(trans)
     {
-        delete trans;
+        //delete trans;
+        trans->deleteSafely();
+        return true;
     }
     else // unexpected item
     {
         qDebug( )<< "ERROR: given an unexpected item to delete!";
-    }
-
-    if(false)
-    {
-    QList<SCState *> list;
-
-    list.append(_topState);
-
-    _topState->getAllStates(list);
-
-    for(int i =0; i < list.count(); i++)
-    {
-        SCState *st = list.at(i);
-        if ( item == st )
-        {
-
-            st->removeTargetsTransitionIn();
-
-            //deleteInTransitions(st);
-
-            int i = list.indexOf(st);
-            list.removeAt(i);
-            delete st;
-            return true;
-        }
-    }
-
-    QList<SCTransition *> tlist;
-
-    _topState->getAllTransitions(tlist);
-
-    for(int i =0; i < tlist.count(); i++)
-    {
-        SCTransition *tr = tlist.at(i);
-        if ( tr == item)
-        {
-            SCState* source = tr->parentSCState();
-            SCState* target = tr->targetState();
-            if(source)
-                source->removeTransitionReferenceOut(tr);
-
-            if(target)
-                target->removeTransitionReferenceIn(tr);
-            // unhook the transition from the references of the state.
-            int i = tlist.indexOf(tr);
-            tlist.removeAt(i);
-            delete tr;
-            return true;
-        }
-    }
-
-    return false;
+        return false;
     }
 }
 
@@ -689,7 +646,7 @@ void SCDataModel::initializeEmptyStateMachine()
 
     if ( _topState != 0 )
     {
-        delete _topState;
+        _topState->deleteSafely();
         _topState = 0;
     }
 
@@ -1141,6 +1098,8 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     delete ta;
 
     qDebug() << "leave handleMakeANewTransition, : "  ;
+
+
 
 
 

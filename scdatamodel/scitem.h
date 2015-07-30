@@ -13,7 +13,10 @@ public:
 
    // SCTextBlock* getTextBlock(QString textBlockName);
     virtual IAttributeContainer * getAttributes() = 0;
+    void deleteSafely();
 
+signals:
+    void markedForDeletion(QObject*);
 };
 
 #endif // SCITEM_H

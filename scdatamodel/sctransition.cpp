@@ -26,7 +26,8 @@
 SCTransition::SCTransition(QObject * parent):
         SCItem(parent),
         attributes(this, "transition.attributes"),
-        _eventTextBlock(new SCTextBlock())
+        _eventTextBlock(new SCTextBlock()),
+        _targetState(NULL)
 
 {
     /*
@@ -62,6 +63,8 @@ SCTransition::SCTransition(QObject * parent):
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
 
+    SCState* parentState = dynamic_cast<SCState*>(parent);
+    connect(parentState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromStates()));
     /*
 
     TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitizgonStringAttribute (this, "cond",QString());
@@ -82,13 +85,6 @@ SCTransition::~SCTransition()
 {
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
 
-    SCState* source = parentSCState();
-    SCState* target = targetState();
-    if(source)
-        source->removeTransitionReferenceOut(this);
-
-    if(target)
-        target->removeTransitionReferenceIn(this);
 
     delete _eventTextBlock;
 }
@@ -131,7 +127,12 @@ SCState *SCTransition::targetState()
 
 void SCTransition::setTargetState(SCState* state)
 {
+    if(_targetState)
+    {
+        disconnect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
+    }
     _targetState = state;
+    connect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
 }
 
 SCTextBlock* SCTransition::getEventTextBlock()
@@ -206,7 +207,38 @@ void SCTransition::setAttributeValue(QString key, QString value)
     }
 }
 
+void SCTransition::deleteSafely()
+{
+    emit markedForDeletion(this);
+/*
+    SCState* source = parentSCState();
+    SCState* target = targetState();
+    if(source)
+        source->removeTransitionReferenceOut(this);
 
+    if(target)
+        target->removeTransitionReferenceIn(this);
+        */
+
+    this->deleteLater();
+}
+
+void SCTransition::detachFromSource(QObject* o)
+{
+    SCState* source = parentSCState();
+    if(source)
+        source->removeTransitionReferenceOut(this);
+
+}
+
+void SCTransition::detachFromSink(QObject* o)
+{
+    SCState* target = targetState();
+    if(target)
+        target->removeTransitionReferenceIn(this);
+
+    this->deleteSafely();
+}
 
 /*
 void SCTransition::handleLineSelected()

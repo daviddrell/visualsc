@@ -105,7 +105,8 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
     TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(trans->attributes.value("target"));
 
     //SCState* parentState = trans->parentSCState();
-    SCState* targetState = lookUpTargetState(targetName->asString());
+    //SCState* targetState = lookUpTargetState(targetName->asString());
+    SCState* targetState = trans->targetState();
     StateBoxGraphic * targetGraphic  = _hashStateToGraphic.value(targetState);
 
 
@@ -460,9 +461,9 @@ void SCGraphicsView::handleStateDeleted(QObject *state)
         {
             QList<QGraphicsItem*> children = i.value()->childItems();
             qDebug() << "deleting children for state "<<" with num children: " << children.count();
-            for(int i = 0; i < children.count(); i++)
+            for(int k = 0; k < children.count(); k++)
             {
-                this->handleStateDeleted( (SCState*)(children.at(i)) );
+                this->handleStateDeleted( (SCState*)(children.at(k)) );
             }
 
             delete i.value();
@@ -520,17 +521,38 @@ void SCGraphicsView::handleStateSizeChangedInFormView(SCState *state, QPointF si
 }
 
 
+/**
+ * @brief SCGraphicsView::handleNewTextBlock
+ * @param trans
+ * @param text
+ *
+ * CURRENTLY NOT IN USE
+ *
+ */
 void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
 {
     SCTextBlock* textBlock = new SCTextBlock();
 }
 
+/*
 void SCGraphicsView::connectState(SCState* state)
 {
     // connect formview and graphics view to update the graphics view if the box is changed by property value
     connect(state, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
-    connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
-    connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
+    //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
+    //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
+
+    //connect(state, SIGNAL(attributeChangedSignal(IAttribute*), ))
+}
+*/
+void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
+{
+    qDebug() << "SCGraphicsView::connectState";
+    connect(state, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
+    connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
+
+    SizeAttribute* size = dynamic_cast<SizeAttribute*>(state->attributes.value("size"));
+    connect(size, SIGNAL(changed(SizeAttribute*)), stateGraphic, SLOT(handleAttributeChanged(SizeAttribute*)));
 }
 
 
@@ -554,7 +576,7 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     TransitionGraphic* transGraphic = _hashTransitionToGraphic.value(trans);
 
     // set the connects for the transition graphic
-    connect(trans, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
+    connect(trans, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
     // create the connection to automatically move anchor elbows when state graphics are moved.
     connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
@@ -616,7 +638,7 @@ void SCGraphicsView::handleNewState (SCState *newState)
     static int zVal = 0;
     // SCState connects
 
-    connectState(newState);
+    // connectState(newState);
 
     StateString * type = dynamic_cast<StateString *> ( newState->attributes.value("type"));
     if ( type != 0 && (type->asString() == "machine"))
@@ -632,6 +654,8 @@ void SCGraphicsView::handleNewState (SCState *newState)
     {
         parentGraphic =   _mapStateToGraphic[parentState];
     }
+
+
 
     // after the reference has been set through the construction
     // of the stateboxgraphic, the graphic and the model
@@ -650,7 +674,8 @@ void SCGraphicsView::handleNewState (SCState *newState)
     //stateGraphic->setSize(newState->attributes.value("size"));
 
     // connect the state graphic's deconstructor to do removal protocol in the graphics view
-    connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
+    connectState(newState,stateGraphic);
+//connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 
     // quick look up of graphics from state model references
     // link the SCState and StateBoxGraphic

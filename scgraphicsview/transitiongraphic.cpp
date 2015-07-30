@@ -331,7 +331,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
     if(elbow)
     {
-        qDebug() <<  "elbow event!\t" << event->type();
+        //qDebug() <<  "elbow event!\t" << event->type();
 
 
             switch(event->type())
@@ -349,7 +349,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
             case QEvent::GraphicsSceneMousePress:
             {
-                qDebug() << "mouse press";
+                //qDebug() << "mouse press";
                 elbow->setMouseState(ElbowGrabber::kMouseDown);
 
                 QPointF scenePosition =  elbow->mapToScene(mevent->pos());
@@ -359,7 +359,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
 
                 //_cornerGrabbed = true;
-                qDebug() << "Corner Position: " << elbow->mouseDownX<<" ," << elbow->mouseDownY;
+                //qDebug() << "Corner Position: " << elbow->mouseDownX<<" ," << elbow->mouseDownY;
 
                 LineSegmentGraphic* segOne = elbow->getSegment(0);
                 LineSegmentGraphic* segTwo = elbow->getSegment(1);
@@ -379,14 +379,14 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
             case QEvent::GraphicsSceneMouseMove:
             {
-                qDebug() << "mouse moving";
+                //qDebug() << "mouse moving";
                 elbow->setMouseState(ElbowGrabber::kMouseMoving );
             }
                 break;
 
             case QEvent::GraphicsSceneMouseRelease:
             {
-                qDebug() << "mouse release";
+                //qDebug() << "mouse release";
                 //_cornerGrabbed = false;
 
                 elbow->setMouseState(ElbowGrabber::kMouseReleased);
@@ -417,25 +417,25 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
     }
     else if(line)
     {
-        qDebug () << "line event!\t\t" <<event->type();
+        //qDebug () << "line event!\t\t" <<event->type();
 
 
         switch(event->type())
         {
         case QEvent::GraphicsSceneHoverEnter:
-            qDebug()<<"GraphicsSceneHoverEnter: " << event->type();
+            //qDebug()<<"GraphicsSceneHoverEnter: " << event->type();
             line->forceHoverEnterEvent();
             break;
 
         case QEvent::GraphicsSceneHoverLeave:
-            qDebug()<<"GraphicsSceneHoverLeave: " <<event->type();
+            //qDebug()<<"GraphicsSceneHoverLeave: " <<event->type();
             line->forceHoverLeaveEvent();
             _hasMovedSinceCreatingElbow = true;     // elbows can be created again after unhovering the segment
             break;
 
         case QEvent::GraphicsSceneMousePress:
         {
-            qDebug() << "line mouse press";
+           // qDebug() << "line mouse press";
             line->setMouseState(ElbowGrabber::kMouseDown);
 
             QPointF scenePosition = mapToScene(mevent->pos());
@@ -446,7 +446,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
 
             //_cornerGrabbed = true;
-            qDebug() << "line Corner Position: " << line->mouseDownX<<" ," << line->mouseDownY;
+            //qDebug() << "line Corner Position: " << line->mouseDownX<<" ," << line->mouseDownY;
 
             // force hover event?? line
 
@@ -455,14 +455,14 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
         case QEvent::GraphicsSceneMouseMove:
         {
-            qDebug() << "line mouse moving";
+            //qDebug() << "line mouse moving";
             line->setMouseState(ElbowGrabber::kMouseMoving );
         }
             break;
 
         case QEvent::GraphicsSceneMouseRelease:
         {
-            qDebug() << "mouse release";
+            //qDebug() << "mouse release";
             //_cornerGrabbed = false;
 
             line->setMouseState(ElbowGrabber::kMouseReleased);

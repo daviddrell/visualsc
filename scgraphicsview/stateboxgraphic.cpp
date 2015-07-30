@@ -434,6 +434,27 @@ int StateBoxGraphic::getGridLocation(QPointF mts,QPointF point)
 
 }
 
+/*
+void StateBoxGraphic::handleAttributeChanged(IAttribute * attr)
+{
+    SizeAttribute* size = dynamic_cast<SizeAttribute*>(attr);
+    qDebug() << "StateBoxGraphic::handleAttributeChanged";
+    if(size)
+    {
+        QPoint pt = size->asPointF().toPoint();
+        qDebug()<<"StateBoxGraphic::handleAttributeChanged for size Attribute";
+        setSizeAndUpdateAnchors(pt);
+        //this->setSize(pt); called inside of setsizeandupdate anchors
+    }
+}*/
+
+void StateBoxGraphic::handleAttributeChanged(SizeAttribute* size)
+{
+    qDebug() << "StateBoxGraphic::handleAttributeChanged(SizeAttribute*)";
+    QPoint sz = size->asPointF().toPoint();
+    setSizeAndUpdateAnchors(sz);
+}
+
 /**
  * @brief StateBoxGraphic::returnClosestWallFace
  * @param newPos

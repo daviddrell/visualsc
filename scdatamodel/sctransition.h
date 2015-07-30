@@ -56,6 +56,7 @@ public:
 
     SCState* parentSCState();
 
+    void deleteSafely();
 
     //void setTextPos(QPointF);
  //   void setTextSize(qreal w, qreal h);
@@ -95,6 +96,8 @@ private slots:
     //void handleLineSelected();
    //void handleLineUnSelected();
 
+    void detachFromSource(QObject*);
+    void detachFromSink(QObject*);
     void handleTextBlockChanged();
 
 private:

@@ -8,6 +8,8 @@
 #include "iattribute.h"
 #include "scdatamodel_global.h"
 
+class IAttribute;
+
 class  SCDATAMODELSHARED_EXPORT SizeAttribute: public IAttribute
 {
 public:

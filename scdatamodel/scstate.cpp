@@ -63,7 +63,7 @@ SCState::~SCState()
 
     // also delete any transitions that were transiting in and their reference to the source state
 
-    this->removeAllTransitionsIn();
+
     delete _IdTextBlock;
 }
 
@@ -159,6 +159,12 @@ void SCState::setText(QString text)
 }
 
 
+void SCState::deleteSafely()
+{
+    emit markedForDeletion(this);
+    //this->removeAllTransitionsIn(); now handled by SCTransition
+    this->deleteLater();
+}
 
 /**
  * @brief SCState::setPosition
@@ -194,11 +200,16 @@ void SCState::setSize(QPointF &size)
     SizeAttribute* sz = dynamic_cast<SizeAttribute*>(attributes.value("size"));
     sz->setValue(size);
     emit sizeChangedInDataModel(this, size);
+
+    qDebug() << "SCState::setSize emit attributeChangedSignal for sz";
+    emit this->attributeChangedSignal(sz);
+
+    //emit this->attributeChangedSignal((IAttribute*)sz);
 }
 
 SCTextBlock* SCState::getIDTextBlock()
 {
-    return  _IdTextBlock;
+    return _IdTextBlock;
 }
 
 /**
@@ -370,7 +381,7 @@ void SCState::removeSourcesTransitionOut()
         if(trans)
         {
             qDebug() << "deleting trans: " << trans;
-            delete trans;
+            trans->deleteSafely();
         }
     }
 }
@@ -427,6 +438,10 @@ void SCState::addTransitionReference(SCTransition* t, TransitionTransitDirection
  * @brief SCState::deleteAllInTransitions
  * @param state
  *
+ *
+ *  NOT CURRENTLY USED
+ * Deprecated because deletion of transitions when states are deleted are now handled in SCTransition and the markedforDeletion Signal given by a state.
+ *
  * deletes all inbound transitions on this state
  *
  * Called when a SCState is deleted and ALL of the inbound transitions should also be deleted
@@ -447,9 +462,9 @@ void SCState::removeAllTransitionsIn()
     SCTransition* tr;
     for(int i = 0; i < dest.count(); i++)
     {
-        tr = dest.at(i); 
+        tr = dest.at(i);
         qDebug() << "deleting transition: tr " << tr->attributes.value("event")->asString();
-        delete tr;
+        tr->deleteSafely();
     }
 }
 
@@ -460,8 +475,8 @@ void SCState::addTransistion(SCTransition * t)
 
     t->setParent(this);
 
-//    connect (t, SIGNAL(selected()), this, SLOT(handleTransitionSelected()) );
- //   connect (t, SIGNAL(unselected()), this, SLOT(handleTransitionUnSelected()) );
+    //      connect (t, SIGNAL(selected()), this, SLOT(handleTransitionSelected()) );
+    //      connect (t, SIGNAL(unselected()), this, SLOT(handleTransitionUnSelected()) );
 
     emit changed();
 
@@ -547,6 +562,19 @@ void SCState::getStates(QList<SCState *> & stateList)
             stateList.append(  state );
     }
 }
+
+QList<SCState*> SCState::getStates()
+{
+    QList<SCState*> ret;
+    for(int i = 0; i < this->children().count(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(children().at(i));
+        if(state)
+            ret.append(state);
+    }
+    return ret;
+}
+
 
 SCState* SCState::getStateByName(QString name)
 {

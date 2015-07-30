@@ -77,7 +77,8 @@ private slots:
 
 private:
 
-    void connectState(SCState*);
+    void connectState(SCState*, StateBoxGraphic*);
+    //void connectState(SCState*);
     void connectTransition(SCTransition*);
 
 

@@ -58,6 +58,8 @@ public:
     SCState(bool topState=false);
     ~SCState();
 
+    void deleteSafely();
+
    // void setGraphic(StateBoxGraphic*);
 
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
@@ -119,6 +121,7 @@ public:
       *
       */
     void getStates(QList<SCState *> & stateList);
+    QList<SCState*> getStates();
 
     /**
       * \fn getAllStates
@@ -181,8 +184,10 @@ public:
 
 signals:
 
+
      void changed();
      void attributeChangedSignal(IAttribute*);
+
      void nameChangedInDataModel(SCState*,QString);
      void positionChangedInDataModel(SCState*, QPointF);
      void sizeChangedInDataModel(SCState*, QPointF);

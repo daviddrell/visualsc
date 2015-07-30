@@ -252,8 +252,6 @@ void CodeWriter::cWriteEntryExitSlots()
 
     QString actionSignal;
     SCState* state;
-    SCTransition* trans;
-    QList<SCTransition*> transitions;
     for(int i = 0; i < _children.size(); i++)
     {
         state = _children.at(i);

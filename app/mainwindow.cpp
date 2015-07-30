@@ -148,11 +148,15 @@ void MainWindow::handleFileOpenClick()
 
     //_formEditorWindow->reset();
 
+    // reselect the new root machine tree widget in the tree view
+    _formEditorWindow->highlightRootItem();
+
+    //this->handleNewClick();
+
     // open the file
     _project->getDM()->openFile(fileName);
 
-    // reselect the new root machine tree widget in the tree view
-    _formEditorWindow->highlightRootItem();
+
   //  _formEditorWindow->reset();
 
 

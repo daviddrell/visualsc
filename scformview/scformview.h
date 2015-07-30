@@ -31,7 +31,9 @@
 #include <QInputDialog>
 #include <QHash>
 #include <QObject>
+#include <QTableWidgetItem>
 #include "scitem.h"
+#include "fvitem.h"
 
 class StateSelectionWindow;
 
@@ -155,6 +157,7 @@ private:
     void initTree();
 
     void connectState(SCState*);
+    void connectState(SCState *, QTableWidgetItem*);
     void connectTransition(SCTransition*);
 
 
@@ -195,7 +198,10 @@ private:
 
     CustomTreeWidgetItem* findItem(SCState*);
     CustomTreeWidgetItem* findItem(SCTransition* item);
+    CustomTreeWidgetItem* findItem(SCItem* item);
     CustomTreeWidgetItem* findItem(QObject * object);
+
+
 
     QTreeWidget    *stateChartTreeView;
     QTableWidget   *propertyTable;
@@ -250,8 +256,13 @@ private:
     QAction *lineAction;
 
     SCDataModel * _dm;
-    QObject     * _currentlySelected;
-    QObject     * _previouslySelected;
+    //QObject     * _currentlySelected;
+    //QObject     * _previouslySelected;
+
+    FVItem* _currentlySelected;
+    FVItem* _topState;
+    //FVItem* _previouslySelected;
+
     StateSelectionWindow * _targetStateSelectionWindow;
 
 
@@ -262,6 +273,9 @@ private:
     QHash<SCItem*, CustomTreeWidgetItem*> _itemToTreeWidget;
     QHash<SCItem*, SCTextBlock*> _itemToTextBlock;
     QHash<CustomTreeWidgetItem*, SCTextBlock*> _treeWidgetToTextBlock;
+    QHash<SCItem*, FVItem*> _items;
+    //QList<FVItem*> _items;
+
 
 
 };

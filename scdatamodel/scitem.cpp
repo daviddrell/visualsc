@@ -14,3 +14,9 @@ SCTextBlock* SCItem::getTextBlock(QString textBlockName)
     return NULL;
 }
 */
+
+void SCItem::deleteSafely()
+{
+    emit markedForDeletion(this);
+    this->deleteLater();
+}

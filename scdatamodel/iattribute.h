@@ -26,6 +26,8 @@
 #include <QMap>
 #include <QMapIterator>
 
+//#include "sizeattribute.h"
+
 /**
    \defgroup Attributes
 
@@ -118,6 +120,9 @@
  \endcode
  */
 
+class SizeAttribute;
+class PositionAttribute;
+
 class IAttribute: public QObject
 {
     Q_OBJECT
@@ -138,6 +143,8 @@ public:
 
 signals:
     void changed( IAttribute* attr);
+    void changed( SizeAttribute* size);
+    void changed( PositionAttribute* pos);
     void error(QString err);
 
 private:

@@ -44,13 +44,17 @@ HEADERS += \
     customtreewidgetitem.h \
     stateselectionwindow.h \
     scformview_global.h \
-    formviewobject.h
+    formviewobject.h \
+    fvstate.h \
+    fvitem.h
 
 SOURCES += \
     scformview.cpp \
     customtreewidgetitem.cpp \
     stateselectionwindow.cpp \
-    formviewobject.cpp
+    formviewobject.cpp \
+    fvstate.cpp \
+    fvitem.cpp
 
 RESOURCES += \
     resources/scformview.qrc
