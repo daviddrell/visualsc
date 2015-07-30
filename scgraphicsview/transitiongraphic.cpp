@@ -674,13 +674,24 @@ void TransitionGraphic::handleGrandParentStateGraphicResized(QRectF oldBox, QRec
  * will update the position of every anchor when a transition graphic's parent state box is being resized
  * oldBox and newBox represent the before and after rectangles of the state box
  *
+ * SLOT
+ * connect in SCGraphicsView
+ *
+ * connect(sbg, SIGNAL(stateBoxResized), transitionGraphic, SLOT(handleparentstategraphic resized))
+ *
  */
 void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
+#if 0
     qreal newWidth = newBox.width()-SOURCE_ANCHOR_BUFFER;
     qreal newHeight = newBox.height()-SOURCE_ANCHOR_BUFFER;
     qreal oldWidth = oldBox.width()-SOURCE_ANCHOR_BUFFER;
     qreal oldHeight = oldBox.height()-SOURCE_ANCHOR_BUFFER;
+#endif
+    qreal newWidth = newBox.width();
+    qreal newHeight = newBox.height();
+    qreal oldWidth = oldBox.width();
+    qreal oldHeight = oldBox.height();
     qreal scaleX = newWidth/oldWidth;
     qreal scaleY = newHeight/oldHeight;
 

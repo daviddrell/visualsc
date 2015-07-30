@@ -453,17 +453,34 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
  *
  * in addition to setting the size, update the anchors attached to this state
  *
+ * SIGNAL emitStateBoxResized
+ * connect in SCGraphicsView
+ * updates the target and parent graphics associated with a transition
+ *
+ *  // create the connect to automatically move anchor elbows when state graphics are moved.
+    connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
+    connect(targetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleTargetStateGraphicResized(QRectF, QRectF, int)));
+ *
  */
 void SelectableBoxGraphic::setSizeAndUpdateAnchors(QPointF size)
 {
-    QRectF oldBox(pos(), getSize());
-    QRectF newBox(pos(), size);
+    //QRectF oldBox(pos(), getSize());
+    //QRectF newBox(pos(), size);
 
+    QPointF mts = (pos());
+
+    QRectF oldBox = QRectF(mts.x(), mts.y(), _width, _height);
+    QRectF newBox = QRectF(mts.x(), mts.y(), size.x(), size.y());
+
+    _width = size.x();
+    _height = size.y();
+    //getSize();
     this->setSize(size);
-    this->update();
+
+
     emit stateBoxResized(oldBox, newBox, 2);    // treat as if the bottom rightcorner was manipulated
 
-
+    this->update();
 
 }
 
