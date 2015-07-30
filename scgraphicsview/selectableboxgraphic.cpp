@@ -338,7 +338,7 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
         //emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
-        int buffer = 12;
+        //int buffer = 12;
         //scaleX = (newWidth-buffer)/(scaleX-buffer);
         //scaleY = (newHeight-buffer)/(scaleY-buffer);
         //emit stateBoxResized((scaleX-buffer),(scaleY-buffer),(newWidth-buffer), (newHeight-buffer) );
@@ -349,7 +349,7 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         else
         {
             //qDebug() << "the corner used: " << corner;
-            qDebug() <<"old box: " <<oldBox << "new Box: " << newBox;
+            //qDebug() <<"old box: " <<oldBox << "new Box: " << newBox;
             emit stateBoxResized(oldBox, newBox, corner);
         }
         this->update();

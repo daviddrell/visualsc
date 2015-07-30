@@ -69,6 +69,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     connect ( & _textBlockModel->attributes,SIGNAL(attributeAdded(IAttribute*)), SLOT(handleAttributeAdded(IAttribute*)), Qt::QueuedConnection );
     connect ( & _textBlockModel->attributes,SIGNAL(attributeDeleted(IAttribute*)), SLOT(handleAttributeDeleted(IAttribute*)), Qt::QueuedConnection );
 
+    qDebug() << "SelectableTextBLock::connectAttributes!";
     connectAttributes( & _textBlockModel->attributes );
 
 }
@@ -169,10 +170,12 @@ void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)
         handleAttributeChanged(fu);
     }
 
-    SizeAttribute * size = dynamic_cast<SizeAttribute *> (  attributes->value("size"));
-    if ( fs )
+
+    SizeAttribute * size = dynamic_cast<SizeAttribute*> (  attributes->value("size"));
+    if ( size )
     {
-        connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        qDebug() << "connecting size!";
+        connect (size, SIGNAL(changed(SizeAttribute*)), this, SLOT(handleAttributeChanged(SizeAttribute*)), Qt::QueuedConnection);
         handleAttributeChanged(size);
     }
 
@@ -194,6 +197,14 @@ void SelectableTextBlock::handleAttributeDeleted(IAttribute *)
 {
 }
 
+void SelectableTextBlock::handleAttributeChanged(SizeAttribute* size)
+{
+    QPoint pt = size->asPointF().toPoint();
+    this->setSize(pt);
+
+    qDebug()<<"SelectableTextBlock::handleAttributeChanged Size Attribute ("+  _textBlockModel->getText()+") setting size = (" +QString::number(pt.x())+","+QString::number(pt.y())+")";
+}
+
 /**
  * @brief SelectableTextBlock::handleAttributeChanged
  * @param attr
@@ -205,6 +216,7 @@ void SelectableTextBlock::handleAttributeDeleted(IAttribute *)
  */
 void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 {
+    qDebug()<<"selectabletextblock::handleattributechanged";
     //TODO make these attributes do something
 
 //    FontFamilyAttribute * ff     = dynamic_cast<FontFamilyAttribute *> ( attr);
@@ -212,16 +224,9 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
     FontColorAttribute * fc      = dynamic_cast<FontColorAttribute *> ( attr);
     FontBoldAttribute * fb       = dynamic_cast<FontBoldAttribute *> ( attr);
 //    FontUnderlineAttribute * fu  = dynamic_cast<FontUnderlineAttribute *> ( attr);
-    SizeAttribute * size         = dynamic_cast<SizeAttribute *> ( attr);
     PositionAttribute * position = dynamic_cast<PositionAttribute*> (attr);
 
-    if ( size )
-    {
-        QPoint pt = size->asPointF().toPoint();
-        qDebug()<<"SelectableTextBlock::handleAttributeChanged ("+  _textBlockModel->getText()+") setting size = (" +QString::number(pt.x())+","+QString::number(pt.y())+")";
-        this->setSize(pt);
-    }
-    else if ( position)
+    if ( position)
     {
         QPointF ps = position->asPointF();
         qDebug()<<"SelectableTextBlock::handleAttributeChanged ("+  _textBlockModel->getText()+") setting position = (" +QString::number(ps.x())+","+QString::number(ps.y())+")";
@@ -277,6 +282,7 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
      _textItem.setBoundingRect(bRect);
 
      update();
+
  }
 
 
@@ -300,9 +306,13 @@ void SelectableTextBlock::graphicHasChanged()
     SizeAttribute * size         = dynamic_cast<SizeAttribute *> ( _textBlockModel->attributes["size"]);
     PositionAttribute * position = dynamic_cast<PositionAttribute*> (_textBlockModel->attributes["position"]);
 
+
     size->setValue(sz);
     position->setValue(ps);
 
-    emit _textBlockModel->sizeChangedInDataModel(_textBlockModel, sz);
-    emit _textBlockModel->positionChangedInDataModel(_textBlockModel, ps);
+
+    //emit size->changed(size);
+    //set
+    //emit _textBlockModel->sizeChangedInDataModel(_textBlockModel, sz);
+    //emit _textBlockModel->positionChangedInDataModel(_textBlockModel, ps);
 }
