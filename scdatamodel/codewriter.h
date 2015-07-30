@@ -49,17 +49,22 @@ private:
     void cPrintln(QString, int);
 
     QString className;
+    QString stateMachineName;
     QFile cFile;
     QFile hFile;
     QTextStream cOut;
     QTextStream hOut;
 
     SCState* _rootMachine;
+    SCState* _initialState;
+
     QList<SCState*> _children;
     QList<SCState*> _childrenMachines;
 
     QHash<SCState*, CWState*> _states;
     QHash<SCTransition*, CWTransition*> _transitions;
+
+
 
 };
 

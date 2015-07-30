@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect ( ui->actionOpen, SIGNAL(triggered()), this, SLOT(handleFileOpenClick()));
     connect ( ui->actionSave, SIGNAL(triggered()), this, SLOT(handleFileSaveClick()));
-    //connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
+    connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
 
     _textFormatToolBar = new TextFormatToolBar();

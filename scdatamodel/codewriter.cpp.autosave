@@ -529,7 +529,7 @@ QString CodeWriter::toCamel(QString text)
 void CodeWriter::hWriteEventSlots()
 {
     // write the start machine event
-    hPrintln("void Event_startMachine"+_states.value(_rootMachine)->stateName+"();");
+    hPrintln("void Event_startMachine"+_states.value(_rootMachine)->stateName+"();",1);
 
     SCState* state;
     SCTransition* trans;

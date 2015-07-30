@@ -36,6 +36,8 @@ public:
     QString entryAction;        // EntryAction_eventName            signal that is emitted in the entry relay slot
     QString exitAction;         // ExitAction_eventName             signal that is emitted in the exit relay slot
 
+    QString readyRelaySignal;   // Siganl_StateReady_stateName      signal reserved for the inital state of this machine
+
 };
 
 #endif // CWSTATE_H
