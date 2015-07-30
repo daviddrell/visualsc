@@ -50,15 +50,6 @@ IAttribute& IAttribute::operator =(const IAttribute& a)
     return *this;
 }
 
-void IAttribute::setValue(const QString)
-{
-}
-
-QString IAttribute::asString()
-{
-    return QString();
-}
-
 QString IAttribute::key() const {return _key; }
 
 

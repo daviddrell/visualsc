@@ -127,6 +127,8 @@ public slots:
     void handleTransitionLineStartMoved(QPointF newPos);
     void handleTransitionLineEndMoved(QPointF newPos);
     void handleAttributeChanged(SizeAttribute*);
+    void handleIsParallelStateChanged(IAttribute*);
+
 
 private:
 
@@ -161,7 +163,6 @@ private:
     QPointF _diagLineEnd;
     bool    _diagLineDrawIt;
     QPointF _intersection;
-
 
 };
 

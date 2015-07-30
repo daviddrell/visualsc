@@ -120,14 +120,6 @@ void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 }
 
 
-QString StateAttributes::asString()
-{
-    return QString();
-}
-
-void StateAttributes::setValue(const QString)
-{
-}
 
   //  NAME
 
@@ -188,7 +180,11 @@ StateString::~StateString()
 
 StateString& StateString::operator=( StateString& sa )
 {
-    _value = sa._value;
+    if ( sa._value != _value )
+    {
+        _value = sa._value;
+        emit changed(this);
+    }
     return *this;
 }
 
@@ -201,8 +197,6 @@ QString StateString::asString()
 
 void    StateString::setValue(const QString value)
 {
-    _value= value;
-
     if ( value != _value )
     {
         _value = value;

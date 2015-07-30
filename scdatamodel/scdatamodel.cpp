@@ -518,6 +518,7 @@ bool SCDataModel::deleteItem(QObject * item)
         }*/
 
          //state->deleteLater();
+
         state->deleteSafely();
         return true;
 

@@ -495,7 +495,7 @@ void SCFormView::deleteTreeItem(SCItem* item)
  */
 void SCFormView::handlePropertyCellChanged(int r, int c)
 {
-    qDebug() << "SCFormView::handlePropertyCelLChanged type is " <<this->getCurrentlySelectedType();
+    qDebug() << "SCFormView::handle PropertyCelLChanged type is " <<this->getCurrentlySelectedType();
 
     if ( c != 1 ) return;
 
@@ -807,70 +807,6 @@ void SCFormView::handleStateDeleted(QObject *s)
     // reset the currently selected state to the top state;
     _currentlySelected = _topState;
     _topState->getTreeWidget()->setSelected(true);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //qDebug() << "SCFormView::handleStateDeleted" << stateTreeItem->text(0);
-   /* _itemToTreeWidget.remove(state);
-    _itemToTextBlock.remove(state);
-
-    CustomTreeWidgetItem* stateTreeItem = _itemToTreeWidget.value(state);
-    _treeWidgetToTextBlock.remove(stateTreeItem);
-*/
-
-
-
-    //_items.remove(state);
-     //delete stateTreeItem;
-
-
-
-
-    // unselect any selected item;
-    /*
-     QList<QTreeWidgetItem*> selected = stateChartTreeView->selectedItems();
-     qDebug() << "v2 there are " << selected.size()<<" selected items.";
-     for(int i = 0; i < selected.size();i++)
-     {
-         selected.at(i)->setSelected(false);
-     }*/
-
-    // s is already deleted, so this cannot be used
-
-    /*if (state == _currentlySelected)
-    {
-        // find a neighbor state to select after this one is gone
-        setSelectedTreeItem(getNeighborState(s));
-        //_currentlySelected = getNeighborState(s);
-    }*/
-
-     /*
-    QList<SCState*> states;
-    states.append( _dm->getTopState());
-
-*/
-   // stateChartTreeView->clear();
-    //loadTree (NULL, states);
-   // replantTree();
-    //highlightRootItem();
-
-    //this->deleteTreeItem(dynamic_cast<SCItem*>(s));
-
 }
 
 QObject* SCFormView::getNeighborState(QObject*s)
@@ -927,6 +863,7 @@ void SCFormView::connectState(SCState* st)
     //connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
     //connect(st->getIDTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*, QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*, QPointF)));
     //connect(st->getIDTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));
+
 }
 
 /**

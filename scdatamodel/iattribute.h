@@ -137,8 +137,8 @@ public:
 
     IAttribute& operator=(const IAttribute& a);
 
-    virtual QString asString();
-    virtual void setValue(const QString value) ;
+    virtual QString asString(){return QString();}
+    virtual void setValue(const QString value){}
     virtual QString key() const;
 
 signals:

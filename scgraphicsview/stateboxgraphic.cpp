@@ -58,6 +58,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     //TextItem.setPos(position->asPointF());
 
     //connect(_stateModel, SIGNAL(positionChanged()))
+
 }
 
 
@@ -66,6 +67,17 @@ StateBoxGraphic::~StateBoxGraphic()
     qDebug () << "stateboxgraphic deconstructor:";
 }
 
+void StateBoxGraphic::handleIsParallelStateChanged(IAttribute*attr)
+{
+    if ( attr->asString() == "true")
+    {
+        setDrawBoxLineStyle(kDrawDotted);
+    }
+    else
+    {
+        setDrawBoxLineStyle(kDrawSolid);
+    }
+}
 
 SCState* StateBoxGraphic::getStateModel()
 {

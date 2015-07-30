@@ -553,6 +553,9 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
     SizeAttribute* size = dynamic_cast<SizeAttribute*>(state->attributes.value("size"));
     connect(size, SIGNAL(changed(SizeAttribute*)), stateGraphic, SLOT(handleAttributeChanged(SizeAttribute*)));
+
+    //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
+    //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
 }
 
 
@@ -664,6 +667,16 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     // create the stateboxgraphic
     stateGraphic = new StateBoxGraphic(parentGraphic, newState);
+
+    //
+    // if a parent state is a parallel state, then its children run in parallel.
+    // this is show by the children being drawn with dotted lines. So inform
+    // the children to watch the parent's isParallelAttribute
+    //
+    IAttributeContainer * attrs = parentState->getAttributes();
+    IAttribute * attr = attrs->value("isParallelState");
+    connect(attr, SIGNAL(changed(IAttribute*)),stateGraphic,SLOT(handleIsParallelStateChanged(IAttribute*)));
+    stateGraphic->handleIsParallelStateChanged(attr);
 
     // new states will be on top
     stateGraphic->setZValue(zVal++);
