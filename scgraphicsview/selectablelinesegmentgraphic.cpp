@@ -100,9 +100,9 @@ int SelectableLineSegmentGraphic::getMouseState()
 
 void SelectableLineSegmentGraphic::handleAttributeChanged(IAttribute *attr)
 {
-    TransitionAttributes::TransitionStringAttribute * name = dynamic_cast<TransitionAttributes::TransitionStringAttribute *> (attr);
-    TransitionAttributes::TransitionPathAttribute * path = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> ( attr);
-    TransitionAttributes::TransitionPositionAttribute * position =dynamic_cast< TransitionAttributes::TransitionPositionAttribute*> (attr);
+    TransitionStringAttribute * name = dynamic_cast<TransitionStringAttribute *> (attr);
+    TransitionPathAttribute * path = dynamic_cast<TransitionPathAttribute *> ( attr);
+    TransitionPositionAttribute * position =dynamic_cast< TransitionPositionAttribute*> (attr);
 
     if ( name )
     {
@@ -453,12 +453,12 @@ void SelectableLineSegmentGraphic::printInfo()
 
 //    if ( _transitionModel )
 //    {
-//        TransitionAttributes::TransitionPositionAttribute *posAttr = dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> ( _transitionModel->attributes.value("position"));
+//        TransitionPositionAttribute *posAttr = dynamic_cast<TransitionPositionAttribute *> ( _transitionModel->attributes.value("position"));
 
 //        QPointF ps = this->pos();
 //        posAttr->setValue(ps);
 
-//        TransitionAttributes::TransitionPathAttribute * pathAttr = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (_transitionModel->attributes.value("path"));
+//        TransitionPathAttribute * pathAttr = dynamic_cast<TransitionPathAttribute *> (_transitionModel->attributes.value("path"));
 
 //        QList<QPointF> path;
 

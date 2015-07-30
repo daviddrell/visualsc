@@ -1203,7 +1203,7 @@ void SCDataModel::handleMakeANewEventTextBlock( TextBlockAttributes* attributes)
 
 void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 {
-    TransitionAttributes::TransitionStringAttribute *targetAttr =  dynamic_cast<TransitionAttributes::TransitionStringAttribute *>( _currentTransition->attributes.value("target"));
+    TransitionStringAttribute *targetAttr =  dynamic_cast<TransitionStringAttribute *>( _currentTransition->attributes.value("target"));
 
     QString target = targetAttr->asString();
 
@@ -1214,8 +1214,8 @@ void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 
     if ( _currentTransition == 0 ) return;
 
-    TransitionAttributes::TransitionPathAttribute *path =
-            dynamic_cast<TransitionAttributes::TransitionPathAttribute *>( _currentTransition->attributes.value("path"));
+    TransitionPathAttribute *path =
+            dynamic_cast<TransitionPathAttribute *>( _currentTransition->attributes.value("path"));
 
     path->setValue( pathStr );
 

@@ -335,18 +335,18 @@ void SCXMLReader::readTransistion()
         QString key =  _reader.attributes().at(i).name().toString();
         QString value = _reader.attributes().at(i).value().toString();
         qDebug() << "reader attributes: " << _reader.attributes().at(i).name() << ":"<<_reader.attributes().at(i).value();
-        TransitionAttributes::TransitionStringAttribute* tsa = new TransitionAttributes::TransitionStringAttribute(NULL, key, value);
+        TransitionStringAttribute* tsa = new TransitionStringAttribute(NULL, key, value);
         ta->addItem(tsa);
     }
 
 /*
-    TransitionAttributes::TransitionStringAttribute * event = new TransitionAttributes::TransitionStringAttribute(NULL,"event", _reader.attributes().value("event").toString());
+    TransitionStringAttribute * event = new TransitionStringAttribute(NULL,"event", _reader.attributes().value("event").toString());
 
-    TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitionStringAttribute (NULL,"cond", _reader.attributes().value("cond").toString());
+    TransitionStringAttribute * cond = new TransitionStringAttribute (NULL,"cond", _reader.attributes().value("cond").toString());
 
-    TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (NULL,"target", _reader.attributes().value("target").toString());
+    TransitionStringAttribute * target = new TransitionStringAttribute (NULL,"target", _reader.attributes().value("target").toString());
 
-    TransitionAttributes::TransitionStringAttribute * ttype = new  TransitionAttributes::TransitionStringAttribute (NULL,"type", _reader.attributes().value("type").toString());
+    TransitionStringAttribute * ttype = new  TransitionStringAttribute (NULL,"type", _reader.attributes().value("type").toString());
 
     ta->addItem(event);
     ta->addItem(cond);

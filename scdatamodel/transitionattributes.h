@@ -25,7 +25,6 @@
 #include <QPointF>
 #include <QString>
 #include "iattribute.h"
-
 #include "scdatamodel_global.h"
 #include <QMetaType>
 
@@ -41,6 +40,7 @@
 
 class  SCDATAMODELSHARED_EXPORT TransitionAttributes: public IAttributeContainer
 {
+    Q_OBJECT
 public:
 
     TransitionAttributes(QObject * parent, QString key);
@@ -52,6 +52,10 @@ public:
     virtual void setAttributes(const IAttributeContainer& sourceAttrList);
 
 
+private: // methods
+
+    void initCommon();
+};
     class SCDATAMODELSHARED_EXPORT  TransitionPathAttribute : public  IAttribute
     {
         //<path d="M 100 100 L 300 100 L 200 300 z" />
@@ -80,6 +84,9 @@ public:
 
     class SCDATAMODELSHARED_EXPORT  TransitionStringAttribute :  public IAttribute
     {
+
+        Q_OBJECT
+
     public:
         TransitionStringAttribute(QObject * parent, QString key, QString initValue);
         TransitionStringAttribute(const TransitionStringAttribute & stringAttribute );
@@ -92,6 +99,8 @@ public:
 
         virtual void    setValue(const QString value)  ;
 
+    signals:
+        void changed(TransitionStringAttribute* tsa);
 
     private:
 
@@ -120,13 +129,10 @@ public:
     };
 
 
-private: // methods
 
-    void initCommon();
-};
 Q_DECLARE_METATYPE(TransitionAttributes);
-Q_DECLARE_METATYPE( TransitionAttributes::TransitionPathAttribute);
-Q_DECLARE_METATYPE(TransitionAttributes::TransitionStringAttribute);
-Q_DECLARE_METATYPE(TransitionAttributes::TransitionPositionAttribute);
+Q_DECLARE_METATYPE(TransitionPathAttribute);
+Q_DECLARE_METATYPE(TransitionStringAttribute);
+Q_DECLARE_METATYPE(TransitionPositionAttribute);
 
 #endif // TRANSISTIONATTRIBUTES_H

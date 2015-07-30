@@ -102,7 +102,7 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
 
     TransitionGraphic* transGraphic = _hashTransitionToGraphic.value(trans);
 
-   // TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(trans->attributes.value("target"));
+   // TransitionStringAttribute *targetName = dynamic_cast<TransitionStringAttribute *>(trans->attributes.value("target"));
 
     //SCState* parentState = trans->parentSCState();
     //SCState* targetState = lookUpTargetState(targetName->asString());
@@ -405,15 +405,15 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
         return;
     }
 
-    TransitionAttributes::TransitionPositionAttribute * pos =
-            dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> (  t->attributes.value("position"));
+    TransitionPositionAttribute * pos =
+            dynamic_cast<TransitionPositionAttribute *> (  t->attributes.value("position"));
     QPointF position(0,0);
     if ( pos == 0 )
         qDebug()<< "pos returned null in SCGraphicsView::handleNewTransition";
     else
         position = pos->asQPointF();
 
-    TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
+    TransitionStringAttribute *targetName = dynamic_cast<TransitionStringAttribute *>(t->attributes.value("target"));
     StateBoxGraphic * targetGraphic = lookUpTargetStateGraphic( targetName->asString() );
 
     // create a transition graphic
@@ -581,6 +581,7 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     // set the connects for the transition graphic
     connect(trans, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
+
     // create the connection to automatically move anchor elbows when state graphics are moved.
     connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
@@ -621,6 +622,8 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
         connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
         grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
     }
+
+
 }
 
 /**

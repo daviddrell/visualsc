@@ -30,6 +30,9 @@ class SCState;
 class QXmlStreamWriter;
 #include "scitem.h"
 #include "textblock.h"
+#include "transitionattributes.h"
+
+
 
 /**
 
@@ -45,6 +48,7 @@ class QXmlStreamWriter;
 
   */
 
+
 class SCDATAMODELSHARED_EXPORT  SCTransition : public SCItem
 {
     Q_OBJECT
@@ -58,10 +62,12 @@ public:
 
     void deleteSafely();
 
+     void setEventName(QString text);
     //void setTextPos(QPointF);
  //   void setTextSize(qreal w, qreal h);
     void setText(QString eventText);
 
+    TransitionStringAttribute* getTransStringAttr(QString key);
 
     virtual IAttributeContainer * getAttributes(); //reimplemented from base SCItem
     void    setAttributeValue(QString key, QString value);

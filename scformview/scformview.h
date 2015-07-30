@@ -88,7 +88,7 @@ public:
 
 private slots:
 
-    void handleAttributeChanged(SizeAttribute*);
+
 
     void handleMakeTransitionConnections(SCTransition* trans);
     void backgroundButtonGroupClicked(QAbstractButton *button);
@@ -166,6 +166,7 @@ private:
 
 
     void connectTransition(SCTransition*);
+    void connectTransition(SCTransition *, CustomTableWidgetItem*, QString);
 
 
     IAttributeContainer * getCurrentlySelectedAttributes();

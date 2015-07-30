@@ -32,8 +32,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
     this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
 
-    TransitionAttributes::TransitionPathAttribute * p =
-            dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (  t->attributes.value("path"));
+    TransitionPathAttribute * p =
+            dynamic_cast<TransitionPathAttribute *> (  t->attributes.value("path"));
 
     QList<QPointF> pointList = p->asQPointFList();
     /*qDebug() << "Printing Point List of size: " <<pointList.count();
@@ -1227,7 +1227,7 @@ void TransitionGraphic::updateModel()
         for( int  i = 0; i < _elbows.count(); i++)
             path.append(_elbows.at(i)->pos());
 
-        TransitionAttributes::TransitionPathAttribute * pathAttr = dynamic_cast<TransitionAttributes::TransitionPathAttribute *> (_transitionDM->attributes.value("path"));
+        TransitionPathAttribute * pathAttr = dynamic_cast<TransitionPathAttribute *> (_transitionDM->attributes.value("path"));
 
         pathAttr->setValue(path);   // update the path values of _transitionDM, the data model object for this transition
     }

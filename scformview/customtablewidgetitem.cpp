@@ -29,3 +29,7 @@ void CustomTableWidgetItem::handleAttributeChanged(StateName * sn)
     setText(sn->asString());
 }
 
+void CustomTableWidgetItem::handleAttributeChanged(TransitionStringAttribute* tsa)
+{
+    setText(tsa->asString());
+}

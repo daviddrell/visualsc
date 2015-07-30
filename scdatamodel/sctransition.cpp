@@ -20,8 +20,10 @@
 #include "sctransition.h"
 #include "scstate.h"
 #include "QXmlStreamWriter"
-
+#include "transitionattributes.h"
 #include <QDebug>
+
+
 
 SCTransition::SCTransition(QObject * parent):
         SCItem(parent),
@@ -43,17 +45,17 @@ SCTransition::SCTransition(QObject * parent):
 
 
     // SCTransition will load with target, event, commentary, and path
-    TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (this, "target",QString());
+    TransitionStringAttribute * target = new TransitionStringAttribute (this, "target",QString());
     attributes.addItem(target);
 
-    TransitionAttributes::TransitionStringAttribute * event = new TransitionAttributes::TransitionStringAttribute (this, "event",QString());
+    TransitionStringAttribute * event = new TransitionStringAttribute (this, "event",QString());
     attributes.addItem(event);
 
-    TransitionAttributes::TransitionStringAttribute * comments = new TransitionAttributes::TransitionStringAttribute (this, "comments",QString());
+    TransitionStringAttribute * comments = new TransitionStringAttribute (this, "comments",QString());
     attributes.addItem(comments);
 
     QList<QPointF> emptyPath;
-    TransitionAttributes::TransitionPathAttribute * path = new TransitionAttributes::TransitionPathAttribute (this, QString("path"),emptyPath);
+    TransitionPathAttribute * path = new TransitionPathAttribute (this, QString("path"),emptyPath);
     attributes.addItem(path);
 
 
@@ -62,19 +64,20 @@ SCTransition::SCTransition(QObject * parent):
     _eventTextBlock->setText("event");  // default event text
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
-
+    connect(event, SIGNAL(changed(TransitionStringAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
     SCState* parentState = dynamic_cast<SCState*>(parent);
-    connect(parentState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromStates()));
+    connect(parentState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSource(QObject*)));
+    //connect(targetState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
     /*
 
-    TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitizgonStringAttribute (this, "cond",QString());
+    TransitionStringAttribute * cond = new TransitizgonStringAttribute (this, "cond",QString());
     attributes.addItem(cond);
 
-    TransitionAttributes::TransitionStringAttribute * type = new TransitionAttributes::TransitionStringAttribute (this, "type",QString("internal"));
+    TransitionStringAttribute * type = new TransitionStringAttribute (this, "type",QString("internal"));
     attributes.addItem(type);
 
 
-    TransitionAttributes::TransitionPositionAttribute * position = new TransitionAttributes::TransitionPositionAttribute (this, "position",QPointF(0,0));
+    TransitionPositionAttribute * position = new TransitionPositionAttribute (this, "position",QPointF(0,0));
     attributes.addItem(position);
 */
 
@@ -87,6 +90,11 @@ SCTransition::~SCTransition()
 
 
     delete _eventTextBlock;
+}
+
+TransitionStringAttribute* SCTransition::getTransStringAttr(QString key)
+{
+    return dynamic_cast<TransitionStringAttribute*>(this->attributes.value(key));
 }
 
 SCState* SCTransition::parentSCState()
@@ -110,14 +118,15 @@ void SCTransition::setText(QString eventText)
  */
 void SCTransition::handleTextBlockChanged()
 {
-    qDebug() << "SCTransition::handleTextBlockChanged";
-    IAttribute* event = attributes.value("event");
-    QString eventText = _eventTextBlock->getText();
+    //this->attributes.value("event")->setValue(_eventTextBlock->getText());
+    this->setEventName(_eventTextBlock->getText());
 
-    this->setObjectName(eventText);
-    event->setValue(eventText);
-    qDebug() << "event changed in data model:  emit eventChangedInDataModel(this, eventText);" << eventText;
-    emit eventChangedInDataModel(this, eventText);
+}
+
+void SCTransition::setEventName(QString text)
+{
+    this->setObjectName(text);
+    attributes.value("event")->setValue(text);;
 }
 
 SCState *SCTransition::targetState()
@@ -183,7 +192,7 @@ IAttributeContainer * SCTransition::getAttributes()
 
 void SCTransition::addAttribute(QString key, QString value)
 {
-    TransitionAttributes::TransitionStringAttribute * attr = new TransitionAttributes::TransitionStringAttribute (this, key,QString());
+    TransitionStringAttribute * attr = new TransitionStringAttribute (this, key,QString());
     attr->setValue(value);
     attributes.addItem(attr);
 }

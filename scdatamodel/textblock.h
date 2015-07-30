@@ -6,6 +6,7 @@
 //#include "scstate.h"
 #include "scitem.h"
 #include "stateattributes.h"
+#include "transitionattributes.h"
 
 /**
 
@@ -33,6 +34,7 @@ public:
 public slots:
     void handleAttributeChanged(IAttribute *attr);
     void handleAttributeChanged(StateName*);
+    void handleAttributeChanged(TransitionStringAttribute*);
 
 signals:
      void textChanged();

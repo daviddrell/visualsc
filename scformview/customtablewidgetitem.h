@@ -5,6 +5,7 @@
 #include <QObject>
 #include "iattribute.h"
 #include "stateattributes.h"
+#include "transitionattributes.h"
 
 class IAttribute;
 
@@ -21,6 +22,7 @@ public slots:
     void handleAttributeChanged(SizeAttribute*);
     void handleAttributeChanged(PositionAttribute*);
     void handleAttributeChanged(StateName*);
+    void handleAttributeChanged(TransitionStringAttribute*);
 };
 
 #endif // CUSTOMTABLEWIDGETITEM_H

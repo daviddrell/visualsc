@@ -29,6 +29,8 @@
 //#include "sizeattribute.h"
 //#include "stateattributes.h"
 
+
+
 /**
    \defgroup Attributes
 
@@ -124,6 +126,7 @@
 class SizeAttribute;
 class PositionAttribute;
 class StateName;
+class TransitionStringAttribute;
 
 class IAttribute: public QObject
 {
@@ -150,6 +153,7 @@ signals:
     void changed(SizeAttribute* size);
     void changed(PositionAttribute* pos);
     void changed(StateName* sn);
+    void changed(TransitionStringAttribute* tsa);
     void error(QString err);
 
 private:

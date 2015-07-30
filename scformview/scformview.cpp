@@ -513,7 +513,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
         if(key == "name")
         {
             // update the state name in the form view and the transitions that target it
-            updateStateName(st, value);
+            //updateStateName(st, value);
 
             st->setStateName(value);
             // then signal that a state was change in the form view (this is done in SCDataModel already with SCState::setText)
@@ -606,11 +606,12 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
         if(key == "event")
         {
             // update the tree
-            updateTransitionEvent(trans, value);
+            //updateTransitionEvent(trans, value);
 
             // update the data model and graphics view
            qDebug() << "emit trans->eventChangedInFormView(trans, value);";
-            emit trans->eventChangedInFormView(trans, value);
+            //emit trans->eventChangedInFormView(trans, value);
+           trans->setEventName(value);
 
             //updateTransitionEvent(trans, value);
             //handleItemNameChangedInDataModel(trans, value);
@@ -1292,13 +1293,19 @@ void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, boo
 
 }
 
-// the problem with setAttributeConnections is that it does not support updating the tree view if something in the graphics view changed and the corresponding item in the tree view was not highlighted
 
-void SCFormView::handleAttributeChanged(SizeAttribute* size)
+void SCFormView::connectTransition(SCTransition * trans, CustomTableWidgetItem * tableItem, QString attributeKey)
 {
-    QPoint sz = size->asPointF().toPoint();
+
+    if(attributeKey == "event")
+    {
+        TransitionStringAttribute* tsa = trans->getTransStringAttr(attributeKey);
+        connect(tsa, SIGNAL(changed(TransitionStringAttribute*)), tableItem, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
+    }
 
 }
+
+
 
 /**
  * @brief SCFormView::connectStateAttribute
@@ -1373,6 +1380,10 @@ void SCFormView::setAttributeConnections(IAttributeContainer * atts, bool should
             if(_currentlySelected->isState())
             {
                 connectState(_currentlySelected->getState(), propValue, key);
+            }
+            if(_currentlySelected->isTransition())
+            {
+                connectTransition(_currentlySelected->getTransition(), propValue, key);
             }
         }
     } else {
@@ -2444,15 +2455,6 @@ void SCFormView::handleItemNameChangedInDataModel(SCState* state, QString name)
 
     }
 }
-
-/**
- * @brief SCFormView::updateState
- * @param state
- * @param name
- *
-
- *
- */
 
 bool SCFormView::isCurrentlySelectedEqualTo(SCItem* item)
 {

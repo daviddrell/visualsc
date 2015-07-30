@@ -76,6 +76,12 @@ void SCTextBlock::handleAttributeChanged(StateName * sn)
     this->setText(sn->asString());
 }
 
+void SCTextBlock::handleAttributeChanged(TransitionStringAttribute* tsa)
+{
+    this->setText(tsa->asString());
+}
+
+
 /**
  * @brief SCTextBlock::handleAttributeChanged
  * @param attr
