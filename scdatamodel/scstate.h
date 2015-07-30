@@ -81,6 +81,11 @@ public:
 
     void setText(QString text);
 
+
+    SizeAttribute* getSizeAttr();
+    PositionAttribute* getPosAttr();
+    StateName* getStateNameAttr();
+
     int  getStateCount();
 
     //void setSize (QPointF& size);

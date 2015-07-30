@@ -71,6 +71,11 @@ void  SCTextBlock::setText(QString text)
     }
 }
 
+void SCTextBlock::handleAttributeChanged(StateName * sn)
+{
+    this->setText(sn->asString());
+}
+
 /**
  * @brief SCTextBlock::handleAttributeChanged
  * @param attr

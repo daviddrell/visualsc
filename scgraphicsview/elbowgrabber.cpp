@@ -304,23 +304,9 @@ QRectF ElbowGrabber::boundingRect() const
 QPointF ElbowGrabber::getCenterPoint()
 {
 
-     if (_placedOnASquare)
-     {
-         /*
-         if ( _corner == 0 )
-             return QPointF(pos().x() + _width/2,pos().y() + _height/2);
-         else  if ( _corner == 1 )
-             return QPointF(pos().x() - _width/2,pos().y() + _height/2);
-         else  if ( _corner == 2 )
-             return QPointF(pos().x() - _width/2,pos().y() - _height/2);
-         else
-             return QPointF(pos().x() + _width/2,pos().y() - _height/2);
-             */
-     }
-     else
-     {
+
          return QPointF(pos()) ;
-     }
+
 
 }
 

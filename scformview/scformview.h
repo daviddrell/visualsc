@@ -34,6 +34,7 @@
 #include <QTableWidgetItem>
 #include "scitem.h"
 #include "fvitem.h"
+#include "customtablewidgetitem.h"
 
 class StateSelectionWindow;
 
@@ -86,6 +87,9 @@ public:
     void highlightPreviousItem();
 
 private slots:
+
+    void handleAttributeChanged(SizeAttribute*);
+
     void handleMakeTransitionConnections(SCTransition* trans);
     void backgroundButtonGroupClicked(QAbstractButton *button);
     void buttonGroupClicked(int id);
@@ -157,7 +161,10 @@ private:
     void initTree();
 
     void connectState(SCState*);
-    void connectState(SCState *, QTableWidgetItem*);
+    void connectState(SCState *, CustomTableWidgetItem*);
+    void connectState(SCState*, CustomTableWidgetItem*, QString);
+
+
     void connectTransition(SCTransition*);
 
 

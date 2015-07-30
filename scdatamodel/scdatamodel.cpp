@@ -552,7 +552,7 @@ SCState* SCDataModel::insertNewState(SCState *parent)
 {
     // SCState connects. 1 of 2 places. this is for any newly created state
     SCState * state = new SCState (parent);
-    connectState(state);
+    // connectState(state);
     //
     //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), );
 
@@ -945,16 +945,27 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
 
 }
 
+/**
+ * @brief SCDataModel::connectState
+ * @param state
+ *
+ * NOT CURRENTLY USED
+ *
+ * Deprecated function. formview and graphics view will update the data model and listen to the data model but the datamodel will be blind to what connects to it
+ *
+ */
 void SCDataModel::connectState(SCState* state)
 {
+    /*
     connect(state, SIGNAL(nameChangedInFormView(SCState*,QString)),     this, SLOT(handleStateNameChangedInFormView(SCState*,QString)));
     connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
     connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)),     this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
+    */
 }
 
 void SCDataModel::connectTransition(SCTransition* trans)
 {
-    connect(trans, SIGNAL(eventChangedInFormView(SCTransition*,QString)), this, SLOT(handleEventNameChangedInFormView(SCTransition*,QString)));
+    //connect(trans, SIGNAL(eventChangedInFormView(SCTransition*,QString)), this, SLOT(handleEventNameChangedInFormView(SCTransition*,QString)));
 }
 
 void SCDataModel::handleEventNameChangedInFormView(SCTransition * trans, QString eventName)

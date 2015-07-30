@@ -151,12 +151,12 @@ QString StateName::asString()
     return _name;
 }
 
-void    StateName::setValue(const QString name)
+void StateName::setValue(const QString name)
 {
     if ( name != _name )
     {
         _name = name;
-        emit changed(this );
+        emit changed(this);
     }
 }
 

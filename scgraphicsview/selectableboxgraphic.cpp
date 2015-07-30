@@ -245,9 +245,7 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         QPointF mts = mapToScene(pos());
         mts = pos();
         QRectF oldBox = QRectF(mts.x(), mts.y(), _width, _height);
-        //QRectF oldBox = this->getUsableArea();
-        qreal scaleX =_width;
-        qreal scaleY = _height;
+
         // depending on which corner has been grabbed, we want to move the position
         // of the item as it grows/shrinks accordingly. so we need to eitehr add
         // or subtract the offsets based on which corner this is.
@@ -328,21 +326,11 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
 
 
         setCornerPositions();
-        //emit stateBoxMoved(difference);    // linked to transition graphic. connect witten in scgraphicsview.cpp
-        QPointF newPos(xMoved, yMoved);
-        QPointF diff = newPos -_dragStart;
-        //QRectF newBox = this->getUsableArea();
-        //QPointF nmts = mapToScene(pos());
+
         QPointF nmts = pos();
         QRectF newBox = QRectF(nmts.x(), nmts.y(), newWidth, newHeight);
         //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
-        //emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
-        //int buffer = 12;
-        //scaleX = (newWidth-buffer)/(scaleX-buffer);
-        //scaleY = (newHeight-buffer)/(scaleY-buffer);
-        //emit stateBoxResized((scaleX-buffer),(scaleY-buffer),(newWidth-buffer), (newHeight-buffer) );
-        //qDebug() <<"scaleX "<<
         int corner = this->getHoveredCorner();
         if(corner==-1)
             qDebug() << "ERROR there was no hovered corner, should not be allowed";
@@ -512,15 +500,7 @@ void SelectableBoxGraphic::setPosAndUpdateAnchors(QPointF newPos)
     this->setPos(newPos);
 }
 
-/*
-void SelectableBoxGraphic::emitChildrenStateBoxMoved()
-{
-
-}
-*/
-
 // remove the corner grabbers
-
 void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
     _isHovered = false;

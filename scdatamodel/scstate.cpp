@@ -129,7 +129,7 @@ void SCState::initCommon()
 
     // connect changing the SCTextBlock to handleTextBlockChanged()
     connect (_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
-
+    connect(name, SIGNAL(changed(StateName*)), _IdTextBlock, SLOT(handleAttributeChanged(StateName*)));
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
 }
 
@@ -184,7 +184,22 @@ void SCState::setPosition(QPointF &position)
 {
     PositionAttribute * pos = dynamic_cast<PositionAttribute *> (attributes.value("position"));
     pos->setValue(position);
-    emit positionChangedInDataModel(this, position);
+    //emit positionChangedInDataModel(this, position);
+}
+
+StateName* SCState::getStateNameAttr()
+{
+    return dynamic_cast<StateName*>(attributes.value("name"));
+}
+
+SizeAttribute* SCState::getSizeAttr()
+{
+    return dynamic_cast<SizeAttribute*>(attributes.value("size"));
+}
+
+PositionAttribute* SCState::getPosAttr()
+{
+    return dynamic_cast<PositionAttribute*>(attributes.value("position"));
 }
 
 /**
@@ -230,34 +245,36 @@ SCTextBlock* SCState::getIDTextBlock()
  * textBlock Changed -> SCState's name changed -> tree/table update
  *
  *
- * SIGNAL
- * connect in scformview
- * connect(SCState, SIGNAL(nameChangedInDataModel(SCState*,QString)), SCFormView, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
+ *
  *
  */
 void SCState::handleTextBlockChanged()
 {
     qDebug()<<"SCState::handleTextBlockChanged";
-    StateName * name = dynamic_cast<StateName *>(attributes["name"]);
-
-    QString nameText = _IdTextBlock->getText();
-    this->setObjectName(nameText);
-    name->setValue(nameText);
-    emit nameChangedInDataModel(this,nameText); // connected to SCFormView::handleItemNameChangedInDataModel()
+    this->setStateName(_IdTextBlock->getText());
 }
 
-/*
-void SCState::setGraphic(StateBoxGraphic* graphic)
+/**
+ * @brief SCState::setStateName
+ * @param n
+ *
+ * this is a public function called by the form view when the state's name is changed in the property table
+ * additionally this will be called by another slot that handles when its textblock is changed (handleTextBlockChanged)
+ *
+ *
+ * sets the state attribute State Name to the passed string
+ *
+ * SIGNAL
+ * if the StateName state attribute is updated, then it will emit changed(StateAttribute*)
+ *
+ */
+void SCState::setStateName(QString n)
 {
-    _stateBoxGraphic = graphic;
-}
-*/
-/*
-void SCState::updateGraphic()
-{
+    this->setObjectName(n);
+    attributes.value("name")->setValue(n);
 
+    // no need to set the textblock here, its been connected to the name attribute
 }
-*/
 
 QString SCState::getAttributeValue(QString key)
 {
@@ -340,10 +357,6 @@ QList<SCTransition*> SCState::getTransitionsTerminating()
 {
     return _transitionsTerminatingHere;
 }
-
-
-
-
 
 /**
  * @brief SCState::removeTargetsTransitionIn
@@ -710,15 +723,6 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
 }
 
 
-void SCState::setStateName(QString n)
-{
-    this->setObjectName(n);
 
-
-    // no need to set the textblock here, its been connected to the name attribute
-   // _IdTextBlock.setText(n);
-
-    attributes.value("name")->setValue(n);
-}
 
 

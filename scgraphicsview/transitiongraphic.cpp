@@ -1,7 +1,20 @@
-﻿#include "transitiongraphic.h"
+﻿/*
+ *  This class represents the transition on the GUI and is a container for anything related to one transition graphic
+ *  Elbows
+ *  LineSegments
+ *  TextBlocks
+ *
+ * anchor[0]                  anchor[1]
+ *      x-------x-x--x-----x-------->
+ *
+ *
+ */
+
+#include "transitiongraphic.h"
 #include "scstate.h"
 #include "selectableboxgraphic.h"
 #include <QDebug>
+
 
 TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys, MouseController* mouse) :
     QGraphicsObject(NULL),
@@ -14,9 +27,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _hasMovedSinceCreatingElbow(true),
     _isCurrentlyDeleting(false),
     _eventText(new SelectableTextBlock(this, t->getEventTextBlock()))
-  //,
-    //TextItem(parentGraphic, parentGraphic->getStateModel()->getIDTextBlock())
-
 {
 
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -49,7 +59,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _anchors[1]->setAcceptHoverEvents(true);
         _elbows.append(_anchors[1]);
 
-
         // set the anchor positions by snapping them to their source and sink state boxes
         int sourceSide=0;
         int targetSide=0;
@@ -63,13 +72,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
        // _anchors[0]->setPos(mapFromScene(sourceAnchor));
        // _anchors[1]->setPos(mapFromScene(targetAnchor));
 
-
-
         LineSegmentGraphic* segment = new LineSegmentGraphic(_anchors[0], _anchors[1], this, _keyController);
         segment->setAcceptHoverEvents(true);                    // allow the segment to be hovered
         segment->installSceneEventFilter(this);
-        //segment->setAcceptTouchEvents(true);
-
 
         _anchors[0]->setSegmentAt(0, NULL);
         _anchors[0]->setSegmentAt(1, segment);
@@ -83,37 +88,13 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _anchors[0]->setAnchor(true);
         _anchors[1]->setAnchor(true);
 
-        /* moved to scgraphics view
-        connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
-        connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
-
-        //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
-        emit _anchors[0]->anchorMoved(sourceAnchor);
-        emit _anchors[1]->anchorMoved(targetAnchor);
-
-*/
-
-
-
-        //elbOne->setVisible(false);
-       // elbOne->setVisible(false);
-
-
         _lineSegments.append(segment);
 
+        _anchors[0]->setPos(this->mapFromScene(sourceAnchor));
+        _anchors[1]->setPos(this->mapFromScene(targetAnchor));
 
-       _anchors[0]->setPos(this->mapFromScene(sourceAnchor));
-       _anchors[1]->setPos(this->mapFromScene(targetAnchor));
-
-
-
-       segment->enclosePathInElbows();
-
-
-       // TextItem.setPos(25,10);
-      //  TextItem.setParentItem(_anchors[1]);
-
-
+        // calculate the position of the hover box for the line segment
+        segment->enclosePathInElbows();
         this->updateModel();
     }
     else // load the point list and create the elbows and line segments

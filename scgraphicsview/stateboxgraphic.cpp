@@ -528,7 +528,7 @@ int StateBoxGraphic::returnClosestWallFace(qreal a, qreal b, qreal c, qreal d)
  */
 void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 {
-    qDebug() << "StateBoxGraphic::handleTransitionLineEndMoved";
+    // qDebug() << "StateBoxGraphic::handleTransitionLineEndMoved";
     ElbowGrabber* elbow = dynamic_cast<ElbowGrabber*> (QObject::sender());
 
     QPointF mts;
@@ -676,9 +676,16 @@ StateBoxGraphic* StateBoxGraphic::parentItemAsStateBoxGraphic()
         return dynamic_cast<StateBoxGraphic* >(this->parentItem());
 }
 
+/**
+ * @brief StateBoxGraphic::getHighestLevelParentItemAsStateBoxGraphic
+ * @return
+ *
+ * this function returns the eldest ancestor state box graphic for any state box graphic
+ *
+ */
 StateBoxGraphic* StateBoxGraphic::getHighestLevelParentItemAsStateBoxGraphic()
 {
-    qDebug() << "StateBoxGraphic::getHighestLevelParentItemAsStateBoxGraphic";
+    // qDebug() << "StateBoxGraphic::getHighestLevelParentItemAsStateBoxGraphic";
     StateBoxGraphic* gp = parentItemAsStateBoxGraphic();
     while(gp->parentItemAsStateBoxGraphic())
     {

@@ -5,6 +5,7 @@
 #include <QXmlStreamWriter>
 //#include "scstate.h"
 #include "scitem.h"
+#include "stateattributes.h"
 
 /**
 
@@ -31,6 +32,7 @@ public:
 
 public slots:
     void handleAttributeChanged(IAttribute *attr);
+    void handleAttributeChanged(StateName*);
 
 signals:
      void textChanged();

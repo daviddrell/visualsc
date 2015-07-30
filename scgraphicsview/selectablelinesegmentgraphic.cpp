@@ -31,49 +31,6 @@
 
 
 
-SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition, TransitionGraphic* parentGraphic,KeyController * keys ):
-        QGraphicsPolygonItem(),
-        _pen(),
-        _dragStart(0,0),
-        _cornerDragStart(0,0),
-        _XcornerGrabBuffer(10),
-        _YcornerGrabBuffer(10),
-        _cornerGrabbed(false),
-        _selectRegion(),
-        _transitionModel(transition),
-        _isTerminal(false),
-        _parentGraphic(parentGraphic),
-        _keyController(keys)
-
-      //_lineEnd_0 ( this->mapFromParent(start)),
-      //_lineEnd_1 ( this->mapFromParent(end)),
-{
-    this->setFlag(QGraphicsItem::ItemIsMovable, false);
-    //this->setAcceptHoverEvents(true);
-    this->setParentItem(parentGraphic);
-    this->setPos(position);
-
-
-    _pen.setWidth(2);
-    _pen.setColor(Qt::black);
-
-//TODO maybe, might not use this constructor anymore
-    QPointF p1  (_elbows[0]->x() - _XcornerGrabBuffer, _elbows[0]->y() - _YcornerGrabBuffer);
-    QPointF p2  (_elbows[0]->x() + _XcornerGrabBuffer, _elbows[0]->y() - _YcornerGrabBuffer);
-    QPointF p3  (_elbows[0]->x() + _XcornerGrabBuffer, _elbows[0]->y() + _YcornerGrabBuffer);
-    QPointF p4  (_elbows[0]->x() - _XcornerGrabBuffer, _elbows[0]->y() + _YcornerGrabBuffer);
-
-
-    QPointF p5  (_elbows[1]->x() - _XcornerGrabBuffer, _elbows[1]->y() - _YcornerGrabBuffer);
-    QPointF p6  (_elbows[1]->x() + _XcornerGrabBuffer, _elbows[1]->y() - _YcornerGrabBuffer);
-    QPointF p7  (_elbows[1]->x() + _XcornerGrabBuffer, _elbows[1]->y() + _YcornerGrabBuffer);
-    QPointF p8  (_elbows[1]->x() - _XcornerGrabBuffer, _elbows[1]->y() + _YcornerGrabBuffer);
-
-
-    _selectRegion << p1 << p2 << p5 << p6 << p7 << p8 << p3 << p4 << p1;
-
-    this->setPolygon(_selectRegion);
-}
 
 
 SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(ElbowGrabber* startPoint, ElbowGrabber* endPoint, SCTransition* transition, TransitionGraphic* parentGraphic,KeyController * keys ):
@@ -128,10 +85,6 @@ SelectableLineSegmentGraphic::SelectableLineSegmentGraphic(ElbowGrabber* startPo
 
 SelectableLineSegmentGraphic::~SelectableLineSegmentGraphic()
 {
-    //TODO
-
-   // if (_elbows[0] != NULL) delete _elbows[0];
-    // if (_elbows[1] != NULL) delete _elbows[1];
 
 }
 

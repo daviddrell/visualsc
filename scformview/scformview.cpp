@@ -515,9 +515,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
             // update the state name in the form view and the transitions that target it
             updateStateName(st, value);
 
-            // now signal the datamodel and graphicsview that the state name was changed here
-            emit st->nameChangedInFormView(st, value);
-
+            st->setStateName(value);
             // then signal that a state was change in the form view (this is done in SCDataModel already with SCState::setText)
 
         }
@@ -541,7 +539,8 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
                     qDebug() << "xy: " << x<< " " << y;
                     QPointF point(x,y);
 
-                    emit st->positionChangedInFormView(st, point);
+                    //emit st->positionChangedInFormView(st, point);
+                    st->setPosition(point);
                 }
                 else
                     failed = true;
@@ -575,7 +574,8 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
                     qDebug() << "xy: " << x<< " " << y;
                     QPointF point(x,y);
 
-                    emit st->sizeChangedInFormView(st, point);
+                    //emit st->sizeChangedInFormView(st, point);
+                    st->setSize(point);
                 }
                 else
                     failed = true;
@@ -583,6 +583,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
             else
                 failed = true;
 
+            // improper input handler
             if(failed)
             {
                 propertyTableSetText(propertyTableIndexOf("size"), st->attributes.value("size")->asString());
@@ -836,12 +837,13 @@ QObject* SCFormView::getNeighborState(QObject*s)
  *
  *
  * connect state attributes to the property table widget item
- *
+ * NOT CURRENTLY USED
  */
-void SCFormView::connectState(SCState *state, QTableWidgetItem* tableItem)
+void SCFormView::connectState(SCState *state, CustomTableWidgetItem* tableItem)
 {
     // disconnects happen
     SizeAttribute* size = dynamic_cast<SizeAttribute*>(state->attributes.value("size"));
+    connect(size, SIGNAL(changed(SizeAttribute*)), tableItem, SLOT(handleAttributeChanged(SizeAttribute*)));
     //connect(size->)
 }
 
@@ -1261,11 +1263,11 @@ void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, boo
 
             //connect ( attr, SIGNAL(changed(IAttribute*)), this, SLOT(handlePropertyChanged(IAttribute*)));
 
-            QTableWidgetItem * propName = new QTableWidgetItem(key);
+            CustomTableWidgetItem * propName = new CustomTableWidgetItem(key);
 
             propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
 
-            QTableWidgetItem * propValue = new QTableWidgetItem(attr->asString());
+            CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
 
             propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
 
@@ -1292,6 +1294,41 @@ void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, boo
 
 // the problem with setAttributeConnections is that it does not support updating the tree view if something in the graphics view changed and the corresponding item in the tree view was not highlighted
 
+void SCFormView::handleAttributeChanged(SizeAttribute* size)
+{
+    QPoint sz = size->asPointF().toPoint();
+
+}
+
+/**
+ * @brief SCFormView::connectStateAttribute
+ * @param state
+ * @param tableItem
+ * @param attributeKey
+ *
+ * helper function that connects changes in the data model to update the properties of a state.
+ *
+ *
+ */
+void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, QString attributeKey)
+{
+    if(attributeKey == "size")
+    {
+        SizeAttribute* size = state->getSizeAttr();
+        connect(size, SIGNAL(changed(SizeAttribute*)), tableItem, SLOT(handleAttributeChanged(SizeAttribute*)));
+    }
+    else if(attributeKey == "position")
+    {
+        PositionAttribute* pos = state->getPosAttr();
+        connect(pos, SIGNAL(changed(PositionAttribute*)), tableItem, SLOT(handleAttributeChanged(PositionAttribute*)));
+    }
+    else if(attributeKey == "name")
+    {
+        StateName* name = state->getStateNameAttr();
+        connect(name, SIGNAL(changed(StateName*)), tableItem, SLOT(handleAttributeChanged(StateName*)));
+    }
+}
+
 /**
  * @brief SCFormView::setAttributeConnections
  * @param atts
@@ -1310,6 +1347,9 @@ void SCFormView::setAttributeConnections(IAttributeContainer * atts, bool should
 
     if(shouldConnect)
     {
+
+
+
         int row = 0;
         QMapIterator<QString,IAttribute*> i(*atts);
         while (i.hasNext())
@@ -1319,17 +1359,21 @@ void SCFormView::setAttributeConnections(IAttributeContainer * atts, bool should
 
             //connect ( attr, SIGNAL(changed(IAttribute*)), this, SLOT(handlePropertyChanged(IAttribute*)));
 
-            QTableWidgetItem * propName = new QTableWidgetItem(key);
+            CustomTableWidgetItem * propName = new CustomTableWidgetItem(key);
 
             propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
 
-            QTableWidgetItem * propValue = new QTableWidgetItem(attr->asString());
+            CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
 
             propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
 
             propertyTable->setItem(row, 0, propName);
             propertyTable->setItem(row++, 1, propValue);
 
+            if(_currentlySelected->isState())
+            {
+                connectState(_currentlySelected->getState(), propValue, key);
+            }
         }
     } else {
 
@@ -1363,7 +1407,7 @@ void SCFormView::clearPropertyTable()
 {
     for (int r =0; r <propertyTable->rowCount(); r++ )
     {
-        QTableWidgetItem * item = propertyTable->itemAt(r,0);
+        QTableWidgetItem* item = propertyTable->itemAt(r,0);
         delete item;
         item = propertyTable->itemAt(r,1);
         delete item;
@@ -1465,6 +1509,7 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
     connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
 
 
+
     // clear the textblock property table
 
     // currently does nothing
@@ -1505,11 +1550,11 @@ void SCFormView::clearAndLoadPropertyTable(SCItem* oldItem,SCItem* item)
 
         //connect ( attr, SIGNAL(changed(IAttribute*)), this, SLOT(handlePropertyChanged(IAttribute*)));
 
-        QTableWidgetItem * propName = new QTableWidgetItem(key);
+        CustomTableWidgetItem * propName = new CustomTableWidgetItem(key);
 
         propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
 
-        QTableWidgetItem * propValue = new QTableWidgetItem(attr->asString());
+        CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
 
         propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
 
@@ -1811,10 +1856,10 @@ void SCFormView::itemInsertProperty(SCItem* item, QString propertyName)
         return; // failed to insert, so halt here.
 
     // insert the new table item
-    QTableWidgetItem * propName = new QTableWidgetItem(propertyName);
+    CustomTableWidgetItem * propName = new CustomTableWidgetItem(propertyName);
     propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
 
-    QTableWidgetItem * propValue = new QTableWidgetItem("");
+    CustomTableWidgetItem * propValue = new CustomTableWidgetItem("");
     propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
 
     // insert the new property at the top of the table

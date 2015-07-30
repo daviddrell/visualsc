@@ -59,5 +59,4 @@ void CustomTreeWidgetItem::treeAddTextBlock(SCTextBlock* textBlock)
 QObject * CustomTreeWidgetItem::data()
 {
     return  _stateOrTransitionItem ;
-
 }

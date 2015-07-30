@@ -53,7 +53,6 @@ class SelectableLineSegmentGraphic : public QObject, public QGraphicsPolygonItem
     Q_OBJECT
 
 public:
-    SelectableLineSegmentGraphic(QPointF position, QPointF start, QPointF end, SCTransition* transition, TransitionGraphic* parentGraphic, KeyController* keys );
     SelectableLineSegmentGraphic(ElbowGrabber* startPoint, ElbowGrabber* endPoint, SCTransition* transition, TransitionGraphic* parentGraphic, KeyController* keys );
     ~SelectableLineSegmentGraphic();
 

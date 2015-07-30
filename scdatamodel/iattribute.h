@@ -27,6 +27,7 @@
 #include <QMapIterator>
 
 //#include "sizeattribute.h"
+//#include "stateattributes.h"
 
 /**
    \defgroup Attributes
@@ -122,6 +123,7 @@
 
 class SizeAttribute;
 class PositionAttribute;
+class StateName;
 
 class IAttribute: public QObject
 {
@@ -142,9 +144,12 @@ public:
     virtual QString key() const;
 
 signals:
-    void changed( IAttribute* attr);
-    void changed( SizeAttribute* size);
-    void changed( PositionAttribute* pos);
+
+// individual attribute changed signals
+    void changed(IAttribute* attr);
+    void changed(SizeAttribute* size);
+    void changed(PositionAttribute* pos);
+    void changed(StateName* sn);
     void error(QString err);
 
 private:

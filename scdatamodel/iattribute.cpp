@@ -150,7 +150,7 @@ bool IAttributeContainer::addItem( IAttribute* attr)
       * \abstract sets the values of the abtribute list to the same values as the passed-in list, equivalent to setAttributes
       */
 IAttributeContainer& IAttributeContainer::operator=( const IAttributeContainer& copyFrom )
-                                                   {
+{
     setAttributes(copyFrom);
     return *this;
 }
