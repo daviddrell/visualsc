@@ -643,6 +643,22 @@ SCState * SCState::getParentState()
     return dynamic_cast<SCState*>(this->parent());
 }
 
+/*
+QList<SCState*> SCState::getAllStates()
+{
+    QList<SCState*> ret;
+    SCState*
+    for(int i = 0; i < children.size(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(children.at(i));
+        if(state)
+        {
+            ret.append(state);
+
+        }
+    }
+}
+*/
 void SCState::getAllStates(QList<SCState *> & stateList)
 {
 

@@ -98,7 +98,7 @@ void StateSelectionWindow::loadTree ( CustomTreeWidgetItem * parentItem , QList<
 
         item->setData(st);
         item->setText(0, st->attributes.value("name")->asString());
-        item->setIcon(0, QIcon(":/SCFormView/statebutton.bmp"));
+        item->setIcon(0, QIcon(":/SCFormView/cardboardbox.png"));
         item->setExpanded(true);
 
         // get all substates of this state

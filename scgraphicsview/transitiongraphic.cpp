@@ -73,6 +73,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
        // _anchors[1]->setPos(mapFromScene(targetAnchor));
 
         LineSegmentGraphic* segment = new LineSegmentGraphic(_anchors[0], _anchors[1], this, _keyController);
+        segment->setZValue(_anchors[0]->zValue()-1);            // move the line segment behind its anchors
         segment->setAcceptHoverEvents(true);                    // allow the segment to be hovered
         segment->installSceneEventFilter(this);
 
@@ -1154,7 +1155,7 @@ void TransitionGraphic::createNewElbow()
 
     // create the new line segment that starts from the new elbow and goes to the old end
     LineSegmentGraphic* newLine = new LineSegmentGraphic(elbMid, elbEnd, this, _keyController);
-
+    newLine->setZValue(elbMid->zValue()-1); // set the line segment behind its elbow
     newLine->installSceneEventFilter(this);
     newLine->setAcceptHoverEvents(true);
 

@@ -137,7 +137,7 @@ public:
       *
       */
     void getAllStates(QList<SCState *> & stateList);
-
+    //QList<SCState*> getAllStates();
     /**
       * \fn getParentState
       * \brief Returns the QObject parent, cast as a state, or NULL if parent is not a state or no parent
@@ -207,6 +207,9 @@ signals:
      void sizeChangedInFormView(SCState*, QPointF);
 
      void changedParent(SCState*,SCState*);
+
+     void bringToFront(SCState*);
+     void sendToBack(SCState*);
 
 public slots:
 

@@ -306,7 +306,7 @@ void SCFormView::handleNewTransition(SCTransition* tr)
     // link the tree widget to the fv item, and set its text and icon
     item->setData(fvItem);
     item->setText(0, tr->attributes.value("event")->asString());
-    item->setIcon(0,QIcon(":/SCFormView/transitionbutton.bmp"));
+    item->setIcon(0,QIcon(":/SCFormView/rightarrowhollow.png"));
 
     // link the SCTransiton and FVItem
     _items.insert(tr, fvItem);
@@ -341,7 +341,7 @@ void SCFormView::handleNewState(SCState* st)
     item->setData(fvItem);
     item->setExpanded(true);
     item->setText(0, st->attributes.value("name")->asString());
-    item->setIcon(0,QIcon(":/SCFormView/statebutton.bmp"));
+    item->setIcon(0,QIcon(":/SCFormView/cardboardbox.png"));
 
     // link the SCState and FVItem
     _items.insert(st,fvItem);
@@ -897,7 +897,7 @@ void SCFormView::loadTreeState(CustomTreeWidgetItem * parentItem, QList<SCState*
         // set the data, text, and icon of the tree item
         //item->setData(st);
         item->setText(0, st->attributes.value("name")->asString());
-        item->setIcon(0,QIcon(":/SCFormView/statebutton.bmp"));
+        item->setIcon(0,QIcon(":/SCFormView/cardboardbox.png"));
 
         // link the SCState item and this tree widget item using a QHash
         SCItem* stateToItem = st;
@@ -966,7 +966,7 @@ void SCFormView::loadTreeTransition(CustomTreeWidgetItem * parentItem , QList<SC
        //item->setData(tr);
 
        item->setText(0, tr->attributes.value("event")->asString());
-       item->setIcon(0,QIcon(":/SCFormView/transitionbutton.bmp"));
+       item->setIcon(0,QIcon(":/SCFormView/rightarrowhollow.png"));
 
        // connect the transition and tree widget item to the hashtable
        _itemToTreeWidget.insert(tr, item);
@@ -1500,6 +1500,7 @@ void SCFormView::sendMessage(QString title, QString message)
 {
     // TODO check if anything is highlighted
     QMessageBox msgBox;
+
     msgBox.setWindowTitle(title);
     msgBox.setText(message);
     //msgBox.setDetailedText(message);
@@ -1508,6 +1509,9 @@ void SCFormView::sendMessage(QString title, QString message)
     msgBox.setDefaultButton(QMessageBox::Ok);
 
     msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    msgBox.move(160,200);
+    msgBox.resize(161,100);
+
     int ret = msgBox.exec();
 
     switch (ret)
@@ -1685,27 +1689,30 @@ void SCFormView::deleteItem()
 {
     // TODO check if anything is highlighted
     QMessageBox msgBox;
-    QString itemType = _currentlySelected->getType();
 
-    msgBox.setText("Confirm delete");
+
+    msgBox.setWindowTitle(" ");
 
     if(_currentlySelected->isState())
     {
-        msgBox.setInformativeText("Delete State: " + _currentlySelected->getState()->objectName() + " (" + itemType + ")");
+        msgBox.setText("Deleting \"" +  _currentlySelected->getState()->objectName()+"\"");
+
     }
     else if(_currentlySelected->isTransition())
     {
-        msgBox.setInformativeText("Are you sure you want to delete item: " + _currentlySelected->getTransition()->objectName() + " (" + itemType + ")");
+        msgBox.setText("Deleting \"" +_currentlySelected->getTransition()->objectName()+"\"");
     }
     else
     {
-        msgBox.setInformativeText("Delete Item?");
+        msgBox.setText("Deleting Selected Item");
     }
 
+    msgBox.setInformativeText("Are you sure?");
 
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setWindowFlags( Qt::WindowStaysOnTopHint);
+    msgBox.move(170,200);
     int ret = msgBox.exec();
 
     switch (ret)
@@ -1743,10 +1750,7 @@ void SCFormView::pointerGroupClicked(int)
 }
 
 
-void SCFormView::bringToFront()
-{
 
-}
 
 void SCFormView::reselectParent()
 {
@@ -1893,9 +1897,20 @@ void SCFormView::insertState()
     // SCState connects
 }
 
+void SCFormView::bringToFront()
+{
+    if(_currentlySelected->isState())
+    {
+        emit _currentlySelected->getState()->bringToFront(_currentlySelected->getState());
+    }
+}
+
 void SCFormView::sendToBack()
 {
-
+    if(_currentlySelected->isState())
+    {
+        emit _currentlySelected->getState()->sendToBack(_currentlySelected->getState());
+    }
 }
 
 /**
@@ -2360,19 +2375,19 @@ void SCFormView::createActions()
     propertyToolBar->addWidget(addPropertyToolButton);
     */
 
-    insertStateAction = new QAction(QIcon(":/SCFormView/statebutton.bmp"), tr("Insert State"), this);
+    insertStateAction = new QAction(QIcon(":/SCFormView/cardboardbox.png"), tr("Insert State"), this);
     insertStateAction->setShortcut(tr("Ctrl+I"));
     insertStateAction->setStatusTip(tr("Insert State"));
     connect(insertStateAction, SIGNAL(triggered()), this, SLOT(insertState()));
 
 
-    insertTransitionAction = new QAction(QIcon(":/SCFormView/transitionbutton.bmp"), tr("Insert Transition"), this);
+    insertTransitionAction = new QAction(QIcon(":/SCFormView/rightarrowhollow.png"), tr("Insert Transition"), this);
     insertTransitionAction->setShortcut(tr("Ctrl+I"));
     insertTransitionAction->setStatusTip(tr("Insert Transition"));
     connect(insertTransitionAction, SIGNAL(triggered()), this, SLOT(insertTransition()));
 
 
-    deleteAction = new QAction(QIcon(":/SCFormView/delete.png"), tr("&Delete"), this);
+    deleteAction = new QAction(QIcon(":/SCFormView/cancelw10.png"), tr("&Delete"), this);
     deleteAction->setShortcut(tr("Delete"));
     deleteAction->setStatusTip(tr("Delete item from diagram"));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
@@ -2382,14 +2397,14 @@ void SCFormView::createActions()
     reselectParentAction->setStatusTip(tr("Reselect a state's parent"));
     connect(reselectParentAction, SIGNAL(triggered()), this, SLOT(reselectParent()));
 
-    toFrontAction = new QAction(QIcon(":/SCFormView/bringtofront.png"),
+    toFrontAction = new QAction(QIcon(":/SCFormView/framein.png"),
                                 tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
     toFrontAction->setStatusTip(tr("Bring item to front"));
     connect(toFrontAction, SIGNAL(triggered()), this, SLOT(bringToFront()));
 
 
-    sendBackAction = new QAction(QIcon(":/SCFormView/sendtoback.png"),
+    sendBackAction = new QAction(QIcon(":/SCFormView/frameout.png"),
                                  tr("Send to &Back"), this);
     sendBackAction->setShortcut(tr("Ctrl+B"));
     sendBackAction->setStatusTip(tr("Send item to back"));
@@ -2430,12 +2445,12 @@ void SCFormView::createActions()
     insertTextBox->setStatusTip(tr("Insert a text box for the selected item"));
     connect(insertTextBox, SIGNAL(triggered()), this, SLOT(itemPromptTextBox()));
 
-    insertProperty = new QAction(QIcon(":/SCFormView/roundadd.png"), tr("Add Property"),this);
+    insertProperty = new QAction(QIcon(":/SCFormView/plusw10.png"), tr("Add Property"),this);
     insertProperty->setShortcut(tr("Ctrl+A"));
     insertProperty->setStatusTip(tr("Insert a property for the selected item"));
     connect(insertProperty, SIGNAL(triggered()), this, SLOT(itemPromptProperty()));
 
-    deleteProperty = new QAction(QIcon(":/SCFormView/roundminus.png"), tr("Remove Property"), this);
+    deleteProperty = new QAction(QIcon(":/SCFormView/minusw10.png"), tr("Remove Property"), this);
     deleteProperty->setShortcut(tr("Ctrl+A"));
     deleteProperty->setStatusTip(tr("Insert a property for the selected item"));
     connect(deleteProperty, SIGNAL(triggered()), this, SLOT(itemDeleteSelectedProperty()));

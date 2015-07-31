@@ -539,17 +539,43 @@ void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
     //SCTextBlock* textBlock = new SCTextBlock();
 }
 
-/*
-void SCGraphicsView::connectState(SCState* state)
+void SCGraphicsView::handleBringToFront(SCState* state)
 {
-    // connect formview and graphics view to update the graphics view if the box is changed by property value
-    connect(state, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
-    //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
-    //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
 
-    //connect(state, SIGNAL(attributeChangedSignal(IAttribute*), ))
+    SCState* top = _dm->getTopState();
+    QList<SCState*> children;
+    top->getAllStates(children);
+    qreal zMax = 0;
+    for(int i = 0; i < children.size(); i++)
+    {
+        StateBoxGraphic* child = _hashStateToGraphic.value(children.at(i));
+        if(zMax < child->zValue())
+        {
+            zMax = child->zValue();
+        }
+    }
+    StateBoxGraphic* sbg = _hashStateToGraphic.value(state);
+    sbg->setZValue(zMax+1);
 }
-*/
+
+void SCGraphicsView::handleSendToBack(SCState* state)
+{
+    SCState* top = _dm->getTopState();
+    QList<SCState*> children;
+    top->getAllStates(children);
+    qreal zMin = std::numeric_limits<double>::max();
+    for(int i = 0; i < children.size(); i++)
+    {
+        StateBoxGraphic* child = _hashStateToGraphic.value(children.at(i));
+        if(zMin > child->zValue())
+        {
+            zMin = child->zValue();
+        }
+    }
+    StateBoxGraphic* sbg = _hashStateToGraphic.value(state);
+    sbg->setZValue(zMin-1);
+}
+
 
 /**
  * @brief SCGraphicsView::connectState
@@ -566,7 +592,8 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
     connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 
     connect(state, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*, SCState*)));
-
+    connect(state, SIGNAL(bringToFront(SCState*)), this, SLOT(handleBringToFront(SCState*)));
+    connect(state, SIGNAL(sendToBack(SCState*)), this, SLOT(handleSendToBack(SCState*)));
 
     SizeAttribute* size = state->getSizeAttr();
     connect(size, SIGNAL(changed(SizeAttribute*)), stateGraphic, SLOT(handleAttributeChanged(SizeAttribute*)));

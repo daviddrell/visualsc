@@ -75,6 +75,8 @@ private slots:
     void handleMakeTransitionConnections(SCTransition*);
     void handleNewTransitionFormView(SCTransition* t);
     void handleChangedParent(SCState* state, SCState* newParent);
+    void handleBringToFront(SCState* state);
+    void handleSendToBack(SCState* state);
 
 private:
 

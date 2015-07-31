@@ -19,5 +19,15 @@
         <file>leftarrow.png</file>
         <file>roundminus.png</file>
         <file>family.png</file>
+        <file>rightarrow.png</file>
+        <file>cancel.png</file>
+        <file>cardboardbox.png</file>
+        <file>rightarrowhollow.png</file>
+        <file>deletesign.png</file>
+        <file>cancelw10.png</file>
+        <file>minusw10.png</file>
+        <file>plusw10.png</file>
+        <file>framein.png</file>
+        <file>frameout.png</file>
     </qresource>
 </RCC>
