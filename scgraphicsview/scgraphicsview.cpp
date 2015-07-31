@@ -565,6 +565,9 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
     connect(state, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
     connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 
+    connect(state, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*, SCState*)));
+
+
     SizeAttribute* size = state->getSizeAttr();
     connect(size, SIGNAL(changed(SizeAttribute*)), stateGraphic, SLOT(handleAttributeChanged(SizeAttribute*)));
 
@@ -632,6 +635,15 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
         connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
         grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
     }
+}
+
+void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
+{
+    StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
+    StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
+
+    stateGraphic->setParentItem(newParentGraphic);
+
 }
 
 /**

@@ -94,6 +94,40 @@ IAttributeContainer* FVItem::getTextBlockAttributes()
     }
 }
 
+QString FVItem::getType()
+{
+    if(isState())
+    {
+        return "state";
+    }
+    else if(isTransition())
+    {
+        return "transition";
+    }
+    else
+    {
+        qDebug() << "FVItem::getType() ERROR unknown type";
+        return "unknown";
+    }
+}
+
+QString FVItem::getTitle()
+{
+    if(isState())
+    {
+        return getState()->getStateNameAttr()->asString();
+    }
+    else if(isTransition())
+    {
+        return getTransition()->getTransStringAttr("event")->asString();
+    }
+    else
+    {
+        qDebug() << "FVItem::getTitle() ERROR unknown type";
+        return "unknown";
+    }
+}
+
 
 bool FVItem::isState()
 {

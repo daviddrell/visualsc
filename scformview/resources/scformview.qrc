@@ -18,5 +18,6 @@
         <file>textbox.png</file>
         <file>leftarrow.png</file>
         <file>roundminus.png</file>
+        <file>family.png</file>
     </qresource>
 </RCC>

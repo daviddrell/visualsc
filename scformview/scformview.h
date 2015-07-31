@@ -112,6 +112,10 @@ private slots:
     void handleFontChange();
     void handleBoldChanged();
 
+    void reselectParent();
+    void handleReselectParent(SCState*);
+    void handleChangedParent(SCState* ,SCState*);
+
     void about();
 
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
@@ -122,7 +126,8 @@ private slots:
     void handleTextBlockDeleted(QObject*);
     void handlePropertyChanged(IAttribute * attr);
     void handlePropertyCellChanged(int, int);
-    void handleStateSelectionWindowStateSelected(SCState *st, QString name);
+    void handleStateSelectionWindowStateSelected(SCState *st);
+
 
     void setSelectedTreeItem(QObject *);
 
@@ -177,8 +182,8 @@ private:
     //IAttributeContainer * getCurrentlySelectedTextBlockAttributes();
     //IAttributeContainer * getPreviouslySelectedTextBlockAttributes();
 
-    QString               getCurrentlySelectedTitle();
-    QString               getCurrentlySelectedType();
+    //QString               getCurrentlySelectedTitle();
+    //QString               _currentlySelected->getType();
     QObject*              getNeighborState(QObject*s);
 
     void createToolBox();
@@ -229,6 +234,7 @@ private:
     QAction *insertTransitionAction;
     QAction *insertStateAction;
     QAction *aboutAction;
+    QAction *reselectParentAction;
 
 
     QMenu *fileMenu;

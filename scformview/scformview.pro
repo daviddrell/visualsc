@@ -60,3 +60,6 @@ SOURCES += \
 
 RESOURCES += \
     resources/scformview.qrc
+
+DISTFILES += \
+    resources/family.png

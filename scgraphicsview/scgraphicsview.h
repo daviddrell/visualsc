@@ -74,6 +74,7 @@ private slots:
     void handleStateSizeChangedInFormView(SCState* state, QPointF size);
     void handleMakeTransitionConnections(SCTransition*);
     void handleNewTransitionFormView(SCTransition* t);
+    void handleChangedParent(SCState* state, SCState* newParent);
 
 private:
 

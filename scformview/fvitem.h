@@ -34,6 +34,9 @@ public:
     SCTransition* getTransition();
     SCItem* getItem();
 
+    QString getType();
+    QString getTitle();
+
     IAttributeContainer* getAttributes();
     IAttributeContainer* getTextBlockAttributes();
 

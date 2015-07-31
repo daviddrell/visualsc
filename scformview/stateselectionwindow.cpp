@@ -52,7 +52,10 @@ StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
 
 
     loadTree (NULL, states);
+    this->setWindowTitle("Select A Target State");
     this->resize(402,650);
+    this->move(315,45);
+
 }
 
 
@@ -64,17 +67,16 @@ void StateSelectionWindow::handleDoneButtonPushed()
 
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
     qDebug() << "the currently selected state is: " << st->attributes.value("name")->asString();
-    emit stateSelected (st,  st->attributes.value("name")->asString());
+    emit stateSelected(st);
 }
 
 
 // recursively walk through the state tree and build the tree view
-
+// NOT CURRENTLY IN USE
+// deprecated function, replaced by loadTreeState
 void StateSelectionWindow::loadTree ( CustomTreeWidgetItem * parentItem , QList<SCState*> & states)
 {
-
     int c = states.count();
-
     for(int i = 0; i < c; i++)
     {
         SCState * st = states.at(i);
@@ -94,25 +96,17 @@ void StateSelectionWindow::loadTree ( CustomTreeWidgetItem * parentItem , QList<
         }
 
 
-        item->setData( st);
-
+        item->setData(st);
         item->setText(0, st->attributes.value("name")->asString());
-
-        item->setIcon(0,QIcon(":/SCFormView/statebutton.bmp"));
-
+        item->setIcon(0, QIcon(":/SCFormView/statebutton.bmp"));
         item->setExpanded(true);
+
         // get all substates of this state
         QList<SCState*> subStates;
-
         st->getStates(subStates);
-
         loadTree (item, subStates);
-
     }
-
 }
-
-
 
 void StateSelectionWindow::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int )
 {
@@ -124,58 +118,4 @@ void StateSelectionWindow::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int 
 
     SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
     _TargetLabel->setText( st->attributes.value("name")->asString());
-
-#if 0
-    // load the Title
-
-    QString selectedItemTitle = getCurrentlySelectedType()  + " : " +  getCurrentlySelectedTitle();
-
-    selectedChartItem->setText(selectedItemTitle );
-
-
-    // clear the tabel, delete the old table items
-    for (int r =0; r <propertyTable->rowCount(); r++ )
-    {
-        QTableWidgetItem * item = propertyTable->itemAt(r,0);
-        delete item;
-        item = propertyTable->itemAt(r,1);
-        delete item;
-    }
-
-    propertyTable->clear();
-
-
-    // load the new attributes
-
-    IAttributeContainer * attributes =  getCurrentlySelectedAttributes();
-
-
-    disconnect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
-
-    propertyTable->setRowCount(attributes->count());
-
-    QMapIterator<QString,IAttribute*> i(*attributes);
-    while (i.hasNext())
-    {
-        QString key  = i.next().key();
-        IAttribute* attr = attributes->value(key)  ;
-
-        connect ( attr, SIGNAL(changed(IAttribute*)), this, SLOT(handlePropertyChanged(IAttribute*)));
-
-        QTableWidgetItem * propName = new QTableWidgetItem(key);
-
-        propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
-
-        QTableWidgetItem * propValue = new QTableWidgetItem(attr->asString());
-
-        propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
-
-        propertyTable->setItem(row, 0, propName);
-        propertyTable->setItem(row++, 1, propValue);
-
-    }
-
-    connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
-
-#endif
 }

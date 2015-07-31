@@ -133,6 +133,13 @@ void SCState::initCommon()
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
 }
 
+void SCState::reselectParent(SCState* newParent)
+{
+    qDebug() << "SCState::reselectParent";
+    emit changedParent(this, newParent);
+    setParent(newParent);
+}
+
 /**
  * @brief SCState::setText
  * @param text

@@ -97,6 +97,7 @@ public:
     void removeTargetsTransitionIn();
     void removeSourcesTransitionOut();
 
+    void reselectParent(SCState* target);
 
     QList<SCTransition*> getTransitionsIn();
     QList<SCTransition*> getTransitionsTerminating();
@@ -205,6 +206,7 @@ signals:
      void positionChangedInFormView(SCState*, QPointF);
      void sizeChangedInFormView(SCState*, QPointF);
 
+     void changedParent(SCState*,SCState*);
 
 public slots:
 

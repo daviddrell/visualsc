@@ -35,6 +35,7 @@ public:
 
 signals:
     void stateSelected(SCState *state, QString name);
+    void stateSelected(SCState* state);
 
 private: // methods
 
