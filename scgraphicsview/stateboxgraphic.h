@@ -126,8 +126,9 @@ public:
 public slots:
     void handleTransitionLineStartMoved(QPointF newPos);
     void handleTransitionLineEndMoved(QPointF newPos);
-    void handleAttributeChanged(SizeAttribute*);
     void handleIsParallelStateChanged(IAttribute*);
+    void handleAttributeChanged(SizeAttribute*);
+    void handleAttributeChanged(PositionAttribute* pos);
 
 
 private:

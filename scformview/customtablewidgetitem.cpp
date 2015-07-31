@@ -2,8 +2,7 @@
 #include <QDebug>
 
 CustomTableWidgetItem::CustomTableWidgetItem(QString text):
-    QTableWidgetItem(text),
-    QObject()
+    QTableWidgetItem(text)
 {
 
 }
@@ -33,3 +32,14 @@ void CustomTableWidgetItem::handleAttributeChanged(TransitionStringAttribute* ts
 {
     setText(tsa->asString());
 }
+
+/*
+void CustomTableWidgetItem::setText(const QString &text)
+{
+    if(text != this->text())
+    {
+        QTableWidgetItem::setText(text);
+        emit textChanged(text);
+    }
+}
+*/

@@ -131,7 +131,7 @@ signals:
     void newTransitionSignal(SCTransition * newTransition);
     void newTextBlockSignal(SCTransition*, QString);
     void transitionsReadyToConnect(SCTransition*);
-    void formViewInsertNewTransitionSignal(SCTransition*);
+    void insertNewTransitionSignal(SCTransition*);
 
 
 private slots:

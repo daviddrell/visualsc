@@ -17,6 +17,10 @@ class CustomTableWidgetItem : public QObject, public QTableWidgetItem
 public:
     CustomTableWidgetItem(QString);
     ~CustomTableWidgetItem();
+    //void setText(const QString &text);
+
+signals:
+    void textChanged(QString);
 
 public slots:
     void handleAttributeChanged(SizeAttribute*);

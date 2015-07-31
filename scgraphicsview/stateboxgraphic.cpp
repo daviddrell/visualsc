@@ -467,6 +467,13 @@ void StateBoxGraphic::handleAttributeChanged(SizeAttribute* size)
     setSizeAndUpdateAnchors(sz);
 }
 
+void StateBoxGraphic::handleAttributeChanged(PositionAttribute* pos)
+{
+    qDebug() << "StateBoxGraphic::handleAttributeChanged position attr";
+    setPosAndUpdateAnchors(pos->asPointF());
+}
+
+
 /**
  * @brief StateBoxGraphic::returnClosestWallFace
  * @param newPos

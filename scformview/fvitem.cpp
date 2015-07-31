@@ -62,6 +62,38 @@ SCItem* FVItem::getItem()
     return _item;
 }
 
+IAttributeContainer* FVItem::getAttributes()
+{
+    if(isState())
+    {
+        return &getState()->attributes;
+    }
+    else if(isTransition())
+    {
+        return &getTransition()->attributes;
+    }
+    else
+    {
+        qDebug() << "FVItem::getAttributes ERROR unexpected type";
+    }
+}
+
+IAttributeContainer* FVItem::getTextBlockAttributes()
+{
+    if(isState())
+    {
+        return &getState()->getIDTextBlock()->attributes;
+    }
+    else if(isTransition())
+    {
+        return &getTransition()->getEventTextBlock()->attributes;
+    }
+    else
+    {
+        qDebug() << "FVItem::getTextBlockAttributes ERROR unexpected type";
+    }
+}
+
 
 bool FVItem::isState()
 {

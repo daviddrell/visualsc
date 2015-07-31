@@ -371,8 +371,6 @@ void SCDataModel::openFile(QString fileName)
        {
            // alert the graphics view and formview that the transition is ready to set up its connections
            emit transitionsReadyToConnect(_transitions.at(i));
-
-
        }
     }
 
@@ -1066,12 +1064,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
 
     qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
 
-
-    //connect(transition,SIGNAL((SCState*,QString)), this,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
-    //emit newTransitionSignal(transition);   // connected to scgraphics view's handleNewTransition and scformview's handle new transition
-    //emit transitionsReadyToConnect(transition);
-    emit formViewInsertNewTransitionSignal(transition);
-
+    emit insertNewTransitionSignal(transition);
     return transition;
 }
 

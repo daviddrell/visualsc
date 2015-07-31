@@ -2,6 +2,7 @@
 #define FVITEM_H
 
 #include <QObject>
+#include <QDebug>
 #include "scstate.h"
 #include "sctransition.h"
 #include "customtreewidgetitem.h"
@@ -33,6 +34,8 @@ public:
     SCTransition* getTransition();
     SCItem* getItem();
 
+    IAttributeContainer* getAttributes();
+    IAttributeContainer* getTextBlockAttributes();
 
 
 protected:

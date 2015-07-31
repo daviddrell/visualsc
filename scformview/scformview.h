@@ -163,17 +163,19 @@ private:
     void connectState(SCState*);
     void connectState(SCState *, CustomTableWidgetItem*);
     void connectState(SCState*, CustomTableWidgetItem*, QString);
+    void connectState(SCState*, CustomTreeWidgetItem*);
 
 
     void connectTransition(SCTransition*);
     void connectTransition(SCTransition *, CustomTableWidgetItem*, QString);
+    void connectTransition(SCTransition*,CustomTreeWidgetItem*);
 
 
-    IAttributeContainer * getCurrentlySelectedAttributes();
-    IAttributeContainer * getPreviouslySelectedAttributes();
+    //IAttributeContainer * getCurrentlySelectedAttributes();
+    //IAttributeContainer * getPreviouslySelectedAttributes();
 
-    IAttributeContainer * getCurrentlySelectedTextBlockAttributes();
-    IAttributeContainer * getPreviouslySelectedTextBlockAttributes();
+    //IAttributeContainer * getCurrentlySelectedTextBlockAttributes();
+    //IAttributeContainer * getPreviouslySelectedTextBlockAttributes();
 
     QString               getCurrentlySelectedTitle();
     QString               getCurrentlySelectedType();

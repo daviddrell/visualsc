@@ -52,10 +52,15 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
 
 
 
-    connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
-    connect(_dm , SIGNAL(transitionsReadyToConnect(SCTransition*)),this,SLOT(handleMakeTransitionConnections(SCTransition*)));
-    connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
-    connect(_dm, SIGNAL(formViewInsertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransitionFormView(SCTransition*)));
+    // generic add state
+    connect(_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
+
+    // reading transitions from scxml file
+    connect(_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
+    connect(_dm, SIGNAL(transitionsReadyToConnect(SCTransition*)),this,SLOT(handleMakeTransitionConnections(SCTransition*)));
+
+    // user inserts a new transition
+    connect(_dm, SIGNAL(insertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransitionFormView(SCTransition*)));
 
     //connect(_dm, SIGNAL(newTextBlockSignal(SCTransition*,QString)), this, SLOT(handleNewTextBlock(SCTransition,QString)));
 
@@ -346,7 +351,7 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
  * @brief SCGraphicsView::handleNewTransition
  * @param t
  *
- * Creation of a new transition graphic from the user creating a new transition or a transition being loaded in from the scxml file.
+ * Creation of a new transition graphic from a transition being loaded from the scxml file.
  * differs from the handleNewTransitionFormView in that this transition may not necessarily know its target state when it is created, so the connectTransition function to set up the connect()s is called after all states have been loaded
  */
 void SCGraphicsView::handleNewTransition (SCTransition * t)
@@ -372,15 +377,15 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     // add the transitiongraphic to the map of transition graphics
     _mapTransitionToGraphic.insert(t, transGraphic);
     _hashTransitionToGraphic.insert(t, transGraphic);
+
     // set the text position of the event attribute
     PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
     qDebug()<< "handle new transition text pos: " << textPos->asPointF();
     transGraphic->setTextPos(textPos->asPointF());
 
+    // wait to do connect calls
 
     qDebug()<<"SCGraphicsView::handleNewTransition inserted a new transition graphic with event name: " << t->attributes.value("event");
-
-
 }
 
 /**
@@ -531,7 +536,7 @@ void SCGraphicsView::handleStateSizeChangedInFormView(SCState *state, QPointF si
  */
 void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
 {
-    SCTextBlock* textBlock = new SCTextBlock();
+    //SCTextBlock* textBlock = new SCTextBlock();
 }
 
 /*
@@ -545,14 +550,26 @@ void SCGraphicsView::connectState(SCState* state)
     //connect(state, SIGNAL(attributeChangedSignal(IAttribute*), ))
 }
 */
+
+/**
+ * @brief SCGraphicsView::connectState
+ * @param state
+ * @param stateGraphic
+ *
+ * sets the connections for the SCState and its graphic whenever a new state is created
+ *
+ */
 void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 {
     qDebug() << "SCGraphicsView::connectState";
     connect(state, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
     connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 
-    SizeAttribute* size = dynamic_cast<SizeAttribute*>(state->attributes.value("size"));
+    SizeAttribute* size = state->getSizeAttr();
     connect(size, SIGNAL(changed(SizeAttribute*)), stateGraphic, SLOT(handleAttributeChanged(SizeAttribute*)));
+
+    PositionAttribute* pos = state->getPosAttr();
+    connect(pos, SIGNAL(changed(PositionAttribute*)), stateGraphic, SLOT(handleAttributeChanged(PositionAttribute*)));
 
     //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
     //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
@@ -592,14 +609,8 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
 
     // do this to set closest wall from default
-
-
-        emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
-        emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
-
-
-
-
+    emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
+    emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
 
 
     // create the connect to automatically move anchor elbows when state graphics are moved.
@@ -618,12 +629,9 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     StateBoxGraphic* grandParentTargetGraphic = targetGraphic->parentItemAsStateBoxGraphic();
     while(grandParentTargetGraphic)
     {
-
         connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
         grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
     }
-
-
 }
 
 /**

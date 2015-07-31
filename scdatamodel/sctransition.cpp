@@ -60,8 +60,6 @@ SCTransition::SCTransition(QObject * parent):
 
 
 
-    _eventTextBlock->setParent(this);
-    _eventTextBlock->setText("event");  // default event text
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
     connect(event, SIGNAL(changed(TransitionStringAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
@@ -81,7 +79,9 @@ SCTransition::SCTransition(QObject * parent):
     attributes.addItem(position);
 */
 
-
+    // set the event sctextblock's parent
+    _eventTextBlock->setParent(this);
+    //_eventTextBlock->setText("event");  // default event text
 }
 
 SCTransition::~SCTransition()
@@ -110,10 +110,8 @@ void SCTransition::setText(QString eventText)
 /**
  * @brief SCTransition::handleTextBlockChanged
  *
- * SLOT
  *
- * signal
- * connect in scformview
+ * when the textblock is changed through the graphics view, use set EventName to set the object name and attribute value for the event of this transition
  *
  */
 void SCTransition::handleTextBlockChanged()
@@ -123,6 +121,12 @@ void SCTransition::handleTextBlockChanged()
 
 }
 
+/**
+ * @brief SCTransition::setEventName
+ * @param text
+ *
+ * called by scformview when the property table is changed for a transition's event name
+ */
 void SCTransition::setEventName(QString text)
 {
     this->setObjectName(text);

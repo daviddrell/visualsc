@@ -60,3 +60,13 @@ QObject * CustomTreeWidgetItem::data()
 {
     return  _stateOrTransitionItem ;
 }
+
+void CustomTreeWidgetItem::handleAttributeChanged(StateName* sn)
+{
+    this->setText(0, sn->asString());
+}
+
+void CustomTreeWidgetItem::handleAttributeChanged(TransitionStringAttribute* tsa)
+{
+    this->setText(0, tsa->asString());
+}
