@@ -59,12 +59,19 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     //connect(_stateModel, SIGNAL(positionChanged()))
 
+    //connect(, SIGNAL(textBlockGraphicChanged()), this, SLOT(handleTextBlockGraphicChanged()));
+
 }
 
 
 StateBoxGraphic::~StateBoxGraphic()
 {
-    qDebug () << "stateboxgraphic deconstructor:";
+    //qDebug () << "stateboxgraphic deconstructor:";
+}
+
+void StateBoxGraphic::handleTextBlockGraphicChanged()
+{
+
 }
 
 void StateBoxGraphic::handleIsParallelStateChanged(IAttribute*attr)

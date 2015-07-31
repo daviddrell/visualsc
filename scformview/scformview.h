@@ -126,6 +126,7 @@ private slots:
     void handleTextBlockDeleted(QObject*);
     void handlePropertyChanged(IAttribute * attr);
     void handlePropertyCellChanged(int, int);
+    void handleTextBlockPropertyCellChanged(int,int);
     void handleStateSelectionWindowStateSelected(SCState *st);
 
 
@@ -170,6 +171,7 @@ private:
     void connectState(SCState*, CustomTableWidgetItem*, QString);
     void connectState(SCState*, CustomTreeWidgetItem*);
 
+    void connectTextBlock(SCTextBlock*, CustomTableWidgetItem*, QString);
 
     void connectTransition(SCTransition*);
     void connectTransition(SCTransition *, CustomTableWidgetItem*, QString);

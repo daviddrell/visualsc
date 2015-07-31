@@ -31,6 +31,10 @@ public:
     void    setText(QString);
     void writeSCVXML(QXmlStreamWriter & sw);
 
+    SizeAttribute* getSizeAttr();
+    PositionAttribute* getPosAttr();
+
+
 public slots:
     void handleAttributeChanged(IAttribute *attr);
     void handleAttributeChanged(StateName*);

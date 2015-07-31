@@ -1,6 +1,6 @@
 
 #include "positionattribute.h"
-
+#include <QDebug>
 
 PositionAttribute::PositionAttribute() :IAttribute( ), _position()
 {
@@ -74,6 +74,7 @@ void PositionAttribute::setValue(const QPointF nPosition)
     if ( nPosition != _position )
     {
         _position = nPosition;
+        qDebug() << "pos attr emit changed";
         emit changed(this);
     }
 }

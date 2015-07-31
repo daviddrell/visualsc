@@ -129,6 +129,7 @@ public slots:
     void handleIsParallelStateChanged(IAttribute*);
     void handleAttributeChanged(SizeAttribute*);
     void handleAttributeChanged(PositionAttribute* pos);
+    void handleTextBlockGraphicChanged();
 
 
 private:

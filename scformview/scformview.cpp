@@ -19,6 +19,11 @@
 */
 
 #include "scformview.h"
+#include "fvstate.h"
+#include "customtreewidgetitem.h"
+#include "stateselectionwindow.h"
+#include "textblock.h"
+#include "scitem.h"
 #include <QHBoxLayout>
 #include <QTableWidget>
 #include <QVariant>
@@ -26,9 +31,6 @@
 #include <QLabel>
 #include <QList>
 #include <QVariant>
-#include "customtreewidgetitem.h"
-#include "stateselectionwindow.h"
-#include "textblock.h"
 #include <QToolBar>
 #include <QMessageBox>
 #include <QAction>
@@ -38,10 +40,8 @@
 #include <QButtonGroup>
 #include <QSignalMapper>
 #include <QTreeWidgetItemIterator>
-#include "scitem.h"
 #include <QHash>
 #include <QDebug>
-#include "fvstate.h"
 
 
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
@@ -441,6 +441,111 @@ void SCFormView::deleteTreeItem(SCItem* item)
     //delete treeWidget;
 }
 
+
+void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
+{
+    qDebug() << "SCFormView::handleTextBlockPropertyCellChanged";
+
+    // only proecss changes from the second column
+    if(c!=1)
+        return;
+
+    SCTextBlock* tb;
+    if(_currentlySelected->isState())
+    {
+        tb = _currentlySelected->getState()->getIDTextBlock();
+    }
+    else if(_currentlySelected->isTransition())
+    {
+        tb = _currentlySelected->getTransition()->getEventTextBlock();
+    }
+    else
+    {
+        qDebug() << "UNKNOWN type given";
+        return;
+    }
+
+    QString key = textBlockPropertyTable->item(r,0)->text();
+    QString value = textBlockPropertyTable->item(r,1)->text();
+    qDebug() << "key is : " << key;
+    if(key == "size")
+    {
+
+        bool failed = false;
+        QStringList xy = value.split(",");
+
+        if(xy.count()==2)
+        {
+            QString xStr = xy.at(0);
+            QString yStr = xy.at(1);
+            bool xConfirm;
+            bool yConfirm;
+
+            int x = xStr.toInt(&xConfirm);
+            int y = yStr.toInt(&yConfirm);
+
+            if(xConfirm && yConfirm && x>0 && y>0)
+            {
+               // qDebug() << "xy: " << x<< " " << y;
+                QPointF point(x,y);
+
+                SizeAttribute* size = tb->getSizeAttr();
+                size->setValue(point);
+                //qDebug() << "SETTING SIZE OF TEXTBLOCK!!";
+            }
+            else
+                failed = true;
+        }
+        else
+            failed = true;
+
+        // improper input handler
+        if(failed)
+        {
+            textBlockPropertyTableSetText(textBlockPropertyTableIndexOf("size"), tb->getSizeAttr()->asString());
+            sendMessage("Invalid Size","Please enter width and height \"w,h\"");
+        }
+
+
+    }
+    else if(key =="position")
+    {
+        bool failed = false;
+        QStringList xy = value.split(",");
+
+        if(xy.count()==2)
+        {
+            QString xStr = xy.at(0);
+            QString yStr = xy.at(1);
+            bool xConfirm;
+            bool yConfirm;
+
+            int x = xStr.toInt(&xConfirm);
+            int y = yStr.toInt(&yConfirm);
+
+            if(xConfirm && yConfirm)
+            {
+                //qDebug() << "xy: " << x<< " " << y;
+                QPointF point(x,y);
+
+                tb->getPosAttr()->setValue(point);
+                //qDebug()<<"SETTING POS OF TEXgtLBOCK!";
+
+            }
+            else
+                failed = true;
+        }
+        else
+            failed = true;
+
+        if(failed)
+        {
+            textBlockPropertyTableSetText(textBlockPropertyTableIndexOf("position"), tb->getPosAttr()->asString());
+            sendMessage("Invalid Position","Please enter coordinates: \"x,y\"");
+        }
+    }
+}
+
 /**
  * @brief SCFormView::handlePropertyCellChanged
  * @param r
@@ -463,6 +568,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
 {
     qDebug() << "SCFormView::handle PropertyCellChanged type is " << _currentlySelected->getType();
 
+    // only process the second column
     if ( c != 1 ) return;
 
     // first determine item type, then determine which property type was changed
@@ -778,6 +884,17 @@ QObject* SCFormView::getNeighborState(QObject*s)
     return prev;
 }
 
+void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem *tableItem, QString key)
+{
+    if(key=="size")
+    {
+        connect(textBlock->getSizeAttr(), SIGNAL(changed(SizeAttribute*)), tableItem, SLOT(handleAttributeChanged(SizeAttribute*)));
+    }
+    else if(key == "position")
+    {
+        connect(textBlock->getPosAttr(), SIGNAL(changed(PositionAttribute*)), tableItem, SLOT(handleAttributeChanged(PositionAttribute*)));
+    }
+}
 
 /**
  * @brief SCFormView::connectState
@@ -1073,7 +1190,7 @@ void SCFormView::setAttributeConnections(IAttributeContainer * atts, bool should
     if(shouldConnect)
     {
 
-        qDebug() << "connecting state " << _currentlySelected->getState()->getStateNameAttr()->asString();
+        //qDebug() << "connecting state " << _currentlySelected->getState()->getStateNameAttr()->asString();
 
         int row = 0;
         QMapIterator<QString,IAttribute*> i(*atts);
@@ -1156,7 +1273,14 @@ void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, boo
 
             textBlockPropertyTable->setItem(row, 0, propName);
             textBlockPropertyTable->setItem(row++, 1, propValue);
-
+            if(_currentlySelected->isState())
+            {
+                connectTextBlock(_currentlySelected->getState()->getIDTextBlock(), propValue, key);
+            }
+            else if(_currentlySelected->isTransition())
+            {
+                connectTextBlock(_currentlySelected->getTransition()->getEventTextBlock(), propValue, key);
+            }
         }
     }
     else
@@ -1218,7 +1342,7 @@ void SCFormView::clearTextBlockPropertyTable()
         delete item;
     }
     textBlockPropertyTable->clear();
-    disconnect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)),this, SLOT(handlePropertyCellChanged(int,int)));
+    disconnect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)),this, SLOT(handleTextBlockPropertyCellChanged(int,int)));
 }
 
 /**
@@ -1289,6 +1413,9 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
     // set up the text block property table with the attributes of the text block
     textBlockPropertyTable->setRowCount(currentAttributes->count());
     setTextBlockAttributeConnections(currentAttributes, true);
+
+    // watch for user changes to the attributes from the property table
+    connect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handleTextBlockPropertyCellChanged(int,int)));
 }
 
 /**
@@ -1351,11 +1478,15 @@ void SCFormView::reloadPropertyTable()
 
 
 
-// TODO marked for deletion, currently not used. replaced this function with multiple functions depending on SCItem and the property changed as it was too generic and we needed to be able to identify which SCItem actually changed its property
+
 /**
  * @brief SCFormView::handlePropertyChanged
  * When a property change is detected from the FormView's cell or the GraphicsView, update the attribute value
  * @param attr
+ *
+ *
+ * // TODO marked for deletion, currently not used. replaced this function with multiple functions depending on SCItem and the property changed as it was too generic and we needed to be able to identify which SCItem actually changed its property
+ *
  */
 void SCFormView::handlePropertyChanged(IAttribute *attr)
 {
@@ -2617,13 +2748,7 @@ void SCFormView::createToolbars()
     pointerToolbar->addWidget(pointerButton);
     pointerToolbar->addWidget(linePointerButton);
     pointerToolbar->addWidget(sceneScaleCombo);
-
-
 }
-
-
-
-
 
 QMenu *SCFormView::createColorMenu(const char *slot, QColor defaultColor)
 {

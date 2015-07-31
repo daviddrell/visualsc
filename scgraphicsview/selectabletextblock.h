@@ -54,6 +54,7 @@ private slots:
     void handleTextChanged();
     void handleAttributeChanged(IAttribute *attr);
     void handleAttributeChanged(SizeAttribute *attr);
+    void handleAttributeChanged(PositionAttribute* attr);
     void handleAttributeAdded(IAttribute *attr);
     void handleAttributeDeleted(IAttribute *attr);
     void handleEditBoxSavedText(QString text);

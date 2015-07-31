@@ -70,6 +70,8 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     connect ( & _textBlockModel->attributes,SIGNAL(attributeDeleted(IAttribute*)), SLOT(handleAttributeDeleted(IAttribute*)), Qt::QueuedConnection );
 
     qDebug() << "SelectableTextBLock::connectAttributes!";
+
+    // connect the data model attributes to handlers for the graphics object
     connectAttributes( & _textBlockModel->attributes );
 
 }
@@ -182,7 +184,7 @@ void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)
     PositionAttribute * position =dynamic_cast<PositionAttribute*> ( attributes->value("position"));
     if  (position)
     {
-        connect (position, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)), Qt::QueuedConnection);
+        connect (position, SIGNAL(changed(PositionAttribute*)), this, SLOT(handleAttributeChanged(PositionAttribute*)), Qt::QueuedConnection);
         handleAttributeChanged(position);
     }
 
@@ -203,6 +205,13 @@ void SelectableTextBlock::handleAttributeChanged(SizeAttribute* size)
     this->setSize(pt);
 
     qDebug()<<"SelectableTextBlock::handleAttributeChanged Size Attribute ("+  _textBlockModel->getText()+") setting size = (" +QString::number(pt.x())+","+QString::number(pt.y())+")";
+}
+
+void SelectableTextBlock::handleAttributeChanged(PositionAttribute* pos)
+{
+    QPointF ps = pos->asPointF();
+    qDebug()<<"SelectableTextBlock::handleAttributeChanged ("+  _textBlockModel->getText()+") setting position = (" +QString::number(ps.x())+","+QString::number(ps.y())+")";
+    SelectableBoxGraphic::setPos(ps);
 }
 
 /**
@@ -300,7 +309,6 @@ void SelectableTextBlock::graphicHasChanged()
     qDebug() << "selectable textblock graphic has changed.";
 
     QPointF sz =this->getSize();
-
     QPointF ps = this->pos();
 
     SizeAttribute * size         = dynamic_cast<SizeAttribute *> ( _textBlockModel->attributes["size"]);

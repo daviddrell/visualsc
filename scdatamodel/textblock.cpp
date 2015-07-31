@@ -43,6 +43,16 @@ SCTextBlock::SCTextBlock(): SCItem()
     connect(sa, SIGNAL(changed(IAttribute*)), this, SLOT(handleAttributeChanged(IAttribute*)));
 }
 
+SizeAttribute* SCTextBlock::getSizeAttr()
+{
+    return dynamic_cast<SizeAttribute*>(attributes.value("size"));
+}
+
+PositionAttribute* SCTextBlock::getPosAttr()
+{
+    return dynamic_cast<PositionAttribute*>(attributes.value("position"));
+}
+
 IAttributeContainer * SCTextBlock::getAttributes()
 {
     return & attributes;
