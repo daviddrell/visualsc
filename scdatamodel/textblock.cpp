@@ -4,6 +4,11 @@
 #include "sizeattribute.h"
 #include <QDebug>
 
+#define TEXTBLOCK_DEFAULT_WIDTH     150
+#define TEXTBLOCK_DEFAULT_HEIGHT    40
+#define TEXTBLOCK_DEFAULT_X         10
+#define TEXTBLOCK_DEFAULT_Y         10
+
 SCTextBlock::SCTextBlock(): SCItem()
 {
     FontFamilyAttribute * ff = new FontFamilyAttribute(NULL,"font-family", "courier");
@@ -26,11 +31,11 @@ SCTextBlock::SCTextBlock(): SCItem()
     fu->setParent(this);
     attributes.addItem(fu);
 
-    PositionAttribute* pa = new PositionAttribute(NULL, "position", QPointF(10,10));
+    PositionAttribute* pa = new PositionAttribute(NULL, "position", QPointF(TEXTBLOCK_DEFAULT_X, TEXTBLOCK_DEFAULT_Y));
     pa->setParent(this);
     attributes.addItem(pa);
 
-    SizeAttribute * sa = new SizeAttribute(NULL, "size", QPointF(100,60) );
+    SizeAttribute * sa = new SizeAttribute(NULL, "size", QPointF(TEXTBLOCK_DEFAULT_WIDTH, TEXTBLOCK_DEFAULT_HEIGHT));
     sa->setParent(this);
     attributes.addItem(sa);
 

@@ -21,7 +21,7 @@
 #include "customtreewidgetitem.h"
 #include <QTreeWidgetItem>
 
-
+#include <QDebug>
 CustomTreeWidgetItem::CustomTreeWidgetItem(CustomTreeWidgetItem * parent) :
         QTreeWidgetItem(parent)
 {
@@ -63,6 +63,7 @@ QObject * CustomTreeWidgetItem::data()
 
 void CustomTreeWidgetItem::handleAttributeChanged(StateName* sn)
 {
+    qDebug() << "CustomTreeWidgetItem::handleATtribtueCHanged";
     this->setText(0, sn->asString());
 }
 

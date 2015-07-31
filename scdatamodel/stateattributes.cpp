@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "stateattributes.h"
+#include <QDebug>
 
 StateAttributes::StateAttributes() :
         IAttributeContainer()
@@ -156,6 +157,7 @@ void StateName::setValue(const QString name)
     if ( name != _name )
     {
         _name = name;
+        qDebug() << "emit changed!";
         emit changed(this);
     }
 }

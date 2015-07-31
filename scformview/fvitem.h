@@ -12,7 +12,7 @@
 class FVItem : public QObject
 {
 public:
-    enum FVItemType { STATE,TRANSITION };
+    enum FVItemType {STATE,TRANSITION };
 
     FVItem(SCItem*,int, CustomTreeWidgetItem*);
     FVItem(CustomTreeWidgetItem*);

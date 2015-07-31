@@ -96,6 +96,7 @@ IAttributeContainer* FVItem::getTextBlockAttributes()
 
 QString FVItem::getType()
 {
+
     if(isState())
     {
         return "state";
@@ -104,12 +105,15 @@ QString FVItem::getType()
     {
         return "transition";
     }
+
     else
     {
         qDebug() << "FVItem::getType() ERROR unknown type";
         return "unknown";
     }
 }
+
+
 
 QString FVItem::getTitle()
 {
@@ -127,6 +131,7 @@ QString FVItem::getTitle()
         return "unknown";
     }
 }
+
 
 
 bool FVItem::isState()

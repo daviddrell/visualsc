@@ -96,7 +96,7 @@ void SCState::initCommon()
 
     // set the initial attributes and size
     StateName * name = new StateName (this, "name",defaultName);
-    SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
+    SizeAttribute * size = new SizeAttribute (this, "size",QPoint(161,100));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
     StateString * type = new StateString(this, "type", "default type");
     StateString * onEntryAction = new StateString(this, "entryAction","");

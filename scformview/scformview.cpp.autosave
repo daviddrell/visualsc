@@ -884,11 +884,12 @@ void SCFormView::loadTreeState(CustomTreeWidgetItem * parentItem, QList<SCState*
         if(connect)
             connectState(st);
 
+        // create a new tree widget item for this state
+        
+        // if this is the root machine, then do not give it a parent
         if(parentItem==NULL)
         {
-
             item = new CustomTreeWidgetItem();
-            //_topState->setTreeWidget(item);
             stateChartTreeView->addTopLevelItem((QTreeWidgetItem*)item);
         }
         else
@@ -909,6 +910,7 @@ void SCFormView::loadTreeState(CustomTreeWidgetItem * parentItem, QList<SCState*
         _items.insert(st,fvItem);
         item->setData(fvItem);
 
+        // if this is the root machine, then set the top state and connect the state to its tree widget handlers
         if(parentItem == NULL)
         {
             _topState = fvItem;
@@ -1044,7 +1046,7 @@ void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, 
  * @param state
  * @param treeItem
  *
- *
+ *  this function sets up connections for a sc states' attributes changing to also update the tree view
  *
  */
 void SCFormView::connectState(SCState *state, CustomTreeWidgetItem* treeItem)

@@ -32,7 +32,7 @@
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent),
-        _minSize(QPoint(100,50)),
+        _minSize(QPoint(150,40)),
         _verticalTextMargin(10),
         _horizontalTextMargin(10),
         _textItem(this, QRect(0,0, _minSize.x()-_horizontalTextMargin, _minSize.y()-_verticalTextMargin)),
