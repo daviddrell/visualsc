@@ -33,7 +33,8 @@
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         SelectableBoxGraphic(parent),
-        TextItem(parent,stateModel->getIDTextBlock()),
+        //TextItem(parent,stateModel->getIDTextBlock()),
+        TextItem(new SelectableTextBlock(this, stateModel->getIDTextBlock())),
         _stateModel(stateModel),
         _diagLineStart(),
         _diagLineEnd(),
@@ -50,17 +51,18 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     //TextItem.setPos(25,10);
 
-    TextItem.setParentItem(this);
+    //TextItem.setParentItem(this);
     //PositionAttribute* position = dynamic_cast<PositionAttribute*> (_stateModel->attributes.value("position"));
     //qDebug() << "setting position: " << mapFromScene(position->asPointF());
     //qDebug() << "setting position: " << mapToScene(position->asPointF());
     //qDebug() << "setting position: " << mapToParent(position->asPointF());
     //TextItem.setPos(position->asPointF());
 
-    //connect(_stateModel, SIGNAL(positionChanged()))
+    //connect(_stateModel->getIDTextBlock()->getSizeAttr(), SIGNAL(changed(SizeAttribute*)), this, SLOT(handleTextBlockAttributeChanged(SizeAttribute*)));
 
-    //connect(, SIGNAL(textBlockGraphicChanged()), this, SLOT(handleTextBlockGraphicChanged()));
+    //connect(_stateModel->getIDTextBlock()->getPosAttr(), SIGNAL(changed(PositionAttribute*)), this, SLOT(handleTextBlockAttributeChanged(PositionAttribute*)));
 
+    connect(TextItem, SIGNAL(textBlockMoved(QPointF)), this, SLOT(handleTextBlockMoved(QPointF)));
 }
 
 
@@ -69,10 +71,54 @@ StateBoxGraphic::~StateBoxGraphic()
     //qDebug () << "stateboxgraphic deconstructor:";
 }
 
-void StateBoxGraphic::handleTextBlockGraphicChanged()
+void StateBoxGraphic::handleTextBlockMoved(QPointF diff)
 {
-
+    qDebug() << "Sbg::htbm diff " << diff;
 }
+
+void StateBoxGraphic::handleTextBlockAttributeChanged(SizeAttribute* size)
+{
+    qDebug() << "SBG::handleTextBLockATtribtueChanged SIZE";
+    QPointF sz = size->asPointF();
+    QPointF pos = _stateModel->getIDTextBlock()->getPosAttr()->asPointF();
+
+    QRectF rect = QRectF(pos.x(), pos.y(), sz.x(), sz.y());
+    bool inside = isContained(rect);
+
+    qDebug() << "Is the text block inside its sbg? " <<inside;
+}
+
+void StateBoxGraphic::handleTextBlockAttributeChanged(PositionAttribute* position)
+{
+    qDebug() << "SBG::handleTextBLockATtribtueChanged POS";
+    QPointF sz = _stateModel->getIDTextBlock()->getSizeAttr()->asPointF();
+    QPointF pos = position->asPointF();
+
+    QRectF rect = QRectF(pos.x(), pos.y(), sz.x(), sz.y());
+    bool inside = isContained(rect);
+
+    qDebug() << "Is the text block inside its sbg? " <<inside;
+}
+
+bool StateBoxGraphic::isContained(QRectF rect)
+{
+    bool ret;
+    QPointF topLeft = rect.topLeft();
+    QPointF topRight = rect.topRight();
+    QPointF bottomRight = rect.bottomRight();
+    QPointF bottomLeft = rect.bottomLeft();
+
+    QPointF origin = QPointF(0,0);
+
+    bool tlInside = getGridLocation(origin, topLeft)     == C;
+    bool trInside = getGridLocation(origin, topRight)    == C;
+    bool brInside = getGridLocation(origin, bottomRight) == C;
+    bool blInside = getGridLocation(origin, bottomLeft)  == C;
+
+    ret = tlInside && trInside && brInside && blInside;
+    return ret;
+}
+
 
 void StateBoxGraphic::handleIsParallelStateChanged(IAttribute*attr)
 {
@@ -397,6 +443,32 @@ bool StateBoxGraphic::isBetween(qreal start, qreal end, qreal point)
     return (point>=start)&&(point<=end);
 }
 
+/**
+ * @brief StateBoxGraphic::getGridLocation
+ * @param mts
+ * @param point
+ * @return
+ *
+ *
+ *  returns the grid location of a point on this box with scene based coordinates
+ *  the entire state box will take up grid location 8
+ *
+ *   the grid location of a statebox is as follows:
+               |   |
+     ________0_|_1_|_2________
+     ________7_|_8_|_3________
+             6 | 5 | 4
+               |   |
+
+ *
+ *  UL  U   UR
+ *  L   C   R
+ *  DL  D   DR
+ *
+ *
+ *
+ *
+ */
 int StateBoxGraphic::getGridLocation(QPointF mts,QPointF point)
 {
     qreal px = point.x();
@@ -453,30 +525,17 @@ int StateBoxGraphic::getGridLocation(QPointF mts,QPointF point)
 
 }
 
-/*
-void StateBoxGraphic::handleAttributeChanged(IAttribute * attr)
-{
-    SizeAttribute* size = dynamic_cast<SizeAttribute*>(attr);
-    qDebug() << "StateBoxGraphic::handleAttributeChanged";
-    if(size)
-    {
-        QPoint pt = size->asPointF().toPoint();
-        qDebug()<<"StateBoxGraphic::handleAttributeChanged for size Attribute";
-        setSizeAndUpdateAnchors(pt);
-        //this->setSize(pt); called inside of setsizeandupdate anchors
-    }
-}*/
 
 void StateBoxGraphic::handleAttributeChanged(SizeAttribute* size)
 {
-    qDebug() << "StateBoxGraphic::handleAttributeChanged(SizeAttribute*)";
+    //qDebug() << "StateBoxGraphic::handleAttributeChanged(SizeAttribute*)";
     QPoint sz = size->asPointF().toPoint();
     setSizeAndUpdateAnchors(sz);
 }
 
 void StateBoxGraphic::handleAttributeChanged(PositionAttribute* pos)
 {
-    qDebug() << "StateBoxGraphic::handleAttributeChanged position attr";
+    //qDebug() << "StateBoxGraphic::handleAttributeChanged position attr";
     setPosAndUpdateAnchors(pos->asPointF());
 }
 
@@ -809,7 +868,7 @@ void StateBoxGraphic::setSize(QPointF size)
 
 void StateBoxGraphic::graphicHasChanged ()
 {
-    qDebug () << "StateBoxGraphic::graphicsHasChanged";
+    //qDebug () << "StateBoxGraphic::graphicsHasChanged";
     if ( _stateModel )
     {
         QPointF ps = this->pos();

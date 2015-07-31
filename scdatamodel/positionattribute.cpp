@@ -74,7 +74,7 @@ void PositionAttribute::setValue(const QPointF nPosition)
     if ( nPosition != _position )
     {
         _position = nPosition;
-        qDebug() << "pos attr emit changed";
+        //qDebug() << "pos attr emit changed";
         emit changed(this);
     }
 }

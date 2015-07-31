@@ -23,7 +23,7 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>TextLabel</string>
+         <string>Testing</string>
         </property>
        </widget>
       </item>
@@ -48,6 +48,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionClose"/>
     <addaction name="actionNew"/>
+    <addaction name="actionExportCode"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -78,6 +79,11 @@
   <action name="actionNew">
    <property name="text">
     <string>New</string>
+   </property>
+  </action>
+  <action name="actionExportCode">
+   <property name="text">
+    <string>Export to Code</string>
    </property>
   </action>
  </widget>

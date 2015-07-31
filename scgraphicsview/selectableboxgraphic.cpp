@@ -413,6 +413,7 @@ void SelectableBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
  */
 void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
+    qDebug() << "mouse move event!";
     QPointF newPos = event->pos() ;
     QPointF location = this->pos();
     QPointF diff = newPos -_dragStart;
@@ -421,17 +422,23 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
 
-    emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their anchors
+    emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their sink anchors
     QList<SelectableBoxGraphic*> children;
     this->getAllChildren(children);
 
-    // also emit statebox moved for all children
+    // also emit statebox moved for all children STATE BOXES
+
     for(int i = 0; i < children.size();i++)
     {
-       // qDebug() << "i " << children.at(i)->objectName();
-        emit children.at(i)->stateBoxMoved(diff);
-    }
+        SelectableBoxGraphic* st = dynamic_cast<SelectableBoxGraphic*>(children.at(i));
+        SelectableTextBlock* tb = dynamic_cast<SelectableTextBlock*> (children.at(i));
 
+        // enforce that this is a state and not a text block
+        if(st && !tb)
+        {
+            emit children.at(i)->stateBoxMoved(diff);
+        }
+    }
     this->setPos(location);
 }
 

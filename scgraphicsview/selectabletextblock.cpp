@@ -190,6 +190,58 @@ void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)
 
 }
 
+
+// for supporting moving the box across the scene
+void SelectableTextBlock::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
+{
+    event->setAccepted(true);
+    QPointF location = this->pos();
+    location.setX( ( static_cast<qreal>(location.x()) / _gridSpace) * _gridSpace );
+    location.setY( ( static_cast<qreal>(location.y()) / _gridSpace) * _gridSpace );
+
+    this->setPos(location);
+
+    //qDebug() << "MOUSE RELEASE : " << this->pos() << "";
+   // emit stateBoxMoved(this->pos());
+
+    // will call the corresponding overrided graphicHasChanged function for a subclass
+    graphicHasChanged();
+}
+
+
+// for supporting moving the box across the scene
+void SelectableTextBlock::mousePressEvent ( QGraphicsSceneMouseEvent * event )
+{
+    event->setAccepted(true);
+    _dragStart = event->pos();
+}
+
+
+// for supporting moving the box across the scene
+/**
+ * @brief SelectableBoxGraphic::mouseMoveEvent
+ * @param event
+ */
+void SelectableTextBlock::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
+{
+    qDebug() << "MY mouse move event!";
+    QPointF newPos = event->pos() ;
+    QPointF location = this->pos();
+    QPointF diff = newPos -_dragStart;
+    location += diff;
+
+    //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
+
+
+    emit textBlockMoved(location);     // emit stateBoxMoved to signal the children transition graphics to update
+
+
+    this->setPos(location);
+}
+
+
+
+
 void SelectableTextBlock::handleAttributeAdded(IAttribute *attr)
 {
     handleAttributeChanged(attr);

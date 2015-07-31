@@ -84,6 +84,9 @@ protected:
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
 
+    QPointF _dragStart;
+    int     _gridSpace;
+
 private:
 
 
@@ -115,8 +118,8 @@ private:
 
     QPen     _pen ;
 
-    QPointF _dragStart;
-    int     _gridSpace;
+
+
     qreal   _width;
     qreal   _height;
 

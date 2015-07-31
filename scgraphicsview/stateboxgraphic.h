@@ -106,7 +106,7 @@ public:
     StateBoxGraphic(QGraphicsObject*parent, SCState * state);
     ~StateBoxGraphic();
 
-    SelectableTextBlock TextItem;    ///<  text to go in the title area.
+    SelectableTextBlock* TextItem;    ///<  text to go in the title area.
 
 
     int getGridLocation(QPointF mts,QPointF point);
@@ -129,7 +129,9 @@ public slots:
     void handleIsParallelStateChanged(IAttribute*);
     void handleAttributeChanged(SizeAttribute*);
     void handleAttributeChanged(PositionAttribute* pos);
-    void handleTextBlockGraphicChanged();
+    void handleTextBlockAttributeChanged(SizeAttribute*);
+    void handleTextBlockAttributeChanged(PositionAttribute*);
+    void handleTextBlockMoved(QPointF);
 
 
 private:
@@ -143,7 +145,7 @@ private:
     int findNearestWall(QRectF,QPointF);
     virtual void graphicHasChanged (); ///< implemented to receive updates from the SelectableBoxGraphic
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
-
+    bool isContained(QRectF);
 
     // private slots
 

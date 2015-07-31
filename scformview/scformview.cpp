@@ -566,7 +566,7 @@ void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
  */
 void SCFormView::handlePropertyCellChanged(int r, int c)
 {
-    qDebug() << "SCFormView::handle PropertyCellChanged type is " << _currentlySelected->getType();
+    //qDebug() << "SCFormView::handle PropertyCellChanged type is " << _currentlySelected->getType();
 
     // only process the second column
     if ( c != 1 ) return;
@@ -574,7 +574,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
     // first determine item type, then determine which property type was changed
     if(_currentlySelected->isState())
     {
-        qDebug() << "staate";
+        //qDebug() << "staate";
         SCState* st = _currentlySelected->getState();    
         QString key = propertyTable->item(r,0)->text();
         QString value = propertyTable->item(r,1)->text();
@@ -602,7 +602,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
 
                 if(xConfirm && yConfirm)
                 {
-                    qDebug() << "xy: " << x<< " " << y;
+                    //qDebug() << "xy: " << x<< " " << y;
                     QPointF point(x,y);
 
                     //emit st->positionChangedInFormView(st, point);
@@ -637,7 +637,7 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
 
                 if(xConfirm && yConfirm && x>0 && y>0)
                 {
-                    qDebug() << "xy: " << x<< " " << y;
+                    //qDebug() << "xy: " << x<< " " << y;
                     QPointF point(x,y);
 
                     //emit st->sizeChangedInFormView(st, point);

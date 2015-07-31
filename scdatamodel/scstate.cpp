@@ -226,7 +226,7 @@ void SCState::setSize(QPointF &size)
     sz->setValue(size);
     emit sizeChangedInDataModel(this, size);
 
-    qDebug() << "SCState::setSize emit attributeChangedSignal for sz";
+    //qDebug() << "SCState::setSize emit attributeChangedSignal for sz";
     emit this->attributeChangedSignal(sz);
 
     //emit this->attributeChangedSignal((IAttribute*)sz);
