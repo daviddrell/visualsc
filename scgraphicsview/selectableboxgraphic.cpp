@@ -58,39 +58,9 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _pen(),
         _dragStart(0,0),
         _gridSpace(10),
-        _width(250),
-        _height(100),
-        _cornerDragStart(0,0),
-        _XcornerGrabBuffer(7),
-        _YcornerGrabBuffer(7),
-        _drawingWidth(  _width -   _XcornerGrabBuffer),
-        _drawingHeight( _height -  _YcornerGrabBuffer),
-        _drawingOrigenX( _XcornerGrabBuffer),
-        _drawingOrigenY( _YcornerGrabBuffer),
-        _isHighlighted(false),
-        _isHovered(false),
-        _showBoxStyle(kWhenSelected),
-        _drawBoxLineStyle(kDrawDotted),
-        _boxStyle(kTransparent),
-        _hoverLineThickness(3)
-{
-
-    _corners[0] = NULL;
-    _corners[1] = NULL;
-    _corners[2] = NULL;
-    _corners[3] = NULL;
-
-    this->setAcceptHoverEvents(true);
-    //this->installEventFilter(this);
-}
-
-SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepInsideParent):
-        QGraphicsObject(parent),
-        _pen(),
-        _dragStart(0,0),
-        _gridSpace(10),
-        _width(250),
-        _height(100),
+        _defaultSize(QPoint(300,300)),
+        _width(_defaultSize.x()),
+        _height(_defaultSize.y()),
         _cornerDragStart(0,0),
         _XcornerGrabBuffer(7),
         _YcornerGrabBuffer(7),
@@ -104,7 +74,9 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
         _drawBoxLineStyle(kDrawDotted),
         _boxStyle(kTransparent),
         _hoverLineThickness(3),
-        _keepInsideParent(keepInsideParent)
+        _keepInsideParent(false),
+        _minSize(QPoint(40,40))
+
 {
 
     _corners[0] = NULL;
@@ -114,6 +86,41 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
 
     this->setAcceptHoverEvents(true);
     //this->installEventFilter(this);
+}
+
+SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepInsideParent):
+    QGraphicsObject(parent),
+    _pen(),
+    _dragStart(0,0),
+    _gridSpace(10),
+    _defaultSize(QPoint(300,300)),
+    _width(_defaultSize.x()),
+    _height(_defaultSize.y()),
+    _cornerDragStart(0,0),
+    _XcornerGrabBuffer(7),
+    _YcornerGrabBuffer(7),
+    _drawingWidth(  _width -   _XcornerGrabBuffer),
+    _drawingHeight( _height -  _YcornerGrabBuffer),
+    _drawingOrigenX( _XcornerGrabBuffer),
+    _drawingOrigenY( _YcornerGrabBuffer),
+    _isHighlighted(false),
+    _isHovered(false),
+    _showBoxStyle(kWhenSelected),
+    _drawBoxLineStyle(kDrawDotted),
+    _boxStyle(kTransparent),
+    _hoverLineThickness(3),
+    _keepInsideParent(keepInsideParent),
+    _minSize(QPoint(40,40))
+
+{
+
+_corners[0] = NULL;
+_corners[1] = NULL;
+_corners[2] = NULL;
+_corners[3] = NULL;
+
+this->setAcceptHoverEvents(true);
+//this->installEventFilter(this);
 }
 
 
@@ -319,6 +326,22 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         // if the mouse is being dragged, calculate a new size and also re-position
         // the box to give the appearance of dragging the corner out/in to resize the box
 
+        QPointF old(this->pos());
+        const qreal w = this->getSize().x();
+        const qreal h = this->getSize().y();
+
+
+        SelectableBoxGraphic* parentGraphic = this->parentAsSelectableBoxGraphic();
+
+
+         qreal parentW;
+         qreal parentH;
+
+
+
+
+
+
         int xMoved = corner->mouseDownX - x;
         int yMoved = corner->mouseDownY - y;
 
@@ -328,46 +351,183 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         int newHeight = _height + (YaxisSign * yMoved) ;
         if ( newHeight < 40 ) newHeight = 40;
 
-        int deltaWidth  =   newWidth - _width ;
-        int deltaHeight =   newHeight - _height ;
+        int deltaWidth;
+        int deltaHeight;
 
-        adjustDrawingSize(  deltaWidth ,   deltaHeight);
 
-        deltaWidth *= (-1);
-        deltaHeight *= (-1);
-
-        qreal newXpos, newYpos;
-        QPointF old(this->pos());
-        const qreal w = this->getSize().x();
-        const qreal h = this->getSize().y();
-
-        if ( corner->getCorner() == 0 )
+        if(_keepInsideParent&&parentGraphic)
         {
-             newXpos = this->pos().x() + deltaWidth;
-             newYpos = this->pos().y() + deltaHeight;
-
-             if(_keepInsideParent)
-             {
-                 if(newXpos > old.x()+w)
-                     newXpos = old.x()+w;
-
-                 if(newYpos > old.y()  + h)
-                     newYpos = old.y() + h;
-             }
+            parentW = parentGraphic->getSize().x();
+            parentH = parentGraphic->getSize().y();
 
 
-            this->setPos(newXpos, newYpos);
+
+            if(newWidth + old.x() > parentW)
+                newWidth = parentW - old.x();
+
+            if(newHeight + old.y() > parentH)
+                newHeight = parentH - old.y();
+
+
+
+
+            deltaWidth =   newWidth - _width ;
+            deltaHeight =   newHeight - _height ;
+
+
+            //adjustDrawingSize(  deltaWidth ,   deltaHeight);
+
+            deltaWidth *= (-1);
+            deltaHeight *= (-1);
+
+            qreal newXpos, newYpos;
+
+
+            if ( corner->getCorner() == 0 )
+            {
+                newXpos = this->pos().x() + deltaWidth;
+                newYpos = this->pos().y() + deltaHeight;
+
+
+                if(newXpos < 0)
+                {
+                    deltaWidth = 0 - pos().x();
+                    newXpos = 0;
+                }
+
+                if(newYpos < 0)
+                {
+                    deltaHeight = 0 - pos().y();
+                    newYpos = 0;
+                }
+
+
+
+                this->setPos(newXpos, newYpos);
+            }
+            else   if ( corner->getCorner() == 1 )
+            {
+                newYpos = this->pos().y() + deltaHeight;
+
+                if(newXpos > parentW)
+                {
+                    deltaWidth = 0 - pos().x();
+                    newXpos = parentW - w;
+                }
+
+                if(newYpos < 0)
+                {
+                    deltaHeight = 0 - pos().y();
+                    newYpos = 0;
+                }
+
+
+
+
+                this->setPos(this->pos().x(), newYpos);
+            }
+            else if(corner->getCorner() == 2)
+            {
+
+
+                    if(newXpos > old.x()+w)
+                    {
+                        deltaWidth = 0 - pos().x();
+                        newXpos = old.x()+w;
+                    }
+
+                    if(newYpos > old.y()  + h)
+                    {
+                        deltaHeight = 0 - pos().y();
+                        newYpos = old.y() + h;
+                    }
+
+            }
+            else   if ( corner->getCorner() == 3 )
+            {
+                newXpos = this->pos().x() + deltaWidth;
+
+
+                    if(newXpos < 0)
+                    {
+                        deltaWidth = 0 - pos().x();
+                        newXpos = 0;
+                    }
+                    if(newYpos > parentH)
+                    {
+                        deltaHeight = 0 - pos().y();
+                        newYpos = parentH - h;
+                    }
+
+                this->setPos(newXpos,this->pos().y());
+            }
+
+            deltaWidth *= (-1);
+            deltaHeight *= (-1);
+            qDebug() << "dw: " << deltaWidth << "dh: " <<deltaHeight;
+            adjustDrawingSize(  deltaWidth ,   deltaHeight);
         }
-        else   if ( corner->getCorner() == 1 )
+        else
         {
-            newYpos = this->pos().y() + deltaHeight;
-            this->setPos(this->pos().x(), newYpos);
+
+
+
+            deltaWidth =   newWidth - _width ;
+            deltaHeight =   newHeight - _height ;
+
+
+            //adjustDrawingSize(  deltaWidth ,   deltaHeight);
+
+            deltaWidth *= (-1);
+            deltaHeight *= (-1);
+
+            qreal newXpos, newYpos;
+
+
+            if ( corner->getCorner() == 0 )
+            {
+                 newXpos = this->pos().x() + deltaWidth;
+                 newYpos = this->pos().y() + deltaHeight;
+
+
+
+
+                this->setPos(newXpos, newYpos);
+            }
+            else   if ( corner->getCorner() == 1 )
+            {
+                newYpos = this->pos().y() + deltaHeight;
+
+
+
+                this->setPos(this->pos().x(), newYpos);
+            }
+            else if(corner->getCorner() == 2)
+            {
+                qDebug() << "corner 2";
+
+
+            }
+            else   if ( corner->getCorner() == 3 )
+            {
+                newXpos = this->pos().x() + deltaWidth;
+
+                this->setPos(newXpos,this->pos().y());
+            }
+
+            deltaWidth *= (-1);
+            deltaHeight *= (-1);
+            adjustDrawingSize(  deltaWidth ,   deltaHeight);
+
         }
-        else   if ( corner->getCorner() == 3 )
-        {
-            newXpos = this->pos().x() + deltaWidth;
-            this->setPos(newXpos,this->pos().y());
-        }
+
+
+
+
+
+
+
+
 
 
         setCornerPositions();
@@ -389,6 +549,11 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
     }
 
     return true;// true => do not send event to watched - we are finished with this event
+}
+
+SelectableBoxGraphic* SelectableBoxGraphic::parentAsSelectableBoxGraphic()
+{
+    return dynamic_cast<SelectableBoxGraphic*>(this->parentItem());
 }
 
 int SelectableBoxGraphic::getHoveredCorner()
@@ -428,15 +593,22 @@ void SelectableBoxGraphic::getAllChildren(QList<SelectableBoxGraphic*> &stateLis
 // for supporting moving the box across the scene
 void SelectableBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
-    event->setAccepted(true);
-    QPointF location = this->pos();
-    location.setX( ( static_cast<qreal>(location.x()) / _gridSpace) * _gridSpace );
-    location.setY( ( static_cast<qreal>(location.y()) / _gridSpace) * _gridSpace );
+    if(_keepInsideParent)
+    {
 
-    this->setPos(location);
+    }
+    else
+    {
+        event->setAccepted(true);
+        QPointF location = this->pos();
+        location.setX( ( static_cast<qreal>(location.x()) / _gridSpace) * _gridSpace );
+        location.setY( ( static_cast<qreal>(location.y()) / _gridSpace) * _gridSpace );
 
-    //qDebug() << "MOUSE RELEASE : " << this->pos() << "";
-   // emit stateBoxMoved(this->pos());
+        this->setPos(location);
+
+        //qDebug() << "MOUSE RELEASE : " << this->pos() << "";
+       // emit stateBoxMoved(this->pos());
+    }
 
     // will call the corresponding overrided graphicHasChanged function for a subclass
     graphicHasChanged();
@@ -466,25 +638,70 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
     //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
-
-    emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their sink anchors
-    QList<SelectableBoxGraphic*> children;
-    this->getAllChildren(children);
-
-    // also emit statebox moved for all children STATE BOXES
-
-    for(int i = 0; i < children.size();i++)
+    SelectableBoxGraphic* parent = parentAsSelectableBoxGraphic();
+    if(_keepInsideParent && parent)
     {
-        SelectableBoxGraphic* st = dynamic_cast<SelectableBoxGraphic*>(children.at(i));
-        SelectableTextBlock* tb = dynamic_cast<SelectableTextBlock*> (children.at(i));
+        qreal x = pos().x()+diff.x();
+        qreal y = pos().y()+diff.y();
+        const qreal w = this->getSize().x();
+        const qreal h = this->getSize().y();
 
-        // enforce that this is a state and not a text block
-        if(st && !tb)
-        {
-            emit children.at(i)->stateBoxMoved(diff);
-        }
+
+        const qreal parentW = parent->getSize().x();
+        const qreal parentH = parent->getSize().y();
+
+        if(x < 0)
+            x=0;
+
+        else if(x+w > parentW)
+            x=parentW-w;
+
+        if(y < 0)
+            y=0;
+
+        else if(y+h > parentH)
+            y=parentH-h;
+
+
+        QPointF newPoint(x,y);
+
+
+        this->setPos(newPoint);
+
+        //this->graphicHasChanged();
     }
-    this->setPos(location);
+    else
+    {
+        emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their sink anchors
+        QList<SelectableBoxGraphic*> children;
+        this->getAllChildren(children);
+
+        // also emit statebox moved for all children STATE BOXES
+
+        for(int i = 0; i < children.size();i++)
+        {
+            SelectableBoxGraphic* st = dynamic_cast<SelectableBoxGraphic*>(children.at(i));
+            SelectableTextBlock* tb = dynamic_cast<SelectableTextBlock*> (children.at(i));
+
+            // enforce that this is a state and not a text block
+            if(st && !tb)
+            {
+                emit children.at(i)->stateBoxMoved(diff);
+            }
+        }
+        this->setPos(location);
+    }
+
+}
+
+void SelectableBoxGraphic::setMinSize(QPoint size)
+{
+    _minSize = size;
+}
+
+void SelectableBoxGraphic::setDefaultSize(QPoint size)
+{
+    _defaultSize = size;
 }
 
 /**

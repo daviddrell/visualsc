@@ -53,9 +53,9 @@ protected:
 
     void keyPressEvent ( QKeyEvent * event ); // [virtual protected]
     void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
-    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
-    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
-    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+//    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+//    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
+//    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
 
 private slots:
@@ -76,7 +76,7 @@ private:
 
    // private data
 
-   QPoint _minSize;
+
    int           _verticalTextMargin;
    int           _horizontalTextMargin;
    MaskedTextEdit _textItem;

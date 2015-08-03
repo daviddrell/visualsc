@@ -51,7 +51,7 @@ public:
     SelectableBoxGraphic(QGraphicsObject*parent, bool keepInsideParent);
     ~SelectableBoxGraphic();
 
-
+    SelectableBoxGraphic* parentAsSelectableBoxGraphic();
     void setPosAndUpdateAnchors(QPointF newPos);
     void setSizeAndUpdateAnchors(QPointF size);
     virtual void setSize(QPointF size); ///< set the size of this object
@@ -75,6 +75,8 @@ public:
     QPointF getSideCenterPointInSceneCoord(int side); ///< returns the center point on a given side, for anchoring a transition line in the middle of a side
     void getAllChildren(QList<SelectableBoxGraphic*> &stateList);
 
+    void setMinSize(QPoint);
+    void setDefaultSize(QPoint);
     //bool eventFilter(QObject *, QEvent *);
 
 signals:
@@ -87,6 +89,8 @@ protected:
 
     QPointF _dragStart;
     int     _gridSpace;
+    QPoint _minSize;
+    QPoint _defaultSize;
 
 private:
 
