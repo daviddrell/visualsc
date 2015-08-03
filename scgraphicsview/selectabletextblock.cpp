@@ -52,7 +52,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     setShowBoxLineStyle(SelectableBoxGraphic::kWhenSelected  );
     setDrawBoxLineStyle( SelectableBoxGraphic::kDrawDotted );
     setBoxStyle(SelectableBoxGraphic::kTransparent );
-    setHoverLineThickness( 1 );
+    setHoverLineThickness( 6 );
     setFlags(QGraphicsItem::ItemClipsChildrenToShape);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
 
@@ -194,6 +194,7 @@ void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)
 // for supporting moving the box across the scene
 void SelectableTextBlock::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
+    /*
     event->setAccepted(true);
     QPointF location = this->pos();
     location.setX( ( static_cast<qreal>(location.x()) / _gridSpace) * _gridSpace );
@@ -205,6 +206,9 @@ void SelectableTextBlock::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
    // emit stateBoxMoved(this->pos());
 
     // will call the corresponding overrided graphicHasChanged function for a subclass
+
+     */
+
     graphicHasChanged();
 }
 
@@ -221,26 +225,54 @@ void SelectableTextBlock::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 /**
  * @brief SelectableBoxGraphic::mouseMoveEvent
  * @param event
+ *
+ *
+ * SIGNAL   textBlockMoved(QPointF)
+ *
+ * connect in StateBoxGraphic
+ *
  */
 void SelectableTextBlock::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
-    qDebug() << "MY mouse move event!";
+    //qDebug() << "MY mouse move event!";
     QPointF newPos = event->pos() ;
     QPointF location = this->pos();
     QPointF diff = newPos -_dragStart;
     location += diff;
 
-    //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
+    qreal x = pos().x()+diff.x();
+    qreal y = pos().y()+diff.y();
+    const qreal w = this->getSize().x();
+    const qreal h = this->getSize().y();
+    SelectableBoxGraphic* parent = parentAsSelectableBoxGraphic();
+
+    const qreal parentW = parent->getSize().x();
+    const qreal parentH = parent->getSize().y();
+
+    if(x < 0)
+        x=0;
+
+    else if(x+w > parentW)
+        x=parentW-w;
+
+    if(y < 0)
+        y=0;
+
+    else if(y+h > parentH)
+        y=parentH-h;
 
 
-    emit textBlockMoved(location);     // emit stateBoxMoved to signal the children transition graphics to update
+    QPointF newPoint(x,y);
 
 
-    this->setPos(location);
+    this->setPos(newPoint);
+
 }
 
-
-
+SelectableBoxGraphic* SelectableTextBlock::parentAsSelectableBoxGraphic()
+{
+    return dynamic_cast<SelectableBoxGraphic*>(this->parentItem());
+}
 
 void SelectableTextBlock::handleAttributeAdded(IAttribute *attr)
 {

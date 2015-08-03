@@ -5,6 +5,7 @@
 #include "selectableboxgraphic.h"
 #include "textblock.h"
 #include "iattribute.h"
+
 class QKeyEvent;
 class QGraphicsSceneMouseEvent;
 
@@ -41,6 +42,8 @@ public:
 
 
     virtual void setSize(QPoint size); ///< from base class
+    virtual void graphicHasChanged(); ///< pure virtual in base SelectableBoxGraphic, subclass must implement this, used to record user changes back to the data model
+    SelectableBoxGraphic* parentAsSelectableBoxGraphic();
 
 signals:
     void textBlockMoved(QPointF);
@@ -70,7 +73,6 @@ private:
     // private methods
 
    void connectAttributes(IAttributeContainer *attributes);
-   virtual void graphicHasChanged(); ///< pure virtual in base SelectableBoxGraphic, subclass must implement this, used to record user changes back to the data model
 
    // private data
 

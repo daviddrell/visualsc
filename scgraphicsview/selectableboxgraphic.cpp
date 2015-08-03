@@ -84,6 +84,38 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
     //this->installEventFilter(this);
 }
 
+SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepInsideParent):
+        QGraphicsObject(parent),
+        _pen(),
+        _dragStart(0,0),
+        _gridSpace(10),
+        _width(250),
+        _height(100),
+        _cornerDragStart(0,0),
+        _XcornerGrabBuffer(7),
+        _YcornerGrabBuffer(7),
+        _drawingWidth(  _width -   _XcornerGrabBuffer),
+        _drawingHeight( _height -  _YcornerGrabBuffer),
+        _drawingOrigenX( _XcornerGrabBuffer),
+        _drawingOrigenY( _YcornerGrabBuffer),
+        _isHighlighted(false),
+        _isHovered(false),
+        _showBoxStyle(kWhenSelected),
+        _drawBoxLineStyle(kDrawDotted),
+        _boxStyle(kTransparent),
+        _hoverLineThickness(3),
+        _keepInsideParent(keepInsideParent)
+{
+
+    _corners[0] = NULL;
+    _corners[1] = NULL;
+    _corners[2] = NULL;
+    _corners[3] = NULL;
+
+    this->setAcceptHoverEvents(true);
+    //this->installEventFilter(this);
+}
+
 
 SelectableBoxGraphic::~SelectableBoxGraphic()
 {
@@ -306,11 +338,24 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
 
         qreal newXpos, newYpos;
         QPointF old(this->pos());
+        const qreal w = this->getSize().x();
+        const qreal h = this->getSize().y();
 
         if ( corner->getCorner() == 0 )
         {
              newXpos = this->pos().x() + deltaWidth;
              newYpos = this->pos().y() + deltaHeight;
+
+             if(_keepInsideParent)
+             {
+                 if(newXpos > old.x()+w)
+                     newXpos = old.x()+w;
+
+                 if(newYpos > old.y()  + h)
+                     newYpos = old.y() + h;
+             }
+
+
             this->setPos(newXpos, newYpos);
         }
         else   if ( corner->getCorner() == 1 )

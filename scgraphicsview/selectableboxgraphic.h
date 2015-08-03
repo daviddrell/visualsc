@@ -48,6 +48,7 @@ Q_OBJECT
 public:
 
     SelectableBoxGraphic(QGraphicsObject*parent);
+    SelectableBoxGraphic(QGraphicsObject*parent, bool keepInsideParent);
     ~SelectableBoxGraphic();
 
 
@@ -119,7 +120,7 @@ private:
     QPen     _pen ;
 
 
-
+    bool _keepInsideParent;
     qreal   _width;
     qreal   _height;
 

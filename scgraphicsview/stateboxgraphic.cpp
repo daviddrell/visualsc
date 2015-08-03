@@ -47,8 +47,8 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     setShowBoxLineStyle ( SelectableBoxGraphic::kAlways );
     setDrawBoxLineStyle  ( SelectableBoxGraphic::kDrawSolid );
-    setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
-
+    //setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
+    setBoxStyle(SelectableBoxGraphic::kSolidNoShadow);
     //TextItem.setPos(25,10);
 
     //TextItem.setParentItem(this);
@@ -62,7 +62,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     //connect(_stateModel->getIDTextBlock()->getPosAttr(), SIGNAL(changed(PositionAttribute*)), this, SLOT(handleTextBlockAttributeChanged(PositionAttribute*)));
 
-    connect(TextItem, SIGNAL(textBlockMoved(QPointF)), this, SLOT(handleTextBlockMoved(QPointF)));
+    //connect(TextItem, SIGNAL(textBlockMoved(QPointF)), this, SLOT(handleTextBlockMoved(QPointF)));
 }
 
 
@@ -71,9 +71,39 @@ StateBoxGraphic::~StateBoxGraphic()
     //qDebug () << "stateboxgraphic deconstructor:";
 }
 
+/**
+ * @brief StateBoxGraphic::handleTextBlockMoved
+ * @param diff
+ *
+ * SLOT
+ *
+ * connect in StateBoxGraphic constructor
+ *
+ * this slot is connected to a signal in mouse move event for this state's text block
+ * and will limit the text block to only be able to be moved in the state's area
+ *
+ *
+ *
+ * NOT CURRENTLY IN USE
+ * moved functionality to selectabletextblock mouse move eevent
+ */
 void StateBoxGraphic::handleTextBlockMoved(QPointF diff)
 {
-    qDebug() << "Sbg::htbm diff " << diff;
+    /*
+    qDebug() << "Sbg::htbm diff " << diff << "\torigin: "<<TextItem->pos();
+
+    QPointF tl = TextItem->pos();
+
+    if(tl.x() < 0)
+        diff.setX(0);
+
+    if(tl.y() < 0)
+        diff.setY(0);
+
+
+    TextItem->setPos(diff);
+    TextItem->graphicHasChanged();
+    */
 }
 
 void StateBoxGraphic::handleTextBlockAttributeChanged(SizeAttribute* size)

@@ -44,11 +44,11 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
-    <addaction name="actionClose"/>
-    <addaction name="actionNew"/>
     <addaction name="actionExportCode"/>
+    <addaction name="actionClose"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -61,6 +61,11 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>
@@ -74,11 +79,6 @@
   <action name="actionClose">
    <property name="text">
     <string>Close</string>
-   </property>
-  </action>
-  <action name="actionNew">
-   <property name="text">
-    <string>New</string>
    </property>
   </action>
   <action name="actionExportCode">

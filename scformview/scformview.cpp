@@ -444,7 +444,7 @@ void SCFormView::deleteTreeItem(SCItem* item)
 
 void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
 {
-    qDebug() << "SCFormView::handleTextBlockPropertyCellChanged";
+    // qDebug() << "SCFormView::handleTextBlockPropertyCellChanged";
 
     // only proecss changes from the second column
     if(c!=1)
@@ -467,7 +467,7 @@ void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
 
     QString key = textBlockPropertyTable->item(r,0)->text();
     QString value = textBlockPropertyTable->item(r,1)->text();
-    qDebug() << "key is : " << key;
+    //qDebug() << "key is : " << key;
     if(key == "size")
     {
 
