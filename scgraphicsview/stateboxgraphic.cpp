@@ -50,7 +50,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     //setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
     setBoxStyle(SelectableBoxGraphic::kSolidNoShadow);
     setMinSize(QPoint(60,60));
-    setPenWidth(2,3.2360679775);
+    setPenWidth(2.472135954999419,4);
     //TextItem.setPos(25,10);
 
     //TextItem.setParentItem(this);
@@ -801,8 +801,11 @@ StateBoxGraphic* StateBoxGraphic::getHighestLevelParentItemAsStateBoxGraphic()
 
 void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    SelectableBoxGraphic::paint(painter, option, widget);
-    //qDebug() << " object name: " << this->objectName()<< " object position: "<<this->getPositionAsString();
+    if  ( (_showBoxStyle == kAlways) || (( _showBoxStyle == kWhenSelected) && ( _isHovered == true)))
+    {
+        painter->setRenderHint(QPainter::HighQualityAntialiasing);
+        SelectableBoxGraphic::paintWithVisibleBox (painter,0,0);
+    }
 
 #if 0  // debug stuff
     if ( _diagLineDrawIt )
