@@ -33,6 +33,8 @@
 #include <QKeyEvent>
 #include "stateboxgraphic.h"
 
+#define INSIDE_PARENT_BUFFER 10
+
 class StateBoxGraphic;
 
 /**
@@ -58,9 +60,8 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _pen(),
         _dragStart(0,0),
         _gridSpace(10),
-        _defaultSize(QPoint(300,300)),
-        _width(_defaultSize.x()),
-        _height(_defaultSize.y()),
+        _width(0),
+        _height(0),
         _cornerDragStart(0,0),
         _XcornerGrabBuffer(7),
         _YcornerGrabBuffer(7),
@@ -76,7 +77,6 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _hoverLineThickness(3),
         _keepInsideParent(false),
         _minSize(QPoint(40,40))
-
 {
 
     _corners[0] = NULL;
@@ -89,38 +89,35 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
 }
 
 SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepInsideParent):
-    QGraphicsObject(parent),
-    _pen(),
-    _dragStart(0,0),
-    _gridSpace(10),
-    _defaultSize(QPoint(300,300)),
-    _width(_defaultSize.x()),
-    _height(_defaultSize.y()),
-    _cornerDragStart(0,0),
-    _XcornerGrabBuffer(7),
-    _YcornerGrabBuffer(7),
-    _drawingWidth(  _width -   _XcornerGrabBuffer),
-    _drawingHeight( _height -  _YcornerGrabBuffer),
-    _drawingOrigenX( _XcornerGrabBuffer),
-    _drawingOrigenY( _YcornerGrabBuffer),
-    _isHighlighted(false),
-    _isHovered(false),
-    _showBoxStyle(kWhenSelected),
-    _drawBoxLineStyle(kDrawDotted),
-    _boxStyle(kTransparent),
-    _hoverLineThickness(3),
-    _keepInsideParent(keepInsideParent),
-    _minSize(QPoint(40,40))
-
+        QGraphicsObject(parent),
+        _pen(),
+        _dragStart(0,0),
+        _gridSpace(10),
+        _width(0),
+        _height(0),
+        _cornerDragStart(0,0),
+        _XcornerGrabBuffer(7),
+        _YcornerGrabBuffer(7),
+        _drawingWidth(  _width -   _XcornerGrabBuffer),
+        _drawingHeight( _height -  _YcornerGrabBuffer),
+        _drawingOrigenX( _XcornerGrabBuffer),
+        _drawingOrigenY( _YcornerGrabBuffer),
+        _isHighlighted(false),
+        _isHovered(false),
+        _showBoxStyle(kWhenSelected),
+        _drawBoxLineStyle(kDrawDotted),
+        _boxStyle(kTransparent),
+        _hoverLineThickness(3),
+        _keepInsideParent(keepInsideParent)
 {
 
-_corners[0] = NULL;
-_corners[1] = NULL;
-_corners[2] = NULL;
-_corners[3] = NULL;
+    _corners[0] = NULL;
+    _corners[1] = NULL;
+    _corners[2] = NULL;
+    _corners[3] = NULL;
 
-this->setAcceptHoverEvents(true);
-//this->installEventFilter(this);
+    this->setAcceptHoverEvents(true);
+    //this->installEventFilter(this);
 }
 
 
@@ -346,15 +343,16 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
         int yMoved = corner->mouseDownY - y;
 
         int newWidth = _width + ( XaxisSign * xMoved);
-        if ( newWidth < 40 ) newWidth  = 40;
+        if ( newWidth < _minSize.x() ) newWidth  = _minSize.x();
 
         int newHeight = _height + (YaxisSign * yMoved) ;
-        if ( newHeight < 40 ) newHeight = 40;
+        if ( newHeight < _minSize.y() ) newHeight = _minSize.y();
 
         int deltaWidth;
         int deltaHeight;
 
 
+        // if this box is resized, keep it inside its parent's area
         if(_keepInsideParent&&parentGraphic)
         {
             parentW = parentGraphic->getSize().x();
@@ -362,12 +360,16 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
 
 
 
-            if(newWidth + old.x() > parentW)
-                newWidth = parentW - old.x();
+            // applies to when pos is static and width and height are changing
+            // check if the new width and height are too far out
 
-            if(newHeight + old.y() > parentH)
-                newHeight = parentH - old.y();
+/*
+            if(newWidth + old.x() > parentW - INSIDE_PARENT_BUFFER)
+                newWidth = parentW - INSIDE_PARENT_BUFFER - old.x();
 
+            if(newHeight + old.y() > parentH - INSIDE_PARENT_BUFFER)
+                newHeight = parentH - INSIDE_PARENT_BUFFER - old.y();
+*/
 
 
 
@@ -382,23 +384,22 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
 
             qreal newXpos, newYpos;
 
-
             if ( corner->getCorner() == 0 )
             {
                 newXpos = this->pos().x() + deltaWidth;
                 newYpos = this->pos().y() + deltaHeight;
 
 
-                if(newXpos < 0)
+                if(newXpos <  0+INSIDE_PARENT_BUFFER)
                 {
-                    deltaWidth = 0 - pos().x();
-                    newXpos = 0;
+                    deltaWidth = 0+INSIDE_PARENT_BUFFER - pos().x();
+                    newXpos = 0+INSIDE_PARENT_BUFFER;
                 }
 
-                if(newYpos < 0)
+                if(newYpos < 0+INSIDE_PARENT_BUFFER)
                 {
-                    deltaHeight = 0 - pos().y();
-                    newYpos = 0;
+                    deltaHeight =0+INSIDE_PARENT_BUFFER - pos().y();
+                    newYpos = 0+INSIDE_PARENT_BUFFER;
                 }
 
 
@@ -407,60 +408,93 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
             }
             else   if ( corner->getCorner() == 1 )
             {
+
+                if(newWidth + old.x() > parentW - INSIDE_PARENT_BUFFER)
+                    newWidth = parentW - INSIDE_PARENT_BUFFER - old.x();
+
+                if(newHeight + old.y() > parentH - INSIDE_PARENT_BUFFER)
+                    newHeight = parentH - INSIDE_PARENT_BUFFER - old.y();
+
+
+
+
+                deltaWidth =   newWidth - _width ;
+                deltaHeight =   newHeight - _height ;
+
+                deltaWidth *= (-1);
+                deltaHeight *= (-1);
+
                 newYpos = this->pos().y() + deltaHeight;
 
-                if(newXpos > parentW)
+                if(newYpos < 0+INSIDE_PARENT_BUFFER)
                 {
-                    deltaWidth = 0 - pos().x();
-                    newXpos = parentW - w;
+                    deltaHeight = 0+INSIDE_PARENT_BUFFER - pos().y();
+                    newYpos = 0+INSIDE_PARENT_BUFFER;
                 }
-
-                if(newYpos < 0)
-                {
-                    deltaHeight = 0 - pos().y();
-                    newYpos = 0;
-                }
-
-
-
 
                 this->setPos(this->pos().x(), newYpos);
             }
             else if(corner->getCorner() == 2)
             {
 
+                if(newWidth + old.x() > parentW - INSIDE_PARENT_BUFFER)
+                    newWidth = parentW - INSIDE_PARENT_BUFFER - old.x();
 
-                    if(newXpos > old.x()+w)
-                    {
-                        deltaWidth = 0 - pos().x();
-                        newXpos = old.x()+w;
-                    }
+                if(newHeight + old.y() > parentH - INSIDE_PARENT_BUFFER)
+                    newHeight = parentH - INSIDE_PARENT_BUFFER - old.y();
 
-                    if(newYpos > old.y()  + h)
-                    {
-                        deltaHeight = 0 - pos().y();
-                        newYpos = old.y() + h;
-                    }
+
+
+
+                deltaWidth =   newWidth - _width ;
+                deltaHeight =   newHeight - _height ;
+
+                deltaWidth *= (-1);
+                deltaHeight *= (-1);
+
+//                    if(newXpos > old.x()+w - INSIDE_PARENT_BUFFER)
+//                    {
+//                        deltaWidth = 0+INSIDE_PARENT_BUFFER - pos().x();
+//                        newXpos = old.x()+w - INSIDE_PARENT_BUFFER;
+//                    }
+
+//                    if(newYpos > old.y()  + h - INSIDE_PARENT_BUFFER)
+//                    {
+//                        deltaHeight = 0+INSIDE_PARENT_BUFFER - pos().y();
+//                        newYpos = old.y() + h - INSIDE_PARENT_BUFFER;
+//                    }
 
             }
             else   if ( corner->getCorner() == 3 )
             {
+
+                if(newWidth + old.x() > parentW - INSIDE_PARENT_BUFFER)
+                    newWidth = parentW - INSIDE_PARENT_BUFFER - old.x();
+
+                if(newHeight + old.y() > parentH - INSIDE_PARENT_BUFFER)
+                    newHeight = parentH - INSIDE_PARENT_BUFFER - old.y();
+
+
+
+
+                deltaWidth =   newWidth - _width ;
+                deltaHeight =   newHeight - _height ;
+
+                deltaWidth *= (-1);
+                deltaHeight *= (-1);
                 newXpos = this->pos().x() + deltaWidth;
 
+                    if(newXpos < 0+INSIDE_PARENT_BUFFER)
+                    {
+                        deltaWidth = 0+INSIDE_PARENT_BUFFER - pos().x();
+                        newXpos = 0+INSIDE_PARENT_BUFFER;
+                    }
 
-                    if(newXpos < 0)
-                    {
-                        deltaWidth = 0 - pos().x();
-                        newXpos = 0;
-                    }
-                    if(newYpos > parentH)
-                    {
-                        deltaHeight = 0 - pos().y();
-                        newYpos = parentH - h;
-                    }
 
                 this->setPos(newXpos,this->pos().y());
             }
+
+            //this->setPos(newXpos, newYpos);
 
             deltaWidth *= (-1);
             deltaHeight *= (-1);
@@ -638,6 +672,7 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
     //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
+    // if keep inside parent is true, then restrict movement of the box to within the parent
     SelectableBoxGraphic* parent = parentAsSelectableBoxGraphic();
     if(_keepInsideParent && parent)
     {
@@ -650,17 +685,17 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
         const qreal parentW = parent->getSize().x();
         const qreal parentH = parent->getSize().y();
 
-        if(x < 0)
-            x=0;
+        if(x < 0+INSIDE_PARENT_BUFFER)
+            x=0+INSIDE_PARENT_BUFFER;
 
-        else if(x+w > parentW)
-            x=parentW-w;
+        else if(x+w > parentW-INSIDE_PARENT_BUFFER)
+            x=parentW-INSIDE_PARENT_BUFFER-w;
 
-        if(y < 0)
-            y=0;
+        if(y < 0+INSIDE_PARENT_BUFFER)
+            y=0+INSIDE_PARENT_BUFFER;
 
-        else if(y+h > parentH)
-            y=parentH-h;
+        else if(y+h > parentH-INSIDE_PARENT_BUFFER)
+            y=parentH-INSIDE_PARENT_BUFFER-h;
 
 
         QPointF newPoint(x,y);
@@ -699,10 +734,6 @@ void SelectableBoxGraphic::setMinSize(QPoint size)
     _minSize = size;
 }
 
-void SelectableBoxGraphic::setDefaultSize(QPoint size)
-{
-    _defaultSize = size;
-}
 
 /**
  * @brief SelectableBoxGraphic::setSizeAndUpdateAnchors

@@ -30,6 +30,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QTextDocument>
 
+
+
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent,true),
         //_minSize(QPoint(150,40)),
@@ -56,10 +58,6 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     setFlags(QGraphicsItem::ItemClipsChildrenToShape);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
     setMinSize(QPoint(40,40));
-    setDefaultSize(QPoint(150,40));
-
-   // setSize (_minSize);
-    setSize(_defaultSize);
 
     // if the textblock model changed, signal handle text changed to update it from the textblock model
     connect ( _textBlockModel, SIGNAL(textChanged()), this, SLOT(handleTextChanged()), Qt::QueuedConnection);

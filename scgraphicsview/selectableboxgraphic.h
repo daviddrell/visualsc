@@ -76,7 +76,6 @@ public:
     void getAllChildren(QList<SelectableBoxGraphic*> &stateList);
 
     void setMinSize(QPoint);
-    void setDefaultSize(QPoint);
     //bool eventFilter(QObject *, QEvent *);
 
 signals:
@@ -90,7 +89,7 @@ protected:
     QPointF _dragStart;
     int     _gridSpace;
     QPoint _minSize;
-    QPoint _defaultSize;
+
 
 private:
 

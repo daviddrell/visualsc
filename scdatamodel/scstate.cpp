@@ -24,6 +24,9 @@
 #include <QVariant>
 #include <QDebug>
 
+#define DEFAULT_STATE_WIDTH  161
+#define DEFAULT_STATE_HEIGHT 100
+
 SCState::SCState(QObject *parent) :
     SCItem(parent),
     attributes(this, "stateAttributes"),
@@ -96,7 +99,7 @@ void SCState::initCommon()
 
     // set the initial attributes and size
     StateName * name = new StateName (this, "name",defaultName);
-    SizeAttribute * size = new SizeAttribute (this, "size",QPoint(161,100));
+    SizeAttribute * size = new SizeAttribute (this, "size",QPoint(DEFAULT_STATE_WIDTH,DEFAULT_STATE_HEIGHT));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
     StateString * type = new StateString(this, "type", "default type");
     StateString * onEntryAction = new StateString(this, "entryAction","");
