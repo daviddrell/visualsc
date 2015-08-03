@@ -3,13 +3,15 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsTextItem>
-
+#include "selectableboxgraphic.h"
 /**
     \class MaskedTextEdit
     \brief this class provides a QGraphicsTextItem but with a controlable display area.
     Set the bounding rect to control the visible text area. The coordinates in the set
     should be relative to this object.
   */
+
+
 
 class MaskedTextEdit : public QGraphicsTextItem
 {
@@ -21,6 +23,9 @@ public:
     virtual QRectF boundingRect();
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+
+
+    SelectableBoxGraphic* parentAsSelectableBoxGraphic();
 private:
     QRectF _rect;
 };

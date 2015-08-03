@@ -30,7 +30,11 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QTextDocument>
 
+#define DEFAULT_PEN_WIDTH 1
+#define HOVER_PEN_WIDTH 1
 
+#define MIN_WIDTH 40
+#define MIN_HEIGHT 40
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent,true),
@@ -38,7 +42,8 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
         _verticalTextMargin(10),
         _horizontalTextMargin(10),
         _textItem(this, QRect(0,0, _minSize.x()-_horizontalTextMargin, _minSize.y()-_verticalTextMargin)),
-        _textBlockModel(textBlockModel)
+        _textBlockModel(textBlockModel),
+        _centerText(true)
 {
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
     _textItem.setFlag(QGraphicsItem::ItemIsMovable, false );
@@ -48,16 +53,16 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     _textItem.setPos( viewArea.x() , viewArea.y() );
 
     // set the initial text to what the datamodel loaded
-    _textItem.setPlainText( _textBlockModel->getText() );
-
+    //_textItem.setPlainText( _textBlockModel->getText(), true );
+    this->setText(_textBlockModel->getText());
 
     setShowBoxLineStyle(SelectableBoxGraphic::kWhenSelected  );
     setDrawBoxLineStyle( SelectableBoxGraphic::kDrawDotted );
     setBoxStyle(SelectableBoxGraphic::kTransparent );
-    setHoverLineThickness( 6 );
     setFlags(QGraphicsItem::ItemClipsChildrenToShape);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
-    setMinSize(QPoint(40,40));
+    setMinSize(QPoint(MIN_WIDTH,MIN_HEIGHT));
+    setPenWidth(DEFAULT_PEN_WIDTH,HOVER_PEN_WIDTH);
 
     // if the textblock model changed, signal handle text changed to update it from the textblock model
     connect ( _textBlockModel, SIGNAL(textChanged()), this, SLOT(handleTextChanged()), Qt::QueuedConnection);
@@ -94,36 +99,85 @@ void SelectableTextBlock::resizeToFitParent()
     if( x+w > parentW - INSIDE_PARENT_BUFFER)
     {
         w = parentW - INSIDE_PARENT_BUFFER - x;
+        changed = true;
     }
 
     if(y+h > parentH - INSIDE_PARENT_BUFFER)
     {
-
+        h = parentH - INSIDE_PARENT_BUFFER - y;
+        changed = true;
     }
 
+    if(changed)
+    {
+
+        this->setSize(QPoint(w,h));
+    }
 
 
 }
 
 void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
-    switch(corner)
+   // qDebug() << "SelectableTextBlock::handleParentStateGraphicResized";
+
+    qreal w = this->getSize().x();
+    qreal h = this->getSize().y();
+    qreal x = this->pos().x();
+    qreal y = this->pos().y();
+
+   // qDebug() << "x: " << x << "y: " << y;
+    QPointF tl(x,y);
+    QPointF tr(x+w,y);
+    QPointF br(x+w,y+h);
+    QPointF bl(x,y+h);
+
+    QRectF box(INSIDE_PARENT_BUFFER,INSIDE_PARENT_BUFFER,newBox.width()-(INSIDE_PARENT_BUFFER+INSIDE_PARENT_BUFFER),newBox.height()-(INSIDE_PARENT_BUFFER+INSIDE_PARENT_BUFFER));
+
+    bool tlloc = getGridLocation(box, tl)== C;
+    bool trloc = getGridLocation(box, tr)== C;
+    bool brloc = getGridLocation(box ,br)== C;
+    bool blloc = getGridLocation(box, bl)== C;
+
+    //qDebug() << "0: "<<tlloc <<"\t1: " << trloc<<"\t2: " << brloc<<"\t3: "<<blloc;
+
+    qreal newWidth = w;
+    qreal newHeight = h;
+    if(!trloc&&!brloc)
     {
-        case 0: // top left corner, check the x,y
-        break;
-    case 1:
-        break;
-    case 2:
-        break;
-    case 3:
-        break;
+        // the right wall of the textblock is out of bounds.
+
+
+        // as long as the width of the text block is not greater than its parent...
+        // first adjust the x position until it fits
+//        x = 0;
+//        this->setPos(x,y);
+
+        // then adjust the size to fit the parent
+
+        newWidth = newBox.width()-INSIDE_PARENT_BUFFER - x;
+        //qDebug() << "old w: "<<w << "\tnew w: " << newWidth;
+
     }
+    else if(!brloc&&!blloc)
+    {
+        // the bottom wall of the text block is out of bounds
+
+        // adjust the height to fit the parent
+
+        newHeight = newBox.height()-INSIDE_PARENT_BUFFER - y;
+
+    }
+
+    this->setSize(QPoint(newWidth,newHeight));
+
 }
 
 void SelectableTextBlock::handleTextChanged()
 {
     qDebug() << "SelectableTextBlock::handleTextChanged";
-    _textItem.setPlainText( _textBlockModel->getText() );
+    //_textItem.setPlainText( _textBlockModel->getText() , true);
+    this->setText(_textBlockModel->getText());
 }
 
 void SelectableTextBlock::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event )
@@ -145,7 +199,8 @@ void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
     {
         TextEditBox * editBox = new TextEditBox( _textBlockModel);
         connect (editBox, SIGNAL(saveButtonClicked(QString)), this, SLOT(handleEditBoxSavedText(QString)));
-        QPointF myPos = this->mapToScene( this->pos() );
+        //QPointF myPos = this->mapToScene( this->pos() );
+        QPointF myPos = pos();
         SCDataModel::singleton()->getScene()->addItem( editBox);
         editBox->setPos( myPos.x(), myPos.y() +100 );
     }
@@ -160,7 +215,8 @@ void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
  */
 void SelectableTextBlock::handleEditBoxSavedText(QString text)
 {
-    _textItem.setPlainText( text );
+    //_textItem.setPlainText( text, true );
+    this->setText(text);
     _textBlockModel->setText(text);
 }
 
@@ -374,27 +430,79 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
         this->update();
 }
 
- void SelectableTextBlock::setSize(QPoint size)
- {
-     if ( size.manhattanLength()< 100)
-     {
-         size.setX( _minSize.x());
-         size.setY( _minSize.y());
-     }
+void SelectableTextBlock::setSize(QPoint size)
+{
+    /*
+    if ( size.manhattanLength()< 100)
+    {
+        size.setX( _minSize.x());
+        size.setY( _minSize.y());
+    }*/
 
-     SelectableBoxGraphic::setSize(size);
+    if(size.y() < _minSize.y())
+    {
+       size.setY(_minSize.y());
+    }
 
-     QRectF viewArea = getUsableArea();
-     int width = viewArea.width() - _horizontalTextMargin;
-     int height = viewArea.height() - _verticalTextMargin;
+    // this will prevent resizes below what fits the text
+   #if 0
+    if(size.x() < _textItem.document()->size().width())
+    {
+        size.setX(_textItem.document()->size().width());
+    }
+   #endif
 
-     QRect bRect( 0,0 , width, height);
-     _textItem.setBoundingRect(bRect);
+    if(size.x() < _minSize.x())
+    {
+        size.setX(_minSize.x());
+    }
+    SelectableBoxGraphic::setSize(size);
 
-     update();
+    recenterText();
 
- }
+    update();
 
+}
+
+ /**
+ * @brief SelectableTextBlock::recenterText
+ *
+ * centers the text in the selectable text block and sets the bounding rect
+ *
+ */
+void SelectableTextBlock::recenterText()
+{
+    QRectF viewArea = getUsableArea();
+    qreal height = viewArea.height() - _verticalTextMargin;
+    qreal width = this->getSize().x();
+    QRect bRect( 0,0 , width, height);
+    qreal textWidth = _textItem.document()->size().width();
+
+    if(textWidth > width)
+    {
+        _textItem.setPos(0, height/2);
+    }
+    else
+        _textItem.setPos(this->getSize().x()/2-_textItem.document()->size().width()/2, height/2);
+
+    _textItem.setBoundingRect(bRect);
+}
+
+/**
+ * @brief SelectableTextBlock::setText
+ * @param text
+ *
+ * overrides any text setting for the masked text item because we also want to check to center the text
+ *
+ */
+void SelectableTextBlock::setText(QString text)
+{
+    _textItem.setPlainText(text);
+    if(_centerText)
+    {
+        recenterText();
+    }
+}
 
  /**
  * @brief SelectableTextBlock::graphicHasChanged
@@ -418,6 +526,8 @@ void SelectableTextBlock::graphicHasChanged()
 
     size->setValue(sz);
     position->setValue(ps);
+
+
 
 
     //emit size->changed(size);

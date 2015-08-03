@@ -603,6 +603,11 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
     //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
     //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
+
+
+    // automatically resize text blocks when parents are resized
+    connect(stateGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)), stateGraphic->TextItem, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
+
 }
 
 
@@ -646,9 +651,6 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     // create the connect to automatically move anchor elbows when state graphics are moved.
     connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
     connect(targetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleTargetStateGraphicResized(QRectF, QRectF, int)));
-
-    // automatically resize text blocks when parents are resized
-    connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)), parentGraphic->TextItem, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
 
     // connect this state box's grand parents update anchors when they are resized
     StateBoxGraphic* grandParentGraphic = parentGraphic->parentItemAsStateBoxGraphic();

@@ -42,8 +42,33 @@ class IAttribute;
   * \ingroup GraphicsView
   */
 
+/* GridLocations
+ *
+ *  0   1   2
+ *  7   8   3
+ *  6   5   4
+ *
+ *  UL  U   UR
+ *  L   C   R
+ *  DL  D   DR
+ *
+ */
+enum GridLocation{
+    UL,
+    U,
+    UR,
+    R,
+    DR,
+    D,
+    DL,
+    L,
+    C
+};
+
+
 class SelectableBoxGraphic :  public QGraphicsObject
 {
+
 
 Q_OBJECT
 public:
@@ -70,12 +95,12 @@ public:
     void setShowBoxLineStyle(ShowBoxStyle s );///< show box always, or only when selected
     void setDrawBoxLineStyle( DrawBoxLineStyle s);///< if drawing box, draw solid or dotted line
     void setBoxStyle (BoxStyle s); ///< set box style
-    void setHoverLineThickness(int t);///< set line thickness when hovered
+
     QRectF getUsableArea();///< returns a rect relative to the SelecableBoxGraphic that represents the inside margin, or usable area of the box.
     QPointF getVisibleCenter();///< returns a point which is appears to be the center of the box (i.e. does not include drop shadow), may not be the center of boundingRect()
     QPointF getSideCenterPointInSceneCoord(int side); ///< returns the center point on a given side, for anchoring a transition line in the middle of a side
     void getAllChildren(QList<SelectableBoxGraphic*> &stateList);
-
+    void setPenWidth(qreal, qreal);
     void setMinSize(QPoint);
     //bool eventFilter(QObject *, QEvent *);
 
@@ -90,7 +115,12 @@ protected:
     QPointF _dragStart;
     int     _gridSpace;
     QPoint _minSize;
+    qreal _penHoverWidth;
+    qreal _penWidth;
 
+
+    int getGridLocation(QRectF, QPointF);
+    bool isBetween(qreal start, qreal end, qreal point);
 
 private:
 
@@ -145,7 +175,6 @@ private:
     ShowBoxStyle     _showBoxStyle;
     DrawBoxLineStyle _drawBoxLineStyle;
     BoxStyle         _boxStyle;
-    int              _hoverLineThickness;
 
 
 };

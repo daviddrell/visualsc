@@ -50,6 +50,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     //setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
     setBoxStyle(SelectableBoxGraphic::kSolidNoShadow);
     setMinSize(QPoint(60,60));
+    setPenWidth(2,3.2360679775);
     //TextItem.setPos(25,10);
 
     //TextItem.setParentItem(this);
@@ -469,10 +470,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
     }
 }
 
-bool StateBoxGraphic::isBetween(qreal start, qreal end, qreal point)
-{
-    return (point>=start)&&(point<=end);
-}
+
 
 /**
  * @brief StateBoxGraphic::getGridLocation

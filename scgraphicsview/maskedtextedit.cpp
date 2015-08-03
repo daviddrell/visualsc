@@ -25,3 +25,7 @@ void MaskedTextEdit::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     QGraphicsTextItem::paint(painter, option, widget);
 }
 
+SelectableBoxGraphic* MaskedTextEdit::parentAsSelectableBoxGraphic()
+{
+    return dynamic_cast<SelectableBoxGraphic*>(this->parentItem());
+}

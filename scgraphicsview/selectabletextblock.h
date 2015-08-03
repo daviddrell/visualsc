@@ -45,6 +45,8 @@ public:
     virtual void graphicHasChanged(); ///< pure virtual in base SelectableBoxGraphic, subclass must implement this, used to record user changes back to the data model
     SelectableBoxGraphic* parentAsSelectableBoxGraphic();
 
+    void setText(QString);
+
 signals:
     void textBlockMoved(QPointF);
 
@@ -75,6 +77,7 @@ private:
 
    void connectAttributes(IAttributeContainer *attributes);
    void resizeToFitParent();
+   void recenterText();
 
    // private data
 
@@ -82,6 +85,8 @@ private:
    int           _verticalTextMargin;
    int           _horizontalTextMargin;
    MaskedTextEdit _textItem;
+
+   bool _centerText;
 
    SCTextBlock * _textBlockModel;
 };

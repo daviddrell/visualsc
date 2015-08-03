@@ -53,28 +53,7 @@ class IAttribute;
 
 
 
-/* GridLocations
- *
- *  0   1   2
- *  7   8   3
- *  6   5   4
- *
- *  UL  U   UR
- *  L   C   R
- *  DL  D   DR
- *
- */
-enum GridLocation{
-    UL,
-    U,
-    UR,
-    R,
-    DR,
-    D,
-    DL,
-    L,
-    C
-};
+
 
 enum WallFace{
     NORTH,
@@ -110,7 +89,6 @@ public:
 
 
     int getGridLocation(QPointF mts,QPointF point);
-    bool isBetween(qreal start, qreal end, qreal point);
     void setGridSpace(int space);
     //void setTitle(QString t);
     void setSize(QPointF size);

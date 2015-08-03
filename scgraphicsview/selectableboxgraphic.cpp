@@ -74,7 +74,6 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _showBoxStyle(kWhenSelected),
         _drawBoxLineStyle(kDrawDotted),
         _boxStyle(kTransparent),
-        _hoverLineThickness(3),
         _keepInsideParent(false),
         _minSize(QPoint(40,40))
 {
@@ -86,6 +85,9 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
 
     this->setAcceptHoverEvents(true);
     //this->installEventFilter(this);
+
+    setPenWidth(2,3);
+
 }
 
 SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepInsideParent):
@@ -107,7 +109,6 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
         _showBoxStyle(kWhenSelected),
         _drawBoxLineStyle(kDrawDotted),
         _boxStyle(kTransparent),
-        _hoverLineThickness(3),
         _keepInsideParent(keepInsideParent)
 {
 
@@ -118,6 +119,7 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
 
     this->setAcceptHoverEvents(true);
     //this->installEventFilter(this);
+    setPenWidth(2,3);
 }
 
 
@@ -130,10 +132,6 @@ SelectableBoxGraphic::~SelectableBoxGraphic()
 }
 
 
-void SelectableBoxGraphic::setHoverLineThickness(int t )
-{
-    _hoverLineThickness = t;
-}
 
 
 void SelectableBoxGraphic::setShowBoxLineStyle(ShowBoxStyle s )
@@ -225,7 +223,7 @@ void SelectableBoxGraphic::adjustDrawingSize(int x, int y)
   * event.  A dynamic_cast is used to determine if the event type is one of the events
   * we are interrested in.
   */
-bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * event )
+bool SelectableBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event )
 {
     //    qDebug() << " QEvent == " + QString::number(event->type());
 
@@ -723,6 +721,87 @@ void SelectableBoxGraphic::setMinSize(QPoint size)
     _minSize = size;
 }
 
+bool SelectableBoxGraphic::isBetween(qreal start, qreal end, qreal point)
+{
+    return (point>=start)&&(point<=end);
+}
+
+/**
+ * @brief SelectableBoxGraphic::getGridLocation
+ * @param box
+ * @param point
+ * @return
+ *
+ *  returns the grid location of a point on this box with scene based coordinates
+ *  the entire state box will take up grid location 8
+ *
+ *   the grid location of a statebox is as follows:
+               |   |
+     ________0_|_1_|_2________
+     ________7_|_8_|_3________
+             6 | 5 | 4
+               |   |
+
+ *
+ *  UL  U   UR
+ *  L   C   R
+ *  DL  D   DR
+ *
+ *
+ *
+ */
+int SelectableBoxGraphic::getGridLocation(QRectF box, QPointF point)
+{
+    qreal px = point.x();
+    qreal py = point.y();
+
+    qreal x = box.x();
+    qreal y = box.y();
+
+    qreal w = box.width();
+    qreal h = box.height();
+
+    // above the box
+    if(py < y )
+    {
+        // directly above
+        if(isBetween(x,x+w,px))
+            return U;
+
+        else if(px<x)
+            return UL;
+
+        else
+            return UR;
+    }
+
+    // below
+    else if( py > (y+h) )
+    {
+        //directly below
+        if(isBetween(x,x+w,px))
+            return D;
+        else if(px < x)
+            return DL;
+        else
+            return DR;
+    }
+
+    // directly right of the box
+    else if( px > (x+w) && isBetween(y,y+h,py))
+    {
+        return R;
+    }
+
+    // directly left of the box
+    else if( px < x && isBetween(y,y+h,py))
+    {
+        return L;
+    }
+
+    else    // otherwise it is in the center of the box
+        return C;
+}
 
 /**
  * @brief SelectableBoxGraphic::setSizeAndUpdateAnchors
@@ -811,6 +890,7 @@ void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     delete _corners[3];
     _corners[3] = NULL;
 
+    _pen.setWidthF(_penWidth);
 }
 
 
@@ -840,6 +920,8 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
     setCornerPositions();
 
+    _pen.setWidthF(_penHoverWidth);
+
 }
 
 void SelectableBoxGraphic::setCornerPositions()
@@ -850,6 +932,13 @@ void SelectableBoxGraphic::setCornerPositions()
     _corners[2]->setPos(_drawingWidth , _drawingHeight);
     _corners[3]->setPos(_drawingOrigenX, _drawingHeight);
 
+}
+
+void SelectableBoxGraphic::setPenWidth(qreal defaultWidth, qreal hoverWidth)
+{
+    _penWidth = defaultWidth;
+    _penHoverWidth = hoverWidth;
+    _pen.setWidthF(_penWidth);
 }
 
 QRectF SelectableBoxGraphic::boundingRect() const
@@ -963,11 +1052,11 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
     else
         _pen.setColor(Qt::black);
 
-    if ( _isHovered )
-         _pen.setWidth(BOX_HOVER_PEN_WIDTH);
+  /*  if ( _isHovered )
+        _pen.setWidth(BOX_HOVER_PEN_WIDTH);
     else
         _pen.setWidth(BOX_DEFAULT_PEN_WIDTH);
-
+*/
     if ( _drawBoxLineStyle == kDrawSolid )
         _pen.setStyle( Qt::SolidLine );
     else
