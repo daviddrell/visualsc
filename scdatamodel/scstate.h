@@ -77,6 +77,9 @@ public:
     void addTransistion(SCTransition*);
     void addState(SCState *);
 
+
+    SCState* parentAsSCState();
+
     void setAttributeValue(QString key, QString value);
     void addAttribute(QString key, QString value);
     bool removeAttribute(QString key);

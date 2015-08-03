@@ -33,6 +33,7 @@ SCState::SCState(QObject *parent) :
     _IdTextBlock(new SCTextBlock())
 {
    initCommon();
+   this->setLevel(this->parentAsSCState()->getLevel()+1);
 }
 
 
@@ -42,6 +43,7 @@ SCState::SCState(const SCState& st) :
     _IdTextBlock(new SCTextBlock())
 {
     initCommon();
+    this->setLevel(this->parentAsSCState()->getLevel()+1);
 }
 
 
@@ -56,6 +58,7 @@ SCState::SCState( bool topState) :
     if ( topState )
     {
         this->setStateName( "State Machine" );
+        this->setLevel(0);
     }
 }
 
@@ -70,6 +73,10 @@ SCState::~SCState()
     delete _IdTextBlock;
 }
 
+SCState* SCState::parentAsSCState()
+{
+    return dynamic_cast<SCState*>(this->parent());
+}
 
 /**
  * @brief SCState::initCommon

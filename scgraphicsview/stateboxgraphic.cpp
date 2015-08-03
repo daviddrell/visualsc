@@ -871,7 +871,18 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
     if ( _boxStyle != kTransparent )
     {
         // QBrush brush2(QColor(187,250,185,255),Qt::SolidPattern);  // the box fill color
-         QBrush brush2(QColor(255,255,255,255),Qt::SolidPattern);  // white fill
+        //qDebug() << "my levle: " <<this->getStateModel()->getLevel() ;
+
+//         int r = (255+ (255 - this->getStateModel()->getLevel()*30)%255);
+//         int g = (255+ (255 - this->getStateModel()->getLevel()*20)%255);
+//         int b = (255+ (255 - this->getStateModel()->getLevel()*10)%255);
+
+        // add colored layers
+         int r = 255 - (((this->getStateModel()->getLevel()) * 67 ) % 255);
+         int g = 255 - (((this->getStateModel()->getLevel()) * 23 ) % 255);
+         int b = 255 - (((this->getStateModel()->getLevel()-1) * 7 ) % 255);
+
+         QBrush brush2(QColor(r,g,b,255),Qt::SolidPattern);  // white fill
          painter->setBrush( brush2);
     }
 
