@@ -647,6 +647,9 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
     connect(targetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleTargetStateGraphicResized(QRectF, QRectF, int)));
 
+    // automatically resize text blocks when parents are resized
+    connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)), parentGraphic->TextItem, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
+
     // connect this state box's grand parents update anchors when they are resized
     StateBoxGraphic* grandParentGraphic = parentGraphic->parentItemAsStateBoxGraphic();
     while(grandParentGraphic)

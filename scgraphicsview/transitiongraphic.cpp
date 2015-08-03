@@ -664,12 +664,6 @@ void TransitionGraphic::handleGrandParentStateGraphicResized(QRectF oldBox, QRec
  */
 void TransitionGraphic::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
-#if 0
-    qreal newWidth = newBox.width()-SOURCE_ANCHOR_BUFFER;
-    qreal newHeight = newBox.height()-SOURCE_ANCHOR_BUFFER;
-    qreal oldWidth = oldBox.width()-SOURCE_ANCHOR_BUFFER;
-    qreal oldHeight = oldBox.height()-SOURCE_ANCHOR_BUFFER;
-#endif
     qreal newWidth = newBox.width();
     qreal newHeight = newBox.height();
     qreal oldWidth = oldBox.width();

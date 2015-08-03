@@ -67,12 +67,14 @@ private slots:
     void handleAttributeAdded(IAttribute *attr);
     void handleAttributeDeleted(IAttribute *attr);
     void handleEditBoxSavedText(QString text);
+    void handleParentStateGraphicResized(QRectF, QRectF, int);
 
 private:
 
     // private methods
 
    void connectAttributes(IAttributeContainer *attributes);
+   void resizeToFitParent();
 
    // private data
 

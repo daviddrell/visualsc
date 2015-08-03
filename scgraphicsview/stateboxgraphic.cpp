@@ -49,6 +49,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     setDrawBoxLineStyle  ( SelectableBoxGraphic::kDrawSolid );
     //setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
     setBoxStyle(SelectableBoxGraphic::kSolidNoShadow);
+    setMinSize(QPoint(60,60));
     //TextItem.setPos(25,10);
 
     //TextItem.setParentItem(this);

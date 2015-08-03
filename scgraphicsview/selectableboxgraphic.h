@@ -15,6 +15,7 @@
 #define BOX_BUFFER 12
 #define BOX_DEFAULT_PEN_WIDTH 2
 #define BOX_HOVER_PEN_WIDTH 3
+#define INSIDE_PARENT_BUFFER 10
 
 class CornerGrabber;
 class IAttribute;

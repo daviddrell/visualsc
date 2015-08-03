@@ -33,7 +33,7 @@
 #include <QKeyEvent>
 #include "stateboxgraphic.h"
 
-#define INSIDE_PARENT_BUFFER 10
+
 
 class StateBoxGraphic;
 
@@ -452,17 +452,6 @@ bool SelectableBoxGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * 
                 deltaWidth *= (-1);
                 deltaHeight *= (-1);
 
-//                    if(newXpos > old.x()+w - INSIDE_PARENT_BUFFER)
-//                    {
-//                        deltaWidth = 0+INSIDE_PARENT_BUFFER - pos().x();
-//                        newXpos = old.x()+w - INSIDE_PARENT_BUFFER;
-//                    }
-
-//                    if(newYpos > old.y()  + h - INSIDE_PARENT_BUFFER)
-//                    {
-//                        deltaHeight = 0+INSIDE_PARENT_BUFFER - pos().y();
-//                        newYpos = old.y() + h - INSIDE_PARENT_BUFFER;
-//                    }
 
             }
             else   if ( corner->getCorner() == 3 )

@@ -161,7 +161,7 @@ void CodeWriter::cWriteConstructor()
     }
 
     // set the machine's initial state
-    cPrintln(stateMachineName+"-setInitialState("+_states.value(_initialState)->stateName+");",1);
+    cPrintln(stateMachineName+"->setInitialState("+_states.value(_initialState)->stateName+");",1);
 
     cPrintln("\n//",1);
     cPrintln("//    add transitions for the QStates using the transitions' private relay signals",1);
@@ -206,8 +206,8 @@ void CodeWriter::cWriteConstructor()
 
 
         childName = "_"+toCamel(state->attributes.value("name")->asString());
-        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(entered()), this, SIGNAL("+_states.value(state)->entryRelaySignal+");",1);
-        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(exited()), this, SIGNAL("+_states.value(state)->entryRelaySignal+");",1);
+        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(entered()), this, SIGNAL("+_states.value(state)->entryRelaySignal+"));",1);
+        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(exited()), this, SIGNAL("+_states.value(state)->entryRelaySignal+"));",1);
 
 
     }
@@ -223,8 +223,8 @@ void CodeWriter::cWriteConstructor()
     for(int i = 0; i < _children.size(); i++)
     {
         state = _children.at(i);
-        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(entered()), this, SLOT("+_states.value(state)->entryRelaySlot+");",1);
-        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(exited()), this, SLOT("+_states.value(state)->exitRelaySlot+");",1);
+        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(entered()), this, SLOT("+_states.value(state)->entryRelaySlot+"));",1);
+        cPrintln("connect("+_states.value(state)->stateName+", SIGNAL(exited()), this, SLOT("+_states.value(state)->exitRelaySlot+"));",1);
 
 
     }
@@ -286,7 +286,7 @@ void CodeWriter::cWriteEntryExitSlots()
     for(int i = 0; i < _children.size(); i++)
     {
         state = _children.at(i);
-        cPrintln("void "+className+"::"+_states.value(state)->entryRelaySlot+"()");
+        cPrintln("void "+className+"::"+_states.value(state)->entryRelaySlot+"");
         cPrintln("{");
         actionSignal = _states.value(state)->entryAction;
 
@@ -297,7 +297,7 @@ void CodeWriter::cWriteEntryExitSlots()
         cPrintln("}\n");
 
 
-        cPrintln("void "+className+"::"+_states.value(state)->exitRelaySlot+"()");
+        cPrintln("void "+className+"::"+_states.value(state)->exitRelaySlot+"");
         cPrintln("{");
         actionSignal = _states.value(state)->exitAction;
 

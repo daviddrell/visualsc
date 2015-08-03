@@ -79,6 +79,47 @@ SelectableTextBlock::~SelectableTextBlock()
 {
 }
 
+void SelectableTextBlock::resizeToFitParent()
+{
+    qreal w = this->getSize().x();
+    qreal h = this->getSize().y();
+    qreal x = this->pos().x();
+    qreal y = this->pos().y();
+
+    qreal parentW = this->parentAsSelectableBoxGraphic()->pos().x();
+    qreal parentH = this->parentAsSelectableBoxGraphic()->pos().y();
+
+    bool changed = false;
+
+    if( x+w > parentW - INSIDE_PARENT_BUFFER)
+    {
+        w = parentW - INSIDE_PARENT_BUFFER - x;
+    }
+
+    if(y+h > parentH - INSIDE_PARENT_BUFFER)
+    {
+
+    }
+
+
+
+}
+
+void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
+{
+    switch(corner)
+    {
+        case 0: // top left corner, check the x,y
+        break;
+    case 1:
+        break;
+    case 2:
+        break;
+    case 3:
+        break;
+    }
+}
+
 void SelectableTextBlock::handleTextChanged()
 {
     qDebug() << "SelectableTextBlock::handleTextChanged";
