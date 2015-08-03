@@ -203,6 +203,11 @@ private:
 
     void deleteItem(QObject * item);
     void setAttributeConnections(IAttributeContainer * atts, bool shouldConnect);
+
+    void loadPropertyTable(FVItem*);
+    void loadPropertyTable(SCState*);
+    void loadPropertyTable(SCTransition*);
+
     void setTextBlockAttributeConnections(IAttributeContainer* atts, bool connect);
     void clearPropertyTable();
     void clearTextBlockPropertyTable();

@@ -31,6 +31,7 @@ class QPoint;
 #include "scdatamodel_global.h"
 #include "scitem.h"
 //#include "stateboxgraphic.h"
+#include <QUuid>
 
 /**
 
@@ -66,7 +67,9 @@ public:
 
     //void prepareForDelete();
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
-
+    QString getUid();
+    bool doNotPrint(QString);
+    int doNotPrintSize();
     enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };
     void addTransitionReference(SCTransition*, TransitionTransitDirection );
 
@@ -163,6 +166,8 @@ public:
     void setLevel(int level);
 
 
+    SCState* getStateByUid(QString);
+
 
     /**
       * \fn getStateByName
@@ -236,6 +241,9 @@ private:
 
     int _level ; ///< distance from top state in terms of parent-child relationships
     QList<QString> DEFAULT_PROPERTIES_LIST;
+
+    QList<QString> DO_NOT_DISPLAY_LIST; // attributes that can be ignored in the property table
+    QHash<QString,int> DO_NOT_DISPLAY_HASH;
 
 };
 

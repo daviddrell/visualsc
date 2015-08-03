@@ -41,7 +41,7 @@ SCTransition::SCTransition(QObject * parent):
      path
      */
 
-    DEFAULT_PROPERTIES_LIST << "target" << "event" << "comments" << "path";
+    DEFAULT_PROPERTIES_LIST << "target" << "event" << "comments" << "path" << "uid";
 
 
     // SCTransition will load with target, event, commentary, and path
@@ -59,6 +59,8 @@ SCTransition::SCTransition(QObject * parent):
     attributes.addItem(path);
 
 
+    TransitionStringAttribute* uid = new TransitionStringAttribute(this, "uid", QString());
+    attributes.addItem(uid);
 
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
@@ -105,6 +107,16 @@ SCState* SCTransition::parentSCState()
 void SCTransition::setText(QString eventText)
 {
     _eventTextBlock->setText(eventText);
+}
+
+void SCTransition::setUid(QString uid)
+{
+    attributes.value("uid")->setValue(uid);
+}
+
+QString SCTransition::getUid()
+{
+    return attributes.value("uid")->asString();
 }
 
 /**

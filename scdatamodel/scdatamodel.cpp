@@ -388,8 +388,26 @@ void SCDataModel::connectTransitionsToStatePath()
     for (int t = 0; t < tlist.count(); t++)
     {
         SCTransition* trans = tlist.at(t);
-        QString targetStr = trans->attributes["target"]->asString();
-        SCState * targetState = _topState->getStateByName(targetStr);
+        //QString targetStr = trans->attributes["target"]->asString();
+        //SCState * targetState = _topState->getStateByName(targetStr);
+
+        QString targetStr = trans->getUid();
+        SCState* targetState = _topState->getStateByUid(targetStr);
+
+        // if uid fails, then try the old method
+        if(!targetState)
+        {
+            qDebug() << "uid was not found. trying by string...";
+            targetStr = trans->attributes["target"]->asString();
+            targetState = _topState->getStateByName(targetStr);
+
+            if(targetState && trans->getUid().isEmpty())
+            {
+                qDebug() << "@@@@ setting transition uid to: "<< targetState->getUid();
+                trans->setUid(targetState->getUid());
+            }
+        }
+
         qDebug() << "target String: " << targetStr << " targetState; " << targetState->objectName();
         if ( targetState )
         {
@@ -1054,6 +1072,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
 
     transition->setAttributeValue("target", target->attributes.value("name")->asString());
     transition->setAttributeValue("event", "event");
+    transition->setAttributeValue("uid",target->getUid());
     transition->setObjectName("event");
     target->addTransitionReference(transition, SCState::kTransitIn);
     source->addTransitionReference(transition, SCState::kTransitOut);
@@ -1103,11 +1122,6 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     delete ta;
 
     qDebug() << "leave handleMakeANewTransition, : "  ;
-
-
-
-
-
 }
 /*
 void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta, SCState* sourceState)

@@ -95,7 +95,9 @@ void SCState::initCommon()
     }
 
 
-    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"finalState"<<"initialState"; // type is added to the state in scxml reader.
+    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"finalState"<<"initialState"<<"uid"; // type is added to the state in scxml reader.
+
+    DO_NOT_DISPLAY_HASH.insert("uid",0);
 
     // set the initial attributes and size
     StateName * name = new StateName (this, "name",defaultName);
@@ -108,6 +110,12 @@ void SCState::initCommon()
     StateString * initialState = new StateString(this, "initialState", "false");
     StateString * isParallelState = new StateString(this, "isParallelState", "false");
 
+    QUuid u=QUuid::createUuid();
+
+    StateString * uid= new StateString(this, "uid", u.toString());
+
+    qDebug() << "uid; " << u.toString();
+
     attributes.addItem(name);
     attributes.addItem(size);
     attributes.addItem(position);
@@ -117,6 +125,7 @@ void SCState::initCommon()
     attributes.addItem(finalState);
     attributes.addItem(initialState);
     attributes.addItem(isParallelState);
+    attributes.addItem(uid);
 
     this->setObjectName(defaultName);// to support debug tracing
 
@@ -630,6 +639,36 @@ SCState* SCState::getStateByName(QString name)
 }
 
 
+SCState* SCState::getStateByUid(QString uid)
+{
+    SCState* target=NULL;
+
+    //qDebug() << "thi sis : " <<this->objectName()<< "and we have children num: " << this->children().size();
+    for(int i = 0; i < this->children().size();i++)
+    {
+
+        SCState* state = dynamic_cast<SCState*>(this->children().at(i));
+        if(state)
+        {
+            //qDebug() << "state name: " << state->objectName()<<" \tstate uid: " << state->getUid();
+            if(state->getUid() == uid)
+            {
+                //qDebug()<<"returning state as target...: " << state->objectName();
+                return state;
+            }
+            else
+            {
+                target = state->getStateByUid(uid);
+                if(target)
+                    return target;
+            }
+        }
+    }
+    return target;
+
+}
+
+
 int SCState::getLevel()
 {
     return _level;
@@ -676,6 +715,21 @@ void SCState::getAllStates(QList<SCState *> & stateList)
     }
 }
 
+
+bool SCState::doNotPrint(QString attribute)
+{
+    return DO_NOT_DISPLAY_HASH.contains(attribute);
+}
+
+int SCState::doNotPrintSize()
+{
+    return DO_NOT_DISPLAY_HASH.size();
+}
+
+QString SCState::getUid()
+{
+    return attributes.value("uid")->asString();
+}
 
 /**
  * @brief SCState::writeSCVXML

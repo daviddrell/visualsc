@@ -651,7 +651,7 @@ void SelectableBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
  */
 void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
-    qDebug() << "mouse move event!";
+    //qDebug() << "mouse move event!";
     QPointF newPos = event->pos() ;
     QPointF location = this->pos();
     QPointF diff = newPos -_dragStart;

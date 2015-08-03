@@ -31,7 +31,7 @@ class QXmlStreamWriter;
 #include "scitem.h"
 #include "textblock.h"
 #include "transitionattributes.h"
-
+#include <QUuid>
 
 
 /**
@@ -61,7 +61,8 @@ public:
     SCState* parentSCState();
 
     void deleteSafely();
-
+    void setUid(QString);
+    QString getUid();
      void setEventName(QString text);
     //void setTextPos(QPointF);
  //   void setTextSize(qreal w, qreal h);
