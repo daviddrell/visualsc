@@ -101,6 +101,9 @@ public:
     QPointF mapToHighestParent(QPointF pos);
     StateBoxGraphic* parentItemAsStateBoxGraphic();
 
+protected:
+    void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+
 public slots:
     void handleTransitionLineStartMoved(QPointF newPos);
     void handleTransitionLineEndMoved(QPointF newPos);

@@ -799,12 +799,113 @@ StateBoxGraphic* StateBoxGraphic::getHighestLevelParentItemAsStateBoxGraphic()
     return gp;
 }
 
+
+void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+
+    int shadowThickness = 5;
+
+    if ( _boxStyle == kSolidWithShadow )
+    {
+
+        /*
+     The drop shadow effect will be created by drawing a filled, rounded corner rectangle with a gradient fill.
+     Then on top of this will be drawn  filled, rounded corner rectangle, filled with a solid color, and offset such that the gradient filled
+     box is only visible below for a few pixels on two edges.
+
+     The total box size is _width by _height. So the top box will start at (0,0) and go to (_width-shadowThickness, _height-shadowThickness),
+     while the under box will be offset, and start at (shadowThickness+0, shadowThickness+0) and go to  (_width, _height).
+       */
+
+
+        QLinearGradient gradient;
+        gradient.setStart(_drawingOrigenX,_drawingOrigenY);
+        gradient.setFinalStop( _drawingWidth ,_drawingOrigenY);
+        QColor grey1(125,125,125,125);// starting color of the gradient - can play with the starting color and ,point since its not visible anyway
+
+        // grey2 is ending color of the gradient - this is what will show up as the shadow. the last parameter is the alpha blend, its set
+        // to 125 allowing a mix of th color and and the background, making more realistic shadow effect.
+        QColor grey2(225,225,225,125);
+
+
+        gradient.setColorAt((qreal)0, grey1 );
+        gradient.setColorAt((qreal)1, grey2 );
+
+        QBrush brush(gradient);
+
+        painter->setBrush( brush);
+
+        // for the desired effect, no border will be drawn, and because a brush was set, the drawRoundRect will fill the box with the gradient brush.
+        QPen pen;
+        pen.setStyle(Qt::NoPen);
+        painter->setPen(pen);
+
+        QPointF topLeft (_drawingOrigenX,_drawingOrigenX);
+        QPointF bottomRight ( _drawingWidth , _drawingHeight);
+
+        QRectF rect (topLeft, bottomRight);
+
+        painter->drawRoundRect(rect,25,25); // corner radius of 25 pixels
+    }
+
+    // draw the top box, the visible one
+
+    if ( _isHighlighted )
+        _pen.setColor(Qt::red);
+    else
+        _pen.setColor(Qt::black);
+
+  /*  if ( _isHovered )
+        _pen.setWidth(BOX_HOVER_PEN_WIDTH);
+    else
+        _pen.setWidth(BOX_DEFAULT_PEN_WIDTH);
+*/
+    if ( _drawBoxLineStyle == kDrawSolid )
+        _pen.setStyle( Qt::SolidLine );
+    else
+        _pen.setStyle( Qt::DotLine );
+
+    painter->setPen(_pen);
+
+
+    if ( _boxStyle != kTransparent )
+    {
+        // QBrush brush2(QColor(187,250,185,255),Qt::SolidPattern);  // the box fill color
+         QBrush brush2(QColor(255,255,255,255),Qt::SolidPattern);  // white fill
+         painter->setBrush( brush2);
+    }
+
+
+    // draw outter layer box
+    // if shadowed box, draw inside, else draw on the outter edge
+    QRectF rect2;
+
+    if ( _boxStyle == kSolidWithShadow )
+    {
+        QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
+        QPointF bottomRight2 ( _drawingWidth - shadowThickness, _drawingHeight - shadowThickness);
+
+        rect2 = QRectF (topLeft2, bottomRight2);
+    }
+    else
+    {
+        QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
+        QPointF bottomRight2 ( _drawingWidth, _drawingHeight);
+
+        rect2 = QRectF (topLeft2, bottomRight2);
+    }
+
+    painter->drawRoundRect(rect2,25,25);
+
+}
+
 void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     if  ( (_showBoxStyle == kAlways) || (( _showBoxStyle == kWhenSelected) && ( _isHovered == true)))
     {
-        painter->setRenderHint(QPainter::HighQualityAntialiasing);
-        SelectableBoxGraphic::paintWithVisibleBox (painter,0,0);
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+        paintWithVisibleBox (painter,0,0);
     }
 
 #if 0  // debug stuff

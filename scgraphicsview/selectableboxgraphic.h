@@ -128,6 +128,7 @@ protected:
     ShowBoxStyle     _showBoxStyle;
     DrawBoxLineStyle _drawBoxLineStyle;
     BoxStyle         _boxStyle;
+    QPen     _pen ;
 
     int getGridLocation(QRectF, QPointF);
     bool isBetween(qreal start, qreal end, qreal point);
@@ -162,7 +163,7 @@ private:
 private:
     //private data
 
-    QPen     _pen ;
+
 
 
     bool _keepInsideParent;

@@ -1102,7 +1102,8 @@ void SelectableBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsI
 
     if  ( (_showBoxStyle == kAlways) || (( _showBoxStyle == kWhenSelected) && ( _isHovered == true)))
     {
-        painter->setRenderHint(QPainter::HighQualityAntialiasing);
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
         paintWithVisibleBox (painter,0,0);
     }
     //else no painting required
