@@ -116,7 +116,7 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
 
 
 
-    qDebug() << "targetGraphic: " << targetGraphic->objectName();
+    //qDebug() << "targetGraphic: " << targetGraphic->objectName();
 
     // set the targetState for the transition
     trans->setTargetState(targetState);

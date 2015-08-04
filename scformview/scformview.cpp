@@ -945,8 +945,9 @@ void SCFormView::connectState(SCState* st)
  */
 void SCFormView::connectTransition(SCTransition* trans)
 {
-    qDebug() << "SCFormView::connectTransition for " << trans->attributes.value("event")->asString();
+    //qDebug() << "SCFormView::connectTransition for " << trans->attributes.value("event")->asString();
     connect(trans, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
+    connect(trans, SIGNAL(changedTarget(SCTransition*,SCState*)), this, SLOT(handleChangedTransitionTarget(SCTransition*,SCState*)));
     /*connect(trans, SIGNAL(eventChangedInDataModel(SCTransition*, QString)), this, SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
     connect(trans->getEventTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*,QPointF)));
     connect(trans->getEventTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));*/
@@ -1189,9 +1190,15 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
     int row = 0;
     QMapIterator<QString,IAttribute*> i(*atts);
 
+    int numRows = atts->size() - trans->doNotPrintSize();
+    propertyTable->setRowCount(numRows);
+
     while (i.hasNext())
     {
         QString key  = i.next().key();
+
+        // only add the property if it's not in the do not display list
+        if(!trans->doNotPrint(key));
         {
             IAttribute* attr = atts->value(key);
 
@@ -1204,20 +1211,21 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
             propertyTable->setItem(row, 0, propName);
             propertyTable->setItem(row++, 1, propValue);
 
-            if(_currentlySelected->isState())
-            {
 
-                connectState(_currentlySelected->getState(), propValue, key);
-            }
+            connectTransition(_currentlySelected->getTransition(), propValue, key);
 
-            if(_currentlySelected->isTransition())
-            {
-                connectTransition(_currentlySelected->getTransition(), propValue, key);
-            }
          }
     }
 }
 
+/**
+ * @brief SCFormView::loadPropertyTable
+ * @param state     SCState to load property table
+ *
+ * loads the property table with the properties of the passed state.
+ * additionally will call connectState on the state so that the property table is updated as the data model is for certain properties
+ *
+ */
 void SCFormView::loadPropertyTable(SCState* state)
 {
     IAttributeContainer* atts = state->getAttributes();
@@ -1246,16 +1254,7 @@ void SCFormView::loadPropertyTable(SCState* state)
             propertyTable->setItem(row, 0, propName);
             propertyTable->setItem(row++, 1, propValue);
 
-            if(_currentlySelected->isState())
-            {
-
-                connectState(_currentlySelected->getState(), propValue, key);
-            }
-
-            if(_currentlySelected->isTransition())
-            {
-                connectTransition(_currentlySelected->getTransition(), propValue, key);
-            }
+            connectState(_currentlySelected->getState(), propValue, key);
         }
     }
 
@@ -1993,36 +1992,74 @@ void SCFormView::pointerGroupClicked(int)
 
 void SCFormView::reselectParent()
 {
-    SCState* st = _currentlySelected->getState();
-    if(st == NULL)
+    if(_currentlySelected->isState())
     {
-        sendMessage("Error","Select a state");
-        return;
+        SCState* st = _currentlySelected->getState();
+        if(st == NULL)
+        {
+            sendMessage("Error","Click a state");
+            return;
+        }
+
+        if(st->parent() == NULL)
+        {
+            sendMessage("Error","Cannot reselect parent for the root machine");
+            return;
+        }
+
+        // create a new state tree window to select a state from
+        _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
+
+        // Pass the target and the target name to handleStateSelectionWindowStateSelected
+        connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectParent(SCState*)));
+
+        _targetStateSelectionWindow->show();
+
+
+    }
+    else if (_currentlySelected->isTransition())
+    {
+        SCTransition* trans = _currentlySelected->getTransition();
+
+        // create a new state tree window to select a state from
+        _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
+
+        // Pass the target and the target name to handleStateSelectionWindowStateSelected
+        connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectTransitionTarget(SCState*)));
+
+        _targetStateSelectionWindow->show();
+    }
+    else
+    {
+        sendMessage("Error","Click a transition or state first");
     }
 
-    if(st->parent() == NULL)
-    {
-        sendMessage("Error","Cannot reselect parent for the root machine");
-        return;
-    }
 
-    // create a new state tree window to select a state from
-    _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
 
-    // Pass the target and the target name to handleStateSelectionWindowStateSelected
-    connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectParent(SCState*)));
 
-    _targetStateSelectionWindow->show();
+}
+
+void SCFormView::handleReselectTransitionTarget(SCState * target)
+{
+    qDebug() << "SCFormView::handleReselectTransitionTarget";
+
+    _currentlySelected->getTransition()->setTargetState(target);
+    _targetStateSelectionWindow->close();
+    delete _targetStateSelectionWindow;
+    _targetStateSelectionWindow = NULL;
+}
+
+void SCFormView::handleChangedTransitionTarget(SCTransition * trans, SCState * newTarget)
+{
+    qDebug() << "SCFormView::handleChangedTransitionTarget";
+
 }
 
 void SCFormView::handleReselectParent(SCState * target)
 {
     qDebug() << "SCFormView::handleReselectParent";
     _currentlySelected->getState()->reselectParent(target);
-
-
     _targetStateSelectionWindow->close();
-
     delete _targetStateSelectionWindow;
     _targetStateSelectionWindow = NULL;
 }

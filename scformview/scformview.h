@@ -114,7 +114,9 @@ private slots:
 
     void reselectParent();
     void handleReselectParent(SCState*);
+    void handleReselectTransitionTarget(SCState*);
     void handleChangedParent(SCState* ,SCState*);
+    void handleChangedTransitionTarget(SCTransition*, SCState*);
 
     void about();
 

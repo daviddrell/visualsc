@@ -83,11 +83,16 @@ public:
     void    writeSCVXML(QXmlStreamWriter & sw);
     SCState *targetState();
 
+
+    bool doNotPrint(QString);
+    int doNotPrintSize();
+
     //QList<SCTextBlock*> getTextBlocks();
     //SCTextBlock* getTextBlock(QString textBlockName);
     SCTextBlock* getEventTextBlock();
 
      //public data members
+
 
     void setTargetState(SCState*);
 
@@ -98,6 +103,7 @@ signals:
     void selected();
     void unselected();
     void transitionAddTextBlock(SCTextBlock*);          // connected in scformview::loadtree for sctransitions. connected to the parentitem's treeAddTextBlock(SCTextBlock) in customtreewidgetitem
+    void changedTarget(SCTransition*, SCState*);
 
 private slots:
     //void handleLineSelected();
@@ -109,6 +115,7 @@ private slots:
 
 private:
     QList<QString> DEFAULT_PROPERTIES_LIST;
+    QHash<QString,int> DO_NOT_DISPLAY_HASH;
     SCState *       _targetState;
 
     //QList<SCTextBlock*> _textBlocks;

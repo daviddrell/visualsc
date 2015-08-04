@@ -118,7 +118,7 @@ void SCXMLReader::readElement()
     if (_reader.name() == "scxml")
     {
         qDebug() << "skipping scxml";
-        emit enterStateElement();           // increase the transit level
+        //emit enterStateElement();           // increase the transit level
         readStateMachine();
         //readState(kSTATE_TYPE_Machine);   // disabled adding a state every time openFile happens
         enteredAStateElement = true;

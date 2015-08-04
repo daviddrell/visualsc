@@ -152,6 +152,20 @@ void SCState::initCommon()
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
 }
 
+
+/**
+ * @brief SCState::reselectParent
+ * @param newParent
+ *
+ * SIGNAL
+ *
+ * changedParent(SCState*,SCState*)
+ *
+ * connects are in SCGraphicsView and SCFormView
+ *  connect(st, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*,SCState*)));
+    will handle updating when a state's parent is changed
+ *
+ */
 void SCState::reselectParent(SCState* newParent)
 {
     qDebug() << "SCState::reselectParent";

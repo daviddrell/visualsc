@@ -102,19 +102,9 @@ void SCDataModel::reset()
     _topState->setLevel(_level);
     {
 
+        // delete all states except the root machine
         QList<SCState *> list;
-        //list.append(_topState);
         _topState->getAllStates(list);
-
-
-
-         // first delete transitions and disconnect them from the states
-        /*for(int i =0; i < list.count(); i++)
-        {
-            SCState *st = list.at(i);
-            st->removeTargetsTransitionIn();
-            st->removeSourcesTransitionOut();
-        }*/
 
         // delete highest level states, this will automatically delete all sub states
         QList<SCState*> directChildren;
@@ -133,7 +123,7 @@ void SCDataModel::reset()
     _topState->attributes.value("name")->setValue("State Machine");
     emit _topState->nameChangedInDataModel(_topState,"State Machine"); // connected to SCFormView::handleItemNameChangedInDataModel()
 
-    qDebug() << "AFTER A RESET, YOU HAVE " << _transitions.count() << " TRANSITIONS LISTED IN _transitions";
+    //qDebug() << "AFTER A RESET, YOU HAVE " << _transitions.count() << " TRANSITIONS LISTED IN _transitions";
 }
 
 void SCDataModel::logError(QString message)
@@ -283,16 +273,14 @@ QString cppFileName;
 #endif
 
     CodeWriter cw(this->getTopState(), className, cppFileName, hFileName);
+
     QList<SCState *> list;
-    //list.append(_topState);
     _topState->getAllStates(list);
     cw.setChildren(list);
 
     cw.createSignalsAndSlots();
-    //cw.helloWorld();
     cw.writeHFile();
     cw.writeCppFile();
-
 
     return true;
 }
@@ -310,13 +298,10 @@ QString cppFileName;
  *
  *
  *
- * DEPRECATED FUNCTION
+ * DEPRECATED FUNCTION replaced by openFile
  */
 void SCDataModel::open(QString file)
 {
-
-
-
     _reader.readFile(file);
 
     _reader.run();
@@ -378,45 +363,48 @@ void SCDataModel::openFile(QString fileName)
 
 
 
-
+/**
+ * @brief SCDataModel::connectTransitionsToStatePath
+ *
+ * Used when reading from an scxml file
+ *
+ * Once all states and transitions are loaded, the transitions' targets are set properly
+ * this is done through a unique identifier given to each state, a QUuid is generated upon state creation
+ * this is saved as a property in the scxml so that states with the same name can be diffentiated
+ *
+ */
 void SCDataModel::connectTransitionsToStatePath()
 {
+    // get all transitions in this state machine
     QList<SCTransition *> tlist;
-
     _topState->getAllTransitions(tlist);
-    qDebug () << "SCDataModel::connectTransitionsToStatePath() " <<tlist.count();
+
     for (int t = 0; t < tlist.count(); t++)
     {
+        // for every transition, load the uid of the state it targets and seach for the state
         SCTransition* trans = tlist.at(t);
-        //QString targetStr = trans->attributes["target"]->asString();
-        //SCState * targetState = _topState->getStateByName(targetStr);
-
         QString targetStr = trans->getUid();
         SCState* targetState = _topState->getStateByUid(targetStr);
 
-        // if uid fails, then try the old method
+        // if uid fails, then try the old method of searching by name
         if(!targetState)
         {
-            qDebug() << "uid was not found. trying by string...";
+            qDebug() << "state uid was not found. searching by state name...";
             targetStr = trans->attributes["target"]->asString();
             targetState = _topState->getStateByName(targetStr);
 
             if(targetState && trans->getUid().isEmpty())
             {
-                qDebug() << "@@@@ setting transition uid to: "<< targetState->getUid();
                 trans->setUid(targetState->getUid());
             }
         }
-
-        qDebug() << "target String: " << targetStr << " targetState; " << targetState->objectName();
-        if ( targetState )
+        if(targetState)    // the state was found, now connect the transition and state
         {
-            qDebug() << "&&& HOOKING TRANSITION "+trans->attributes.value("event")->asString()+"TO TARGET! " << targetState->objectName();
+            //qDebug() << "&&& HOOKING TRANSITION "+trans->attributes.value("event")->asString()+"TO TARGET! " << targetState->objectName();
             makeTransitionConnections(targetState, trans);
         }
 
     }
-    qDebug() << "finished SCDataModel::connectTransitionsToStatePath";
 }
 
 
@@ -424,8 +412,6 @@ void SCDataModel::connectTransitionsToStatePath()
 void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition* trans)
 {
     qDebug() << "SCDataModel::makeTransitionConnections";
-    // work backwards from target state to its ancestors, from the transitions source state to its ancestors, until
-    // both have a common ancestor
 
     // set the transition to point to its target
     trans->setTargetState(targetState);
@@ -434,49 +420,8 @@ void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition*
     targetState->addTransitionReference(trans, SCState::kTransitIn);
 
     // add this transition to the source state's list of out transitions
-    SCState * sourceState = dynamic_cast<SCState *> ( trans->parent());
+    SCState * sourceState = trans->parentSCState();
     sourceState->addTransitionReference(trans, SCState::kTransitOut);
-/*
-    SCState *sourceTreeNode=NULL;
-    SCState *targetTreeNode=NULL;
-
-    int sourceLevel =  sourceState->getLevel();
-    int targetLevel = targetState->getLevel();
-*/
-     // change behavior to not promote transition references to parent
-    /*
-   // example: targetStateLevel = 1, sourceStateLevel = 3
-    while ( sourceLevel > targetLevel )
-    {
-        sourceTreeNode = sourceState->getParentState();
-        sourceTreeNode->addTransitionReference(trans, SCState::kTransitOut);
-        sourceLevel =  sourceTreeNode->getLevel();
-    }
-
-    // example: targetStateLevel = 3, sourceStateLevel = 1
-     while ( targetLevel >  sourceLevel)
-     {
-         targetTreeNode = targetState->getParentState();
-         targetTreeNode->addTransitionReference(trans, SCState::kTransitIn);
-         targetLevel =  targetTreeNode->getLevel();
-     }
-
-     // now targetLevel and sourceLevel should match
-
-    while ( sourceTreeNode != targetTreeNode )
-    {
-        targetTreeNode = targetState->getParentState();
-        targetTreeNode->addTransitionReference(trans, SCState::kTransitOut);
-        targetLevel =  targetTreeNode->getLevel();
-
-        sourceTreeNode = sourceState->getParentState();
-        sourceTreeNode->addTransitionReference(trans, SCState::kTransitOut);
-        sourceLevel =  sourceTreeNode->getLevel();
-    }
-    */
-
-
-
 }
 
 
@@ -503,45 +448,18 @@ void SCDataModel::getStates(QList<SCState *>& list)
  * returns false if item was not found
  *
  */
-
-
-
-
-// TODO this can be optimized.
 bool SCDataModel::deleteItem(QObject * item)
 {
-    SCState* state = dynamic_cast<SCState*>(item);
+    SCState* state      = dynamic_cast<SCState*>(item);
     SCTransition* trans = dynamic_cast<SCTransition*>(item);
 
     if(state)
-    {
-        qDebug() << "SCDataModel::deleteItem state: " << state->objectName() << " the top state is: " <<_topState->objectName();
-        /*QList<SCState*> list;
-        _topState->getAllStates(list);
-
-        // unhook target state's in transitions
-        state->removeTargetsTransitionIn();
-        state->removeSourcesTransitionOut();
-
-        QList<SCState*> childrenStates;
-
-        state->getAllStates(childrenStates);
-        SCState* child;
-        for(int i = 0 ; i < childrenStates.count(); i++)
-        {
-            child = childrenStates.at(i);
-
-        }*/
-
-         //state->deleteLater();
-
+    {         
         state->deleteSafely();
         return true;
-
     }
     else if(trans)
-    {
-        //delete trans;
+    {    
         trans->deleteSafely();
         return true;
     }
@@ -566,14 +484,8 @@ bool SCDataModel::deleteItem(QObject * item)
  */
 SCState* SCDataModel::insertNewState(SCState *parent)
 {
-    // SCState connects. 1 of 2 places. this is for any newly created state
     SCState * state = new SCState (parent);
-    // connectState(state);
-    //
-    //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), );
-
     emit newStateSignal(state);
-
     return state;
 }
 

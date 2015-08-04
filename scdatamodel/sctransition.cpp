@@ -43,6 +43,7 @@ SCTransition::SCTransition(QObject * parent):
 
     DEFAULT_PROPERTIES_LIST << "target" << "event" << "comments" << "path" << "uid";
 
+    DO_NOT_DISPLAY_HASH.insert("uid",0);
 
     // SCTransition will load with target, event, commentary, and path
     TransitionStringAttribute * target = new TransitionStringAttribute (this, "target",QString());
@@ -119,6 +120,16 @@ QString SCTransition::getUid()
     return attributes.value("uid")->asString();
 }
 
+bool SCTransition::doNotPrint(QString attribute)
+{
+    return DO_NOT_DISPLAY_HASH.contains(attribute);
+}
+
+int SCTransition::doNotPrintSize()
+{
+    return DO_NOT_DISPLAY_HASH.size();
+}
+
 /**
  * @brief SCTransition::handleTextBlockChanged
  *
@@ -150,13 +161,29 @@ SCState *SCTransition::targetState()
     return _targetState;
 }
 
+/**
+ * @brief SCTransition::setTargetState
+ * @param state
+ *
+ * reselects the transition's target state
+ *
+ * SIGNAL
+ * changedTarget(SCTransiton*, SCState*)
+ *
+ * notifies the SCFormView and SCGraphicsView to update the transition change.
+ */
 void SCTransition::setTargetState(SCState* state)
 {
+    // first update the formview and graphicsview
+    // emit changedTarget(this, state);
     if(_targetState)
     {
         disconnect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
     }
     _targetState = state;
+
+    // set the transition to point to this new state
+    //this->setUid(_targetState->getUid());
     connect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
 }
 

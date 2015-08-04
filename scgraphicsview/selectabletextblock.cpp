@@ -34,11 +34,11 @@
 #define HOVER_PEN_WIDTH 1
 
 #define MIN_WIDTH 40
-#define MIN_HEIGHT 40
+#define MIN_HEIGHT 35
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent,true),
-        //_minSize(QPoint(150,40)),
+       // _minSize(QPoint(MIN_WIDTH,MIN_HEIGHT)),
         _verticalTextMargin(10),
         _horizontalTextMargin(10),
         _textItem(this, QRect(0,0, _minSize.x()-_horizontalTextMargin, _minSize.y()-_verticalTextMargin)),
@@ -159,7 +159,7 @@ void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF 
         //qDebug() << "old w: "<<w << "\tnew w: " << newWidth;
 
     }
-    else if(!brloc&&!blloc)
+    if(!brloc&&!blloc)
     {
         // the bottom wall of the text block is out of bounds
 
