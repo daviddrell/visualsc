@@ -890,7 +890,7 @@ void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     delete _corners[3];
     _corners[3] = NULL;
 
-    _pen.setWidthF(_penWidth);
+   // _pen.setWidthF(_penWidth);
 }
 
 
@@ -920,7 +920,7 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
     setCornerPositions();
 
-    _pen.setWidthF(_penHoverWidth);
+    //_pen.setWidthF(_penHoverWidth);
 
 }
 
@@ -1092,7 +1092,7 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
         rect2 = QRectF (topLeft2, bottomRight2);
     }
 
-    painter->drawRoundRect(rect2,25,25);
+    painter->drawRoundRect(rect2,0,0);
 
 }
 

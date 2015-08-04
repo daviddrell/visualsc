@@ -31,6 +31,11 @@
 #include "selectablelinesegmentgraphic.h"
 
 
+#define RECT_ROUNDNESS  0
+#define INNER_BORDER_THICKNESS  1.61803398875
+#define INNER_BORDER_DISTANCE   0.5*(INNER_BORDER_THICKNESS-4.5)+3
+
+
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         SelectableBoxGraphic(parent),
         //TextItem(parent,stateModel->getIDTextBlock()),
@@ -65,6 +70,9 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     //connect(_stateModel->getIDTextBlock()->getPosAttr(), SIGNAL(changed(PositionAttribute*)), this, SLOT(handleTextBlockAttributeChanged(PositionAttribute*)));
 
     //connect(TextItem, SIGNAL(textBlockMoved(QPointF)), this, SLOT(handleTextBlockMoved(QPointF)));
+
+    _initialStateColor = QColor(104,237,153,255);
+    _finalStateColor = QColor(242,119,119,255);
 }
 
 
@@ -803,7 +811,7 @@ StateBoxGraphic* StateBoxGraphic::getHighestLevelParentItemAsStateBoxGraphic()
 void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 
-    int shadowThickness = 5;
+    int shadowThickness = 0;//5
 
     if ( _boxStyle == kSolidWithShadow )
     {
@@ -845,21 +853,23 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
 
         QRectF rect (topLeft, bottomRight);
 
-        painter->drawRoundRect(rect,25,25); // corner radius of 25 pixels
+        painter->drawRoundRect(rect,RECT_ROUNDNESS,RECT_ROUNDNESS); // corner radius of 25 pixels
     }
 
     // draw the top box, the visible one
 
-    if ( _isHighlighted )
-        _pen.setColor(Qt::red);
-    else
-        _pen.setColor(Qt::black);
 
-  /*  if ( _isHovered )
-        _pen.setWidth(BOX_HOVER_PEN_WIDTH);
+    {
+        _pen.setColor(Qt::black);
+    }
+
+
+
+    if ( _isHovered )
+        _pen.setWidthF(_penHoverWidth);
     else
-        _pen.setWidth(BOX_DEFAULT_PEN_WIDTH);
-*/
+        _pen.setWidthF(_penWidth);
+
     if ( _drawBoxLineStyle == kDrawSolid )
         _pen.setStyle( Qt::SolidLine );
     else
@@ -882,21 +892,29 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
          int g = 255 - (((this->getStateModel()->getLevel()) * 23 ) % 255);
          int b = 255 - (((this->getStateModel()->getLevel()-1) * 7 ) % 255);
 
+
+
          QBrush brush2(QColor(r,g,b,255),Qt::SolidPattern);  // white fill
-         painter->setBrush( brush2);
+         painter->setBrush(brush2);
     }
 
 
     // draw outter layer box
     // if shadowed box, draw inside, else draw on the outter edge
     QRectF rect2;
-
+    QRectF rect3;
     if ( _boxStyle == kSolidWithShadow )
     {
         QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
         QPointF bottomRight2 ( _drawingWidth - shadowThickness, _drawingHeight - shadowThickness);
 
+
+
         rect2 = QRectF (topLeft2, bottomRight2);
+
+        QPointF offset(INNER_BORDER_DISTANCE,INNER_BORDER_DISTANCE);
+        rect3 = QRectF(topLeft2 + offset, bottomRight2 - offset);
+
     }
     else
     {
@@ -904,9 +922,51 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
         QPointF bottomRight2 ( _drawingWidth, _drawingHeight);
 
         rect2 = QRectF (topLeft2, bottomRight2);
+
+        QPointF offset(INNER_BORDER_DISTANCE,INNER_BORDER_DISTANCE);
+        rect3 = QRectF(topLeft2 + offset, bottomRight2 - offset);
     }
 
-    painter->drawRoundRect(rect2,25,25);
+
+
+
+
+    painter->drawRoundRect(rect2,RECT_ROUNDNESS,RECT_ROUNDNESS);
+
+    if(getStateModel()->isFinal())
+    {
+        QColor temp = _pen.color();
+        qreal width = _pen.widthF();
+        _pen.setColor(_finalStateColor);
+        _pen.setWidthF(INNER_BORDER_THICKNESS);
+        _pen.setCapStyle(Qt::RoundCap);
+        _pen.setJoinStyle(Qt::MiterJoin);
+        painter->setPen(_pen);
+
+        painter->drawRoundRect(rect3,RECT_ROUNDNESS,RECT_ROUNDNESS);
+
+        _pen.setColor(temp);
+        _pen.setWidthF(width);
+         painter->setPen(_pen);
+    }
+    else if(getStateModel()->isInitial())
+    {
+        QColor temp = _pen.color();
+        qreal width = _pen.widthF();
+        _pen.setColor(_initialStateColor);
+        _pen.setWidthF(INNER_BORDER_THICKNESS);
+        _pen.setCapStyle(Qt::RoundCap);
+        _pen.setJoinStyle(Qt::MiterJoin);
+        painter->setPen(_pen);
+        painter->drawRoundRect(rect3,RECT_ROUNDNESS,RECT_ROUNDNESS);
+
+        _pen.setColor(temp);
+        _pen.setWidthF(width);
+         painter->setPen(_pen);
+    }
+
+
+
 
 }
 

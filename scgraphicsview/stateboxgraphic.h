@@ -32,6 +32,7 @@
 #define SINK_ANCHOR_BUFFER 5.5
 #define SINK_ANCHOR_POS_BUFFER 8.5
 
+
 #include "sizeattribute.h"
 class SCState;
 class IAttribute;
@@ -148,6 +149,9 @@ private:
     QPointF _diagLineEnd;
     bool    _diagLineDrawIt;
     QPointF _intersection;
+
+    QColor  _finalStateColor;
+    QColor  _initialStateColor;
 
 };
 

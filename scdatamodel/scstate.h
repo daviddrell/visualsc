@@ -78,6 +78,9 @@ public:
     void addState(SCState *);
 
 
+    bool isInitial();
+    bool isFinal();
+
     SCState* parentAsSCState();
 
     void setAttributeValue(QString key, QString value);

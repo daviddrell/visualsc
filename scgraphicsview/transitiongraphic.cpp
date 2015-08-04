@@ -32,8 +32,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
     this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
 
-    TransitionPathAttribute * p =
-            dynamic_cast<TransitionPathAttribute *> (  t->attributes.value("path"));
+    TransitionPathAttribute * p = dynamic_cast<TransitionPathAttribute *> (  t->attributes.value("path"));
 
     QList<QPointF> pointList = p->asQPointFList();
     /*qDebug() << "Printing Point List of size: " <<pointList.count();
@@ -52,7 +51,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _anchors[0]->installSceneEventFilter(this);
         _anchors[0]->setAcceptHoverEvents(true);
         _elbows.append(_anchors[0]);
-
 
         _anchors[1] = new ElbowGrabber(this, _keyController);
         _anchors[1]->installSceneEventFilter(this);
@@ -134,14 +132,14 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             if(i==0 || i== _elbows.count()-2)   // anchor elbows at the end and beginning
             {
                 if(i==0){                       // source anchor
-                    qDebug() << "source anchor";
+                    //qDebug() << "source anchor";
                     elbOne->setSegmentAt(0, NULL);
                     elbOne->setSegmentAt(1, segment);
 
                     elbTwo->setSegmentAt(0, segment);
                 }
                 if(i==_elbows.count()-2){      // sink anchor
-                    qDebug() << "sink anchor";
+                    //qDebug() << "sink anchor";
                     elbTwo->setSegmentAt(0, segment);
                     elbTwo->setSegmentAt(1, NULL);
 
@@ -150,7 +148,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             }
             else                                // standard elbow that connects two line segments
             {
-                qDebug() << "normal elbow";
+                //qDebug() << "normal elbow";
                 elbOne->setSegmentAt(1, segment);
                 elbTwo->setSegmentAt(0, segment);
             }

@@ -153,6 +153,16 @@ void SCState::initCommon()
 }
 
 
+bool SCState::isFinal()
+{
+    return (attributes.value("finalState")->asString()=="true");
+}
+
+bool SCState::isInitial()
+{
+    return (attributes.value("initialState")->asString()=="true");
+}
+
 /**
  * @brief SCState::reselectParent
  * @param newParent
