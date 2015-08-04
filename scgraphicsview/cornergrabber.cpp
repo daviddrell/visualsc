@@ -21,12 +21,13 @@
 #include "cornergrabber.h"
 #include "arrowheadgraphic.h"
 #include <QDebug>
+#include <QApplication>
 
 CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnASquare) :
     QGraphicsItem(parent),
     mouseDownX(0),
     mouseDownY(0),
-    _outterborderColor(Qt::black),
+    _outterborderColor(QColor(0,0,0,140)),
     _outterborderPen(),
     _width(6),
     _height(6),
@@ -122,7 +123,11 @@ void CornerGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
     _isHovered= false;
-    _outterborderColor = Qt::black;
+    _outterborderColor = QColor(0,0,0,140);
+
+    // reset the cursor
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
+
     this->update(0,0,_width,_height);
 }
 
@@ -130,7 +135,16 @@ void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
     //qDebug() << "CornerGrabber HoverEnterEvent";
     _isHovered = true;
-    _outterborderColor = Qt::red;
+    _outterborderColor = QColor(255,0,0,140);
+
+    // change the cursor to the diagonal sizer
+    if(_corner == 0 || _corner == 2)
+        QApplication::setOverrideCursor(Qt::SizeFDiagCursor);
+
+    else if(_corner == 1 || _corner == 3)
+        QApplication::setOverrideCursor(Qt::SizeBDiagCursor);
+
+
     this->update(0,0,_width,_height);
 }
 

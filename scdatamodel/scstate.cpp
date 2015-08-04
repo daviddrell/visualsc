@@ -163,6 +163,46 @@ bool SCState::isInitial()
     return (attributes.value("initialState")->asString()=="true");
 }
 
+bool SCState::isStateMachine()
+{
+    for(int i = 0 ; i < this->children().size(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(this->children().at(i));
+        if(state)
+            return true;
+    }
+    return false;
+}
+
+SCState* SCState::getInitialState()
+{
+    for(int i = 0 ; i < this->children().size(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(this->children().at(i));
+        if(state)
+        {
+            if(state->isInitial())
+                return state;
+        }
+    }
+    return NULL;
+}
+
+SCState* SCState::getFinalState()
+{
+    for(int i = 0 ; i < this->children().size(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(this->children().at(i));
+        if(state)
+        {
+            if(state->isFinal())
+                return state;
+        }
+    }
+    return NULL;
+}
+
+
 /**
  * @brief SCState::reselectParent
  * @param newParent

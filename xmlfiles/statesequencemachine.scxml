@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scxml name="State Sequence Machine" xmlns="http://www.w3.org/2005/07/scxml">
-    <state entryAction="" exitAction="" finalState="false" initialState="false" isParallelState="true" name="Checking All State Sequences" position="-703,-382" size="534,523" type="default type" uid="{d74d8a42-628a-48e8-8fda-0e2c1f594278}">
+    <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="true" name="Checking All State Sequences" position="-703,-382" size="534,523" type="default type" uid="{d74d8a42-628a-48e8-8fda-0e2c1f594278}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="24,14" size="183,42"/>
         <state entryAction="" exitAction="" finalState="false" initialState="false" isParallelState="false" name="Checking Call Sequence" position="100,50" size="350,138" type="default type" uid="{78faf58e-191d-4584-9436-ef1442597646}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="94,-2" size="163,52"/>

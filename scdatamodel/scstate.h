@@ -81,6 +81,10 @@ public:
     bool isInitial();
     bool isFinal();
 
+    SCState* getInitialState();
+    SCState* getFinalState();
+    bool isStateMachine();
+
     SCState* parentAsSCState();
 
     void setAttributeValue(QString key, QString value);

@@ -31,9 +31,15 @@
 #include "selectablelinesegmentgraphic.h"
 
 
-#define RECT_ROUNDNESS  0
-#define INNER_BORDER_THICKNESS  1.61803398875
-#define INNER_BORDER_DISTANCE   0.5*(INNER_BORDER_THICKNESS-4.5)+3
+
+
+#define PEN_DEFAULT_WIDTH       2.472135954999419
+#define PEN_HOVER_WIDTH         4
+
+#define RECT_ROUNDNESS          0
+#define INNER_BORDER_THICKNESS  1.8
+
+#define INNER_BORDER_DISTANCE   INNER_BORDER_THICKNESS/2 + PEN_DEFAULT_WIDTH/2
 
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
@@ -55,7 +61,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     //setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
     setBoxStyle(SelectableBoxGraphic::kSolidNoShadow);
     setMinSize(QPoint(60,60));
-    setPenWidth(2.472135954999419,4);
+    setPenWidth(PEN_DEFAULT_WIDTH, PEN_HOVER_WIDTH);
     //TextItem.setPos(25,10);
 
     //TextItem.setParentItem(this);
