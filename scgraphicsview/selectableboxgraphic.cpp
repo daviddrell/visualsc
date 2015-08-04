@@ -632,6 +632,8 @@ void SelectableBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event 
        // emit stateBoxMoved(this->pos());
     }
 
+    QApplication::restoreOverrideCursor();
+
     // will call the corresponding overrided graphicHasChanged function for a subclass
     graphicHasChanged();
 }
@@ -641,6 +643,7 @@ void SelectableBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event 
 void SelectableBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
     event->setAccepted(true);
+    QApplication::setOverrideCursor(Qt::ClosedHandCursor);
     _dragStart = event->pos();
 }
 
@@ -876,6 +879,8 @@ void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
     _isHovered = false;
 
+    QApplication::restoreOverrideCursor();
+
     _corners[0]->setParentItem(NULL);
     _corners[1]->setParentItem(NULL);
     _corners[2]->setParentItem(NULL);
@@ -906,6 +911,7 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
     qDebug() << "SelectableBoxGraphic HoverEnterEvent";
     _isHovered = true;
 
+    QApplication::setOverrideCursor(Qt::OpenHandCursor);
 
     _corners[0] = new CornerGrabber(this,0, true);
     _corners[1] = new CornerGrabber(this,1, true);

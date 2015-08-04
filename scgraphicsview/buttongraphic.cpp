@@ -3,6 +3,7 @@
 #include "scdatamodel.h"
 #include <QPainter>
 #include <QDebug>
+#include <QApplication>
 
 ButtonGraphic::ButtonGraphic(int x, int y):
         QGraphicsObject(NULL),
@@ -25,12 +26,14 @@ void ButtonGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent *  )
 {
     //qDebug() << "ButtonGraphic HoverEnterEvent";
     _mouseState = kHovered;
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
     update();
 }
 
 void ButtonGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent *  )
 {
     _mouseState = kNormal;
+    QApplication::restoreOverrideCursor();
     update();
 }
 
@@ -43,6 +46,7 @@ void ButtonGraphic::mousePressEvent ( QGraphicsSceneMouseEvent *  )
 void ButtonGraphic::mouseReleaseEvent( QGraphicsSceneMouseEvent *  )
 {
     _mouseState = kNormal;
+
     update();
     emit clicked();
 }

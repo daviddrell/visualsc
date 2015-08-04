@@ -53,7 +53,7 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _completed->addTransition(this,SIGNAL(Relay_Event_pollTimerPopped()),_downloadingAVC);
 
     //    Propogate the private QState signals to public signals
-    connect(_testManagerStateMachine, SIGNAL(started()), this, SIGNAL(Signal_StateReady_testManagerStateMachine());
+    connect(_testManagerStateMachine, SIGNAL(started()), this, SIGNAL(Signal_StateReady_testManagerStateMachine()));
     connect(_idle, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_idle()));
     connect(_idle, SIGNAL(exited()), this, SIGNAL(Signal_StateEntry_idle()));
     connect(_downloadingAVC, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_downloadingAVC()));

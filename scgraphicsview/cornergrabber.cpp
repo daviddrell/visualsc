@@ -126,7 +126,7 @@ void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     _outterborderColor = QColor(0,0,0,140);
 
     // reset the cursor
-    QApplication::setOverrideCursor(Qt::ArrowCursor);
+    QApplication::restoreOverrideCursor();
 
     this->update(0,0,_width,_height);
 }
