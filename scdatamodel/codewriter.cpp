@@ -197,7 +197,7 @@ void CodeWriter::cWriteConstructor()
     cPrintln("\n//    Propogate the private QState signals to public signals",1);
 
     // set the started signal to the inital state
-    cPrintln("connect("+stateMachineName+", SIGNAL(started()), this, SIGNAL("+_states.value(_rootMachine)->readyRelaySignal+");",1);
+    cPrintln("connect("+stateMachineName+", SIGNAL(started()), this, SIGNAL("+_states.value(_rootMachine)->readyRelaySignal+"));",1);
 
     for(int i = 0 ; i < _children.size(); i++)
     {

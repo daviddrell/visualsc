@@ -1171,6 +1171,97 @@ void SCFormView::connectState(SCState *state, CustomTreeWidgetItem* treeItem)
     connect(state->getStateNameAttr(), SIGNAL(changed(StateName*)), treeItem, SLOT(handleAttributeChanged(StateName*)));
 }
 
+void SCFormView::loadPropertyTable(FVItem* item)
+{
+    if(item->isState())
+    {
+        loadPropertyTable(item->getState());
+    }
+    else if (item->isTransition())
+    {
+        loadPropertyTable(item->getTransition());
+    }
+}
+
+void SCFormView::loadPropertyTable(SCTransition* trans)
+{
+    IAttributeContainer* atts = trans->getAttributes();
+    int row = 0;
+    QMapIterator<QString,IAttribute*> i(*atts);
+
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+        {
+            IAttribute* attr = atts->value(key);
+
+            CustomTableWidgetItem * propName = new CustomTableWidgetItem(key);
+            propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
+
+            CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
+            propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+
+            propertyTable->setItem(row, 0, propName);
+            propertyTable->setItem(row++, 1, propValue);
+
+            if(_currentlySelected->isState())
+            {
+
+                connectState(_currentlySelected->getState(), propValue, key);
+            }
+
+            if(_currentlySelected->isTransition())
+            {
+                connectTransition(_currentlySelected->getTransition(), propValue, key);
+            }
+         }
+    }
+}
+
+void SCFormView::loadPropertyTable(SCState* state)
+{
+    IAttributeContainer* atts = state->getAttributes();
+    int row = 0;
+    QMapIterator<QString,IAttribute*> i(*atts);
+
+    int numRows = atts->count() - state->doNotPrintSize();
+    propertyTable->setRowCount(numRows);
+    while (i.hasNext())
+    {
+        QString key  = i.next().key();
+
+        if(state->doNotPrint(key))
+        {
+
+        }
+        else
+        {
+            IAttribute* attr = atts->value(key);
+            CustomTableWidgetItem * propName = new CustomTableWidgetItem(key);
+            propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
+
+            CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
+            propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+
+            propertyTable->setItem(row, 0, propName);
+            propertyTable->setItem(row++, 1, propValue);
+
+            if(_currentlySelected->isState())
+            {
+
+                connectState(_currentlySelected->getState(), propValue, key);
+            }
+
+            if(_currentlySelected->isTransition())
+            {
+                connectTransition(_currentlySelected->getTransition(), propValue, key);
+            }
+        }
+    }
+
+
+}
+
 /**
  * @brief SCFormView::setAttributeConnections
  * @param atts
@@ -1396,8 +1487,12 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
     IAttributeContainer * currentAttributes =  _currentlySelected->getAttributes();
 
     // set up the property table with these new attributes
-    propertyTable->setRowCount(currentAttributes->count());
-    setAttributeConnections(currentAttributes, true);
+
+    //setAttributeConnections(currentAttributes, true);
+
+    // load the property table with the current state's attributes
+    //setAttributeConnections(_currentlySelected);
+    loadPropertyTable(_currentlySelected);
 
     // watch for user changes to the attributes
     connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));

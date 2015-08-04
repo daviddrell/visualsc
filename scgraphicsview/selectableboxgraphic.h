@@ -117,10 +117,23 @@ protected:
     QPoint _minSize;
     qreal _penHoverWidth;
     qreal _penWidth;
-
+    int _XcornerGrabBuffer;
+    int _YcornerGrabBuffer;
+    qreal   _drawingWidth;
+    qreal   _drawingHeight;
+    qreal   _drawingOrigenX;
+    qreal   _drawingOrigenY;
+    bool    _isHovered;
+    bool    _isHighlighted; ///< highlighting is used to indicate visually a group of objects that are related when one of the group is selected
+    ShowBoxStyle     _showBoxStyle;
+    DrawBoxLineStyle _drawBoxLineStyle;
+    BoxStyle         _boxStyle;
+    QPen     _pen ;
 
     int getGridLocation(QRectF, QPointF);
     bool isBetween(qreal start, qreal end, qreal point);
+    void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+
 
 private:
 
@@ -144,14 +157,13 @@ private:
     void adjustDrawingSize(int x, int y);
 
     int getHoveredCorner();
-    void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
 
 
 private:
     //private data
 
-    QPen     _pen ;
+
 
 
     bool _keepInsideParent;
@@ -160,21 +172,14 @@ private:
 
     QPointF _cornerDragStart;
 
-    int _XcornerGrabBuffer;
-    int _YcornerGrabBuffer;
-    qreal   _drawingWidth;
-    qreal   _drawingHeight;
-    qreal   _drawingOrigenX;
-    qreal   _drawingOrigenY;
+
 
     CornerGrabber*  _corners[4];// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
 
-    bool    _isHighlighted; ///< highlighting is used to indicate visually a group of objects that are related when one of the group is selected
-    bool    _isHovered;
 
-    ShowBoxStyle     _showBoxStyle;
-    DrawBoxLineStyle _drawBoxLineStyle;
-    BoxStyle         _boxStyle;
+
+
+
 
 
 };

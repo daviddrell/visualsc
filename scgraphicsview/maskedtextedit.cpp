@@ -20,6 +20,7 @@ QRectF MaskedTextEdit::boundingRect()
 
 void MaskedTextEdit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    painter->setRenderHints(QPainter::TextAntialiasing);
     painter->setClipping(true);
     painter->setClipRect(_rect);
     QGraphicsTextItem::paint(painter, option, widget);
