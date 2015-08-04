@@ -64,4 +64,8 @@
     <state entryAction="" exitAction="" finalState="true" initialState="false" isParallelState="false" name="Success" position="3,-108" size="220,116" type="default type">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="67,12" size="81,45"/>
     </state>
+<<<<<<< HEAD
 </scxml>
+=======
+</scxml>
+>>>>>>> 074856d3e25bbd1a436a9eed424676871a4fb812
