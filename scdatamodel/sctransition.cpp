@@ -43,7 +43,7 @@ SCTransition::SCTransition(QObject * parent):
 
     DEFAULT_PROPERTIES_LIST << "target" << "event" << "comments" << "path" << "uid";
 
-    DO_NOT_DISPLAY_HASH.insert("uid",0);
+    //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
     // SCTransition will load with target, event, commentary, and path
     TransitionStringAttribute * target = new TransitionStringAttribute (this, "target",QString());

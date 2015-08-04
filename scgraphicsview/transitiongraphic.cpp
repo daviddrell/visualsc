@@ -14,6 +14,7 @@
 #include "scstate.h"
 #include "selectableboxgraphic.h"
 #include <QDebug>
+#include <QApplication>
 
 
 TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys, MouseController* mouse) :
@@ -333,6 +334,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             {
                 //qDebug() << "mouse press";
                 elbow->setMouseState(ElbowGrabber::kMouseDown);
+                QApplication::setOverrideCursor(Qt::ClosedHandCursor);
 
                 QPointF scenePosition =  elbow->mapToScene(mevent->pos());
                 elbow->mouseDownY = scenePosition.y();
@@ -372,6 +374,9 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 //_cornerGrabbed = false;
 
                 elbow->setMouseState(ElbowGrabber::kMouseReleased);
+
+                QApplication::restoreOverrideCursor();
+
                 updateModel();                  // update the transition datamodel for this path
                 //elbow->forceHoverLeaveEvent();  // old elbow hover events will trigger for mouse press and releases
             }
@@ -419,6 +424,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
         {
            // qDebug() << "line mouse press";
             line->setMouseState(ElbowGrabber::kMouseDown);
+            QApplication::setOverrideCursor(Qt::ClosedHandCursor);
 
             QPointF scenePosition = mapToScene(mevent->pos());
             line->mouseDownY = scenePosition.y();
@@ -448,6 +454,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             //_cornerGrabbed = false;
 
             line->setMouseState(ElbowGrabber::kMouseReleased);
+            QApplication::restoreOverrideCursor();
             updateModel();                  // update the transition datamodel for this path
             //line->forceHoverLeaveEvent();  // old elbow hover events will trigger for mouse press and releases
         }

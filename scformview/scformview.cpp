@@ -307,7 +307,7 @@ void SCFormView::handleNewTransition(SCTransition* tr)
     // link the tree widget to the fv item, and set its text and icon
     item->setData(fvItem);
     item->setText(0, tr->attributes.value("event")->asString());
-    item->setIcon(0,QIcon(":/SCFormView/rightarrowhollow.png"));
+    item->setIcon(0,QIcon(":/SCFormView/diagonalarrowhollow.png"));
 
     // link the SCTransiton and FVItem
     _items.insert(tr, fvItem);
@@ -1053,7 +1053,7 @@ void SCFormView::loadTreeTransition(CustomTreeWidgetItem * parentItem , QList<SC
        //item->setData(tr);
 
        item->setText(0, tr->attributes.value("event")->asString());
-       item->setIcon(0,QIcon(":/SCFormView/rightarrowhollow.png"));
+       item->setIcon(0,QIcon(":/SCFormView/diagonalarrowhollow.png"));
 
        // connect the transition and tree widget item to the hashtable
        _itemToTreeWidget.insert(tr, item);
@@ -1156,7 +1156,7 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
         QString key  = i.next().key();
 
         // only add the property if it's not in the do not display list
-        if(!trans->doNotPrint(key));
+        if(!trans->doNotPrint(key))
         {
             IAttribute* attr = atts->value(key);
 
@@ -2626,13 +2626,13 @@ void SCFormView::createActions()
     propertyToolBar->addWidget(addPropertyToolButton);
     */
 
-    insertStateAction = new QAction(QIcon(":/SCFormView/cardboardbox.png"), tr("Insert State"), this);
+    insertStateAction = new QAction(QIcon(":/SCFormView/cardboardboxnew.png"), tr("Insert State"), this);
     insertStateAction->setShortcut(tr("Ctrl+I"));
     insertStateAction->setStatusTip(tr("Insert State"));
     connect(insertStateAction, SIGNAL(triggered()), this, SLOT(insertState()));
 
 
-    insertTransitionAction = new QAction(QIcon(":/SCFormView/rightarrowhollow.png"), tr("Insert Transition"), this);
+    insertTransitionAction = new QAction(QIcon(":/SCFormView/rightarrowhollownew.png"), tr("Insert Transition"), this);
     insertTransitionAction->setShortcut(tr("Ctrl+I"));
     insertTransitionAction->setStatusTip(tr("Insert Transition"));
     connect(insertTransitionAction, SIGNAL(triggered()), this, SLOT(insertTransition()));

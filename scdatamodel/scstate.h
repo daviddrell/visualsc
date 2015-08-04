@@ -77,6 +77,7 @@ public:
     void addTransistion(SCTransition*);
     void addState(SCState *);
 
+    bool isParallel();
 
     bool isInitial();
     bool isFinal();

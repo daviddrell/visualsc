@@ -361,13 +361,13 @@ void SelectableTextBlock::handleAttributeChanged(SizeAttribute* size)
     QPoint pt = size->asPointF().toPoint();
     this->setSize(pt);
 
-    qDebug()<<"SelectableTextBlock::handleAttributeChanged Size Attribute ("+  _textBlockModel->getText()+") setting size = (" +QString::number(pt.x())+","+QString::number(pt.y())+")";
+    //qDebug()<<"SelectableTextBlock::handleAttributeChanged Size Attribute ("+  _textBlockModel->getText()+") setting size = (" +QString::number(pt.x())+","+QString::number(pt.y())+")";
 }
 
 void SelectableTextBlock::handleAttributeChanged(PositionAttribute* pos)
 {
     QPointF ps = pos->asPointF();
-    qDebug()<<"SelectableTextBlock::handleAttributeChanged ("+  _textBlockModel->getText()+") setting position = (" +QString::number(ps.x())+","+QString::number(ps.y())+")";
+    //qDebug()<<"SelectableTextBlock::handleAttributeChanged ("+  _textBlockModel->getText()+") setting position = (" +QString::number(ps.x())+","+QString::number(ps.y())+")";
     SelectableBoxGraphic::setPos(ps);
 }
 

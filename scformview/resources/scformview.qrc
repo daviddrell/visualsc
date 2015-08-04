@@ -29,5 +29,8 @@
         <file>plusw10.png</file>
         <file>framein.png</file>
         <file>frameout.png</file>
+        <file>cardboardboxnew.png</file>
+        <file>rightarrowhollownew.png</file>
+        <file>diagonalarrowhollow.png</file>
     </qresource>
 </RCC>

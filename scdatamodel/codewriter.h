@@ -5,8 +5,9 @@
 #include <QFile>
 #include <scstate.h>
 #include <sctransition.h>
-#include <cwstate.h>
-#include <cwtransition.h>
+#include "cwstate.h"
+#include "cwtransition.h"
+#include "cwstatemachine.h"
 
 class CodeWriter
 {
@@ -20,9 +21,10 @@ public:
 
     void addStateMachine(SCState*);
     void setRootMachine(SCState*);
-    void addState(SCState*);
-    void setChildren(QList<SCState*>);
-    void createSignalsAndSlots();
+    //void addState(SCState*);
+    //void setChildren(QList<SCState*>);
+  //  void createSignalsAndSlots();
+    void createStateMachines();
 
 private:
 
@@ -56,13 +58,15 @@ private:
     QTextStream hOut;
 
     SCState* _rootMachine;
-    SCState* _initialState;
+    //SCState* _initialState;
 
-    QList<SCState*> _children;
-    QList<SCState*> _childrenMachines;
+    //QList<SCState*> _children;
+    //zQList<SCState*> _childrenMachines;
+    QList<SCState*> _machines;
 
-    QHash<SCState*, CWState*> _states;
-    QHash<SCTransition*, CWTransition*> _transitions;
+    //QHash<SCState*, CWState*> _states;
+    QHash<SCState*, CWStateMachine*> _machineHash;
+    //QHash<SCTransition*, CWTransition*> _transitions;
 
 
 

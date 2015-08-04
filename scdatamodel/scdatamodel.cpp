@@ -274,11 +274,26 @@ QString cppFileName;
 
     CodeWriter cw(this->getTopState(), className, cppFileName, hFileName);
 
-    QList<SCState *> list;
-    _topState->getAllStates(list);
-    cw.setChildren(list);
+    //QList<SCState *> list;
+    //_topState->getAllStates(list);
+   // _topState->getStates(list);
 
-    cw.createSignalsAndSlots();
+
+    QList<SCState* > all;
+    _topState->getAllStates(all);
+    all.append(_topState);
+
+
+    for(int i = 0; i < all.size();i++)
+    {
+        SCState* state = all.at(i);
+        if(state->isStateMachine())
+        {
+            cw.addStateMachine(state);
+        }
+    }
+    //cw.createSignalsAndSlots();
+    cw.createStateMachines();
     cw.writeHFile();
     cw.writeCppFile();
 
@@ -413,7 +428,7 @@ void SCDataModel::connectTransitionsToStatePath()
 
 void SCDataModel::makeTransitionConnections(SCState * targetState, SCTransition* trans)
 {
-    qDebug() << "SCDataModel::makeTransitionConnections";
+    //qDebug() << "SCDataModel::makeTransitionConnections";
 
     // set the transition to point to its target
     trans->setTargetState(targetState);

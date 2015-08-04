@@ -1,6 +1,10 @@
 #ifndef CWSTATE_H
 #define CWSTATE_H
 #include <QString>
+#include "scstate.h"
+#include "cwtransition.h"
+#include "sctransition.h"
+#include <QDebug>
 
 /*
  the state machine class is modeled as a QStateMachine and encapsulates a hierarchical state machine by holding QStates for each state
@@ -26,18 +30,33 @@ class CWState
 {
 public:
     CWState(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString theEntryAction, QString theExitAction);
+    CWState();
     ~CWState();
 
-    QString stateName;          // _stateName                       state's name in camel case and preceeding "_"
-    QString entryRelaySlot;     // Slot_StateEntry_stateName        QState's private corresponding entry slot called when a transition leads to this state
-    QString exitRelaySlot;      // Slot_StateExit_stateName         QState's private corresponding exit slot called when a transition exits this state
-    QString entryRelaySignal;   // Signal_StateEntry_stateName      QState's public signal connected to its private entered() signal
-    QString exitRelaySignal;    // Signal_StateExit_stateName       QState's public signal connected to its private exited() signal
-    QString entryAction;        // EntryAction_eventName            signal that is emitted in the entry relay slot
-    QString exitAction;         // ExitAction_eventName             signal that is emitted in the exit relay slot
+    QString _stateName;          // _stateName                       state's name in camel case and preceeding "_"
+    QString _entryRelaySlot;     // Slot_StateEntry_stateName        QState's private corresponding entry slot called when a transition leads to this state
+    QString _exitRelaySlot;      // Slot_StateExit_stateName         QState's private corresponding exit slot called when a transition exits this state
+    QString _entryRelaySignal;   // Signal_StateEntry_stateName      QState's public signal connected to its private entered() signal
+    QString _exitRelaySignal;    // Signal_StateExit_stateName       QState's public signal connected to its private exited() signal
+    QString _entryAction;        // EntryAction_eventName            signal that is emitted in the entry relay slot
+    QString _exitAction;         // ExitAction_eventName             signal that is emitted in the exit relay slot
 
-    QString readyRelaySignal;   // Siganl_StateReady_stateName      signal reserved for the inital state of this machine
+    QString _readyRelaySignal;   // Signal_StateReady_stateName      signal reserved for the inital state of this machine
 
+
+    QString toCamel(QString);
+
+    void insertTransition(CWTransition* transCW);
+
+    void setState(SCState*);
+    SCState* getState();
+
+protected:
+
+    // transitions that belong to this state
+    //QHash<SCTransition*, CWTransition*> _transitions;
+    QList<CWTransition*> _transitions;
+    SCState* _myState;
 };
 
 #endif // CWSTATE_H

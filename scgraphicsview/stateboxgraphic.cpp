@@ -397,7 +397,7 @@ void StateBoxGraphic::handleTransitionLineStartMoved(QPointF newPos)
      *
      */
     int grid = getGridLocation(mts,newPos);
-    qDebug() << "box position: " << mts <<" newPos: "<<newPos<<"the elbow is in grid: " << grid;
+    //qDebug() << "box position: " << mts <<" newPos: "<<newPos<<"the elbow is in grid: " << grid;
     switch (grid) {
     case UL:
         nx = x;
@@ -688,7 +688,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 
     int wall;
     int grid = getGridLocation(mts,newPos);
-    qDebug() << "box position: " << mts <<" newPos: "<<newPos<<"the elbow is in grid: " << grid;
+   // qDebug() << "box position: " << mts <<" newPos: "<<newPos<<"the elbow is in grid: " << grid;
     switch (grid) {
     case UL:
         nx = x;
@@ -807,7 +807,7 @@ StateBoxGraphic* StateBoxGraphic::getHighestLevelParentItemAsStateBoxGraphic()
     {
         //qDebug() << "counter: ";
         gp = gp->parentItemAsStateBoxGraphic();
-       qDebug() << "* GP is: " << gp;
+       //qDebug() << "* GP is: " << gp;
     }
 
     return gp;

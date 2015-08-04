@@ -104,7 +104,7 @@ void SCState::initCommon()
 
     DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"finalState"<<"initialState"<<"uid"; // type is added to the state in scxml reader.
 
-    DO_NOT_DISPLAY_HASH.insert("uid",0);
+    //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
     // set the initial attributes and size
     StateName * name = new StateName (this, "name",defaultName);
@@ -161,6 +161,11 @@ bool SCState::isFinal()
 bool SCState::isInitial()
 {
     return (attributes.value("initialState")->asString()=="true");
+}
+
+bool SCState::isParallel()
+{
+    return (attributes.value("isParallelState")->asString()=="true");
 }
 
 bool SCState::isStateMachine()

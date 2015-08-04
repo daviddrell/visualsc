@@ -908,7 +908,7 @@ void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 
 void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
-    qDebug() << "SelectableBoxGraphic HoverEnterEvent";
+    //qDebug() << "SelectableBoxGraphic HoverEnterEvent";
     _isHovered = true;
 
     QApplication::setOverrideCursor(Qt::OpenHandCursor);
