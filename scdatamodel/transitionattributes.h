@@ -45,6 +45,7 @@ public:
 
     TransitionAttributes(QObject * parent, QString key);
     TransitionAttributes( const TransitionAttributes& ta);
+    //TransitionAttributes(IAttributeContainer&);
     TransitionAttributes();
     ~TransitionAttributes();
 
@@ -54,6 +55,7 @@ public:
 
 private: // methods
 
+    //void addAllAttributes(IAttributeContainer&);
     void initCommon();
 };
     class SCDATAMODELSHARED_EXPORT  TransitionPathAttribute : public  IAttribute

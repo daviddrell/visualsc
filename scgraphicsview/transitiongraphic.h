@@ -14,8 +14,8 @@
 #include <QObject>
 #include "textbox.h"
 
-#define TRANSITION_DEFAULT_COLOR Qt::blue
-#define TRANSITION_HOVER_COLOR Qt::red
+//#define TRANSITION_DEFAULT_COLOR Qt::blue
+//#define TRANSITION_HOVER_COLOR Qt::red
 #define TRANSITION_DEFAULT_LINE_STYLE Qt::SolidLine
 #define TRANSITION_HOVER_LINE_STYLE Qt::DashLine
 #define TRANSITION_DEFAULT_WIDTH 2

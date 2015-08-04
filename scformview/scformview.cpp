@@ -789,48 +789,6 @@ void SCFormView::handleTransitionDeleted(QObject *t)
     _currentlySelected = _topState;
     _topState->getTreeWidget()->setSelected(true);
 
-
-
-
-
-
-    /*
-    if ( t == _currentlySelected){
-       // setSelectedTreeItem(NULL);
-        // _currentlySelected = NULL;
-    }
-
-    QList<SCState*> states;
-    states.append( _dm->getTopState());
-    */
- //   stateChartTreeView->clear();
-
- //   replantTree();
-   // loadTree (NULL, states);
-
-    /*
-    SCTransition* trans = (SCTransition*)t;
-    //CustomTreeWidgetItem* transTreeItem = _itemToTreeWidget.value(trans);
-    CustomTreeWidgetItem* transTreeItem = _items.value(trans)->getTreeWidget();
-    //qDebug() << "SCFormView::handleTransitionDeleted: " << transTreeItem->text(0);
-    _itemToTreeWidget.remove(trans);
-    _itemToTextBlock.remove(trans);
-    _treeWidgetToTextBlock.remove(transTreeItem);
-    _items.remove(trans);
-    delete transTreeItem;
-
-    // unselect any selected item;
-     QList<QTreeWidgetItem*> selected = stateChartTreeView->selectedItems();
-     qDebug() << "v2 there are " << selected.size()<<" selected items.";
-     //stateTreeItem->setSelected(false);
-
-     for(int i = 0; i < selected.size();i++)
-     {
-         selected.at(i)->setSelected(false);
-     }
-
-    highlightRootItem();
-    */
 }
 
 /**
@@ -2043,10 +2001,27 @@ void SCFormView::handleReselectTransitionTarget(SCState * target)
 {
     qDebug() << "SCFormView::handleReselectTransitionTarget";
 
-    _currentlySelected->getTransition()->setTargetState(target);
     _targetStateSelectionWindow->close();
     delete _targetStateSelectionWindow;
     _targetStateSelectionWindow = NULL;
+
+    //_currentlySelected->getTransition()->setTargetState(target);
+
+    //TransitionAttributes * ta = new TransitionAttributes(_currentlySelected->getTransition()->attributes);
+
+    //_dm->handleMakeANewTransition(dynamic_cast<TransitionAttributes*>(_currentlySelected->getTransition()->getAttributes()));
+
+    SCTransition* trans = _currentlySelected->getTransition();
+    SCState* source = trans->parentSCState();
+    QString eventName = trans->getEventName();
+
+    _dm->deleteItem(trans);
+
+    SCTransition* newTrans = _dm->insertNewTransition(source, target);
+    newTrans->setEventName(eventName);
+
+
+
 }
 
 void SCFormView::handleChangedTransitionTarget(SCTransition * trans, SCState * newTarget)

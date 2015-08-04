@@ -16,7 +16,12 @@ LineSegmentGraphic::LineSegmentGraphic(ElbowGrabber *startPoint, ElbowGrabber *e
     _elbows[1] = endPoint;
 
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
-    _pen.setColor(TRANSITION_DEFAULT_COLOR);
+
+    _defaultColor=QColor(0,150,200,255);
+    _hoverColor=QColor(255,0,0,180);
+
+
+    _pen.setColor(_defaultColor);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
 
     enclosePathInElbows();
@@ -111,7 +116,7 @@ void LineSegmentGraphic::forceHoverEnterEvent()
 
 
     _pen.setWidth(TRANSITION_HOVER_WIDTH);
-    _pen.setColor(TRANSITION_HOVER_COLOR);
+    _pen.setColor(_hoverColor);
     _pen.setStyle(TRANSITION_HOVER_LINE_STYLE);
 }
 
@@ -127,7 +132,7 @@ void LineSegmentGraphic::forceHoverLeaveEvent()
     disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleLineSegmentKeyPressEvent(int)));
 
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
-    _pen.setColor(TRANSITION_DEFAULT_COLOR);
+    _pen.setColor(_defaultColor);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
 }
 
@@ -145,7 +150,7 @@ void LineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 
     _pen.setWidth(TRANSITION_HOVER_WIDTH);
-    _pen.setColor(TRANSITION_HOVER_COLOR);
+    _pen.setColor(_hoverColor);
     _pen.setStyle(TRANSITION_HOVER_LINE_STYLE);
 
 
@@ -163,7 +168,7 @@ void LineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleKeyPressEvent(int)));
 
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
-    _pen.setColor(TRANSITION_DEFAULT_COLOR);
+    _pen.setColor(_defaultColor);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
 }
 */
@@ -390,7 +395,10 @@ void LineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsIte
     //_pen.setWidth(20);
 //#define SHOW_HOVER_BOXES
     painter->setPen(_pen);
-    painter->setRenderHint(QPainter::HighQualityAntialiasing);
+
+    painter->setRenderHint(QPainter::Antialiasing);
+
+
 
 #ifndef SHOW_HOVER_BOXES
     painter->drawLine(_elbows[0]->pos(), _elbows[1]->pos());

@@ -667,6 +667,8 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
         connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
         grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
     }
+
+
 }
 
 void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)

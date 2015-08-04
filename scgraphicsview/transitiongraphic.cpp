@@ -121,6 +121,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             ElbowGrabber* elbTwo = _elbows.at(i+1);
 
             LineSegmentGraphic* segment = new LineSegmentGraphic(elbOne, elbTwo, this, _keyController);
+            segment->setZValue(elbOne->zValue()-1);            // move the line segment behind its anchors
+
             segment->installSceneEventFilter(this);
             segment->setAcceptHoverEvents(true);                    // allow the line segment to be hovered
 

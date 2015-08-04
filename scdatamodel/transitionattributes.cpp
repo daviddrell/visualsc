@@ -53,10 +53,14 @@ TransitionAttributes::TransitionAttributes(const TransitionAttributes& ta):
 
 }
 
+
+
 TransitionAttributes::~TransitionAttributes()
 {
 
 }
+
+
 
 void TransitionAttributes::addAttribute(const QString attrName)
 {

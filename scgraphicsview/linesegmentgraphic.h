@@ -52,6 +52,9 @@ private:
     bool            _isHovered;
     int _mouseState;
 
+    QColor          _defaultColor;
+    QColor          _hoverColor;
+
 
 
     /*

@@ -59,7 +59,6 @@ SCTransition::SCTransition(QObject * parent):
     TransitionPathAttribute * path = new TransitionPathAttribute (this, QString("path"),emptyPath);
     attributes.addItem(path);
 
-
     TransitionStringAttribute* uid = new TransitionStringAttribute(this, "uid", QString());
     attributes.addItem(uid);
 
@@ -154,6 +153,11 @@ void SCTransition::setEventName(QString text)
 {
     this->setObjectName(text);
     attributes.value("event")->setValue(text);;
+}
+
+QString SCTransition::getEventName()
+{
+    return attributes.value("event")->asString();
 }
 
 SCState *SCTransition::targetState()

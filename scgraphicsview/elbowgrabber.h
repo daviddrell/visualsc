@@ -111,6 +111,9 @@ private:
     LineSegmentGraphic* _segments[2];
 
     KeyController*  _keyController;
+
+    QColor _defaultColor;
+    QColor  _hoverColor;
 };
 
 #endif // ELBOWGRABBER_H

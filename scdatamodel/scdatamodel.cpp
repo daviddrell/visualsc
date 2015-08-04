@@ -398,6 +398,8 @@ void SCDataModel::connectTransitionsToStatePath()
                 trans->setUid(targetState->getUid());
             }
         }
+
+        // ensure that the target state exists
         if(targetState)    // the state was found, now connect the transition and state
         {
             //qDebug() << "&&& HOOKING TRANSITION "+trans->attributes.value("event")->asString()+"TO TARGET! " << targetState->objectName();
