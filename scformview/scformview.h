@@ -121,6 +121,7 @@ private slots:
     void handleChangedTransitionTarget(SCTransition*, SCState*);
 
     void about();
+    void viewKeybinds();
 
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
     void handleNewTransition(SCTransition*);
@@ -153,10 +154,11 @@ private slots:
     void handleItemSizeChangedInDataModel(SCTextBlock*, QPointF);
 
 
-     void handleItemNameChangedInDataModel(SCTransition*, QString);
+    void handleItemNameChangedInDataModel(SCTransition*, QString);
 
 private:
 
+    void updateCurrentlySelected();
     void deleteTreeItem(SCItem*);
 
     int propertyTableIndexOf(QString propertyName);
@@ -245,6 +247,7 @@ private:
     QAction *insertTransitionAction;
     QAction *insertStateAction;
     QAction *aboutAction;
+    QAction *viewKeybindsAction;
     QAction *reselectParentAction;
     QAction *reselectTargetAction;
 

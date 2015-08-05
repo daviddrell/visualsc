@@ -53,10 +53,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
 
+  #ifdef ENABLE_TEXT_TOOL_BAR
     _textFormatToolBar = new TextFormatToolBar();
 
-    this->addToolBar(_textFormatToolBar);
 
+    this->addToolBar(_textFormatToolBar);
+#endif
     this->setWindowTitle("Visual State Chart Editor");
 
     this->resize(1272,1000);

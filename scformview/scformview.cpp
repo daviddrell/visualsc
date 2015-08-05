@@ -91,7 +91,7 @@ this->resize(618,1000);
 
     propertyTable = new QTableWidget();
     propertyTable->setColumnCount(2);
-    propertyTable->setColumnWidth(1,170);
+    propertyTable->setColumnWidth(1,180);
 
     propertyLayout->addWidget( propertyTable );
 
@@ -102,7 +102,7 @@ this->resize(618,1000);
 
     textBlockPropertyTable = new QTableWidget();
     textBlockPropertyTable->setColumnCount(2);
-    textBlockPropertyTable->setColumnWidth(1,170);
+    textBlockPropertyTable->setColumnWidth(1,180);
     //textBlockPropertyTable->columnViewportPosition(1);
 
     propertyLayout->addWidget(textBlockPropertyTable);
@@ -2178,6 +2178,7 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
  */
 void SCFormView::insertTransition()
 {
+    updateCurrentlySelected();
     //SCState * st = dynamic_cast<SCState *> (_currentlySelected);
     SCState* st = _currentlySelected->getState();
     if ( st == NULL ) return;
@@ -2188,7 +2189,7 @@ void SCFormView::insertTransition()
         QMessageBox msgBox;
         msgBox.setText("cannot add state from root machine");
         msgBox.exec();*/
-        sendMessage("Error", "Cannot add state from root machine");
+        sendMessage("Error", "Cannot add transition from root machine");
         return;
     }
 
@@ -2231,7 +2232,17 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* target)
     _targetStateSelectionWindow = NULL;
 }
 
-
+/**
+ * @brief SCFormView::updateCurrentlySelected
+ *
+ * sets currently selected to the first item in the tree view's selected list
+ */
+void SCFormView::updateCurrentlySelected()
+{
+    QList<QTreeWidgetItem*> selected = stateChartTreeView->selectedItems();
+    CustomTreeWidgetItem* ti = dynamic_cast<CustomTreeWidgetItem*>(selected.at(0));
+    _currentlySelected = dynamic_cast<FVItem*> (ti->data());
+}
 
 /**
  * @brief SCFormView::insertState
@@ -2245,8 +2256,14 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* target)
 void SCFormView::insertState()
 {
     //SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
+
+    updateCurrentlySelected();
+
     SCState* st = _currentlySelected->getState();
     if ( st == NULL ) return;
+
+
+
 
     qDebug() << "inserting new state into parent = " + _currentlySelected->getState()->objectName();
 
@@ -2712,6 +2729,13 @@ void SCFormView::about()
                           "which read/writes from/to SCXML"));
 }
 
+void SCFormView::viewKeybinds()
+{
+    sendMessage("Keybinds", tr("N   Creates a new elbow joint for a hovered transition\nD   Deletes a hovered elbow joint"));
+
+
+
+}
 
 
 /**
@@ -2723,13 +2747,13 @@ void SCFormView::createActions()
 {
 
     insertStateAction = new QAction(QIcon(":/SCFormView/cardboardboxnew.png"), tr("Insert State"), this);
-    insertStateAction->setShortcut(tr("Ctrl+I"));
+    insertStateAction->setShortcut(tr("S"));
     insertStateAction->setStatusTip(tr("Insert State"));
     connect(insertStateAction, SIGNAL(triggered()), this, SLOT(insertState()));
 
 
     insertTransitionAction = new QAction(QIcon(":/SCFormView/rightarrowhollownew.png"), tr("Insert Transition"), this);
-    insertTransitionAction->setShortcut(tr("Ctrl+I"));
+    insertTransitionAction->setShortcut(tr("T"));
     insertTransitionAction->setStatusTip(tr("Insert Transition"));
     connect(insertTransitionAction, SIGNAL(triggered()), this, SLOT(insertTransition()));
 
@@ -2787,8 +2811,12 @@ void SCFormView::createActions()
     connect(underlineAction, SIGNAL(triggered()), this, SLOT(handleFontChange()));
 
     aboutAction = new QAction(tr("A&bout"), this);
-    aboutAction->setShortcut(tr("Ctrl+B"));
+    aboutAction->setShortcut(tr("Ctrl+H"));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+
+    viewKeybindsAction = new QAction(tr("Keybinds"), this);
+    viewKeybindsAction->setShortcut(tr("Ctrl+K"));
+    connect(viewKeybindsAction, SIGNAL(triggered()), this, SLOT(viewKeybinds()));
 
 
     insertTextBox = new QAction(QIcon(":/SCFormView/textbox.png"),
@@ -2840,6 +2868,7 @@ void SCFormView::createMenus()
 
     aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(aboutAction);
+    aboutMenu->addAction(viewKeybindsAction);
 }
 
 
@@ -2916,6 +2945,7 @@ void SCFormView::createToolbars()
     connect(lineColorToolButton, SIGNAL(clicked()),
             this, SLOT(lineButtonTriggered()));
 
+#ifdef ENABLE_TEXT_TOOL_BAR
     textToolBar = addToolBar(tr("Font"));
     textToolBar->addWidget(fontCombo);
     textToolBar->addWidget(fontSizeCombo);
@@ -2957,6 +2987,8 @@ void SCFormView::createToolbars()
     pointerToolbar->addWidget(pointerButton);
     pointerToolbar->addWidget(linePointerButton);
     pointerToolbar->addWidget(sceneScaleCombo);
+#endif
+
 }
 
 QMenu *SCFormView::createColorMenu(const char *slot, QColor defaultColor)
