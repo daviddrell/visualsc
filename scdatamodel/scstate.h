@@ -101,6 +101,7 @@ public:
     SizeAttribute* getSizeAttr();
     PositionAttribute* getPosAttr();
     StateName* getStateNameAttr();
+    StateString* getStringAttr(QString attrName);
 
     int  getStateCount();
 

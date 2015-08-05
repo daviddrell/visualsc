@@ -122,7 +122,6 @@ this->resize(618,1000);
 
 
     initTree();
-
 }
 
 /**
@@ -991,6 +990,7 @@ void SCFormView::loadTreeState(CustomTreeWidgetItem * parentItem, QList<SCState*
         {
             _topState = fvItem;
             connectState(_topState->getState(), _topState->getTreeWidget());   // tree item handler
+            //connectState(_topState->getState(), _topState->getTreeWidget(), "")
         }
 
         // get the state's text block
@@ -1115,7 +1115,14 @@ void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, 
         StateName* name = state->getStateNameAttr();
         connect(name, SIGNAL(changed(StateName*)), tableItem, SLOT(handleAttributeChanged(StateName*)));
     }
+    else if(attributeKey == "uid")
+    {
+        qDebug() << "uid connectd!";
+        StateString* uid = state->getStringAttr("uid");
+        connect(uid, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
+    }
 }
+
 
 /**
  * @brief SCFormView::connectState

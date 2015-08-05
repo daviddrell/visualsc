@@ -58,6 +58,7 @@ void SCDataModel::connectDataModel()
 
     // connects scxml reader to changing the state machine's name
     connect(&_reader, SIGNAL(changeStateMachineName(QString)), this, SLOT(handleStateMachineNameLoad(QString)));
+    connect(&_reader, SIGNAL(changeStateMachineUid(QString)), this, SLOT(handleStateMachineUidLoad(QString)));
 }
 
 SCDataModel * SCDataModel::singleton()
@@ -86,9 +87,13 @@ void SCDataModel::handleStateMachineNameLoad(QString machineName)
 {
     // change the value in the data model and alert the formview that this happened to update the tree and property table
     _topState->attributes.value("name")->setValue(machineName);
-    emit _topState->nameChangedInDataModel(_topState,machineName); // connected to SCFormView::handleItemNameChangedInDataModel()
-
 }
+
+void SCDataModel::handleStateMachineUidLoad(QString uid)
+{
+    _topState->attributes.value("uid")->setValue(uid);
+}
+
 
 /**
  * @brief SCDataModel::reset
@@ -197,6 +202,7 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     {
         _writer->writeStartElement("scxml");
         _writer->writeAttribute("name", _topState->attributes.value("name")->asString());
+        _writer->writeAttribute("uid", _topState->getUid());
         _writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
     }
 

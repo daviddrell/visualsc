@@ -12,75 +12,15 @@ CWStateMachine::CWStateMachine(SCState *state):
 {
 
     // a CWStateMachine is a state with children states, so it has all the things a normal state would, but we also want to keep track of each of its states/statemachines
-    this->setState(state);
+    _myState = state;
     this->setParallel(state->isParallel());
 
     QString stateName;          // _stateName                       state's name in camel case and preceeding "_"
-    QString entryRelaySlot;     // Slot_StateEntry_stateName        QState's private corresponding entry slot called when a transition leads to this state
-    QString exitRelaySlot;      // Slot_StateExit_stateName         QState's private corresponding exit slot called when a transition exits this state
-    QString entryRelaySignal;   // Signal_StateEntry_stateName      QState's public signal connected to its private entered() signal
-    QString exitRelaySignal;    // Signal_StateExit_stateName       QState's public signal connected to its private exited() signal
-    QString entryAction;        // EntryAction_eventName            signal that is emitted in the entry relay slot
-    QString exitAction;         // ExitAction_eventName             signal that is emitted in the exit relay slot
-    QString readyRelaySignal="";   // Signal_StateReady_stateName      signal reserved for the initial states of machines
-
-    QList<SCTransition*> transitions;
-    SCTransition* trans;
-    QString eventName;
-    QString relaySignal;
-    QString targetName;
-    CWTransition* cwTransition;
-
     stateName =         "_" + toCamel(state->getName())+"_"+state->getUidFirstName();
-
-    entryRelaySignal =  "Signal_StateEntry"+stateName+"()";
-    exitRelaySignal =   "Signal_StateExit"+stateName+"()";
-
-    entryRelaySlot =    "Slot_StateEntry" + stateName+"()";
-    exitRelaySlot =     "Slot_StateExit"+ stateName+"()";
-
-    entryAction = state->attributes.value("entryAction")->asString();
-    if(!entryAction.isEmpty())
-    {
-        qDebug()<<"writing entry action: " <<entryAction;
-        entryAction =   "EntryAction_"+toCamel(entryAction)+"()";
-        qDebug()<<"here's entry action: " <<entryAction;
-    }
-
-    exitAction = state->attributes.value("exitAction")->asString();
-    if(!exitAction.isEmpty())
-    {
-        exitAction =    "ExitAction_" +toCamel(exitAction)+"()";
-    }
-
-    // this is a state machine, so set its ready relay signal.
-    readyRelaySignal = "Signal_StateReady"+stateName+"()";
-
 
     // set the function names for this State Machine
     _stateName = stateName;
-    _entryRelaySlot = entryRelaySlot;
-    _exitRelaySlot = exitRelaySlot;
-    _entryRelaySignal = entryRelaySignal;
-    _exitRelaySignal= exitRelaySignal;
-    _entryAction = entryAction;
-    _exitAction = exitAction;
-    _readyRelaySignal = readyRelaySignal;
-
-    // for each out transition, determine the transition's event name and relay signal name
-    transitions.clear();
-    state->getTransitions(transitions);
-    for(int k = 0 ; k < transitions.size(); k++)
-    {
-        trans = transitions.at(k);
-        eventName = "Event_"+toCamel(trans->getEventName())+"_"+trans->getUidFirstName()+"()";
-        relaySignal = "Relay_"+eventName;
-        targetName = "_"+toCamel(trans->targetState()->getName())+"_"+trans->targetState()->getUidFirstName();
-
-        // create a new codewriter transition and link them with a QHash
-        cwTransition = new CWTransition(eventName, relaySignal, targetName);
-        _transitions.append(cwTransition);
-    }
+    _readyRelaySignal = "Signal_StateReady"+stateName+"()";
 }
 
 CWStateMachine::CWStateMachine(SCState *state, bool isRoot)
@@ -93,7 +33,7 @@ CWStateMachine::CWStateMachine(SCState *state, bool isRoot)
         this->setParallel(state->isParallel());
 
         QString stateName;          // _stateName                       state's name in camel case and preceeding "_"
-        stateName =         "_" + toCamel(state->attributes.value("name")->asString());
+        stateName =         "_" + toCamel(state->getName())+"_"+state->getUidFirstName();
 
         // set the function names for this State Machine
         _stateName = stateName;

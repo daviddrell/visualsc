@@ -89,6 +89,11 @@ void SCXMLReader::getReadResult(bool &success, QStringList& message)
 /**
  * @brief SCXMLReader::readStateMachine
  * Used to change the state machine's name in the data model when reading from this file
+ *
+ *
+ * SIGNAL
+ * connect in SCDataModel::connectDataModel()
+ *
  */
 void SCXMLReader::readStateMachine()
 {
@@ -98,6 +103,10 @@ void SCXMLReader::readStateMachine()
         if(xmlAttr.name() == "name")
         {
             emit changeStateMachineName(xmlAttr.value().toString());
+        }
+        else if(xmlAttr.name() == "uid")
+        {
+            emit changeStateMachineUid(xmlAttr.value().toString());
         }
     }
 

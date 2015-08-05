@@ -302,6 +302,11 @@ PositionAttribute* SCState::getPosAttr()
     return dynamic_cast<PositionAttribute*>(attributes.value("position"));
 }
 
+StateString* SCState::getStringAttr(QString attrName)
+{
+    return dynamic_cast<StateString*>(attributes.value(attrName));
+}
+
 /**
  * @brief SCState::setSize
  * @param size
@@ -861,30 +866,6 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
         if (tb)
             tb->writeSCVXML(sw);
     }
-
-
-
-
-    /*
-    sw.writeAttribute(QString("id"), attributes.value("name")->asString());
-    sw.writeAttribute(QString("position"),attributes.value("position")->asString());
-    sw.writeAttribute(QString("size"),attributes.value("size")->asString());
-
-    for(int i=0; i < children().length(); i++)
-    {
-        SCState * sc = dynamic_cast<SCState*>(children()[i]);
-        if (sc)
-            sc->writeSCVXML(sw);
-
-        SCTransition * st = dynamic_cast<SCTransition*>(children()[i]);
-        if (st)
-            st->writeSCVXML(sw);
-
-        SCTextBlock * tb = dynamic_cast<SCTextBlock*>(children()[i]);
-        if (tb)
-            tb->writeSCVXML(sw);
-
-    }*/
 
     sw.writeEndElement();
 }

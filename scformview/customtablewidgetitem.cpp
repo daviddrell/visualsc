@@ -33,6 +33,11 @@ void CustomTableWidgetItem::handleAttributeChanged(TransitionStringAttribute* ts
     setText(tsa->asString());
 }
 
+void CustomTableWidgetItem::handleAttributeChanged(StateString* ss)
+{
+    setText(ss->asString());
+}
+
 /*
 void CustomTableWidgetItem::setText(const QString &text)
 {

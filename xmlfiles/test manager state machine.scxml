@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scxml name="Test Manager State Machine" xmlns="http://www.w3.org/2005/07/scxml">
+<scxml name="Test Manager State Machine" uid="{0c016b77-8a19-423d-ae43-c91ef5d4d673}" xmlns="http://www.w3.org/2005/07/scxml">
     <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="false" name="Idle" position="88,-230" size="167,82" type="default type" uid="{1aefb2b3-e575-4cd2-a224-241f618b3362}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="2,11" size="100,60"/>
         <transition comments="" event="start" target="Downloading AVC" uid="{faa33767-23ec-4c2c-b28d-1165acb59a22}">

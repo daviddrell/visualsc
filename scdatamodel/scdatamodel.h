@@ -154,6 +154,7 @@ private slots:
     void handleEventSizeChangedInFormView(SCTransition*, QString);
 
     void handleStateMachineNameLoad(QString);
+    void handleStateMachineUidLoad(QString);
 
 
 private:

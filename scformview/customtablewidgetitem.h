@@ -27,6 +27,7 @@ public slots:
     void handleAttributeChanged(PositionAttribute*);
     void handleAttributeChanged(StateName*);
     void handleAttributeChanged(TransitionStringAttribute*);
+    void handleAttributeChanged(StateString*);
 };
 
 #endif // CUSTOMTABLEWIDGETITEM_H

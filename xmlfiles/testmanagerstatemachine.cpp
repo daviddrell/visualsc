@@ -26,8 +26,8 @@ registered when using addTransition to trigger transitions between the QStates),
 
 TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     QObject(parent),
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
-    _testManagerStateMachine_d47570ed(new QStateMachine(this)),
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
+    _testManagerStateMachine_0c016b77(new QStateMachine(this)),
     _idle_1aefb2b3(new QState()),
     _downloadingAVC_faa33767(new QState()),
     _unzipAVC_21a6ba6b(new QState()),
@@ -35,13 +35,13 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _completed_680d4ac1(new QState())
 
 {
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
-    _testManagerStateMachine_d47570ed->addState(_idle_1aefb2b3);
-    _testManagerStateMachine_d47570ed->setInitialState(_idle_1aefb2b3);
-    _testManagerStateMachine_d47570ed->addState(_downloadingAVC_faa33767);
-    _testManagerStateMachine_d47570ed->addState(_unzipAVC_21a6ba6b);
-    _testManagerStateMachine_d47570ed->addState(_runningTests_7a81f0a9);
-    _testManagerStateMachine_d47570ed->addState(_completed_680d4ac1);
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
+    _testManagerStateMachine_0c016b77->addState(_idle_1aefb2b3);
+    _testManagerStateMachine_0c016b77->setInitialState(_idle_1aefb2b3);
+    _testManagerStateMachine_0c016b77->addState(_downloadingAVC_faa33767);
+    _testManagerStateMachine_0c016b77->addState(_unzipAVC_21a6ba6b);
+    _testManagerStateMachine_0c016b77->addState(_runningTests_7a81f0a9);
+    _testManagerStateMachine_0c016b77->addState(_completed_680d4ac1);
 
     //
     //    add transitions for the QStates using the transitions' private relay signals
@@ -56,7 +56,7 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _completed_680d4ac1->addTransition(this, SIGNAL(Relay_Event_pollTimerPopped_faa33767()),_downloadingAVC_faa33767);
 
     //    Propogate the private QState signals to public signals
-    connect(_testManagerStateMachine_d47570ed, SIGNAL(started()), this, SIGNAL(Signal_StateReady_testManagerStateMachine_d47570ed()));
+    connect(_testManagerStateMachine_0c016b77, SIGNAL(started()), this, SIGNAL(Signal_StateReady_testManagerStateMachine_0c016b77()));
     connect(_idle_1aefb2b3, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_idle_1aefb2b3()));
     connect(_idle_1aefb2b3, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_idle_1aefb2b3()));
     connect(_downloadingAVC_faa33767, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_downloadingAVC_faa33767()));
@@ -90,10 +90,10 @@ TestManagerStateMachine::~TestManagerStateMachine()
 //    PUBLIC
 //    these functions connect external Event slots to internal signals to drive the inputs to the state machine
 //
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
-void TestManagerStateMachine::Event_startMachine_testManagerStateMachine_d47570ed()
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
+void TestManagerStateMachine::Event_startMachine_testManagerStateMachine_0c016b77()
 {
-    _testManagerStateMachine_d47570ed->start();
+    _testManagerStateMachine_0c016b77->start();
 }
 
 void TestManagerStateMachine::Event_start_faa33767()
@@ -140,7 +140,7 @@ void TestManagerStateMachine::Event_pollTimerPopped_faa33767()
 //
 //    these slots register the state entry/exits to generate event signals for any given entry or exit events
 //
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
 void TestManagerStateMachine::Slot_StateEntry_idle_1aefb2b3()
 {
 

@@ -35,8 +35,8 @@ public:
 
 
 public slots:
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
-    void Event_startMachine_testManagerStateMachine_d47570ed();
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
+    void Event_startMachine_testManagerStateMachine_0c016b77();
     void Event_start_faa33767();
     void Event_sHA1IsDifferent_21a6ba6b();
     void Event_downloadFailed_680d4ac1();
@@ -53,7 +53,7 @@ signals:
     //
     //    Connect to these signals to a slot corresponding to a entryAction or exitAction
     //
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
     void EntryAction_startDownload();
     void EntryAction_startUnzip();
     void EntryAction_startTests();
@@ -64,8 +64,8 @@ signals:
     //
     //    Connect to these signals to monitor state transitions
     //
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
-    void Signal_StateReady_testManagerStateMachine_d47570ed();
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
+    void Signal_StateReady_testManagerStateMachine_0c016b77();
     void Signal_StateEntry_idle_1aefb2b3();
     void Signal_StateExit_idle_1aefb2b3();
     void Signal_StateEntry_downloadingAVC_faa33767();
@@ -104,7 +104,7 @@ private:
 
 private slots:
     // The Entry/Exit Slots that belong to QStates
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
     void Slot_StateEntry_idle_1aefb2b3();
     void Slot_StateExit_idle_1aefb2b3();
     void Slot_StateEntry_downloadingAVC_faa33767();
@@ -119,7 +119,7 @@ private slots:
 
 signals:
     // A Transition/Event slot's corresponding signal emitted in the slot
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
     void Relay_Event_start_faa33767();
     void Relay_Event_sHA1IsDifferent_21a6ba6b();
     void Relay_Event_downloadFailed_680d4ac1();
@@ -131,8 +131,8 @@ signals:
 
 
 private:
-    //////// State Machine: _testManagerStateMachine_d47570ed ////////
-    QStateMachine*    _testManagerStateMachine_d47570ed;
+    //////// State Machine: _testManagerStateMachine_0c016b77 ////////
+    QStateMachine*    _testManagerStateMachine_0c016b77;
     QState*    _idle_1aefb2b3;
     QState*    _downloadingAVC_faa33767;
     QState*    _unzipAVC_21a6ba6b;

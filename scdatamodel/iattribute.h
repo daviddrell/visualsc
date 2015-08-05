@@ -126,6 +126,7 @@
 class SizeAttribute;
 class PositionAttribute;
 class StateName;
+class StateString;
 class TransitionStringAttribute;
 
 class IAttribute: public QObject
@@ -154,6 +155,7 @@ signals:
     void changed(PositionAttribute* pos);
     void changed(StateName* sn);
     void changed(TransitionStringAttribute* tsa);
+    void changed(StateString*);
     void error(QString err);
 
 private:
