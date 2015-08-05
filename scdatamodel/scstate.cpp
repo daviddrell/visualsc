@@ -179,6 +179,11 @@ bool SCState::isStateMachine()
     return false;
 }
 
+QString SCState::getName()
+{
+    return attributes.value("name")->asString();
+}
+
 SCState* SCState::getInitialState()
 {
     for(int i = 0 ; i < this->children().size(); i++)
@@ -805,6 +810,12 @@ int SCState::doNotPrintSize()
 QString SCState::getUid()
 {
     return attributes.value("uid")->asString();
+}
+
+QString SCState::getUidFirstName()
+{
+    QStringList qsl = getUid().split("-");
+    return qsl.at(0).mid(1,qsl.at(0).size());
 }
 
 /**

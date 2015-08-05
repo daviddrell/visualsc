@@ -62,12 +62,14 @@ public:
 
     void deleteSafely();
 
+    QString getName();
    // void setGraphic(StateBoxGraphic*);
 
 
     //void prepareForDelete();
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
     QString getUid();
+    QString getUidFirstName();
     bool doNotPrint(QString);
     int doNotPrintSize();
     enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };

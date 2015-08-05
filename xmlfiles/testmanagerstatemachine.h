@@ -35,15 +35,17 @@ public:
 
 
 public slots:
-    void Event_startMachine_testManagerStateMachine();
-    void Event_start();
-    void Event_sHA1IsDifferent();
-    void Event_downloadFailed();
-    void Event_sHA1IsSame();
-    void Event_unzipSuccess();
-    void Event_unzipFail();
-    void Event_testsCompleted();
-    void Event_pollTimerPopped();
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    void Event_startMachine_testManagerStateMachine_d47570ed();
+    void Event_start_faa33767();
+    void Event_sHA1IsDifferent_21a6ba6b();
+    void Event_downloadFailed_680d4ac1();
+    void Event_sHA1IsSame_680d4ac1();
+    void Event_unzipSuccess_7a81f0a9();
+    void Event_unzipFail_680d4ac1();
+    void Event_testsCompleted_680d4ac1();
+    void Event_pollTimerPopped_faa33767();
+
 
 signals:
     //
@@ -51,26 +53,30 @@ signals:
     //
     //    Connect to these signals to a slot corresponding to a entryAction or exitAction
     //
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
     void EntryAction_startDownload();
     void EntryAction_startUnzip();
     void EntryAction_startTests();
+
 
     //
     //    STATE CHANGE MONITOR SIGNALS
     //
     //    Connect to these signals to monitor state transitions
     //
-    void Signal_StateReady_testManagerStateMachine();
-    void Signal_StateEntry_idle();
-    void Signal_StateExit_idle();
-    void Signal_StateEntry_downloadingAVC();
-    void Signal_StateExit_downloadingAVC();
-    void Signal_StateEntry_unzipAVC();
-    void Signal_StateExit_unzipAVC();
-    void Signal_StateEntry_runningTests();
-    void Signal_StateExit_runningTests();
-    void Signal_StateEntry_completed();
-    void Signal_StateExit_completed();
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    void Signal_StateReady_testManagerStateMachine_d47570ed();
+    void Signal_StateEntry_idle_1aefb2b3();
+    void Signal_StateExit_idle_1aefb2b3();
+    void Signal_StateEntry_downloadingAVC_faa33767();
+    void Signal_StateExit_downloadingAVC_faa33767();
+    void Signal_StateEntry_unzipAVC_21a6ba6b();
+    void Signal_StateExit_unzipAVC_21a6ba6b();
+    void Signal_StateEntry_runningTests_7a81f0a9();
+    void Signal_StateExit_runningTests_7a81f0a9();
+    void Signal_StateEntry_completed_680d4ac1();
+    void Signal_StateExit_completed_680d4ac1();
+
 
     //////////////////
     //
@@ -98,35 +104,41 @@ private:
 
 private slots:
     // The Entry/Exit Slots that belong to QStates
-    void Slot_StateEntry_idle();
-    void Slot_StateExit_idle();
-    void Slot_StateEntry_downloadingAVC();
-    void Slot_StateExit_downloadingAVC();
-    void Slot_StateEntry_unzipAVC();
-    void Slot_StateExit_unzipAVC();
-    void Slot_StateEntry_runningTests();
-    void Slot_StateExit_runningTests();
-    void Slot_StateEntry_completed();
-    void Slot_StateExit_completed();
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    void Slot_StateEntry_idle_1aefb2b3();
+    void Slot_StateExit_idle_1aefb2b3();
+    void Slot_StateEntry_downloadingAVC_faa33767();
+    void Slot_StateExit_downloadingAVC_faa33767();
+    void Slot_StateEntry_unzipAVC_21a6ba6b();
+    void Slot_StateExit_unzipAVC_21a6ba6b();
+    void Slot_StateEntry_runningTests_7a81f0a9();
+    void Slot_StateExit_runningTests_7a81f0a9();
+    void Slot_StateEntry_completed_680d4ac1();
+    void Slot_StateExit_completed_680d4ac1();
+
 
 signals:
-    // A Transiton/Event slot's corresponding signal emitted in the slot
-    void Relay_Event_start();
-    void Relay_Event_sHA1IsDifferent();
-    void Relay_Event_downloadFailed();
-    void Relay_Event_sHA1IsSame();
-    void Relay_Event_unzipSuccess();
-    void Relay_Event_unzipFail();
-    void Relay_Event_testsCompleted();
-    void Relay_Event_pollTimerPopped();
+    // A Transition/Event slot's corresponding signal emitted in the slot
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    void Relay_Event_start_faa33767();
+    void Relay_Event_sHA1IsDifferent_21a6ba6b();
+    void Relay_Event_downloadFailed_680d4ac1();
+    void Relay_Event_sHA1IsSame_680d4ac1();
+    void Relay_Event_unzipSuccess_7a81f0a9();
+    void Relay_Event_unzipFail_680d4ac1();
+    void Relay_Event_testsCompleted_680d4ac1();
+    void Relay_Event_pollTimerPopped_faa33767();
+
 
 private:
-    QStateMachine*    _testManagerStateMachine;
-    QState*    _idle;
-    QState*    _downloadingAVC;
-    QState*    _unzipAVC;
-    QState*    _runningTests;
-    QState*    _completed;
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    QStateMachine*    _testManagerStateMachine_d47570ed;
+    QState*    _idle_1aefb2b3;
+    QState*    _downloadingAVC_faa33767;
+    QState*    _unzipAVC_21a6ba6b;
+    QState*    _runningTests_7a81f0a9;
+    QState*    _completed_680d4ac1;
+
 
 };
 

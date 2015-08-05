@@ -28,9 +28,10 @@ CWStateMachine::CWStateMachine(SCState *state):
     SCTransition* trans;
     QString eventName;
     QString relaySignal;
+    QString targetName;
     CWTransition* cwTransition;
 
-    stateName =         "_" + toCamel(state->attributes.value("name")->asString());
+    stateName =         "_" + toCamel(state->getName())+"_"+state->getUidFirstName();
 
     entryRelaySignal =  "Signal_StateEntry"+stateName+"()";
     exitRelaySignal =   "Signal_StateExit"+stateName+"()";
@@ -52,11 +53,9 @@ CWStateMachine::CWStateMachine(SCState *state):
         exitAction =    "ExitAction_" +toCamel(exitAction)+"()";
     }
 
-    // if this is an initial state, then set the ready relay signal name
-    if(state->isInitial())
-    {
-        readyRelaySignal = "Signal_StateReady_"+stateName+"()";
-    }
+    // this is a state machine, so set its ready relay signal.
+    readyRelaySignal = "Signal_StateReady"+stateName+"()";
+
 
     // set the function names for this State Machine
     _stateName = stateName;
@@ -74,11 +73,12 @@ CWStateMachine::CWStateMachine(SCState *state):
     for(int k = 0 ; k < transitions.size(); k++)
     {
         trans = transitions.at(k);
-        eventName = "Event_"+toCamel(trans->attributes.value("event")->asString())+"()";
+        eventName = "Event_"+toCamel(trans->getEventName())+"_"+trans->getUidFirstName()+"()";
         relaySignal = "Relay_"+eventName;
+        targetName = "_"+toCamel(trans->targetState()->getName())+"_"+trans->targetState()->getUidFirstName();
 
         // create a new codewriter transition and link them with a QHash
-        cwTransition = new CWTransition(eventName, relaySignal);
+        cwTransition = new CWTransition(eventName, relaySignal, targetName);
         _transitions.append(cwTransition);
     }
 }
@@ -97,6 +97,7 @@ CWStateMachine::CWStateMachine(SCState *state, bool isRoot)
 
         // set the function names for this State Machine
         _stateName = stateName;
+        _readyRelaySignal = "Signal_StateReady"+stateName+"()";
     }
 }
 
@@ -133,6 +134,7 @@ void CWStateMachine::createSignalsAndSlots()
     SCTransition* trans;
     QString eventName;
     QString relaySignal;
+    QString targetName;
     CWTransition* cwTransition;
 
 
@@ -144,7 +146,7 @@ void CWStateMachine::createSignalsAndSlots()
     for(int i = 0 ; i < directChildren.size();i++)
     {
         state = directChildren.at(i);
-        stateName =         "_" + toCamel(state->attributes.value("name")->asString());
+        stateName =         "_" + toCamel(state->getName())+"_"+state->getUidFirstName();
 
         entryRelaySignal =  "Signal_StateEntry"+stateName+"()";
         exitRelaySignal =   "Signal_StateExit"+stateName+"()";
@@ -179,11 +181,12 @@ void CWStateMachine::createSignalsAndSlots()
         for(int k = 0 ; k < transitions.size(); k++)
         {
             trans = transitions.at(k);
-            eventName = "Event_"+toCamel(trans->attributes.value("event")->asString())+"()";
+            eventName = "Event_"+toCamel(trans->getEventName())+"_"+trans->getUidFirstName()+"()";
             relaySignal = "Relay_"+eventName;
+            targetName = "_"+toCamel(trans->targetState()->getName())+"_"+trans->targetState()->getUidFirstName();
 
             // create a new codewriter transition and link them with the state's Transition QHash
-            cwTransition = new CWTransition(eventName, relaySignal);
+            cwTransition = new CWTransition(eventName, relaySignal, targetName);
             cwState->insertTransition( cwTransition);
         }
 

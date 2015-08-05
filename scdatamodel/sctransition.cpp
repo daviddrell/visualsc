@@ -119,6 +119,12 @@ QString SCTransition::getUid()
     return attributes.value("uid")->asString();
 }
 
+QString SCTransition::getUidFirstName()
+{
+    QStringList qsl = getUid().split("-");
+    return qsl.at(0).mid(1,qsl.at(0).size());
+}
+
 bool SCTransition::doNotPrint(QString attribute)
 {
     return DO_NOT_DISPLAY_HASH.contains(attribute);

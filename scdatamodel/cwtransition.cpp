@@ -1,9 +1,10 @@
 #include "cwtransition.h"
 
-CWTransition::CWTransition(QString theEventName, QString theRelaySignalName)
+CWTransition::CWTransition(QString theEventName, QString theRelaySignalName, QString targetName)
 {
-    eventName = theEventName;
-    relaySignal = theRelaySignalName;
+    _eventName = theEventName;
+    _relaySignal = theRelaySignalName;
+    _targetName = targetName;
 }
 
 CWTransition::~CWTransition()

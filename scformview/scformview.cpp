@@ -294,9 +294,9 @@ void SCFormView::handleMakeTransitionConnections(SCTransition* trans)
  */
 void SCFormView::handleNewTransition(SCTransition* tr)
 {
-    qDebug()<<"SCFormView::handleNewTransition";
+    //qDebug()<<"SCFormView::handleNewTransition";
 
-    // parent state widget will be the parent of this transition's widget
+    // the parent state's widget will be the parent of this transition's widget
     SCState* parentState = tr->parentSCState();
     FVItem*parentfv = _items.value(parentState);
 
@@ -306,7 +306,7 @@ void SCFormView::handleNewTransition(SCTransition* tr)
 
     // link the tree widget to the fv item, and set its text and icon
     item->setData(fvItem);
-    item->setText(0, tr->attributes.value("event")->asString());
+    item->setText(0, tr->getEventName());
     item->setIcon(0,QIcon(":/SCFormView/diagonalarrowhollow.png"));
 
     // link the SCTransiton and FVItem

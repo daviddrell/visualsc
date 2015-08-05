@@ -33,6 +33,8 @@ public:
     CWState();
     ~CWState();
 
+    QList<CWTransition*> getTransitions();
+
     QString _stateName;          // _stateName                       state's name in camel case and preceeding "_"
     QString _entryRelaySlot;     // Slot_StateEntry_stateName        QState's private corresponding entry slot called when a transition leads to this state
     QString _exitRelaySlot;      // Slot_StateExit_stateName         QState's private corresponding exit slot called when a transition exits this state

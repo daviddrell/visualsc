@@ -30,11 +30,13 @@
 class CWTransition
 {
 public:
-    CWTransition(QString theEventName, QString theRelaySignalName);
+    CWTransition(QString theEventName, QString theRelaySignalName, QString targetName);
     ~CWTransition();
 
-    QString eventName;      // Event_eventName              public slot that transition calls, the "event" attribute value in a transition
-    QString relaySignal;    // RelaySlot_Event_eventName    the signal corresponding to the transiton's slot
+    QString _eventName;      // Event_eventName              public slot that transition calls, the "event" attribute value in a transition
+    QString _relaySignal;    // RelaySlot_Event_eventName    the signal corresponding to the transiton's slot
+
+    QString _targetName;
 };
 
 #endif // CWTRANSITION_H

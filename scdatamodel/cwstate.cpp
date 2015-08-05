@@ -38,6 +38,12 @@ void CWState::insertTransition( CWTransition *transCW)
     _transitions.append(transCW);
 }
 
+QList<CWTransition*> CWState::getTransitions()
+{
+    return _transitions;
+}
+
+
 /**
  * @brief CodeWriter::toCamel
  * @param text

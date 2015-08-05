@@ -26,56 +26,61 @@ registered when using addTransition to trigger transitions between the QStates),
 
 TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     QObject(parent),
-    _testManagerStateMachine(new QStateMachine(this)),
-    _idle(new QState()),
-    _downloadingAVC(new QState()),
-    _unzipAVC(new QState()),
-    _runningTests(new QState()),
-    _completed(new QState())
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    _testManagerStateMachine_d47570ed(new QStateMachine(this)),
+    _idle_1aefb2b3(new QState()),
+    _downloadingAVC_faa33767(new QState()),
+    _unzipAVC_21a6ba6b(new QState()),
+    _runningTests_7a81f0a9(new QState()),
+    _completed_680d4ac1(new QState())
+
 {
-    _testManagerStateMachine->addState(_idle);
-    _testManagerStateMachine->addState(_downloadingAVC);
-    _testManagerStateMachine->addState(_unzipAVC);
-    _testManagerStateMachine->addState(_runningTests);
-    _testManagerStateMachine->addState(_completed);
-    _testManagerStateMachine->setInitialState(_idle);
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+    _testManagerStateMachine_d47570ed->addState(_idle_1aefb2b3);
+    _testManagerStateMachine_d47570ed->setInitialState(_idle_1aefb2b3);
+    _testManagerStateMachine_d47570ed->addState(_downloadingAVC_faa33767);
+    _testManagerStateMachine_d47570ed->addState(_unzipAVC_21a6ba6b);
+    _testManagerStateMachine_d47570ed->addState(_runningTests_7a81f0a9);
+    _testManagerStateMachine_d47570ed->addState(_completed_680d4ac1);
 
     //
     //    add transitions for the QStates using the transitions' private relay signals
     //
-    _idle->addTransition(this,SIGNAL(Relay_Event_start()),_downloadingAVC);
-    _downloadingAVC->addTransition(this,SIGNAL(Relay_Event_sHA1IsDifferent()),_unzipAVC);
-    _downloadingAVC->addTransition(this,SIGNAL(Relay_Event_downloadFailed()),_completed);
-    _downloadingAVC->addTransition(this,SIGNAL(Relay_Event_sHA1IsSame()),_completed);
-    _unzipAVC->addTransition(this,SIGNAL(Relay_Event_unzipSuccess()),_runningTests);
-    _unzipAVC->addTransition(this,SIGNAL(Relay_Event_unzipFail()),_completed);
-    _runningTests->addTransition(this,SIGNAL(Relay_Event_testsCompleted()),_completed);
-    _completed->addTransition(this,SIGNAL(Relay_Event_pollTimerPopped()),_downloadingAVC);
+    _idle_1aefb2b3->addTransition(this, SIGNAL(Relay_Event_start_faa33767()),_downloadingAVC_faa33767);
+    _downloadingAVC_faa33767->addTransition(this, SIGNAL(Relay_Event_sHA1IsDifferent_21a6ba6b()),_unzipAVC_21a6ba6b);
+    _downloadingAVC_faa33767->addTransition(this, SIGNAL(Relay_Event_downloadFailed_680d4ac1()),_completed_680d4ac1);
+    _downloadingAVC_faa33767->addTransition(this, SIGNAL(Relay_Event_sHA1IsSame_680d4ac1()),_completed_680d4ac1);
+    _unzipAVC_21a6ba6b->addTransition(this, SIGNAL(Relay_Event_unzipSuccess_7a81f0a9()),_runningTests_7a81f0a9);
+    _unzipAVC_21a6ba6b->addTransition(this, SIGNAL(Relay_Event_unzipFail_680d4ac1()),_completed_680d4ac1);
+    _runningTests_7a81f0a9->addTransition(this, SIGNAL(Relay_Event_testsCompleted_680d4ac1()),_completed_680d4ac1);
+    _completed_680d4ac1->addTransition(this, SIGNAL(Relay_Event_pollTimerPopped_faa33767()),_downloadingAVC_faa33767);
 
     //    Propogate the private QState signals to public signals
-    connect(_testManagerStateMachine, SIGNAL(started()), this, SIGNAL(Signal_StateReady_testManagerStateMachine()));
-    connect(_idle, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_idle()));
-    connect(_idle, SIGNAL(exited()), this, SIGNAL(Signal_StateEntry_idle()));
-    connect(_downloadingAVC, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_downloadingAVC()));
-    connect(_downloadingAVC, SIGNAL(exited()), this, SIGNAL(Signal_StateEntry_downloadingAVC()));
-    connect(_unzipAVC, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_unzipAVC()));
-    connect(_unzipAVC, SIGNAL(exited()), this, SIGNAL(Signal_StateEntry_unzipAVC()));
-    connect(_runningTests, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_runningTests()));
-    connect(_runningTests, SIGNAL(exited()), this, SIGNAL(Signal_StateEntry_runningTests()));
-    connect(_completed, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_completed()));
-    connect(_completed, SIGNAL(exited()), this, SIGNAL(Signal_StateEntry_completed()));
+    connect(_testManagerStateMachine_d47570ed, SIGNAL(started()), this, SIGNAL(Signal_StateReady_testManagerStateMachine_d47570ed()));
+    connect(_idle_1aefb2b3, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_idle_1aefb2b3()));
+    connect(_idle_1aefb2b3, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_idle_1aefb2b3()));
+    connect(_downloadingAVC_faa33767, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_downloadingAVC_faa33767()));
+    connect(_downloadingAVC_faa33767, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_downloadingAVC_faa33767()));
+    connect(_unzipAVC_21a6ba6b, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_unzipAVC_21a6ba6b()));
+    connect(_unzipAVC_21a6ba6b, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_unzipAVC_21a6ba6b()));
+    connect(_runningTests_7a81f0a9, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_runningTests_7a81f0a9()));
+    connect(_runningTests_7a81f0a9, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_runningTests_7a81f0a9()));
+    connect(_completed_680d4ac1, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_completed_680d4ac1()));
+    connect(_completed_680d4ac1, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_completed_680d4ac1()));
 
     //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_idle, SIGNAL(entered()), this, SLOT(Slot_StateEntry_idle()));
-    connect(_idle, SIGNAL(exited()), this, SLOT(Slot_StateExit_idle()));
-    connect(_downloadingAVC, SIGNAL(entered()), this, SLOT(Slot_StateEntry_downloadingAVC()));
-    connect(_downloadingAVC, SIGNAL(exited()), this, SLOT(Slot_StateExit_downloadingAVC()));
-    connect(_unzipAVC, SIGNAL(entered()), this, SLOT(Slot_StateEntry_unzipAVC()));
-    connect(_unzipAVC, SIGNAL(exited()), this, SLOT(Slot_StateExit_unzipAVC()));
-    connect(_runningTests, SIGNAL(entered()), this, SLOT(Slot_StateEntry_runningTests()));
-    connect(_runningTests, SIGNAL(exited()), this, SLOT(Slot_StateExit_runningTests()));
-    connect(_completed, SIGNAL(entered()), this, SLOT(Slot_StateEntry_completed()));
-    connect(_completed, SIGNAL(exited()), this, SLOT(Slot_StateExit_completed()));
+    connect(_idle_1aefb2b3, SIGNAL(entered()), this, SLOT(Slot_StateEntry_idle_1aefb2b3()));
+    connect(_idle_1aefb2b3, SIGNAL(exited()), this, SLOT(Slot_StateExit_idle_1aefb2b3()));
+    connect(_downloadingAVC_faa33767, SIGNAL(entered()), this, SLOT(Slot_StateEntry_downloadingAVC_faa33767()));
+    connect(_downloadingAVC_faa33767, SIGNAL(exited()), this, SLOT(Slot_StateExit_downloadingAVC_faa33767()));
+    connect(_unzipAVC_21a6ba6b, SIGNAL(entered()), this, SLOT(Slot_StateEntry_unzipAVC_21a6ba6b()));
+    connect(_unzipAVC_21a6ba6b, SIGNAL(exited()), this, SLOT(Slot_StateExit_unzipAVC_21a6ba6b()));
+    connect(_runningTests_7a81f0a9, SIGNAL(entered()), this, SLOT(Slot_StateEntry_runningTests_7a81f0a9()));
+    connect(_runningTests_7a81f0a9, SIGNAL(exited()), this, SLOT(Slot_StateExit_runningTests_7a81f0a9()));
+    connect(_completed_680d4ac1, SIGNAL(entered()), this, SLOT(Slot_StateEntry_completed_680d4ac1()));
+    connect(_completed_680d4ac1, SIGNAL(exited()), this, SLOT(Slot_StateExit_completed_680d4ac1()));
+
+
 }
 
 TestManagerStateMachine::~TestManagerStateMachine()
@@ -85,99 +90,105 @@ TestManagerStateMachine::~TestManagerStateMachine()
 //    PUBLIC
 //    these functions connect external Event slots to internal signals to drive the inputs to the state machine
 //
-void TestManagerStateMachine::Event_startMachine_testManagerStateMachine()
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+void TestManagerStateMachine::Event_startMachine_testManagerStateMachine_d47570ed()
 {
-    _testManagerStateMachine->start();
+    _testManagerStateMachine_d47570ed->start();
 }
 
-void TestManagerStateMachine::Event_start()
+void TestManagerStateMachine::Event_start_faa33767()
 {
-    emit Relay_Event_start();
+    emit Relay_Event_start_faa33767();
 }
 
-void TestManagerStateMachine::Event_sHA1IsDifferent()
+void TestManagerStateMachine::Event_sHA1IsDifferent_21a6ba6b()
 {
-    emit Relay_Event_sHA1IsDifferent();
+    emit Relay_Event_sHA1IsDifferent_21a6ba6b();
 }
 
-void TestManagerStateMachine::Event_downloadFailed()
+void TestManagerStateMachine::Event_downloadFailed_680d4ac1()
 {
-    emit Relay_Event_downloadFailed();
+    emit Relay_Event_downloadFailed_680d4ac1();
 }
 
-void TestManagerStateMachine::Event_sHA1IsSame()
+void TestManagerStateMachine::Event_sHA1IsSame_680d4ac1()
 {
-    emit Relay_Event_sHA1IsSame();
+    emit Relay_Event_sHA1IsSame_680d4ac1();
 }
 
-void TestManagerStateMachine::Event_unzipSuccess()
+void TestManagerStateMachine::Event_unzipSuccess_7a81f0a9()
 {
-    emit Relay_Event_unzipSuccess();
+    emit Relay_Event_unzipSuccess_7a81f0a9();
 }
 
-void TestManagerStateMachine::Event_unzipFail()
+void TestManagerStateMachine::Event_unzipFail_680d4ac1()
 {
-    emit Relay_Event_unzipFail();
+    emit Relay_Event_unzipFail_680d4ac1();
 }
 
-void TestManagerStateMachine::Event_testsCompleted()
+void TestManagerStateMachine::Event_testsCompleted_680d4ac1()
 {
-    emit Relay_Event_testsCompleted();
+    emit Relay_Event_testsCompleted_680d4ac1();
 }
 
-void TestManagerStateMachine::Event_pollTimerPopped()
+void TestManagerStateMachine::Event_pollTimerPopped_faa33767()
 {
-    emit Relay_Event_pollTimerPopped();
+    emit Relay_Event_pollTimerPopped_faa33767();
 }
+
 
 //
 //    these slots register the state entry/exits to generate event signals for any given entry or exit events
 //
-void TestManagerStateMachine::Slot_StateEntry_idle()
-{
-}
-
-void TestManagerStateMachine::Slot_StateExit_idle()
+    //////// State Machine: _testManagerStateMachine_d47570ed ////////
+void TestManagerStateMachine::Slot_StateEntry_idle_1aefb2b3()
 {
 
 }
 
-void TestManagerStateMachine::Slot_StateEntry_downloadingAVC()
+void TestManagerStateMachine::Slot_StateExit_idle_1aefb2b3()
+{
+
+}
+
+void TestManagerStateMachine::Slot_StateEntry_downloadingAVC_faa33767()
 {
     emit EntryAction_startDownload();
 }
 
-void TestManagerStateMachine::Slot_StateExit_downloadingAVC()
+void TestManagerStateMachine::Slot_StateExit_downloadingAVC_faa33767()
 {
 
 }
 
-void TestManagerStateMachine::Slot_StateEntry_unzipAVC()
+void TestManagerStateMachine::Slot_StateEntry_unzipAVC_21a6ba6b()
 {
     emit EntryAction_startUnzip();
 }
 
-void TestManagerStateMachine::Slot_StateExit_unzipAVC()
+void TestManagerStateMachine::Slot_StateExit_unzipAVC_21a6ba6b()
 {
 
 }
 
-void TestManagerStateMachine::Slot_StateEntry_runningTests()
+void TestManagerStateMachine::Slot_StateEntry_runningTests_7a81f0a9()
 {
     emit EntryAction_startTests();
 }
 
-void TestManagerStateMachine::Slot_StateExit_runningTests()
+void TestManagerStateMachine::Slot_StateExit_runningTests_7a81f0a9()
 {
 
 }
 
-void TestManagerStateMachine::Slot_StateEntry_completed()
-{
-}
-
-void TestManagerStateMachine::Slot_StateExit_completed()
+void TestManagerStateMachine::Slot_StateEntry_completed_680d4ac1()
 {
 
 }
+
+void TestManagerStateMachine::Slot_StateExit_completed_680d4ac1()
+{
+
+}
+
 

@@ -63,6 +63,7 @@ public:
     void deleteSafely();
     void setUid(QString);
     QString getUid();
+    QString getUidFirstName();
     void setEventName(QString text);
     QString getEventName();
     //void setTextPos(QPointF);
