@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QMapIterator>
 #include <QGraphicsScene>
+#include <QUuid>
 
 SCDataModel::SCDataModel(QObject * parent) :
     QObject (parent),
@@ -127,6 +128,11 @@ void SCDataModel::reset()
     // reset the name of the state machine and alert the formview that this happened
     _topState->attributes.value("name")->setValue("State Machine");
     emit _topState->nameChangedInDataModel(_topState,"State Machine"); // connected to SCFormView::handleItemNameChangedInDataModel()
+
+    // generate another uid for the root machine
+    _topState->getStringAttr("uid")->setValue(QUuid::createUuid().toString());
+
+
 
     //qDebug() << "AFTER A RESET, YOU HAVE " << _transitions.count() << " TRANSITIONS LISTED IN _transitions";
 }

@@ -89,24 +89,55 @@ void CodeWriter::cWriteConstructor()
             if(i == _machines.size()-1 && k == cwsm->_states.size()-1)
             {
                 // if this is the last state initalized, do not add a comma
-                if(cws->getState()->isFinal())
+
+                if(cwsm->isParallel())
                 {
-                    cPrintln(cws->_stateName+"(new QFinalState())",1);
+                    if(cws->getState()->isFinal())
+                    {
+                        cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates))",1);
+                    }
+                    else
+                    {
+                        cPrintln(cws->_stateName+"(new QState(QState::ParallelStates))",1);
+                    }
                 }
                 else
                 {
-                    cPrintln(cws->_stateName+"(new QState())",1);
+                    if(cws->getState()->isFinal())
+                    {
+                        cPrintln(cws->_stateName+"(new QFinalState())",1);
+                    }
+                    else
+                    {
+                        cPrintln(cws->_stateName+"(new QState())",1);
+                    }
                 }
+
+
             }
             else
             {
-                if(cws->getState()->isFinal())
+                if(cwsm->isParallel())
                 {
-                    cPrintln(cws->_stateName+"(new QFinalState()),",1);
+                    if(cws->getState()->isFinal())
+                    {
+                        cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates)),",1);
+                    }
+                    else
+                    {
+                        cPrintln(cws->_stateName+"(new QState(QState::ParallelStates)),",1);
+                    }
                 }
                 else
                 {
-                    cPrintln(cws->_stateName+"(new QState()),",1);
+                    if(cws->getState()->isFinal())
+                    {
+                        cPrintln(cws->_stateName+"(new QFinalState()),",1);
+                    }
+                    else
+                    {
+                        cPrintln(cws->_stateName+"(new QState()),",1);
+                    }
                 }
             }
         }
@@ -160,6 +191,11 @@ void CodeWriter::cWriteConstructor()
         cPrintln("\n//    Propogate the private QState signals to public signals",1);
         cPrintln("connect("+cwsm->_stateName+", SIGNAL(started()), this, SIGNAL("+cwsm->_readyRelaySignal+"));",1);
 
+        if(cwsm->isParallel())
+        {
+             cPrintln("connect("+cwsm->_stateName+", SIGNAL(finished()), this, SIGNAL("+cwsm->_finishedRelaySignal+"));",1);
+        }
+
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             CWState* cws = cwsm->_states.at(k);
@@ -171,6 +207,11 @@ void CodeWriter::cWriteConstructor()
 
         // Connect the private QState entry/exit signals to their own private entry/exit slots
         cPrintln("\n//    Connect the private QState signals to private slots for entry/exit handlers",1);
+
+        if(cwsm->isParallel())
+        {
+             cPrintln("connect("+cwsm->_stateName+", SIGNAL(finished()), this, SLOT("+cwsm->_finishedRelaySlot+"));",1);
+        }
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
@@ -247,6 +288,19 @@ void CodeWriter::cWriteEntryExitSlots()
         SCState* machine = _machines.at(i);
         CWStateMachine* cwsm = _machineHash.value(machine);
         cPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
+
+        // if this is a parallel state machine, create a public slot that corresponds to its finished
+        if(cwsm->isParallel())
+        {
+            cPrintln("void "+className+"::"+cwsm->_finishedRelaySlot+"");
+            cPrintln("{");
+            for(int k = 0; k < cwsm->_finishedTransitions.size(); k++)
+            {
+                SCTransition* trans = cwsm->_finishedTransitions.at(k);
+                cPrintln("Event_"+toCamel(trans->getEventName())+"_"+trans->getUidFirstName()+"();",1);
+            }
+            cPrintln("}\n");
+        }
 
         // for every direct child state, write the private entry/exit slots for every entry/exit action
         for(int k = 0; k < cwsm->_states.size(); k ++)
@@ -629,6 +683,11 @@ void CodeWriter::hWriteActionRelaySlots()
         {
             CWState* cws = cwsm->_states.at(k);
             hPrintln("void "+cws->_entryRelaySlot+";",1);
+           /* if(cws->getState()->isFinal() && cwsm->isParallel())
+            {
+                hPrintln("void "+cws->_finishedRelaySlot+";",1);
+            }
+            */
             hPrintln("void "+cws->_exitRelaySlot+";",1);
         }
         hPrintln("");

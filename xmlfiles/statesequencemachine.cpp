@@ -28,9 +28,9 @@ StateSequenceMachine::StateSequenceMachine(QObject* parent):
     QObject(parent),
     //////// State Machine: _checkingAllStateSequences_d74d8a42 ////////
     _checkingAllStateSequences_d74d8a42(new QStateMachine(this)),
-    _checkingCallSequence_78faf58e(new QState()),
-    _checkingConnSequence_926f34d4(new QState()),
-    _checkingSessionSeq_9f53745d(new QState()),
+    _checkingCallSequence_78faf58e(new QState(QState::ParallelStates)),
+    _checkingConnSequence_926f34d4(new QState(QState::ParallelStates)),
+    _checkingSessionSeq_9f53745d(new QState(QState::ParallelStates)),
 
     //////// State Machine: _checkingCallSequence_78faf58e ////////
     _checkingCallSequence_78faf58e(new QStateMachine(this)),
@@ -47,8 +47,8 @@ StateSequenceMachine::StateSequenceMachine(QObject* parent):
     _waiting_ff5a583f(new QState()),
     _completed_3967534e(new QFinalState()),
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
-    _stateSequenceMachine_d47570ed(new QStateMachine(this)),
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
+    _stateSequenceMachine_ba72ef13(new QStateMachine(this)),
     _checkingAllStateSequences_d74d8a42(new QState()),
     _failed_51ea86cc(new QFinalState()),
     _success_914678f0(new QFinalState())
@@ -65,6 +65,7 @@ StateSequenceMachine::StateSequenceMachine(QObject* parent):
 
     //    Propogate the private QState signals to public signals
     connect(_checkingAllStateSequences_d74d8a42, SIGNAL(started()), this, SIGNAL(Signal_StateReady_checkingAllStateSequences_d74d8a42()));
+    connect(_checkingAllStateSequences_d74d8a42, SIGNAL(finished()), this, SIGNAL(Signal_StateFinished_checkingAllStateSequences_d74d8a42()));
     connect(_checkingCallSequence_78faf58e, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_checkingCallSequence_78faf58e()));
     connect(_checkingCallSequence_78faf58e, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_checkingCallSequence_78faf58e()));
     connect(_checkingConnSequence_926f34d4, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_checkingConnSequence_926f34d4()));
@@ -73,6 +74,7 @@ StateSequenceMachine::StateSequenceMachine(QObject* parent):
     connect(_checkingSessionSeq_9f53745d, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_checkingSessionSeq_9f53745d()));
 
     //    Connect the private QState signals to private slots for entry/exit handlers
+    connect(_checkingAllStateSequences_d74d8a42, SIGNAL(finished()), this, SLOT(Slot_StateFinished_checkingAllStateSequences_d74d8a42()));
     connect(_checkingCallSequence_78faf58e, SIGNAL(entered()), this, SLOT(Slot_StateEntry_checkingCallSequence_78faf58e()));
     connect(_checkingCallSequence_78faf58e, SIGNAL(exited()), this, SLOT(Slot_StateExit_checkingCallSequence_78faf58e()));
     connect(_checkingConnSequence_926f34d4, SIGNAL(entered()), this, SLOT(Slot_StateEntry_checkingConnSequence_926f34d4()));
@@ -153,11 +155,11 @@ StateSequenceMachine::StateSequenceMachine(QObject* parent):
     connect(_completed_3967534e, SIGNAL(exited()), this, SLOT(Slot_StateExit_completed_3967534e()));
 
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
-    _stateSequenceMachine_d47570ed->addState(_checkingAllStateSequences_d74d8a42);
-    _stateSequenceMachine_d47570ed->setInitialState(_checkingAllStateSequences_d74d8a42);
-    _stateSequenceMachine_d47570ed->addState(_failed_51ea86cc);
-    _stateSequenceMachine_d47570ed->addState(_success_914678f0);
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
+    _stateSequenceMachine_ba72ef13->addState(_checkingAllStateSequences_d74d8a42);
+    _stateSequenceMachine_ba72ef13->setInitialState(_checkingAllStateSequences_d74d8a42);
+    _stateSequenceMachine_ba72ef13->addState(_failed_51ea86cc);
+    _stateSequenceMachine_ba72ef13->addState(_success_914678f0);
 
     //
     //    add transitions for the QStates using the transitions' private relay signals
@@ -168,7 +170,7 @@ StateSequenceMachine::StateSequenceMachine(QObject* parent):
     _checkingAllStateSequences_d74d8a42->addTransition(this, SIGNAL(Relay_Event_checkingSessionSeqFailed_51ea86cc()),_failed_51ea86cc);
 
     //    Propogate the private QState signals to public signals
-    connect(_stateSequenceMachine_d47570ed, SIGNAL(started()), this, SIGNAL(Signal_StateReady_stateSequenceMachine_d47570ed()));
+    connect(_stateSequenceMachine_ba72ef13, SIGNAL(started()), this, SIGNAL(Signal_StateReady_stateSequenceMachine_ba72ef13()));
     connect(_checkingAllStateSequences_d74d8a42, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_checkingAllStateSequences_d74d8a42()));
     connect(_checkingAllStateSequences_d74d8a42, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_checkingAllStateSequences_d74d8a42()));
     connect(_failed_51ea86cc, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_failed_51ea86cc()));
@@ -237,10 +239,10 @@ void StateSequenceMachine::Event_sessionSeqComplete_3967534e()
 }
 
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
-void StateSequenceMachine::Event_startMachine_stateSequenceMachine_d47570ed()
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
+void StateSequenceMachine::Event_startMachine_stateSequenceMachine_ba72ef13()
 {
-    _stateSequenceMachine_d47570ed->start();
+    _stateSequenceMachine_ba72ef13->start();
 }
 
 void StateSequenceMachine::Event_checkingAllStatesCompleted_914678f0()
@@ -268,6 +270,11 @@ void StateSequenceMachine::Event_checkingSessionSeqFailed_51ea86cc()
 //    these slots register the state entry/exits to generate event signals for any given entry or exit events
 //
     //////// State Machine: _checkingAllStateSequences_d74d8a42 ////////
+void StateSequenceMachine::Slot_StateFinished_checkingAllStateSequences_d74d8a42()
+{
+    Event_checkingAllStatesCompleted_914678f0();
+}
+
 void StateSequenceMachine::Slot_StateEntry_checkingCallSequence_78faf58e()
 {
 
@@ -365,7 +372,7 @@ void StateSequenceMachine::Slot_StateExit_completed_3967534e()
 }
 
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
 void StateSequenceMachine::Slot_StateEntry_checkingAllStateSequences_d74d8a42()
 {
 

@@ -50,8 +50,8 @@ public slots:
     void Event_startMachine_checkingSessionSeq_9f53745d();
     void Event_sessionSeqComplete_3967534e();
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
-    void Event_startMachine_stateSequenceMachine_d47570ed();
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
+    void Event_startMachine_stateSequenceMachine_ba72ef13();
     void Event_checkingAllStatesCompleted_914678f0();
     void Event_checkingCallSequenceFailed_51ea86cc();
     void Event_checkingConnSequenceFailed_51ea86cc();
@@ -72,7 +72,7 @@ signals:
 
     //////// State Machine: _checkingSessionSeq_9f53745d ////////
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
 
 
     //
@@ -110,8 +110,8 @@ signals:
     void Signal_StateEntry_completed_3967534e();
     void Signal_StateExit_completed_3967534e();
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
-    void Signal_StateReady_stateSequenceMachine_d47570ed();
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
+    void Signal_StateReady_stateSequenceMachine_ba72ef13();
     void Signal_StateEntry_checkingAllStateSequences_d74d8a42();
     void Signal_StateExit_checkingAllStateSequences_d74d8a42();
     void Signal_StateEntry_failed_51ea86cc();
@@ -172,7 +172,7 @@ private slots:
     void Slot_StateEntry_completed_3967534e();
     void Slot_StateExit_completed_3967534e();
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
     void Slot_StateEntry_checkingAllStateSequences_d74d8a42();
     void Slot_StateExit_checkingAllStateSequences_d74d8a42();
     void Slot_StateEntry_failed_51ea86cc();
@@ -194,7 +194,7 @@ signals:
     //////// State Machine: _checkingSessionSeq_9f53745d ////////
     void Relay_Event_sessionSeqComplete_3967534e();
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
     void Relay_Event_checkingAllStatesCompleted_914678f0();
     void Relay_Event_checkingCallSequenceFailed_51ea86cc();
     void Relay_Event_checkingConnSequenceFailed_51ea86cc();
@@ -223,8 +223,8 @@ private:
     QState*    _waiting_ff5a583f;
     QFinalState*    _completed_3967534e;
 
-    //////// State Machine: _stateSequenceMachine_d47570ed ////////
-    QStateMachine*    _stateSequenceMachine_d47570ed;
+    //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
+    QStateMachine*    _stateSequenceMachine_ba72ef13;
     QState*    _checkingAllStateSequences_d74d8a42;
     QFinalState*    _failed_51ea86cc;
     QFinalState*    _success_914678f0;

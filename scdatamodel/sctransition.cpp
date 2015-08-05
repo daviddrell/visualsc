@@ -62,6 +62,9 @@ SCTransition::SCTransition(QObject * parent):
     TransitionStringAttribute* uid = new TransitionStringAttribute(this, "uid", QString());
     attributes.addItem(uid);
 
+    TransitionStringAttribute* connectToFinished = new TransitionStringAttribute(this, "connectToFinished", "false");
+    attributes.addItem(connectToFinished);
+
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
     connect(event, SIGNAL(changed(TransitionStringAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(TransitionStringAttribute*)));

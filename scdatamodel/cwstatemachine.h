@@ -9,7 +9,7 @@ class CWStateMachine : public CWState
 public:
     CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString theEntryAction, QString theExitAction);
     CWStateMachine(SCState* state);
-    CWStateMachine(SCState* state, bool isRoot);
+   // CWStateMachine(SCState* state, bool isRoot);
     ~CWStateMachine();
 
 
@@ -28,6 +28,8 @@ public:
 
     bool isParallel();
     void setParallel(bool);
+
+    QList<SCTransition*> _finishedTransitions;
 };
 
 #endif // CWSTATEMACHINE_H

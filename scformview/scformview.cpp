@@ -681,6 +681,10 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
             //updateTransitionEvent(trans, value);
             //handleItemNameChangedInDataModel(trans, value);
         }
+        else    // some other property was updated
+        {
+            trans->attributes.value(key)->setValue(value);
+        }
     }
    /* else if(_currentlySelected->isMachine())
     {
@@ -1117,7 +1121,6 @@ void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, 
     }
     else if(attributeKey == "uid")
     {
-        qDebug() << "uid connectd!";
         StateString* uid = state->getStringAttr("uid");
         connect(uid, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
     }

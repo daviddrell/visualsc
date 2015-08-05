@@ -118,7 +118,6 @@ void SCState::initCommon()
     StateString * isParallelState = new StateString(this, "isParallelState", "false");
 
     QUuid u=QUuid::createUuid();
-
     StateString * uid= new StateString(this, "uid", u.toString());
 
     qDebug() << "uid; " << u.toString();
