@@ -165,7 +165,7 @@ bool StateBoxGraphic::isContained(QRectF rect)
     return ret;
 }
 
-
+// DEPRECATED FUNCTION, now handled inside of StateBoxGraphic::paintWithVisibleBox
 void StateBoxGraphic::handleIsParallelStateChanged(IAttribute*attr)
 {
     if ( attr->asString() == "true")
@@ -865,9 +865,8 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
     // draw the top box, the visible one
 
 
-    {
-        _pen.setColor(Qt::black);
-    }
+
+    _pen.setColor(Qt::black);
 
 
 
@@ -876,10 +875,17 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
     else
         _pen.setWidthF(_penWidth);
 
+    if(this->getStateModel()->parentAsSCState()->isParallel())
+        setDrawBoxLineStyle(kDrawDotted);
+    else
+        setDrawBoxLineStyle(kDrawSolid);
+
     if ( _drawBoxLineStyle == kDrawSolid )
         _pen.setStyle( Qt::SolidLine );
     else
         _pen.setStyle( Qt::DotLine );
+
+
 
     painter->setPen(_pen);
 
@@ -941,8 +947,6 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
 
     if(getStateModel()->isFinal())
     {
-        QColor temp = _pen.color();
-        qreal width = _pen.widthF();
         _pen.setColor(_finalStateColor);
         _pen.setWidthF(INNER_BORDER_THICKNESS);
         _pen.setCapStyle(Qt::RoundCap);
@@ -951,24 +955,16 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
 
         painter->drawRoundRect(rect3,RECT_ROUNDNESS,RECT_ROUNDNESS);
 
-        _pen.setColor(temp);
-        _pen.setWidthF(width);
-         painter->setPen(_pen);
+
     }
     else if(getStateModel()->isInitial())
     {
-        QColor temp = _pen.color();
-        qreal width = _pen.widthF();
         _pen.setColor(_initialStateColor);
         _pen.setWidthF(INNER_BORDER_THICKNESS);
         _pen.setCapStyle(Qt::RoundCap);
         _pen.setJoinStyle(Qt::MiterJoin);
         painter->setPen(_pen);
-        painter->drawRoundRect(rect3,RECT_ROUNDNESS,RECT_ROUNDNESS);
-
-        _pen.setColor(temp);
-        _pen.setWidthF(width);
-         painter->setPen(_pen);
+        painter->drawRoundRect(rect3,RECT_ROUNDNESS,RECT_ROUNDNESS); 
     }
 
 

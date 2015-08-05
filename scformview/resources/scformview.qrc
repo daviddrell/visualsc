@@ -32,5 +32,6 @@
         <file>cardboardboxnew.png</file>
         <file>rightarrowhollownew.png</file>
         <file>diagonalarrowhollow.png</file>
+        <file>reselect.png</file>
     </qresource>
 </RCC>

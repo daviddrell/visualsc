@@ -661,6 +661,10 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
     state->attributes.setAttributes( *sa);
     state->setLevel(_level);
 
+    if(state->isInitial())
+    {
+        state->parentAsSCState()->setInitialState(state);
+    }
 
     /*PositionAttribute * position =dynamic_cast<PositionAttribute*> ((IAttribute*)state->attributes.value("position"));
     QPointF ps = position->asPointF();

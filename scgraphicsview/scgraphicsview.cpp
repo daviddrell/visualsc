@@ -732,8 +732,10 @@ void SCGraphicsView::handleNewState (SCState *newState)
     //
     IAttributeContainer * attrs = parentState->getAttributes();
     IAttribute * attr = attrs->value("isParallelState");
-    connect(attr, SIGNAL(changed(IAttribute*)),stateGraphic,SLOT(handleIsParallelStateChanged(IAttribute*)));
-    stateGraphic->handleIsParallelStateChanged(attr);
+
+    // moved this to state box paint
+    //connect(attr, SIGNAL(changed(IAttribute*)),stateGraphic,SLOT(handleIsParallelStateChanged(IAttribute*)));
+    //stateGraphic->handleIsParallelStateChanged(attr);
 
     // new states will be on top
     stateGraphic->setZValue(zVal++);

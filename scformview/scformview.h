@@ -113,7 +113,9 @@ private slots:
     void handleBoldChanged();
 
     void reselectParent();
+    void reselectTarget();
     void handleReselectParent(SCState*);
+    void handleReselectTransitionParent(SCState*);
     void handleReselectTransitionTarget(SCState*);
     void handleChangedParent(SCState* ,SCState*);
     void handleChangedTransitionTarget(SCTransition*, SCState*);
@@ -215,7 +217,7 @@ private:
     void clearTextBlockPropertyTable();
     void reloadPropertyTable();
 
-    void itemInsertProperty(SCItem* item, const QString name);
+    void itemInsertProperty(FVItem* item, const QString name);
     void itemInsertTextBlock(SCItem* item, const QString name);
 
     void clearAndLoadPropertyTable(SCItem*,SCItem*);
@@ -244,7 +246,7 @@ private:
     QAction *insertStateAction;
     QAction *aboutAction;
     QAction *reselectParentAction;
-
+    QAction *reselectTargetAction;
 
     QMenu *fileMenu;
     QMenu *itemMenu;

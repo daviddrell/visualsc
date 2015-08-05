@@ -89,6 +89,9 @@ void SCState::initCommon()
    // _stateBoxGraphic = NULL;
     QString defaultName = QString();
 
+    _initialState = NULL;
+
+
 
     SCState * parent = dynamic_cast<SCState *>(this->parent());
 
@@ -102,7 +105,7 @@ void SCState::initCommon()
     }
 
 
-    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"finalState"<<"initialState"<<"uid"; // type is added to the state in scxml reader.
+    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"isParallelState"<<"finalState"<<"initialState"<<"uid"; // type is added to the state in scxml reader.
 
     //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
@@ -157,6 +160,35 @@ bool SCState::isFinal()
     return (attributes.value("finalState")->asString()=="true");
 }
 
+void SCState::setInitial(QString boolString)
+{
+    if(boolString=="true")
+    {
+        this->parentAsSCState()->setInitialState(this);
+        attributes.value("initialState")->setValue(boolString);
+    }
+    else if(boolString != "true")
+    {
+        this->parentAsSCState()->setInitialState(NULL);
+        attributes.value("initialState")->setValue("false");
+    }
+}
+
+bool SCState::hasAnInitialState()
+{
+    return getInitialState();
+}
+
+SCState* SCState::getInitialStateMember()
+{
+    return _initialState;
+}
+
+void SCState::setInitialState(SCState * st)
+{
+    _initialState = st;
+}
+
 bool SCState::isInitial()
 {
     return (attributes.value("initialState")->asString()=="true");
@@ -191,7 +223,10 @@ SCState* SCState::getInitialState()
         if(state)
         {
             if(state->isInitial())
+            {
+                _initialState = state;
                 return state;
+            }
         }
     }
     return NULL;

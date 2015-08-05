@@ -85,8 +85,15 @@ public:
     bool isFinal();
 
     SCState* getInitialState();
+    SCState* getInitialStateMember();
     SCState* getFinalState();
     bool isStateMachine();
+
+    void setInitial(QString);
+    void setInitialState(SCState*);
+
+
+    bool hasAnInitialState();
 
     SCState* parentAsSCState();
 
@@ -258,6 +265,8 @@ private:
 
     QList<QString> DO_NOT_DISPLAY_LIST; // attributes that can be ignored in the property table
     QHash<QString,int> DO_NOT_DISPLAY_HASH;
+
+    SCState* _initialState;
 
 };
 

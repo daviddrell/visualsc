@@ -42,6 +42,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QHash>
 #include <QDebug>
+#include <QApplication>
 
 
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
@@ -653,6 +654,44 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
             {
                 propertyTableSetText(propertyTableIndexOf("size"), st->attributes.value("size")->asString());
                 sendMessage("Invalid Size","Please enter width and height \"w,h\"");
+            }
+        }
+        else if(key == "initialState")
+        {
+            SCState* parentSt = st->parentAsSCState();
+            bool failed = false;
+            if(value == "false")
+            {
+                if(st->parentAsSCState() == NULL)
+                {
+                    failed = true;
+                }
+                else
+                    st->setInitial(value);
+            }
+            else if(!parentSt)
+            {
+                sendMessage("Error","The Root Machine cannot be an initial state.");
+                failed = true;
+            }
+            else if(parentSt->isParallel())
+            {
+                sendMessage("Error","Parallel states have no initial top-level states.");
+                failed = true;
+            }
+            else if(parentSt->hasAnInitialState())
+            {
+                sendMessage("Error","State Machine \""+parentSt->objectName()+"\" already has an initial state \""+parentSt->getInitialStateMember()->objectName()+"\"");
+                failed = true;
+            }
+            else
+            {
+                st->setInitial(value);
+            }
+
+            if(failed)
+            {
+                propertyTableSetText(propertyTableIndexOf("initialState"), st->attributes.value("initialState")->asString());
             }
         }
         else    // some other property was updated
@@ -1478,6 +1517,29 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
 
     // watch for user changes to the attributes from the property table
     connect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handleTextBlockPropertyCellChanged(int,int)));
+
+    if(_currentlySelected->isTransition())
+    {
+        //reselectParentAction->setIcon(QIcon(":/SCFormView/reselect.png"));
+        reselectParentAction->setText(tr("Reset Transition's Parent"));
+        reselectParentAction->setShortcut(tr("Reset Transition's Parent"));
+        reselectParentAction->setStatusTip(tr("Reset Transition's Parent"));
+
+
+
+        reselectTargetAction->setEnabled(true);
+    }
+    else if(_currentlySelected->isState())
+    {
+        reselectParentAction->setIcon(QIcon(":/SCFormView/family.png"));
+        reselectParentAction->setText(tr("Reset State's Parent"));
+        reselectParentAction->setShortcut(tr("Reset State's Parent"));
+        reselectParentAction->setStatusTip(tr("Reset State's Parent"));
+
+
+        reselectTargetAction->setEnabled(false);
+
+    }
 }
 
 /**
@@ -1716,8 +1778,7 @@ void SCFormView::sendMessage(QString title, QString message)
 
     msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
     msgBox.move(160,200);
-    msgBox.resize(161,100);
-
+    msgBox.adjustSize();
     int ret = msgBox.exec();
 
     switch (ret)
@@ -1744,15 +1805,19 @@ void SCFormView::sendMessage(QString title, QString message)
  */
 const QString SCFormView::promptTextInput(QString windowTitle, QString message, QString defaultText, bool* ok)
 {
-    QInputDialog qid;
-    qid.setInputMode(QInputDialog::TextInput);
-    //qid.setWindowFlags(Qt);
-    int tet = Qt::WindowStaysOnTopHint | Qt::Popup | Qt::WindowMinMaxButtonsHint; //& (~(Qt::WindowContextHelpButtonHint));
-    //Qt::WindowCloseButtonHint |
-    qDebug() << "test: "<<tet;
-    qid.setWindowFlags(static_cast<Qt::WindowFlags>(tet));
- //   qid.set
-    return qid.getText(NULL, windowTitle, message,QLineEdit::Normal,defaultText, ok);
+
+    QString mText;
+    QInputDialog *inp = new QInputDialog(this);
+    inp->setLabelText(message);
+    inp->setWindowTitle(windowTitle);
+    inp->setTextEchoMode(QLineEdit::Normal);
+    inp->setTextValue(defaultText);
+    //inp->resize(500,309);
+    inp->adjustSize();
+    inp->move(160,200);
+    if(inp->exec() == QDialog::Accepted)
+        mText = inp->textValue();
+    return mText;
 }
 
 /**
@@ -1780,7 +1845,7 @@ void SCFormView::itemPromptProperty()
 
     // prompt the user for a property name
     bool ok;
-    QString input = this->promptTextInput("New Property", _currentlySelected->getType()+" Property", "", &ok);
+    QString input = this->promptTextInput("New Property", "Insert "+_currentlySelected->getType()+" property", "", &ok);
 
     // check if the property name has a space (not supported by scxml reading)
     if(input.contains(' '))
@@ -1798,7 +1863,7 @@ void SCFormView::itemPromptProperty()
     if(ok && !input.isEmpty())
     {
         // the user inputted something so insert this as a new property
-        itemInsertProperty(dynamic_cast<SCItem*>(_currentlySelected),input);
+        itemInsertProperty((_currentlySelected),input);
     }
 }
 
@@ -1812,12 +1877,12 @@ void SCFormView::itemPromptProperty()
 
    will also update the current property table, adding the new property to the top of the table
  */
-void SCFormView::itemInsertProperty(SCItem* item, QString propertyName)
+void SCFormView::itemInsertProperty(FVItem* item, QString propertyName)
 {
     QString itemType = _currentlySelected->getType();
 
     qDebug() << "item Type " << itemType;
-    if(!_dm->insertNewProperty(item, propertyName))
+    if(!_dm->insertNewProperty(item->getItem(), propertyName))
         return; // failed to insert, so halt here.
 
     // insert the new table item
@@ -1867,7 +1932,7 @@ void SCFormView::itemDeleteSelectedProperty()
 
 
 
-    SCItem* item = dynamic_cast<SCItem*>(_currentlySelected);
+    SCItem* item = _currentlySelected->getItem();
 
 
 
@@ -1918,7 +1983,7 @@ void SCFormView::deleteItem()
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setWindowFlags( Qt::WindowStaysOnTopHint);
-    msgBox.move(170,200);
+    msgBox.move(160,200);
     int ret = msgBox.exec();
 
     switch (ret)
@@ -1956,7 +2021,21 @@ void SCFormView::pointerGroupClicked(int)
 }
 
 
+void SCFormView::reselectTarget()
+{
+    if(_currentlySelected->isTransition())
+    {
+        SCTransition* trans = _currentlySelected->getTransition();
 
+        // create a new state tree window to select a state from
+        _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
+
+        // Pass the target and the target name to handleStateSelectionWindowStateSelected
+        connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectTransitionTarget(SCState*)));
+
+        _targetStateSelectionWindow->show();
+    }
+}
 
 void SCFormView::reselectParent()
 {
@@ -1993,7 +2072,7 @@ void SCFormView::reselectParent()
         _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
 
         // Pass the target and the target name to handleStateSelectionWindowStateSelected
-        connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectTransitionTarget(SCState*)));
+        connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectTransitionParent(SCState*)));
 
         _targetStateSelectionWindow->show();
     }
@@ -2005,6 +2084,24 @@ void SCFormView::reselectParent()
 
 
 
+}
+
+void SCFormView::handleReselectTransitionParent(SCState * source)
+{
+    _targetStateSelectionWindow->close();
+    delete _targetStateSelectionWindow;
+    _targetStateSelectionWindow = NULL;
+
+    SCTransition* trans = _currentlySelected->getTransition();
+    SCState* target = trans->targetState();
+    QString eventName = trans->getEventName();
+
+    _dm->deleteItem(trans);
+
+    SCTransition* newTrans = _dm->insertNewTransition(source, target);
+    newTrans->setEventName(eventName);
+
+    highlightRootItem();
 }
 
 void SCFormView::handleReselectTransitionTarget(SCState * target)
@@ -2030,7 +2127,7 @@ void SCFormView::handleReselectTransitionTarget(SCState * target)
     SCTransition* newTrans = _dm->insertNewTransition(source, target);
     newTrans->setEventName(eventName);
 
-
+    highlightRootItem();
 
 }
 
@@ -2624,17 +2721,6 @@ void SCFormView::about()
  */
 void SCFormView::createActions()
 {
-    // TODO button
-    // insert properties
-
-    // Property Table stuff
-    /*
-    addPropertyToolButton = new QToolButton();
-    addPropertyToolButton->setPopupMode(QToolButton::MenuButtonPopup);
-
-    propertyToolBar = addToolBar(tr("Add"));
-    propertyToolBar->addWidget(addPropertyToolButton);
-    */
 
     insertStateAction = new QAction(QIcon(":/SCFormView/cardboardboxnew.png"), tr("Insert State"), this);
     insertStateAction->setShortcut(tr("Ctrl+I"));
@@ -2653,10 +2739,15 @@ void SCFormView::createActions()
     deleteAction->setStatusTip(tr("Delete item from diagram"));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
 
-    reselectParentAction = new QAction(QIcon(":/SCFormView/family.png"), tr("Reselect Parent"), this);
-    reselectParentAction->setShortcut(tr("Reselect Parent"));
-    reselectParentAction->setStatusTip(tr("Reselect a state's parent"));
+    reselectParentAction = new QAction(QIcon(":/SCFormView/family.png"), tr("Reset State's Parent"), this);
+    reselectParentAction->setShortcut(tr("Reset State's Parent"));
+    reselectParentAction->setStatusTip(tr("Reset State's Parent"));
     connect(reselectParentAction, SIGNAL(triggered()), this, SLOT(reselectParent()));
+
+    reselectTargetAction = new QAction(QIcon(":/SCFormView/reselect.png"), tr("Reset Transition's Target"), this);
+    reselectTargetAction->setShortcut(tr("Reset Transition's Target"));
+    reselectTargetAction->setStatusTip(tr("Reset Transition's Target"));
+    connect(reselectTargetAction, SIGNAL(triggered()), this, SLOT(reselectTarget()));
 
     toFrontAction = new QAction(QIcon(":/SCFormView/framein.png"),
                                 tr("Bring to &Front"), this);
@@ -2758,7 +2849,7 @@ void SCFormView::createToolbars()
     propertyToolBar = new QToolBar("Property",this);
     propertyToolBar->addAction(insertProperty);
     propertyToolBar->addAction(deleteProperty);
-    propertyToolBar->addAction(insertTextBox);
+   // propertyToolBar->addAction(insertTextBox);
 
     //editToolBar = addToolBar(tr("Edit"));
     editToolBar = new QToolBar("Edit", this);
@@ -2766,6 +2857,7 @@ void SCFormView::createToolbars()
     editToolBar->addAction(insertTransitionAction);
 
     editToolBar->addAction(reselectParentAction);
+    editToolBar->addAction(reselectTargetAction);
     editToolBar->addAction(deleteAction);
     editToolBar->addSeparator();
     editToolBar->addAction(toFrontAction);

@@ -161,7 +161,7 @@ void CodeWriter::cWriteConstructor()
             CWState* cws = cwsm->_states.at(k);
 
             cPrintln(cwsm->_stateName+"->addState("+cws->_stateName+");",1);
-            if(cws->getState()->isInitial())
+            if(cws->getState()->isInitial()&&!cwsm->isParallel())
             {
                 cPrintln(cwsm->_stateName+"->setInitialState("+cws->_stateName+");",1);
             }
