@@ -147,6 +147,7 @@ private:
 private slots:
     // The Entry/Exit Slots that belong to QStates
     //////// State Machine: _checkingAllStateSequences_d74d8a42 ////////
+    void Slot_StateFinished_checkingAllStateSequences_d74d8a42();
     void Slot_StateEntry_checkingCallSequence_78faf58e();
     void Slot_StateExit_checkingCallSequence_78faf58e();
     void Slot_StateEntry_checkingConnSequence_926f34d4();
@@ -204,9 +205,6 @@ signals:
 private:
     //////// State Machine: _checkingAllStateSequences_d74d8a42 ////////
     QStateMachine*    _checkingAllStateSequences_d74d8a42;
-    QState*    _checkingCallSequence_78faf58e;
-    QState*    _checkingConnSequence_926f34d4;
-    QState*    _checkingSessionSeq_9f53745d;
 
     //////// State Machine: _checkingCallSequence_78faf58e ////////
     QStateMachine*    _checkingCallSequence_78faf58e;
@@ -225,7 +223,6 @@ private:
 
     //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
     QStateMachine*    _stateSequenceMachine_ba72ef13;
-    QState*    _checkingAllStateSequences_d74d8a42;
     QFinalState*    _failed_51ea86cc;
     QFinalState*    _success_914678f0;
 

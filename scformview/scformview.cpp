@@ -44,6 +44,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QHeaderView>
+#include <QFileDialog>
 
 #define PROPERTY_TABLE_WIDTH_1  108     // smallest value while still having clearance for the longest attribute name connectToFinished
 #define PROPERTY_TABLE_WIDTH_2  170
@@ -2034,7 +2035,7 @@ void SCFormView::reselectTarget()
 {
     if(_currentlySelected->isTransition())
     {
-        SCTransition* trans = _currentlySelected->getTransition();
+        //SCTransition* trans = _currentlySelected->getTransition();
 
         // create a new state tree window to select a state from
         _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
@@ -2075,7 +2076,7 @@ void SCFormView::reselectParent()
     }
     else if (_currentlySelected->isTransition())
     {
-        SCTransition* trans = _currentlySelected->getTransition();
+        //SCTransition* trans = _currentlySelected->getTransition();
 
         // create a new state tree window to select a state from
         _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
@@ -2769,6 +2770,20 @@ void SCFormView::viewKeybinds()
 
 }
 
+void SCFormView::import()
+{
+    if(!_currentlySelected->isState())
+    {
+        sendMessage("Error","Please select a state to import into");
+        return;
+    }
+    qDebug() << "import!";
+    QString prevFilePath=QDir::homePath();
+    QString fileName;
+    fileName = QFileDialog::getOpenFileName(this, tr("Import SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
+    _dm->importFile(_currentlySelected->getState(),fileName);
+}
+
 
 /**
  * @brief SCFormView::createActions
@@ -2818,12 +2833,15 @@ void SCFormView::createActions()
     sendBackAction->setStatusTip(tr("Send item to back"));
     connect(sendBackAction, SIGNAL(triggered()), this, SLOT(sendToBack()));
 
-
-
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
     exitAction->setStatusTip(tr("Quit VisualSC Editor"));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+
+    importAction = new QAction(tr("I&mport"), this);
+    importAction->setShortcut(tr("Ctrl+I"));
+    importAction->setStatusTip(tr("Import an SCXML state machine into the selected State"));
+    connect(importAction, SIGNAL(triggered()), this, SLOT(import()));
 
     boldAction = new QAction(tr("Bold"), this);
     boldAction->setCheckable(true);
@@ -2888,7 +2906,9 @@ void SCFormView::handleBoldChanged()
 void SCFormView::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(importAction);
     fileMenu->addAction(exitAction);
+
 
     itemMenu = menuBar()->addMenu(tr("&Item"));
     itemMenu->addAction(deleteAction);

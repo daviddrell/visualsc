@@ -27,10 +27,10 @@ registered when using addTransition to trigger transitions between the QStates),
 StateSequenceMachine::StateSequenceMachine(QObject* parent):
     QObject(parent),
     //////// State Machine: _checkingAllStateSequences_d74d8a42 ////////
-    _checkingAllStateSequences_d74d8a42(new QStateMachine(this)),
-    _checkingCallSequence_78faf58e(new QState(QState::ParallelStates)),
-    _checkingConnSequence_926f34d4(new QState(QState::ParallelStates)),
-    _checkingSessionSeq_9f53745d(new QState(QState::ParallelStates)),
+    _checkingAllStateSequences_d74d8a42(new QStateMachine(QState::ParallelStates)),
+    // child initialized elsewhere: QStateMachine* _checkingCallSequence_78faf58e 
+    // child initialized elsewhere: QStateMachine* _checkingConnSequence_926f34d4 
+    // child initialized elsewhere: QStateMachine* _checkingSessionSeq_9f53745d 
 
     //////// State Machine: _checkingCallSequence_78faf58e ////////
     _checkingCallSequence_78faf58e(new QStateMachine(this)),
@@ -49,7 +49,7 @@ StateSequenceMachine::StateSequenceMachine(QObject* parent):
 
     //////// State Machine: _stateSequenceMachine_ba72ef13 ////////
     _stateSequenceMachine_ba72ef13(new QStateMachine(this)),
-    _checkingAllStateSequences_d74d8a42(new QState()),
+    // child initialized elsewhere: QStateMachine* _checkingAllStateSequences_d74d8a42 
     _failed_51ea86cc(new QFinalState()),
     _success_914678f0(new QFinalState())
 

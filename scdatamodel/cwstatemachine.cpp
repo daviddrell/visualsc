@@ -27,6 +27,11 @@ CWStateMachine::CWStateMachine(SCState *state):
 
         _finishedRelaySlot = "Slot_StateFinished"+stateName+"()";
         _finishedRelaySignal = "Signal_StateFinished"+stateName+"()";
+        _parallel = true;
+    }
+    else
+    {
+        _parallel =false;
     }
 
     // set the function names for this State Machine

@@ -80,6 +80,7 @@ public:
     static SCDataModel * singleton();
 
     // direct interface
+    void importFile(SCState* parent,QString scxmlFileName);
     void openFile(QString scxmlFileName);
     void open(QString scxmlFile);
 
@@ -124,6 +125,8 @@ public:
 
     bool insertNewTextBlock(SCItem* item, QString name);
 
+public slots:
+    SCState* handleMakeANewState(SCState*, StateAttributes*);
 
 signals:
     void openCompleted(bool sucess, QStringList message);
@@ -135,6 +138,7 @@ signals:
 
 
 private slots:
+
 
     void handleMakeANewState(StateAttributes*);
     void handleMakeANewTransition(TransitionAttributes*);

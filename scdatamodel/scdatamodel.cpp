@@ -36,7 +36,7 @@ SCDataModel::SCDataModel(QObject * parent) :
     _topState(NULL),
     _scene(0)
 {
-
+    _reader.setDataModel(this);
 
 }
 
@@ -388,6 +388,12 @@ void SCDataModel::openFile(QString fileName)
 
 }
 
+void SCDataModel::importFile(SCState* parent,QString fileName)
+{
+    _reader.readFile(fileName);
+    _reader.importFile(parent);
+}
+
 
 
 /**
@@ -519,6 +525,7 @@ SCState* SCDataModel::insertNewState(SCState *parent)
 }
 
 
+
 SCState * SCDataModel::getTopState()
 {
     return _topState;
@@ -637,6 +644,71 @@ void SCDataModel::initializeEmptyStateMachine()
 
 }
 
+
+SCState* SCDataModel::handleMakeANewState(SCState* parent,StateAttributes*  sa)
+{
+    qDebug() << "SCDataModel::handleMakeANewState on level " << _level;
+    SCState* state = NULL;
+    state = new SCState(parent);
+    state->attributes.setAttributes( *sa);
+    state->setLevel(parent->getLevel()+1);
+
+    if(state->isInitial())
+    {
+        state->parentAsSCState()->setInitialState(state);
+    }
+
+    /*PositionAttribute * position =dynamic_cast<PositionAttribute*> ((IAttribute*)state->attributes.value("position"));
+    QPointF ps = position->asPointF();
+    state->setPosition(ps);
+*/
+    QString name ;
+    if (! sa->contains("name"))
+    {
+        // is this an initial state?
+        if ( sa->value("type")->asString() == "initial")
+        {
+            name =     _currentState->objectName() + "_initial" ;
+        }
+        else if ( sa->value("type")->asString() == "final")
+        {
+            name =     _currentState->objectName() + "_final" ;
+        }
+        else
+        {
+            name = _currentState->objectName() + "_" + QString::number( _currentState->children().count() );
+        }
+
+        StateName *nm = new StateName(NULL,"name",name);
+        state->attributes.addItem(nm);
+    }
+    else
+    {
+        name = sa->value("name")->asString();
+    }
+
+    state->setObjectName( name );
+    state->setText(name);
+
+
+
+    // SCState connects. 1 of 2 places where the SCState connects are set up. this is for loading states through the xml
+    connectState(state);
+
+    //_currentState  = state;
+
+
+    // connected to scformview slot handleNewState
+    // connected to scgraphicsview slot handleNewState
+    emit newStateSignal(state);
+
+
+    delete sa;
+
+    return state;
+}
+
+
 /**
  * @brief SCDataModel::handleMakeANewState
  * @param sa
@@ -712,103 +784,6 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
 
     delete sa;
-
-
-    if(false)
-    {
-    qDebug() <<" SCDataModel::handleMakeANewState " << _level;
-    SCState * state = NULL;
-
-    if ( _currentState == 0 )
-    {
-
-        // TODO: add scxml rules check - top state must be element 'scxml' and the reader should have assign an attribute type='machine'
-
-        _topLevel = _level;
-        state = new SCState(true);
-        state->attributes.setAttributes( *sa);
-        state->setLevel(_level);
-
-        _topState = state;
-
-        QString name;
-
-        if ( ! sa->contains("name"))
-        {
-            name = "State Machine";
-
-            StateName *nm = new StateName(NULL,"name",name);
-            state->attributes.addItem(nm);
-
-        }
-        else
-        {
-            name = sa->value("name")->asString();
-        }
-
-        state->setObjectName( name);
-
-
-        qDebug() << "adding new state at top level : " + state->attributes.value("name")->asString();
-    }
-    else if ( _level > _topLevel)
-    {
-        state = new SCState(_currentState);
-        state->attributes.setAttributes( *sa);
-        state->setLevel(_level);
-
-
-        /*PositionAttribute * position =dynamic_cast<PositionAttribute*> ((IAttribute*)state->attributes.value("position"));
-        QPointF ps = position->asPointF();
-        state->setPosition(ps);
-*/
-        QString name ;
-        if (! sa->contains("name"))
-        {
-            // is this an initial state?
-            if ( sa->value("type")->asString() == "initial")
-            {
-                name =     _currentState->objectName() + "_initial" ;
-            }
-            else if ( sa->value("type")->asString() == "final")
-            {
-                name =     _currentState->objectName() + "_final" ;
-            }
-            else
-            {
-                name = _currentState->objectName() + "_" + QString::number( _currentState->children().count() );
-            }
-
-            StateName *nm = new StateName(NULL,"name",name);
-            state->attributes.addItem(nm);
-        }
-        else
-        {
-            name = sa->value("name")->asString();
-        }
-
-        state->setObjectName( name );
-        state->setText(name);
-
-        qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
-
-        // SCState connects. 1 of 2 places where the SCState connects are set up. this is for loading states through the xml
-        connectState(state);
-    }
-
-
-
-    _currentState  = state;
-
-
-    // connected to scformview slot handleNewState
-    // connected to scgraphicsview slot handleNewState
-    emit newStateSignal(state);
-
-
-    delete sa;
-    }
-
 }
 
 /**

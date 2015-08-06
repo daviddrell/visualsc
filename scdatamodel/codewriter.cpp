@@ -78,68 +78,95 @@ void CodeWriter::cWriteConstructor()
         SCState* machine = _machines.at(i);
         CWStateMachine* cwsm = _machineHash.value(machine);
         cPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
+        //cOut<<QString("\b");
 
-        cPrintln(cwsm->_stateName+"(new QStateMachine(this)),",1);
+        if(cwsm->isParallel())
+        {
+            cPrintln(cwsm->_stateName+"(new QStateMachine(QState::ParallelStates)),",1);
+        }
+        else
+        {
+            cPrintln(cwsm->_stateName+"(new QStateMachine(this)),",1);
+        }
+
+
+
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             // initialize all direct descendants of this state machine
             CWState* cws = cwsm->_states.at(k);
 
-            if(i == _machines.size()-1 && k == cwsm->_states.size()-1)
-            {
-                // if this is the last state initalized, do not add a comma
 
-                if(cwsm->isParallel())
+
+
+
+
+            // do not initialize again if this state is a state machine
+            if(cws->getState()->isStateMachine())
+            {
+                cPrintln("// child initialized elsewhere: QStateMachine* "+cws->_stateName+" ",1);
+            }
+            else    // this is not a state machine
+            {
+
+
+                if(i == _machines.size()-1 && k == cwsm->_states.size()-1)
                 {
-                    if(cws->getState()->isFinal())
+                    // if this is the last state initalized, do not add a comma
+
+                    if(cwsm->isParallel())
                     {
-                        cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates))",1);
+                        if(cws->getState()->isFinal())
+                        {
+                            cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates))",1);
+                        }
+                        else
+                        {
+                            cPrintln(cws->_stateName+"(new QState(QState::ParallelStates))",1);
+                        }
                     }
                     else
                     {
-                        cPrintln(cws->_stateName+"(new QState(QState::ParallelStates))",1);
+                        if(cws->getState()->isFinal())
+                        {
+                            cPrintln(cws->_stateName+"(new QFinalState())",1);
+                        }
+                        else
+                        {
+                            cPrintln(cws->_stateName+"(new QState())",1);
+                        }
                     }
+
+
                 }
                 else
                 {
-                    if(cws->getState()->isFinal())
+                    if(cwsm->isParallel())
                     {
-                        cPrintln(cws->_stateName+"(new QFinalState())",1);
+                        if(cws->getState()->isFinal())
+                        {
+                            cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates)),",1);
+                        }
+                        else
+                        {
+                            cPrintln(cws->_stateName+"(new QState(QState::ParallelStates)),",1);
+                        }
                     }
                     else
                     {
-                        cPrintln(cws->_stateName+"(new QState())",1);
-                    }
-                }
-
-
-            }
-            else
-            {
-                if(cwsm->isParallel())
-                {
-                    if(cws->getState()->isFinal())
-                    {
-                        cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates)),",1);
-                    }
-                    else
-                    {
-                        cPrintln(cws->_stateName+"(new QState(QState::ParallelStates)),",1);
-                    }
-                }
-                else
-                {
-                    if(cws->getState()->isFinal())
-                    {
-                        cPrintln(cws->_stateName+"(new QFinalState()),",1);
-                    }
-                    else
-                    {
-                        cPrintln(cws->_stateName+"(new QState()),",1);
+                        if(cws->getState()->isFinal())
+                        {
+                            cPrintln(cws->_stateName+"(new QFinalState()),",1);
+                        }
+                        else
+                        {
+                            cPrintln(cws->_stateName+"(new QState()),",1);
+                        }
                     }
                 }
             }
+
         }
         cPrintln("");
     }
@@ -679,6 +706,12 @@ void CodeWriter::hWriteActionRelaySlots()
         CWStateMachine* cwsm = _machineHash.value(machine);
         hPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
 
+        // if this is a parallel state machine, create a public slot that corresponds to its finished
+        if(cwsm->isParallel())
+        {
+            hPrintln("void "+cwsm->_finishedRelaySlot+";",1);
+        }
+
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             CWState* cws = cwsm->_states.at(k);
@@ -712,13 +745,18 @@ void CodeWriter::hWriteStates()
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             CWState* cws = cwsm->_states.at(k);
-            if(cws->getState()->isFinal())
+
+            // do not write another member if its a state machine
+            if(!cws->getState()->isStateMachine())
             {
-                hPrintln("QFinalState*    "+cws->_stateName+";",1);
-            }
-            else
-            {
-                hPrintln("QState*    "+ cws->_stateName+";",1);
+                if(cws->getState()->isFinal())
+                {
+                    hPrintln("QFinalState*    "+cws->_stateName+";",1);
+                }
+                else
+                {
+                    hPrintln("QState*    "+ cws->_stateName+";",1);
+                }
             }
         }
         hPrintln("");

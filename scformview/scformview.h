@@ -99,6 +99,7 @@ private slots:
     void pointerGroupClicked(int id);
     void bringToFront();
     void sendToBack();
+    void import();
     void insertTransition();
     void insertState();
     void textInserted(QGraphicsTextItem *item);
@@ -244,6 +245,8 @@ private:
     QGraphicsView *view;
 
     QAction *exitAction;
+    QAction *importAction;
+
     QAction *addAction;
     QAction *deleteAction;
 

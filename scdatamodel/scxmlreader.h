@@ -29,8 +29,11 @@
 #include "stateattributes.h"
 #include "transitionattributes.h"
 #include "textblock.h"
-#include "sctransition.h"
+#include "sctransition.h"//
+//#include "scdatamodel.h"
 
+
+class SCDataModel;
 class StateData;
 
 #include "scdatamodel_global.h"
@@ -46,15 +49,18 @@ class  SCDATAMODELSHARED_EXPORT  SCXMLReader : public QObject
     };
 
 public:
-    SCXMLReader( );
+    SCXMLReader();
+    SCXMLReader(SCDataModel* dm);
     void readFile(QString infile);
     virtual void run();
-
+    void importFile(SCState* parent);
+    void setDataModel(SCDataModel* dm);
     void getReadResult(bool &success, QStringList& message);
 
 signals:
      void done(bool result, QStringList message);
      void makeANewState(StateAttributes*);
+     void makeANewChildState(SCState* parent, StateAttributes*);
      void enterStateElement();
      void leaveStateElement();
 
@@ -81,10 +87,15 @@ private:
     QStringList _resultMessages;
     int _currentItemType;
 
+    void importIDTextBlockElement(SCState* parent);
+    void importEventTextBlockElement(SCTransition* parent);
     void readIDTextBlockElement();
     void readEventTextBlockElement();
     void readElement();
+    void importElement(SCState* parent);
     void readState(STATE_TYPE t= kSTATE_TYPE_Normal);
+    SCState* importState(SCState* parent);
+    SCState* importStateMachine(SCState* parent);
     void readTransistion();
     void readTransistionPath();
     void readFinal();
@@ -92,6 +103,7 @@ private:
     void readOnExit();
     void readStateMachine();
 
+    SCDataModel* _dm;
 
     //private data
     bool _error;
