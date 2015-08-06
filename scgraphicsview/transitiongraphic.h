@@ -29,6 +29,7 @@ class TransitionGraphic : public QGraphicsObject
 {
     Q_OBJECT
 
+
 public:
     explicit TransitionGraphic( StateBoxGraphic *parentState, StateBoxGraphic *targetState, SCTransition *t, KeyController * keys, MouseController* mouse);
     void printInfo();
@@ -81,6 +82,7 @@ protected:
 private :
 
         // private methods
+
     void bindNeighborElbows(ElbowGrabber* elbow);
     void updateElbow(QPointF newPos, ElbowGrabber* elbow);
     void updateLineSegments(ElbowGrabber* elbow);

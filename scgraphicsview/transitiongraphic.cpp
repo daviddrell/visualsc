@@ -17,6 +17,10 @@
 #include <QApplication>
 
 
+#define PI                  3.14159265359
+#define ANGLE_SNAP_DEGREE   11
+
+
 TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys, MouseController* mouse) :
     QGraphicsObject(NULL),
     _transitionDM(t),
@@ -284,16 +288,62 @@ void TransitionGraphic::updateElbow(QPointF newPos, ElbowGrabber *elbow)
 void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
 {
     LineSegmentGraphic* one = elbow->getSegment(0);
+    LineSegmentGraphic* two = elbow->getSegment(1);
+
+//#define RIGHT_ANGLE_MODE
+#ifdef RIGHT_ANGLE_MODE
+    // at most two line segments will be updated. so update each of those line segment's elbows as well
+
+    if(one)
+    {
+        ElbowGrabber* left = one->getElbow(0);
+
+        if(left)
+        {
+            qreal xDiff = fabs(elbow->x()-left->x());
+            qreal yDiff = fabs(elbow->y()-left->y());
+
+            if(xDiff < yDiff)
+                left->setX(elbow->x());
+            else
+                left->setY(elbow->y());
+        }
+    }
+    if(two)
+    {
+
+        ElbowGrabber* right = two->getElbow(1);
+
+
+
+
+        if(right)
+        {
+            qreal xDiff = fabs(elbow->x()-right->x());
+            qreal yDiff = fabs(elbow->y()-right->y());
+
+            if(xDiff < yDiff)
+                right->setX(elbow->x());
+            else
+                right->setY(elbow->y());
+        }
+    }
+
+
+#endif
     if(one) // check if object exists
     {
         one->enclosePathInElbows();
     }
-    LineSegmentGraphic* two = elbow->getSegment(1);
     if(two) // check if object exists
     {
         two->enclosePathInElbows();
     }
 }
+
+
+
+
 
 /**
  * @brief TransitionGraphic::sceneEventFilter
@@ -374,8 +424,10 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 //_cornerGrabbed = false;
 
                 elbow->setMouseState(ElbowGrabber::kMouseReleased);
-
+                elbow->straightenLines(elbow);
                 QApplication::restoreOverrideCursor();
+
+                //straightenLines(elbow);
 
                 updateModel();                  // update the transition datamodel for this path
                 //elbow->forceHoverLeaveEvent();  // old elbow hover events will trigger for mouse press and releases
@@ -454,7 +506,13 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             //_cornerGrabbed = false;
 
             line->setMouseState(ElbowGrabber::kMouseReleased);
+
+           // straightenLines(line->getElbow(0));
+//            straightenLines(line->getElbow(1));
+
             QApplication::restoreOverrideCursor();
+
+
             updateModel();                  // update the transition datamodel for this path
             //line->forceHoverLeaveEvent();  // old elbow hover events will trigger for mouse press and releases
         }
@@ -1222,13 +1280,17 @@ void TransitionGraphic::handleElbowKeyPressEvent(int key)
 void TransitionGraphic::updateModel()
 {
 
+
+
     if ( _transitionDM )                                 // check if the data model for this transition exists
     {
         // use elbows to create the path attribute
         QList<QPointF> path;
         for( int  i = 0; i < _elbows.count(); i++)
+        {
             path.append(_elbows.at(i)->pos());
 
+        }
         TransitionPathAttribute * pathAttr = dynamic_cast<TransitionPathAttribute *> (_transitionDM->attributes.value("path"));
 
         pathAttr->setValue(path);   // update the path values of _transitionDM, the data model object for this transition

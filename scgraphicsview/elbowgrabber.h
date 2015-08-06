@@ -23,6 +23,8 @@ class ElbowGrabber : public QObject ,  public QGraphicsItem
 {
     Q_OBJECT
 
+
+    enum Zone{FLAT, ANGLED, VERTICAL};
 public:
     ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys);
     ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyController* keys);
@@ -43,7 +45,15 @@ public:
 
     void forceLineHoverLeaveEvent();
 
-
+    void setXSnap(qreal x);
+    void setYSnap(qreal y);
+    void setPosSnap(QPointF);
+    void setPosSnap(qreal x, qreal y);
+//setPosNoSnap(QPointF);
+//    void setPosNoSnap(qreal x, qreal y);
+    void straightenLines(ElbowGrabber*);
+    int getZone(qreal);
+    qreal distance(ElbowGrabber* one, ElbowGrabber* two);
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
     void forceHoverEnterEvent();

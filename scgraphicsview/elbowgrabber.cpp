@@ -3,7 +3,8 @@
 #include "arrowheadgraphic.h"
 #include <QDebug>
 
-
+#define PI                  3.14159265359
+#define ANGLE_SNAP_DEGREE   11
 
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys) :
     mouseDownX(0),
@@ -22,7 +23,8 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys
     _terminator(false),
     _keyController(keys)
 {
-
+    _segments[0] = NULL;
+    _segments[1] = NULL;
     _defaultColor=QColor(0,0,125,255);
     _hoverColor=QColor(255,0,0,180);
 
@@ -35,8 +37,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys
     _outterborderPen.setColor(_defaultColor);
     //this->setAcceptHoverEvents(true);
 
-    _segments[0] = NULL;
-    _segments[1] = NULL;
+
 
 
 }
@@ -58,12 +59,14 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyC
     _terminator(false),
     _keyController(keys)
 {
+    _segments[0] = NULL;
+    _segments[1] = NULL;
     _defaultColor=QColor(0,0,125,255);
     _hoverColor=QColor(255,0,0,180);
 
     this->setParentItem(parentGraphic);
 
-    this->setPos(point);
+     this->setPos(point);
    // this->setPos(0,0);
    // qDebug() << "Elbow Parent: " << parentGraphic << " pos: "<< this->pos();
 
@@ -71,8 +74,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyC
     _outterborderPen.setColor(_defaultColor);
     //this->setAcceptHoverEvents(true);
 
-    _segments[0] = NULL;
-    _segments[1] = NULL;
+
 
 
 }
@@ -324,6 +326,178 @@ QPointF ElbowGrabber::getCenterPoint()
 void ElbowGrabber::setAngle(int angle)
 {
     _arrowAngle = angle - 45; // subtract 45 because of how we draw it
+}
+
+//void ElbowGrabber::setX(qreal x)
+//{
+//    straightenLines(this);
+//    QGraphicsItem::setX(x);
+//}
+
+void ElbowGrabber::setXSnap(qreal x)
+{
+    QGraphicsItem::setX(x);
+    straightenLines(this);
+}
+
+void ElbowGrabber::setYSnap(qreal y)
+{
+    QGraphicsItem::setY(y);
+    straightenLines(this);
+}
+
+void ElbowGrabber::setPosSnap(QPointF point)
+{
+    QGraphicsItem::setPos(point);
+    straightenLines(this);
+}
+
+void ElbowGrabber::setPosSnap(qreal x, qreal y)
+{
+    QGraphicsItem::setPos(x,y);
+    straightenLines(this);
+}
+
+
+qreal ElbowGrabber::distance(ElbowGrabber* one, ElbowGrabber* two)
+{
+    qreal x1 = one->x();
+    qreal y1 = one->y();
+    qreal x2 = two->x();
+    qreal y2 = two->y();
+
+    return sqrt((y2-y1)*(y2-y1) + (x2-x1)*(x2-x1));
+}
+
+int ElbowGrabber::getZone(qreal angle)
+{
+   if( angle > (90 - ANGLE_SNAP_DEGREE) && angle <= 90)
+       return Zone::VERTICAL;
+   else if( angle >= 0 && angle < ANGLE_SNAP_DEGREE)
+       return Zone::FLAT;
+
+   return Zone::ANGLED;
+}
+
+
+/**
+ * @brief TransitionGraphic::straightenLines
+ * @param mid
+ *
+ * used to snap elbows to other elbows
+ *
+ */
+void ElbowGrabber::straightenLines(ElbowGrabber* mid)
+{
+
+    int leftZone = -1;
+    int rightZone = -1;
+
+    qreal leftDeg;
+    qreal rightDeg;
+
+    // check the elbows around the middle one, get their angle and relative zone (~90, ~45, ~0) if the elbow exists
+    LineSegmentGraphic* one = mid->getSegment(0);
+    ElbowGrabber* left;
+    if(one)
+    {
+        left = one->getElbow(0);
+        if(left)
+        {
+            qreal m = (mid->y() - left->y())/(mid->x()- left->x());  // y = mx + b
+            qreal theta = atan(m);          // find the angle between the two points
+            leftDeg = fabs(theta * 180/PI);
+
+            leftZone = getZone(leftDeg);
+            //qDebug()<<"angle between left and mid is " << thetaDeg<<" in zone "<<zone;
+
+
+        }
+    }
+
+    LineSegmentGraphic* two = mid->getSegment(1);
+    ElbowGrabber* right;
+    if(two)
+    {
+        right = two->getElbow(1);
+        if(right)
+        {
+            qreal m = (mid->y() - right->y())/(mid->x()- right->x());  // y = mx + b
+            qreal theta = atan(m);          // find the angle between the two points
+            rightDeg = fabs(theta * 180/PI);
+
+            rightZone = getZone(rightDeg);
+            //qDebug()<<"angle between mid and right is " << thetaDeg<<" in zone "<<zone;
+
+        }
+    }
+
+    // if the elbows compete for the same zone, the select the closer one to snap to
+    if(rightZone == leftZone && rightZone!=-1)
+    {
+        qreal leftToMid = distance(left,mid);
+        qreal rightToMid = distance(mid,right);
+
+        if(leftToMid > rightToMid)
+        {
+            switch(rightZone)
+            {
+            case Zone::FLAT:
+                mid->QGraphicsItem::setY(right->y());
+                break;
+            case Zone::ANGLED:
+                break;
+            case Zone::VERTICAL:
+                mid->QGraphicsItem::setX(right->x());
+                break;
+            }
+        }
+        else
+        {
+            switch(leftZone)
+            {
+            case Zone::FLAT:
+                mid->QGraphicsItem::setY(left->y());
+                break;
+            case Zone::ANGLED:
+                break;
+            case Zone::VERTICAL:
+                mid->QGraphicsItem::setX(left->x());
+                break;
+            }
+        }
+    }
+    else    // check the neighbor elbows and snap them if needed
+    {
+        if(rightZone!=-1)
+        {
+            switch(rightZone)
+            {
+            case Zone::FLAT:
+                mid->QGraphicsItem::setY(right->y());
+                break;
+            case Zone::ANGLED:
+                break;
+            case Zone::VERTICAL:
+                mid->QGraphicsItem::setX(right->x());
+                break;
+            }
+        }
+        if(leftZone!=-1)
+        {
+            switch(leftZone)
+            {
+            case Zone::FLAT:
+                mid->QGraphicsItem::setY(left->y());
+                break;
+            case Zone::ANGLED:
+                break;
+            case Zone::VERTICAL:
+                mid->QGraphicsItem::setX(left->x());
+                break;
+            }
+        }
+    }
 }
 
 void ElbowGrabber::updateArrowHead()
