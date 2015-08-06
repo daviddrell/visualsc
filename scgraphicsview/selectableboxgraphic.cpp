@@ -911,7 +911,7 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
     //qDebug() << "SelectableBoxGraphic HoverEnterEvent";
     _isHovered = true;
 
-    QApplication::setOverrideCursor(Qt::OpenHandCursor);
+    //QApplication::setOverrideCursor(Qt::OpenHandCursor);
 
     _corners[0] = new CornerGrabber(this,0, true);
     _corners[1] = new CornerGrabber(this,1, true);

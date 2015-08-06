@@ -43,6 +43,23 @@
 #include <QHash>
 #include <QDebug>
 #include <QApplication>
+#include <QHeaderView>
+
+#define PROPERTY_TABLE_WIDTH_1  108     // smallest value while still having clearance for the longest attribute name connectToFinished
+#define PROPERTY_TABLE_WIDTH_2  170
+
+#define WINDOW_WIDTH    618
+#define WINDOW_HEIGHT   1000
+
+
+#define TREEVIEW_COLOR_ENABLE
+#define BOX_RED_COLOR_JUMP      67
+#define BOX_GREEN_COLOR_JUMP    23
+#define BOX_BLUE_COLOR_JUMP     7
+#define BOX_RED_OFFSET          0
+#define BOX_GREEN_OFFSET        0
+#define BOX_BLUE_OFFSET         1
+
 
 
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
@@ -51,7 +68,7 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         _currentlySelected(NULL)//,
         //_previouslySelected(NULL)
 {
-this->resize(618,1000);
+this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     createActions();
     createMenus();
@@ -68,7 +85,8 @@ this->resize(618,1000);
 
     stateChartTreeView = new QTreeWidget();
     stateChartTreeView->setColumnCount(1);
-    connect ( stateChartTreeView, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(handleTreeViewItemClicked(QTreeWidgetItem*,int)));
+    //connect(stateChartTreeView, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(handleTreeViewItemClicked(QTreeWidgetItem*,int)));
+    connect(stateChartTreeView, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(handleTreeViewItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
 
     QVBoxLayout *treeLayout = new QVBoxLayout();
     //selectedChartItem = new QLabel();
@@ -91,7 +109,9 @@ this->resize(618,1000);
 
     propertyTable = new QTableWidget();
     propertyTable->setColumnCount(2);
-    propertyTable->setColumnWidth(1,180);
+    propertyTable->setColumnWidth(0,PROPERTY_TABLE_WIDTH_1);
+    propertyTable->horizontalHeader()->setStretchLastSection(true);
+    //propertyTable->setColumnWidth(1,PROPERTY_TABLE_WIDTH_2);
 
     propertyLayout->addWidget( propertyTable );
 
@@ -102,12 +122,14 @@ this->resize(618,1000);
 
     textBlockPropertyTable = new QTableWidget();
     textBlockPropertyTable->setColumnCount(2);
-    textBlockPropertyTable->setColumnWidth(1,180);
+    textBlockPropertyTable->setColumnWidth(0,PROPERTY_TABLE_WIDTH_1);
+    textBlockPropertyTable->horizontalHeader()->setStretchLastSection(true);
+    //textBlockPropertyTable->setColumnWidth(1,180);
     //textBlockPropertyTable->columnViewportPosition(1);
 
     propertyLayout->addWidget(textBlockPropertyTable);
 
-    setWindowTitle(tr("State Chart Tree Editor"));
+    setWindowTitle(tr("Tree Statechart Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
 
    // QList<SCState*> states;
@@ -328,8 +350,6 @@ void SCFormView::handleNewTransition(SCTransition* tr)
  */
 void SCFormView::handleNewState(SCState* st)
 {
-
-
     // parent of this widget will be the state's parent's widget
     SCState* parentState = st->getParentState();
     FVItem* parentfv = _items.value(parentState);
@@ -341,48 +361,23 @@ void SCFormView::handleNewState(SCState* st)
     // link the tree widget to the fv item, expand the widget, set its text and icon
     item->setData(fvItem);
     item->setExpanded(true);
-    item->setText(0, st->attributes.value("name")->asString());
+    item->setText(0, st->getName());
     item->setIcon(0,QIcon(":/SCFormView/cardboardbox.png"));
+
+#ifdef TREEVIEW_COLOR_ENABLE
+    int r = 255 - (((st->getLevel()-BOX_RED_OFFSET) * BOX_RED_COLOR_JUMP ) % 255);
+    int g = 255 - (((st->getLevel()-BOX_GREEN_OFFSET) * BOX_GREEN_COLOR_JUMP ) % 255);
+    int b = 255 - (((st->getLevel()-BOX_BLUE_OFFSET) * BOX_BLUE_COLOR_JUMP ) % 255);
+
+    item->setBackgroundColor(0, QColor(r,g,b,255));
+#endif
 
     // link the SCState and FVItem
     _items.insert(st,fvItem);
 
-
     // hook up the state to handlers in the formview
     connectState(st);           // deleteSafely handler
     connectState(st, fvItem->getTreeWidget());   // tree item handler
-
-
-
-    //(void)s;
-    // pass the loadTree function a list of top-level states and starting node
-    // the top node (NULL) has only one top state
-    //QList<SCState*> states;
-    //states.append( _dm->getTopState());
-
-    //stateChartTreeView->clear();
-
-
-
-    //connectState(s);
-
-/*
-    replantTree();
-
-    if(!_currentlySelected)
-    {
-        //setSelectedTreeItem(_dm->getTopState());
-        _currentlySelected = _topState;
-
-    }
-    CustomTreeWidgetItem* twid = findItem(_currentlySelected); // rehighlight the item that was highlighted
-    if(twid)
-    {
-        twid->setSelected(true);
-        handleTreeViewItemClicked((QTreeWidgetItem*)twid,0);
-    }
-    */
-
 }
 
 /**
@@ -1442,6 +1437,50 @@ void SCFormView::clearTextBlockPropertyTable()
     disconnect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)),this, SLOT(handleTextBlockPropertyCellChanged(int,int)));
 }
 
+void SCFormView::handleTreeViewItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous)
+{
+    CustomTreeWidgetItem * item = dynamic_cast<CustomTreeWidgetItem*>(current);
+
+    if(item)
+    {
+        _currentlySelected = dynamic_cast<FVItem*>(item->data());
+
+        // clear the table, delete the old table items
+        clearPropertyTable();
+
+        // load the new attributes
+        IAttributeContainer * currentAttributes =  _currentlySelected->getAttributes();
+
+        // load the property table with the current state's attributes
+        loadPropertyTable(_currentlySelected);
+
+        // watch for user changes to the attributes
+        connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
+
+        // clear the textblock property table
+        clearTextBlockPropertyTable();
+
+        // reload the textBlockPropertyTable
+        currentAttributes = _currentlySelected->getTextBlockAttributes();
+
+        // set up the text block property table with the attributes of the text block
+        textBlockPropertyTable->setRowCount(currentAttributes->count());
+        setTextBlockAttributeConnections(currentAttributes, true);
+
+        // watch for user changes to the attributes from the property table
+        connect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handleTextBlockPropertyCellChanged(int,int)));
+
+        // depending on the selected item, change some of the buttons
+        changeEditToolBar(_currentlySelected->getTypeInt());
+    }
+    else
+    {
+        qDebug() << "ERROR SCFormView::handleTreeViewItemChanged Current Item not an FVItem!!";
+    }
+
+
+}
+
 /**
  * @brief SCFormView::handleTreeViewItemClicked
  * Updates the attribute information for the currently highlight tree object
@@ -1449,6 +1488,9 @@ void SCFormView::clearTextBlockPropertyTable()
  * loads each attribute of the highlighted tree object
  * Disconnects handlePropertyCellChanged
  * connects handlePropertyCellChanged
+ *
+ * DEPRECATED FUNCTION, replaced by handleTreeViewItemChanged, which triggers on arrow key press in addition to mouse clicks
+ *
  * @param qitem
  */
 void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
@@ -1459,13 +1501,7 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
     // display the name of the item
     // load its attributes in the table
 
-    //_currentlySelected =  item->data();
-    //setSelectedTreeItem(item->data());
-
     _currentlySelected = dynamic_cast<FVItem*>(item->data());
-    //qDebug() << "handleTreeViewItemClicked: " << _currentlySelected->getState()->objectName();
-    //qDebug() << "handleTreeViewItemClicked Object name: "<<_currentlySelected->objectName();
-
     // load the Title
 
     //QString selectedItemTitle = _currentlySelected->getType()  + " : " +  getCurrentlySelectedTitle();
@@ -1481,29 +1517,17 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
         textToolBar->setEnabled(false);
     }
 */
-    //clearAndLoadPropertyTable(dynamic_cast<SCItem*>(_previouslySelected),dynamic_cast<SCItem*>(_currentlySelected));
-
-
-
-
     // clear the table, delete the old table items
     clearPropertyTable();
 
     // load the new attributes
     IAttributeContainer * currentAttributes =  _currentlySelected->getAttributes();
 
-    // set up the property table with these new attributes
-
-    //setAttributeConnections(currentAttributes, true);
-
     // load the property table with the current state's attributes
-    //setAttributeConnections(_currentlySelected);
     loadPropertyTable(_currentlySelected);
 
     // watch for user changes to the attributes
     connect(propertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handlePropertyCellChanged(int,int)));
-
-
 
     // clear the textblock property table
     clearTextBlockPropertyTable();
@@ -1518,28 +1542,8 @@ void SCFormView::handleTreeViewItemClicked(QTreeWidgetItem* qitem,int ){
     // watch for user changes to the attributes from the property table
     connect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)), this, SLOT(handleTextBlockPropertyCellChanged(int,int)));
 
-    if(_currentlySelected->isTransition())
-    {
-        //reselectParentAction->setIcon(QIcon(":/SCFormView/reselect.png"));
-        reselectParentAction->setText(tr("Reset Transition's Parent"));
-        reselectParentAction->setShortcut(tr("Reset Transition's Parent"));
-        reselectParentAction->setStatusTip(tr("Reset Transition's Parent"));
-
-
-
-        reselectTargetAction->setEnabled(true);
-    }
-    else if(_currentlySelected->isState())
-    {
-        reselectParentAction->setIcon(QIcon(":/SCFormView/family.png"));
-        reselectParentAction->setText(tr("Reset State's Parent"));
-        reselectParentAction->setShortcut(tr("Reset State's Parent"));
-        reselectParentAction->setStatusTip(tr("Reset State's Parent"));
-
-
-        reselectTargetAction->setEnabled(false);
-
-    }
+    // depending on the selected item, change some of the buttons
+    changeEditToolBar(_currentlySelected->getTypeInt());
 }
 
 /**
@@ -1961,6 +1965,11 @@ void SCFormView::deleteItem()
     // TODO check if anything is highlighted
     QMessageBox msgBox;
 
+    if(_currentlySelected->isState() && _topState == _currentlySelected)
+    {
+        sendMessage("Error", "Cannot delete the root machine");
+        return;
+    }
 
     msgBox.setWindowTitle(" ");
 
@@ -2236,6 +2245,9 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* target)
  * @brief SCFormView::updateCurrentlySelected
  *
  * sets currently selected to the first item in the tree view's selected list
+ *
+ * DEPRECATED FUNCTION, no longer needed due to changing how items are selected
+ *
  */
 void SCFormView::updateCurrentlySelected()
 {
@@ -2257,7 +2269,7 @@ void SCFormView::insertState()
 {
     //SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
 
-    updateCurrentlySelected();
+    //updateCurrentlySelected();
 
     SCState* st = _currentlySelected->getState();
     if ( st == NULL ) return;
@@ -2724,9 +2736,29 @@ void SCFormView::handleFontChange()
 
 void SCFormView::about()
 {
-    QMessageBox::about(this, tr("About Visual State Chart"),
-                       tr("<b>VisualSC</b>  is a State Chart Editor "
-                          "which read/writes from/to SCXML"));
+
+//    QString text = QString("\nDeveloped by: David Drell & Matt Zhan\nhttps://github.com/daviddrell/visualsc");
+//    QString er = tr("<b>VisualSC</b>  is a Statechart Editor which read/writes from/to SCXML %1\nsurname: %2\ndata: %3\ntest:%4").arg("wat");
+//    QMessageBox ab;
+//    ab.setWindowTitle("About Visual Statechart");
+//    ab.setText(er);
+//    ab.exec();
+
+    //QMessageBox::about(this, tr("About Visual State Chart"), "");
+
+    QMessageBox::about(this, "About Visual Statechart",
+                       "https://github.com/daviddrell/visualsc"
+                       "\n"
+                       "VisualSC is a Statechart Editor which reads/writes from/to SCXML\n"
+                       "\n"
+                       "This is an open source project by David Drell & Matt Zhan"
+                       ""
+
+
+                       "");
+
+
+
 }
 
 void SCFormView::viewKeybinds()
@@ -2871,6 +2903,43 @@ void SCFormView::createMenus()
     aboutMenu->addAction(viewKeybindsAction);
 }
 
+/**
+ * @brief SCFormView::changeEditToolBar
+ * @param type
+ *
+ * change the edit tool bars to a configuration based on what is currently selected.
+ *
+ */
+void SCFormView::changeEditToolBar(int type)
+{
+    switch(type)
+    {
+    case FVItem::STATE:
+        reselectParentAction->setText(tr("Reset State's Parent"));
+        reselectParentAction->setShortcut(tr("Reset State's Parent"));
+        reselectParentAction->setStatusTip(tr("Reset State's Parent"));
+
+        reselectTargetAction->setIcon(QIcon(":/SCFormView/reselectgrey.png"));
+        reselectTargetAction->setEnabled(false);
+
+        insertTransitionAction->setEnabled(true);
+        insertStateAction->setEnabled(true);
+
+        break;
+
+    case FVItem::TRANSITION:
+        reselectParentAction->setText(tr("Reset Transition's Parent"));
+        reselectParentAction->setShortcut(tr("Reset Transition's Parent"));
+        reselectParentAction->setStatusTip(tr("Reset Transition's Parent"));
+
+        reselectTargetAction->setIcon(QIcon(":/SCFormView/reselect.png"));
+        reselectTargetAction->setEnabled(true);
+
+        insertTransitionAction->setEnabled(false);
+        insertStateAction->setEnabled(false);
+        break;
+    }
+}
 
 void SCFormView::createToolbars()
 {
@@ -2884,7 +2953,7 @@ void SCFormView::createToolbars()
     editToolBar = new QToolBar("Edit", this);
     editToolBar->addAction(insertStateAction);
     editToolBar->addAction(insertTransitionAction);
-
+    editToolBar->addSeparator();
     editToolBar->addAction(reselectParentAction);
     editToolBar->addAction(reselectTargetAction);
     editToolBar->addAction(deleteAction);

@@ -42,6 +42,23 @@
 #define INNER_BORDER_DISTANCE   INNER_BORDER_THICKNESS/2 + PEN_DEFAULT_WIDTH/2
 
 
+#define SOURCE_ANCHOR_BUFFER 2.0    // smaller value means closer to real dimensions
+#define SOURCE_ANCHOR_POS_BUFFER 9.0    // was 2
+
+#define SINK_ANCHOR_BUFFER 5.5
+#define SINK_ANCHOR_POS_BUFFER 8.5
+
+#define BOX_RED_COLOR_JUMP      67
+#define BOX_GREEN_COLOR_JUMP    23
+#define BOX_BLUE_COLOR_JUMP     7
+#define BOX_RED_OFFSET          0
+#define BOX_GREEN_OFFSET        0
+#define BOX_BLUE_OFFSET         1
+
+#define MIN_WIDTH       105
+#define MIN_HEIGHT      65
+
+
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         SelectableBoxGraphic(parent),
         //TextItem(parent,stateModel->getIDTextBlock()),
@@ -60,7 +77,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     setDrawBoxLineStyle  ( SelectableBoxGraphic::kDrawSolid );
     //setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
     setBoxStyle(SelectableBoxGraphic::kSolidNoShadow);
-    setMinSize(QPoint(60,60));
+    setMinSize(QPoint(MIN_WIDTH,MIN_HEIGHT));
     setPenWidth(PEN_DEFAULT_WIDTH, PEN_HOVER_WIDTH);
     //TextItem.setPos(25,10);
 
@@ -900,9 +917,9 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
 //         int b = (255+ (255 - this->getStateModel()->getLevel()*10)%255);
 
         // add colored layers
-         int r = 255 - (((this->getStateModel()->getLevel()) * 67 ) % 255);
-         int g = 255 - (((this->getStateModel()->getLevel()) * 23 ) % 255);
-         int b = 255 - (((this->getStateModel()->getLevel()-1) * 7 ) % 255);
+         int r = 255 - (((this->getStateModel()->getLevel()-BOX_RED_OFFSET) * BOX_RED_COLOR_JUMP ) % 255);
+         int g = 255 - (((this->getStateModel()->getLevel()-BOX_GREEN_OFFSET) * BOX_GREEN_COLOR_JUMP ) % 255);
+         int b = 255 - (((this->getStateModel()->getLevel()-BOX_BLUE_OFFSET) * BOX_BLUE_COLOR_JUMP ) % 255);
 
 
 

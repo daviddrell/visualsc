@@ -36,6 +36,8 @@
 #include "fvitem.h"
 #include "customtablewidgetitem.h"
 
+
+
 class StateSelectionWindow;
 
 
@@ -124,6 +126,7 @@ private slots:
     void viewKeybinds();
 
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
+    void handleTreeViewItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
     void handleNewTransition(SCTransition*);
     void handleTransitionDeleted(QObject *);
     void handleStateDeleted(QObject*);
@@ -157,6 +160,8 @@ private slots:
     void handleItemNameChangedInDataModel(SCTransition*, QString);
 
 private:
+
+    void changeEditToolBar(int);
 
     void updateCurrentlySelected();
     void deleteTreeItem(SCItem*);

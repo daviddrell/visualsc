@@ -102,7 +102,7 @@ private: // methods
         virtual void    setValue(const QString value)  ;
 
     signals:
-        void changed(TransitionStringAttribute* tsa);
+        //void changed(TransitionStringAttribute* tsa);
 
     private:
 

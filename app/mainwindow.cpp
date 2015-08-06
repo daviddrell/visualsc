@@ -32,6 +32,7 @@
 // adding comments to get the git repository
 
 QString MainWindow::_keyLastFilePath = QString("lastFilePath");
+QString MainWindow::_codeLastFilePath =QString("codeLastFilePath");
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -43,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     QCoreApplication::setOrganizationName("David W Drell");
     QCoreApplication::setOrganizationDomain("davidwdrell.net");
-    QCoreApplication::setApplicationName("Visual State Chart Editor");
+    QCoreApplication::setApplicationName("Visual Statechart Editor");
     _settings  = new QSettings(this);
 
     ui->setupUi(this);
@@ -53,13 +54,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
 
-  #ifdef ENABLE_TEXT_TOOL_BAR
+#ifdef ENABLE_TEXT_TOOL_BAR
     _textFormatToolBar = new TextFormatToolBar();
 
 
     this->addToolBar(_textFormatToolBar);
 #endif
-    this->setWindowTitle("Visual State Chart Editor");
+    this->setWindowTitle("Visual Statechart Editor");
 
     this->resize(1272,1000);
     this->move(633,0);
@@ -239,15 +240,15 @@ void MainWindow::handleExportCodeClick()
     QString prevFilePath=QDir::homePath();
     QString fileName ;
 
-    if ( _settings->contains(_keyLastFilePath))
+    if ( _settings->contains(_codeLastFilePath))
     {
-        prevFilePath = _settings->value(_keyLastFilePath).toString();
+        prevFilePath = _settings->value(_codeLastFilePath).toString();
     }
 
     fileName = QFileDialog::getSaveFileName(this,
                                             tr("Save as .cpp and .h Files"), prevFilePath, tr("C++ and Header (*.cpp)"));
 
-    _settings->setValue(_keyLastFilePath, fileName);
+    _settings->setValue(_codeLastFilePath, fileName);
     //_project->save(fileName);
     qDebug() << "export to code file name: " << fileName;
     _project->exportToCode(fileName);

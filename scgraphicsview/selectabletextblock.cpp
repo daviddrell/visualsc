@@ -33,7 +33,7 @@
 #define DEFAULT_PEN_WIDTH 1
 #define HOVER_PEN_WIDTH 1
 
-#define MIN_WIDTH 40
+#define MIN_WIDTH 50
 #define MIN_HEIGHT 36
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :

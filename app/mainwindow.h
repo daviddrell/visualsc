@@ -50,6 +50,7 @@ private:
     SMProject *_project;
     QSettings *_settings;
     static QString _keyLastFilePath;
+    static QString _codeLastFilePath;
     SCFormView *_formEditorWindow;
     TextFormatToolBar *_textFormatToolBar;
 

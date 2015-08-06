@@ -113,7 +113,10 @@ QString FVItem::getType()
     }
 }
 
-
+int FVItem::getTypeInt()
+{
+    return _type;
+}
 
 QString FVItem::getTitle()
 {

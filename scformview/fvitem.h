@@ -30,6 +30,8 @@ public:
     bool isState();
     bool isTransition();
 
+    int getTypeInt();
+
     SCState* getState();
     SCTransition* getTransition();
     SCItem* getItem();
