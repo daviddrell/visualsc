@@ -344,7 +344,9 @@ void SCDataModel::open(QString file)
         // the state-path is all of the state's which a transition must transit through on the path to its taget state.
         //
 
-        connectTransitionsToStatePath();
+        QList<SCTransition*> tlist;
+        _topState->getAllTransitions(tlist);
+       connectTransitionsToStatePath(tlist);
     }
 
     emit openCompleted ( ok,  messages );
@@ -376,7 +378,9 @@ void SCDataModel::openFile(QString fileName)
     if(ok)
     {
        // set up the transition connections in the data model
-       connectTransitionsToStatePath();
+        QList<SCTransition*> tlist;
+        _topState->getAllTransitions(tlist);
+       connectTransitionsToStatePath(tlist);
 
        // set up the transition connections in the graphics
        for(int i = 0; i < _transitions.count(); i++)
@@ -390,8 +394,16 @@ void SCDataModel::openFile(QString fileName)
 
 void SCDataModel::importFile(SCState* parent,QString fileName)
 {
+    _importedTransitions.clear();
     _reader.readFile(fileName);
     _reader.importFile(parent);
+
+    connectTransitionsToStatePath(_importedTransitions);
+    for(int i = 0; i < _importedTransitions.count(); i++)
+    {
+        // alert the graphicsview and formview that the imported transitions are ready
+        emit transitionsReadyToConnect(_importedTransitions.at(i));
+    }
 }
 
 
@@ -406,11 +418,8 @@ void SCDataModel::importFile(SCState* parent,QString fileName)
  * this is saved as a property in the scxml so that states with the same name can be diffentiated
  *
  */
-void SCDataModel::connectTransitionsToStatePath()
+void SCDataModel::connectTransitionsToStatePath(QList<SCTransition*> tlist)
 {
-    // get all transitions in this state machine
-    QList<SCTransition *> tlist;
-    _topState->getAllTransitions(tlist);
 
     for (int t = 0; t < tlist.count(); t++)
     {
@@ -998,13 +1007,44 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     source->addTransitionReference(transition, SCState::kTransitOut);
     transition->setTargetState(target);
 
-    connectTransition(transition);
-    _transitions.append(transition);
+    _transitions.append(transition);        // add to the total list of transitions
 
     qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
 
     emit insertNewTransitionSignal(transition);
     return transition;
+}
+
+
+SCTransition* SCDataModel::handleMakeANewTransition(SCState* source, TransitionAttributes* ta)
+{
+    qDebug() << "handleMakeANewTransition, : "  + ta->value("target")->asString() << "\t" << ta->value("event")->asString();
+
+    SCTransition * transition = new SCTransition(source);
+
+    if ( source == 0)
+        return NULL;
+
+    transition->attributes.setAttributes(*ta);
+    transition->setText(transition->attributes.value("event")->asString());
+
+    TransitionPathAttribute *path = dynamic_cast<TransitionPathAttribute *>( transition->attributes.value("path"));
+
+    // this will interpret the path values as points
+    path->setValue( path->asString() );
+    source->addTransistion(transition);
+    _transitions.append(transition);
+    _importedTransitions.append(transition);    // add to the list of transitions that stil need connect
+
+
+    delete ta;
+
+    // alert the graphicsview and form view that there is a new transition
+    emit this->newTransitionSignal(transition);
+
+    return transition;
+
+    qDebug() << "leave handleMakeANewTransition, : "  ;
 }
 
 /**
@@ -1032,7 +1072,11 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     transition->attributes.setAttributes(*ta);
     transition->setText(transition->attributes.value("event")->asString());
 
-    connectTransition(transition);
+    TransitionPathAttribute *path =
+            dynamic_cast<TransitionPathAttribute *>( transition->attributes.value("path"));
+
+    path->setValue( path->asString() );
+
 
     _currentTransition = transition;
     _currentState->addTransistion(transition);
@@ -1057,6 +1101,10 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta, SCState* s
 }
 */
 
+/**
+ * @brief SCDataModel::handleLeaveTransitionElement
+ * notifies the graphicsview and form view that there is a new transition element
+ */
 void SCDataModel::handleLeaveTransitionElement()
 {
     qDebug() << "handleLeaveTransitionElement ";

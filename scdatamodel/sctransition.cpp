@@ -333,20 +333,20 @@ void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
     {
         QString key = i.next().key();
 
-        if(key != "path")           // do a special write for the path
+        //if(key != "path")           // do a special write for the path
         {
             qDebug() << "writing " << key <<"...";
             sw.writeAttribute(key, attributes.value(key)->asString());
         }
     }
 
-    if (  attributes.contains("path"))  // write all the path values in a separate element
-    {
-         sw.writeStartElement(QString("path"));
-         QString path = attributes.value("path")->asString();
-         sw.writeAttribute(QString("d"),path);
-         sw.writeEndElement();
-    }
+//    if (  attributes.contains("path"))  // write all the path values in a separate element
+//    {
+//         sw.writeStartElement(QString("path"));
+//         QString path = attributes.value("path")->asString();
+//         sw.writeAttribute(QString("d"),path);
+//         sw.writeEndElement();
+//    }
 
     // additionally, write each of the attributes of this transitions's children.
     for(int k = 0 ; k < children().length(); k++)

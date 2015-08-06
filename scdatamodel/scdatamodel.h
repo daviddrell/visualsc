@@ -127,6 +127,7 @@ public:
 
 public slots:
     SCState* handleMakeANewState(SCState*, StateAttributes*);
+    SCTransition* handleMakeANewTransition(SCState* source, TransitionAttributes*);
 
 signals:
     void openCompleted(bool sucess, QStringList message);
@@ -141,6 +142,7 @@ private slots:
 
 
     void handleMakeANewState(StateAttributes*);
+
     void handleMakeANewTransition(TransitionAttributes*);
     void handleLeaveTransitionElement();
     void handleMakeANewTransitionPath(QString path);
@@ -179,12 +181,13 @@ private:
     QGraphicsScene * _scene;
     //QList<SCState*> _states;
     QList<SCTransition*> _transitions;
+    QList<SCTransition*> _importedTransitions;
 
 
 
 //private methods
     SCDataModel(QObject * parent=NULL);
-    void connectTransitionsToStatePath();
+    void connectTransitionsToStatePath(QList<SCTransition*> tlist);
     void makeTransitionConnections(SCState * targetState, SCTransition* trans);
     //void deleteInTransitions(SCState* state);
 };

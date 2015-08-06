@@ -86,6 +86,9 @@ private:
     QString _file;
     QStringList _resultMessages;
     int _currentItemType;
+    //SCItem* _currentItem;
+    SCState* _currentState;
+    SCTransition* _currentTransition;
 
     void importIDTextBlockElement(SCState* parent);
     void importEventTextBlockElement(SCTransition* parent);
@@ -94,6 +97,7 @@ private:
     void readElement();
     void importElement(SCState* parent);
     void readState(STATE_TYPE t= kSTATE_TYPE_Normal);
+    SCTransition* importTransition(SCState* source);
     SCState* importState(SCState* parent);
     SCState* importStateMachine(SCState* parent);
     void readTransistion();

@@ -52,6 +52,8 @@ void SCXMLReader::readFile(QString infile)
 
 void SCXMLReader::importFile(SCState* parent)
 {
+    //_currentItem = parent;
+    _currentState = parent;
     QFile file(_file);
     if ( ! file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -64,13 +66,17 @@ void SCXMLReader::importFile(SCState* parent)
     _reader.setDevice(&file);
     _reader.readNext();
 
-    while ( ! _reader.atEnd())
+    // while the reader hasn't ended, keep reading elements
+    while ( !_reader.atEnd())
     {
-        if ( ! _reader.isStartElement())
+        // look for a start element
+        if (!_reader.isStartElement())
             _reader.readNext();
-        else
+
+        else    // start element found
         {
-            importElement(parent);
+            // import the element in
+            importElement(_currentState);
         }
     }
 
@@ -82,25 +88,30 @@ void SCXMLReader::importFile(SCState* parent)
 
 void SCXMLReader::importElement(SCState* parent)
 {
-    qDebug() << "SCXMLReader::importElement";
+    qDebug() << "SCXMLReader::importElement READING... "<< _reader.name() <<" importing into parent: "<< parent->objectName();
 
-    SCState* current;
+    bool readState = false;
+    bool readTrans = false;
+    //bool readText = false;
+
     if(_reader.name() == "scxml")
     {
         _currentItemType = ItemType::STATE;
-        current = importStateMachine(parent);
+        _currentState = importStateMachine(parent);
+        readState = true;
 
     }
     else if(_reader.name() == "state")
     {
         _currentItemType = ItemType::STATE;
-        current = importState(parent);
-
+        _currentState = importState(parent);
+        readState = true;
     }
     else if(_reader.name() == "transition")
     {
         _currentItemType = ItemType::TRANSITION;
-//        importTransition(parent);
+        _currentTransition = importTransition(parent);
+        readTrans = true;
     }
     else if(_reader.name() == "textblock")
     {
@@ -108,13 +119,13 @@ void SCXMLReader::importElement(SCState* parent)
         {
         case ItemType::STATE:
             qDebug() <<"reading State TextBlockElement";
-            //importIDTextBlockElement(parent);
+            importIDTextBlockElement(parent);
             break;
 
 
         case ItemType::TRANSITION:
             qDebug() <<"reading Event TextBlockElement";
-//            importEventTextBlockElement(parent);
+            importEventTextBlockElement(_currentTransition);
             break;
 
 
@@ -124,9 +135,11 @@ void SCXMLReader::importElement(SCState* parent)
     }
 
 
+    // read the next element
     _reader.readNext();
 
-    while ( ! _reader.atEnd())
+    // while there are sub elements to this, keep calling this function
+    while (! _reader.atEnd())
     {
         if ( _reader.isEndElement()  )
         {
@@ -137,10 +150,30 @@ void SCXMLReader::importElement(SCState* parent)
 
         if ( _reader.isStartElement()){
             qDebug() << "this element has another start element!";
-            importElement(current);
+            importElement(_currentState);
         }
         _reader.readNext();
     }
+
+    // when we leave this element, set the current state back one level before what it was originally
+    if(readState)
+        _currentState = parent;
+}
+
+SCTransition* SCXMLReader::importTransition(SCState* source)
+{
+    TransitionAttributes * ta = new TransitionAttributes(0,"TransitionAttributes");
+
+    for(int i = 0; i < _reader.attributes().size();i++)
+    {
+        QString key =  _reader.attributes().at(i).name().toString();
+        QString value = _reader.attributes().at(i).value().toString();
+        qDebug() << "reader attributes: " << _reader.attributes().at(i).name() << ":"<<_reader.attributes().at(i).value();
+        TransitionStringAttribute* tsa = new TransitionStringAttribute(NULL, key, value);
+        ta->addItem(tsa);
+    }
+
+    return _dm->handleMakeANewTransition(source, ta);
 }
 
 SCState* SCXMLReader::importState(SCState* parent)
@@ -512,37 +545,6 @@ void SCXMLReader::readTransistion()
         ta->addItem(tsa);
     }
 
-/*
-    TransitionStringAttribute * event = new TransitionStringAttribute(NULL,"event", _reader.attributes().value("event").toString());
-
-    TransitionStringAttribute * cond = new TransitionStringAttribute (NULL,"cond", _reader.attributes().value("cond").toString());
-
-    TransitionStringAttribute * target = new TransitionStringAttribute (NULL,"target", _reader.attributes().value("target").toString());
-
-    TransitionStringAttribute * ttype = new  TransitionStringAttribute (NULL,"type", _reader.attributes().value("type").toString());
-
-    ta->addItem(event);
-    ta->addItem(cond);
-    ta->addItem(target);
-    ta->addItem(ttype);
-
-     qDebug() << "target : " << target->asString();
-     qDebug() << "event : " << event->asString();
-
-
-    // restrict type to interal or external
-    if ( ! _reader.attributes().value("type").isEmpty() )
-    {
-        if (_reader.attributes().value("type").toString().toLower() == "internal")
-        {   
-            ta->value("type")->setValue("internal");
-        }
-        else
-        {   
-            ta->value("type")->setValue("external");
-        }
-    }
-*/
     emit makeANewTransistion(ta);   // connected to handleMakeANewTransition in scdatamodel.cpp
 
 }
@@ -593,6 +595,8 @@ void SCXMLReader::importEventTextBlockElement(SCTransition* parent)
 
    _reader.readElementText(); //-- id-textblock gets it text data from the state ID
 
+   parent->getEventTextBlock()->attributes.setAttributes(*tb);
+   delete tb;
    // emit makeANewTransitionTextBlockElement(tb); //connected to handleMakeANewTransitionTextBlock in scdatamodel
     //emit makeANewIDTextBlockElement( tb);
 }

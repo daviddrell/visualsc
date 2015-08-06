@@ -6,8 +6,7 @@
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="94,-2" size="163,52"/>
             <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="false" name="Waiting" position="25,40" size="131,62" type="default type" uid="{246b7dcb-f715-44d0-99aa-37c48e303173}">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="29,10" size="69,40"/>
-                <transition comments="" connectToFinished="false" event="Call Seq Complete" target="Completed" uid="{0b1b5af8-62f8-4e6c-8236-cd1182459777}">
-                    <path d="M 131 32 L 165 32 "/>
+                <transition comments="" connectToFinished="false" event="Call Seq Complete" path="M 131 32 L 165 32 " target="Completed" uid="{0b1b5af8-62f8-4e6c-8236-cd1182459777}">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-21,9" size="138,47"/>
                 </transition>
             </state>
@@ -19,8 +18,7 @@
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="100,10" size="151,38"/>
             <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="false" name="Waiting" position="25,40" size="131,62" type="default type" uid="{c3267d7e-f5b5-40b3-ada8-d5847e08fee1}">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="32,10" size="68,40"/>
-                <transition comments="" connectToFinished="false" event="Conn Seq Complete" target="Completed" uid="{57b5d5f6-d4eb-4c91-af52-fab26a026324}">
-                    <path d="M 131 31 L 165 31 "/>
+                <transition comments="" connectToFinished="false" event="Conn Seq Complete" path="M 131 31 L 165 31 " target="Completed" uid="{57b5d5f6-d4eb-4c91-af52-fab26a026324}">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="0,10" size="137,40"/>
                 </transition>
             </state>
@@ -32,8 +30,7 @@
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="88,9" size="183,43"/>
             <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="false" name="Waiting" position="25,40" size="131,62" type="default type" uid="{ff5a583f-8107-49ff-a68b-8ed71f196ee2}">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="35,10" size="68,40"/>
-                <transition comments="" connectToFinished="false" event="Session Seq Complete" target="Completed" uid="{3967534e-fab3-4a2b-b43c-56d133745de4}">
-                    <path d="M 131 31 L 165 31 "/>
+                <transition comments="" connectToFinished="false" event="Session Seq Complete" path="M 131 31 L 165 31 " target="Completed" uid="{3967534e-fab3-4a2b-b43c-56d133745de4}">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
                 </transition>
             </state>
@@ -41,20 +38,16 @@
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="20,11" size="79,40"/>
             </state>
         </state>
-        <transition comments="" connectToFinished="true" event="Checking All States Completed" target="Success" uid="{914678f0-d657-4858-982e-080be2b4fa99}">
-            <path d="M 534 331 L 753 331 "/>
+        <transition comments="" connectToFinished="true" event="Checking All States Completed" path="M 534 331 L 753 331 " target="Success" uid="{914678f0-d657-4858-982e-080be2b4fa99}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="17,-33" size="184,37"/>
         </transition>
-        <transition comments="" connectToFinished="false" event="Checking Call Sequence Failed" target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
-            <path d="M 534 137 L 753 137 "/>
+        <transition comments="" connectToFinished="false" event="Checking Call Sequence Failed" path="M 534 137 L 753 137 " target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="15,-40" size="188,40"/>
         </transition>
-        <transition comments="" connectToFinished="false" event="Checking Conn Sequence Failed" target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
-            <path d="M 534 181 L 753 181 "/>
+        <transition comments="" connectToFinished="false" event="Checking Conn Sequence Failed" path="M 534 181 L 753 181 " target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="17,-36" size="187,48"/>
         </transition>
-        <transition comments="" connectToFinished="false" event="Checking Session Seq Failed" target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
-            <path d="M 534 91 L 753 91 "/>
+        <transition comments="" connectToFinished="false" event="Checking Session Seq Failed" path="M 534 91 L 753 91 " target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="14,-40" size="177,46"/>
         </transition>
     </state>
