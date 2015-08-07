@@ -2848,6 +2848,28 @@ void SCFormView::createActions()
     sendBackAction->setStatusTip(tr("Send item to back"));
     connect(sendBackAction, SIGNAL(triggered()), this, SLOT(sendToBack()));
 
+
+    // file menu items
+    newAction = new QAction(tr("N&ew"), this);
+    newAction->setShortcut(tr("Ctrl+N"));
+    newAction->setStatusTip(tr("Create a new State Machine from scratch"));
+    connect(newAction, SIGNAL(triggered()), this, SLOT(newClicked()));
+
+    openAction = new QAction(tr("O&pen"), this);
+    openAction->setShortcut(tr("Ctrl+O"));
+    openAction->setStatusTip(tr("Open an .SCXML file"));
+    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+
+    saveAction = new QAction(tr("S&ave"), this);
+    saveAction->setShortcut(tr("Ctrl+S"));
+    saveAction->setStatusTip(tr("Save this State Machine to an .SCXML"));
+    connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
+
+    exportAction = new QAction(tr("E&xport"), this);
+    exportAction->setShortcut(tr("Ctrl+E"));
+    exportAction->setStatusTip(tr("Export to .cpp & .h"));
+//    connect(exportAction, SIGNAL(triggered()),
+
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
     exitAction->setStatusTip(tr("Quit VisualSC Editor"));

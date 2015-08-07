@@ -70,7 +70,7 @@ void CodeWriter::cWriteConstructor()
 {
     // print the constructor
     cPrintln(className+"::"+className+"(QObject* parent):");
-    //cPrintln("QObject(parent),",1);
+    cPrintln("QObject(parent),",1);
 
     //QList<QString> init;
     QStringList init;
@@ -79,19 +79,19 @@ void CodeWriter::cWriteConstructor()
     {
         SCState* machine = _machines.at(i);
         CWStateMachine* cwsm = _machineHash.value(machine);
-        cPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
-        //init.append("//////// State Machine: "+cwsm->_stateName+" ////////");
+        //cPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
+        init.append("//////// State Machine: "+cwsm->_stateName+" ////////");
         //cOut<<QString("\b");
 
         if(cwsm->isParallel())
         {
-            cPrintln(cwsm->_stateName+"(new QStateMachine(QState::ParallelStates)),",1);
-            //init.append(QString(cwsm->_stateName+"(new QStateMachine(QState::ParallelStates)),"));
+            //cPrintln(cwsm->_stateName+"(new QStateMachine(QState::ParallelStates)),",1);
+            init.append(QString(cwsm->_stateName+"(new QStateMachine(QState::ParallelStates)),"));
         }
         else
         {
-            cPrintln(cwsm->_stateName+"(new QStateMachine(this)),",1);
-            //init.append(QString(cwsm->_stateName+"(new QStateMachine(this)),"));
+            //cPrintln(cwsm->_stateName+"(new QStateMachine(this)),",1);
+            init.append(QString(cwsm->_stateName+"(new QStateMachine(this)),"));
         }
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
@@ -103,8 +103,8 @@ void CodeWriter::cWriteConstructor()
             if(cws->getState()->isStateMachine())
             {
 
-                cPrintln("// child initialized elsewhere: QStateMachine* "+cws->_stateName+" ",1);
-                //init.apend(QString("// child initialized elsewhere: QStateMachine* "+cws->_stateName+" "));
+                //cPrintln("// child initialized elsewhere: QStateMachine* "+cws->_stateName+" ",1);
+                init.append(QString("// child initialized elsewhere: QStateMachine* "+cws->_stateName+" "));
             }
             else    // this is not a state machine
             {
@@ -113,58 +113,60 @@ void CodeWriter::cWriteConstructor()
                     {
                         if(cws->getState()->isFinal())
                         {
-                            cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates)),",1);
-                            //init.append(QString(cws->_stateName+"(new QFinalState(QState::ParallelStates)),"));
+                           // cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates)),",1);
+                            init.append(QString(cws->_stateName+"(new QFinalState(QState::ParallelStates)),"));
                         }
                         else
                         {
-                            cPrintln(cws->_stateName+"(new QState(QState::ParallelStates)),",1);
-                            //init.append(QString(cws->_stateName+"(new QState(QState::ParallelStates)),"));
+                           // cPrintln(cws->_stateName+"(new QState(QState::ParallelStates)),",1);
+                            init.append(QString(cws->_stateName+"(new QState(QState::ParallelStates)),"));
                         }
                     }
                     else
                     {
                         if(cws->getState()->isFinal())
                         {
-                            cPrintln(cws->_stateName+"(new QFinalState()),",1);
-                            //init.append(QString(cws->_stateName+"(new QFinalState()),"));
+                           // cPrintln(cws->_stateName+"(new QFinalState()),",1);
+                            init.append(QString(cws->_stateName+"(new QFinalState()),"));
                         }
                         else
                         {
-                            cPrintln(cws->_stateName+"(new QState()),",1);
-                            //init.append(QString(cws->_stateName+"(new QState()),"));
+                           // cPrintln(cws->_stateName+"(new QState()),",1);
+                            init.append(QString(cws->_stateName+"(new QState()),"));
                         }
                     }
                 }
             }
 
         }
-        cPrintln("");
-        //init.append("");
+       // cPrintln("");
+        init.append("");
     }
 
-//    qDebug() << "initsize: " <<init.size();
+    qDebug() << "initsize: " <<init.size();
 
 //    for(int i = 0; i < init.size(); i++)
 //    {
 //        qDebug()<< init.at(i);
 //    }
 
-//    for(int i = init.size()-1; i > -1; i--)
-//    {
-//        if(!init.at(i).isEmpty() && (init.at(i).at(0)!=QChar('/')))
-//        {
-//            QString s = init.at(i);
-//            s.chop(1);
-//            init.removeAt(i);
-//            init.insert(i,s);
-//            i=-1;
-//        }
-//    }
-//        for(QStringList::Iterator it = init.begin(); it!= init.end(); ++it)
-//            cPrintln(*it,1);
+    for(int i = init.size()-1; i > -1; i--)
+    {
+        if(!init.at(i).isEmpty() && (init.at(i).at(0)!=QChar('/')))
+        {
+            QString s = init.at(i);
+            s.chop(1);
+            init.removeAt(i);
+            init.insert(i,s);
+            i=-1;
+        }
+    }
+        for(QStringList::Iterator it = init.begin(); it!= init.end(); ++it)
+        {
+            cPrintln(*it,1);
+        }
 
-    cPrintln("QObject(parent)",1);
+
     // open curly brace
     cPrintln("{");
 
@@ -800,6 +802,13 @@ void CodeWriter::cPrintln(QString text)
 
 void CodeWriter::cPrintln(QString text, int tabLevel)
 {
+    qDebug() << text;
+    if(text.isEmpty())
+    {
+        cOut << "\n";
+        return;
+    }
+
     if(text.at(0)=='\n')
     {
         cOut << "\n";

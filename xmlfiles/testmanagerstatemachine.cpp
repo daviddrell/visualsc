@@ -25,6 +25,7 @@ registered when using addTransition to trigger transitions between the QStates),
 #include <QDebug>
 
 TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
+    QObject(parent),
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
     _updateFirmwareAllUnits_53416b9a(new QStateMachine(QState::ParallelStates)),
     // child initialized elsewhere: QStateMachine* _updatingGSUnits_52c831de 
@@ -45,10 +46,9 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _idle_c9dcfd20(new QState()),
     _downloadingAVC_fa1bce49(new QState()),
     _runningTests_c9e4b34a(new QState()),
-    _completed_850da190(new QState()),
+    _completed_850da190(new QState())
     // child initialized elsewhere: QStateMachine* _updateFirmwareAllUnits_53416b9a 
 
-    QObject(parent)
 {
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
     _updateFirmwareAllUnits_53416b9a->addState(_updatingGSUnits_52c831de);

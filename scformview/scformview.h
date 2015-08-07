@@ -247,6 +247,11 @@ private:
 
     QAction *exitAction;
     QAction *importAction;
+    QAction *newAction;
+    QAction *openAction;
+    QAction *saveAction;
+    QAction *exportAction;
+
 
     QAction *addAction;
     QAction *deleteAction;
