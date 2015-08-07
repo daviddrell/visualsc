@@ -2,6 +2,7 @@
 #define CWTRANSITION_H
 
 #include <QString>
+#include "sctransition.h"
 
 // a transition in the code writer will have its own slot labeled Event_eventName()
 // this slot will also emit a signal labeled RelaySlot_Event_eventName() to alert anyone connected to this event
@@ -30,13 +31,18 @@
 class CWTransition
 {
 public:
-    CWTransition(QString theEventName, QString theRelaySignalName, QString targetName);
+
+    SCTransition* getTransition();
+
+    CWTransition(SCTransition* trans,QString theEventName, QString theRelaySignalName, QString targetName);
     ~CWTransition();
 
     QString _eventName;      // Event_eventName              public slot that transition calls, the "event" attribute value in a transition
     QString _relaySignal;    // RelaySlot_Event_eventName    the signal corresponding to the transiton's slot
 
     QString _targetName;
+
+    SCTransition* _transModel;
 };
 
 #endif // CWTRANSITION_H

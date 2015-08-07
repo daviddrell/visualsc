@@ -34,6 +34,7 @@
 
 QString MainWindow::_keyLastFilePath = QString("lastFilePath");
 QString MainWindow::_codeLastFilePath =QString("codeLastFilePath");
+QString MainWindow::_lastImportFilePath = QString("lastImportFilePath");
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -206,22 +207,6 @@ void MainWindow::handleFileOpenClick()
 
     emit reset();
 
-    QList<SCState*> states;
-    _project->getDM()->getAllStates(states);
-
-    while(states.size()!=0)
-    {
-        for(int i = 0; i < states.size(); i++)
-        {
-            qDebug() << "state was not deleted: "<<states.at(i)->objectName();
-        }
-
-        delay();
-
-        states.clear();
-        _project->getDM()->getAllStates(states);
-    }
-
     emit open(fileName);
 
 
@@ -360,3 +345,24 @@ void MainWindow::handleExportCodeClick()
 
 
 
+
+void MainWindow::on_actionImport_triggered()
+{
+    QString prevFilePath=QDir::homePath();
+    QString fileName;
+
+    if( _settings->contains(_lastImportFilePath))
+    {
+        prevFilePath = _settings->value(_lastImportFilePath).toString();
+    }
+
+    fileName = QFileDialog::getOpenFileName(this, tr("Import SCXML File"), prevFilePath, tr("SCXML Files (*.scxml)"));
+    _settings->setValue(_lastImportFilePath, fileName);
+
+    SCState* current = _formEditorWindow->getCurrentlySelectedState();
+
+    if(current)
+        _project->getDM()->importFile(current,fileName);
+
+
+}

@@ -25,9 +25,9 @@ CWStateMachine::CWStateMachine(SCState *state):
         //QString finishedRelaySlot;  // Slot_StateFinished_stateName     A parallel StateMachine's private slot that is called when finished is emitted from all of its children states
         //QString finishedRelaySignal;// Signal_StateFinished_stateName   A parallel StateMachine's public signal that is emitted when finished is emitted from all of its children states
 
-        _finishedRelaySlot = "Slot_StateFinished"+stateName+"()";
-        _finishedRelaySignal = "Signal_StateFinished"+stateName+"()";
-        _parallel = true;
+//        _finishedRelaySlot = "Slot_StateFinished"+stateName+"()";
+//        _finishedRelaySignal = "Signal_StateFinished"+stateName+"()";
+//        _parallel = true;
     }
     else
     {
@@ -173,7 +173,7 @@ void CWStateMachine::createSignalsAndSlots()
             targetName = "_"+toCamel(trans->targetState()->getName())+"_"+trans->targetState()->getUidFirstName();
 
             // create a new codewriter transition and link them with the state's Transition QHash
-            cwTransition = new CWTransition(eventName, relaySignal, targetName);
+            cwTransition = new CWTransition(trans, eventName, relaySignal, targetName);
             cwState->insertTransition( cwTransition);
         }
 

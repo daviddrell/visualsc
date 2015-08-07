@@ -272,6 +272,11 @@ void SCTransition::setAttributeValue(QString key, QString value)
     }
 }
 
+bool SCTransition::isConnectToFinished()
+{
+    return (attributes.value("connectToFinished")->asString()=="true");
+}
+
 void SCTransition::deleteSafely()
 {
     emit markedForDeletion(this);

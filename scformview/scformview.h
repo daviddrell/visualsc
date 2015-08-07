@@ -88,6 +88,9 @@ public:
     void highlightRootItem();
     void highlightPreviousItem();
     void setProject(SMProject*);
+
+    SCState* getCurrentlySelectedState();
+
 signals:
     void openClick();
     void exportClick();

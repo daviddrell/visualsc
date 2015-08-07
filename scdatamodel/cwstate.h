@@ -45,8 +45,6 @@ public:
 
     QString _readyRelaySignal;   // Signal_StateReady_stateName      signal reserved for the inital state of this machine
 
-    QString _finishedRelaySlot;
-    QString _finishedRelaySignal;   // Signal_StateFinished_stateName public signal that is connected to a private finished signal. used for parallel states.
 
     QString toCamel(QString);
 

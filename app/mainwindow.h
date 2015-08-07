@@ -53,8 +53,10 @@ private:
 
     SMProject *_project;
     QSettings *_settings;
+    static QString _lastImportFilePath;
     static QString _keyLastFilePath;
     static QString _codeLastFilePath;
+
     SCFormView *_formEditorWindow;
     TextFormatToolBar *_textFormatToolBar;
 
@@ -67,6 +69,7 @@ private slots:
     void handleExportCodeClick();
     void handleNewClick();
     void handleReadInputFileDone(bool,QStringList);
+    void on_actionImport_triggered();
 
 };
 

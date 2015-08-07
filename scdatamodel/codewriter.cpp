@@ -9,29 +9,8 @@ CodeWriter::CodeWriter(SCState* rootMachine, QString classNameString,QString cFi
     _rootMachine(rootMachine),
     className(classNameString)
 {
-    //_sAndS = new QHash<SCState*, QHash<QString, QString> *>();
-    //_stateToName = new QHash<SCState*, QString>();
-    //QStringList qsl = cFileName.split("/");
-   //QString fName = qsl.at(qsl.size()-1);
-    //className = fName.mid(0,fName.size()-4);    // get the class name out of the entire file name
-
-    //className = classNameString;
-
-    qDebug() << "the class name is " << className;
-   // cOut = new QTextStream(&cFile);
-  //  hOut = new QTextStream(&hFile);
-/*
-    stateMachineName = "_"+toCamel(_rootMachine->attributes.value("name")->asString());
-    CWState* root = new CWState(stateMachineName,"","","","","","");
-    root->_readyRelaySignal = "Signal_StateReady"+stateMachineName+"()";
-    //_states.insert(_rootMachine, root);
-    _stateMachines.insert(_rootMachine, root);*/
 
 
-
-
-    //CWStateMachine* root = new CWStateMachine(_rootMachine, true);
-    //_machineHash.insert(_rootMachine, root);
 }
 
 void CodeWriter::createStateMachines()
@@ -79,64 +58,111 @@ void CodeWriter::cWriteConstructor()
     {
         SCState* machine = _machines.at(i);
         CWStateMachine* cwsm = _machineHash.value(machine);
-        //cPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
         init.append("//////// State Machine: "+cwsm->_stateName+" ////////");
         //cOut<<QString("\b");
 
-        if(cwsm->isParallel())
+        // create this as a QStateMachine
+        if(machine == _rootMachine)
         {
-            //cPrintln(cwsm->_stateName+"(new QStateMachine(QState::ParallelStates)),",1);
-            init.append(QString(cwsm->_stateName+"(new QStateMachine(QState::ParallelStates)),"));
+            if(cwsm->isParallel())
+            {
+                init.append(QString(cwsm->_stateName+"(new QStateMachine(QState::ParallelStates, this)),"));
+            }
+            else
+            {
+                init.append(QString(cwsm->_stateName+"(new QStateMachine(this)),"));
+            }
         }
-        else
-        {
-            //cPrintln(cwsm->_stateName+"(new QStateMachine(this)),",1);
-            init.append(QString(cwsm->_stateName+"(new QStateMachine(this)),"));
-        }
-
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             // initialize all direct descendants of this state machine
             CWState* cws = cwsm->_states.at(k);
 
-            // do not initialize again if this state is a state machine
-            if(cws->getState()->isStateMachine())
-            {
 
-                //cPrintln("// child initialized elsewhere: QStateMachine* "+cws->_stateName+" ",1);
-                init.append(QString("// child initialized elsewhere: QStateMachine* "+cws->_stateName+" "));
-            }
-            else    // this is not a state machine
+            if(machine==_rootMachine)
             {
+                if(cws->getState()->isFinal())
                 {
-                    if(cwsm->isParallel())
-                    {
-                        if(cws->getState()->isFinal())
-                        {
-                           // cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates)),",1);
-                            init.append(QString(cws->_stateName+"(new QFinalState(QState::ParallelStates)),"));
-                        }
-                        else
-                        {
-                           // cPrintln(cws->_stateName+"(new QState(QState::ParallelStates)),",1);
-                            init.append(QString(cws->_stateName+"(new QState(QState::ParallelStates)),"));
-                        }
-                    }
+
+                    if(cws->getState()->isParallel())
+                       init.append(cws->_stateName+"(new QFinalState(QState::ParallelStates)),");
+
                     else
-                    {
-                        if(cws->getState()->isFinal())
-                        {
-                           // cPrintln(cws->_stateName+"(new QFinalState()),",1);
-                            init.append(QString(cws->_stateName+"(new QFinalState()),"));
-                        }
-                        else
-                        {
-                           // cPrintln(cws->_stateName+"(new QState()),",1);
-                            init.append(QString(cws->_stateName+"(new QState()),"));
-                        }
-                    }
+                        init.append(cws->_stateName+"(new QFinalState("+")),");
+                }
+                else
+                {
+                    if(cws->getState()->isParallel())
+                        init.append(cws->_stateName+"(new QState(QState::ParallelStates)),");
+
+                    else
+                        init.append(cws->_stateName+"(new QState("+")),");
                 }
             }
+            else
+            {
+
+                if(cws->getState()->isFinal())
+                {
+                    if(cws->getState()->isParallel())
+                        init.append(cws->_stateName+"(new QFinalState(QState::ParallelStates, "+cwsm->_stateName+")),");
+
+                    else
+                        init.append(cws->_stateName+"(new QFinalState("+cwsm->_stateName+")),");
+
+                }
+                else
+                {
+                    if(cws->getState()->isParallel())
+                        init.append(cws->_stateName+"(new QState(QState::ParallelStates, "+cwsm->_stateName+")),");
+
+                    else
+                        init.append(cws->_stateName+"(new QState("+cwsm->_stateName+")),");
+                }
+
+            }
+
+
+
+//            // do not initialize again if this state is a state machine
+//            if(cws->getState()->isStateMachine())
+//            {
+
+//                //cPrintln("// child initialized elsewhere: QState* "+cws->_stateName+" ",1);
+//                //init.append(QString("// child state machine initialized elsewhere: QState* "+cws->_stateName+" "));
+//                //init.append(cwsm->_stateName+"(new QState()),");
+//            }
+//            else    // this is not a state machine
+//            {
+//                {
+//                    if(cwsm->isParallel())
+//                    {
+//                        if(cws->getState()->isFinal())
+//                        {
+//                           // cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates)),",1);
+//                            init.append(QString(cws->_stateName+"(new QFinalState(QState::ParallelStates)),"));
+//                        }
+//                        else
+//                        {
+//                           // cPrintln(cws->_stateName+"(new QState(QState::ParallelStates)),",1);
+//                            init.append(QString(cws->_stateName+"(new QState(QState::ParallelStates)),"));
+//                        }
+//                    }
+//                    else
+//                    {
+//                        if(cws->getState()->isFinal())
+//                        {
+//                           // cPrintln(cws->_stateName+"(new QFinalState()),",1);
+//                            init.append(QString(cws->_stateName+"(new QFinalState()),"));
+//                        }
+//                        else
+//                        {
+//                           // cPrintln(cws->_stateName+"(new QState()),",1);
+//                            init.append(QString(cws->_stateName+"(new QState()),"));
+//                        }
+//                    }
+//                }
+//            }
 
         }
        // cPrintln("");
@@ -183,15 +209,20 @@ void CodeWriter::cWriteConstructor()
         {
             CWState* cws = cwsm->_states.at(k);
 
-            cPrintln(cwsm->_stateName+"->addState("+cws->_stateName+");",1);
+
+            // only the root machine adds states
+            if(machine == _rootMachine)
+                cPrintln(cwsm->_stateName+"->addState("+cws->_stateName+");",1);
+
+
             if(cws->getState()->isInitial()&&!cwsm->isParallel())
             {
                 cPrintln(cwsm->_stateName+"->setInitialState("+cws->_stateName+");",1);
             }
         }
-        cPrintln("\n//",1);
-        cPrintln("//    add transitions for the QStates using the transitions' private relay signals",1);
-        cPrintln("//",1);
+        //cPrintln("\n//",1);
+        cPrintln("\n//    Add transitions for the QStates using the transitions' private relay signals",1);
+        //cPrintln("//",1);
 
 
 
@@ -202,7 +233,19 @@ void CodeWriter::cWriteConstructor()
             for(int x = 0; x < cws->getTransitions().size(); x++)
             {
                 CWTransition* cwt = cws->getTransitions().at(x);
-                cPrintln(cws->_stateName+"->addTransition(this, SIGNAL("+cwt->_relaySignal+"),"+cwt->_targetName+");",1);
+                cPrintln(cws->_stateName+"->addTransition(this, SIGNAL("+cwt->_relaySignal+"), "+cwt->_targetName+");",1);
+
+
+                // for every out transition, check the connectToFinishedAttribute, and connect the finished signal of the state
+
+
+               if(cwt->getTransition()->isConnectToFinished())
+               {
+                   cPrintln(cws->_stateName+"->addTransition(this, SIGNAL(finished()), "+cwt->_targetName+");",1);
+                   //cPrintln("connect("+cws->_stateName+", SIGNAL(finished()), this, SLOT("+cwt->_eventName+"));",1);
+               }
+
+
             }
         }
 
@@ -214,10 +257,10 @@ void CodeWriter::cWriteConstructor()
         cPrintln("\n//    Propogate the private QState signals to public signals",1);
         cPrintln("connect("+cwsm->_stateName+", SIGNAL(started()), this, SIGNAL("+cwsm->_readyRelaySignal+"));",1);
 
-        if(cwsm->isParallel())
-        {
-             cPrintln("connect("+cwsm->_stateName+", SIGNAL(finished()), this, SIGNAL("+cwsm->_finishedRelaySignal+"));",1);
-        }
+//        if(cwsm->isParallel())
+//        {
+//             cPrintln("connect("+cwsm->_stateName+", SIGNAL(finished()), this, SIGNAL("+cwsm->_finishedRelaySignal+"));",1);
+//        }
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
@@ -231,16 +274,16 @@ void CodeWriter::cWriteConstructor()
         // Connect the private QState entry/exit signals to their own private entry/exit slots
         cPrintln("\n//    Connect the private QState signals to private slots for entry/exit handlers",1);
 
-        if(cwsm->isParallel())
-        {
-             cPrintln("connect("+cwsm->_stateName+", SIGNAL(finished()), this, SLOT("+cwsm->_finishedRelaySlot+"));",1);
-        }
+        //if(cwsm->isParallel())
+
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             CWState* cws = cwsm->_states.at(k);
             cPrintln("connect("+cws->_stateName+", SIGNAL(entered()), this, SLOT("+cws->_entryRelaySlot+"));",1);
             cPrintln("connect("+cws->_stateName+", SIGNAL(exited()), this, SLOT("+cws->_exitRelaySlot+"));",1);
+
+
         }
 
 
@@ -265,7 +308,7 @@ void CodeWriter::cWriteEventSlots()
 {
     cPrintln("//    PUBLIC");
     cPrintln("//    these functions connect external Event slots to internal signals to drive the inputs to the state machine");
-    cPrintln("//");
+    cPrintln("//    Each State Machine Section shows all transitions between its direct children");
 
     // for every state machine
     for(int i = 0 ; i < _machines.size(); i++)
@@ -275,10 +318,13 @@ void CodeWriter::cWriteEventSlots()
         CWStateMachine* cwsm = _machineHash.value(machine);
         cPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
 
-        cPrintln("void "+className+"::Event_startMachine"+cwsm->_stateName+"()");
-        cPrintln("{");
-        cPrintln(cwsm->_stateName+"->start();",1);
-        cPrintln("}\n");
+        if(machine==_rootMachine)
+        {
+            cPrintln("void "+className+"::Event_startMachine"+cwsm->_stateName+"()");
+            cPrintln("{");
+            cPrintln(cwsm->_stateName+"->start();",1);
+            cPrintln("}\n");
+        }
 
 
         // write the public event slots for every out transition of each state
@@ -312,18 +358,18 @@ void CodeWriter::cWriteEntryExitSlots()
         CWStateMachine* cwsm = _machineHash.value(machine);
         cPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
 
-        // if this is a parallel state machine, create a public slot that corresponds to its finished
-        if(cwsm->isParallel())
-        {
-            cPrintln("void "+className+"::"+cwsm->_finishedRelaySlot+"");
-            cPrintln("{");
-            for(int k = 0; k < cwsm->_finishedTransitions.size(); k++)
-            {
-                SCTransition* trans = cwsm->_finishedTransitions.at(k);
-                cPrintln("Event_"+toCamel(trans->getEventName())+"_"+trans->getUidFirstName()+"();",1);
-            }
-            cPrintln("}\n");
-        }
+//        // if this is a parallel state machine, create a public slot that corresponds to its finished
+//        if(cwsm->isParallel())
+//        {
+//            cPrintln("void "+className+"::"+cwsm->_finishedRelaySlot+"");
+//            cPrintln("{");
+//            for(int k = 0; k < cwsm->_finishedTransitions.size(); k++)
+//            {
+//                SCTransition* trans = cwsm->_finishedTransitions.at(k);
+//                cPrintln("Event_"+toCamel(trans->getEventName())+"_"+trans->getUidFirstName()+"();",1);
+//            }
+//            cPrintln("}\n");
+//        }
 
         // for every direct child state, write the private entry/exit slots for every entry/exit action
         for(int k = 0; k < cwsm->_states.size(); k ++)
@@ -702,11 +748,11 @@ void CodeWriter::hWriteActionRelaySlots()
         CWStateMachine* cwsm = _machineHash.value(machine);
         hPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
 
-        // if this is a parallel state machine, create a public slot that corresponds to its finished
-        if(cwsm->isParallel())
-        {
-            hPrintln("void "+cwsm->_finishedRelaySlot+";",1);
-        }
+//        // if this is a parallel state machine, create a public slot that corresponds to its finished
+//        if(cwsm->isParallel())
+//        {
+//            hPrintln("void "+cwsm->_finishedRelaySlot+";",1);
+//        }
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
@@ -736,24 +782,29 @@ void CodeWriter::hWriteStates()
         SCState* machine = _machines.at(i);
         CWStateMachine* cwsm = _machineHash.value(machine);
         hPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
+        // if this is the root machine, write QStateMachine
 
-        hPrintln("QStateMachine*    "+cwsm->_stateName+";",1);
+        if(machine == _rootMachine)
+        {
+            hPrintln("QStateMachine*    "+cwsm->_stateName+";",1);
+        }
+        else
+        {
+            hPrintln("// child QState declared elsewhere "+cwsm->_stateName,1);
+        }
+
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             CWState* cws = cwsm->_states.at(k);
-
-            // do not write another member if its a state machine
-            if(!cws->getState()->isStateMachine())
+            if(cws->getState()->isFinal())
             {
-                if(cws->getState()->isFinal())
-                {
-                    hPrintln("QFinalState*    "+cws->_stateName+";",1);
-                }
-                else
-                {
-                    hPrintln("QState*    "+ cws->_stateName+";",1);
-                }
+                hPrintln("QFinalState*    "+cws->_stateName+";",1);
             }
+            else
+            {
+                hPrintln("QState*    "+ cws->_stateName+";",1);
+            }
+
         }
         hPrintln("");
     }

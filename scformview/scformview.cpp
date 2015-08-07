@@ -2827,7 +2827,16 @@ void SCFormView::handleNewRootMachine(SCState*)
     this->initTree();
 }
 
+SCState* SCFormView::getCurrentlySelectedState()
+{
+    if(!_currentlySelected->isState())
+    {
+        sendMessage("Error", "Please select a state");
+        return NULL;
+    }
 
+    return _currentlySelected->getState();
+}
 
 /**
  * @brief SCFormView::createActions
@@ -2898,7 +2907,7 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
 //    connect(saveAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileSaveClick()));
     connect(saveAction, SIGNAL(triggered()),  this, SIGNAL(saveClick()));
 
-    exportAction = new QAction(tr("E&xport"), this);
+    exportAction = new QAction(tr("E&xport to Code"), this);
     exportAction->setShortcut(tr("Ctrl+E"));
     exportAction->setStatusTip(tr("Export to .cpp & .h"));
 //    connect(exportAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileExportClick()));
@@ -2909,7 +2918,7 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     exitAction->setStatusTip(tr("Quit VisualSC Editor"));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
 
-    importAction = new QAction(tr("I&mport"), this);
+    importAction = new QAction(tr("I&mport .SCXML"), this);
     importAction->setShortcut(tr("Ctrl+I"));
     importAction->setStatusTip(tr("Import an SCXML state machine into the selected State"));
     connect(importAction, SIGNAL(triggered()), this, SLOT(import()));

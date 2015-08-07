@@ -60,6 +60,8 @@ public:
 
     SCState* parentSCState();
 
+
+    bool isConnectToFinished();
     void deleteSafely();
     void setUid(QString);
     QString getUid();
