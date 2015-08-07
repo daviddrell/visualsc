@@ -120,7 +120,15 @@ MainWindow::MainWindow(QWidget *parent) :
     // _project->initNewSM(); moved to constructor
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
     _formEditorWindow = new SCFormView(0, _project->getDM());
+   // _formEditorWindow->setProject(_project);
+    connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
+    connect(_formEditorWindow, SIGNAL(openClick()), this, SLOT(handleFileOpenClick()));
+    connect(_formEditorWindow, SIGNAL(saveClick()), this, SLOT(handleFileSaveClick()));
+
+    connect(_formEditorWindow, SIGNAL(exportClick()), this, SLOT(handleExportCodeClick()));
+
     _formEditorWindow->show();
+
 
 
     connect(this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));

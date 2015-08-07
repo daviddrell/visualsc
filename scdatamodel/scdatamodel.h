@@ -29,6 +29,7 @@
 #include <QXmlStreamWriter>
 #include <QTextStream>
 #include <codewriter.h>
+#include <QSettings>
 
 class QGraphicsScene;
 
@@ -74,7 +75,10 @@ class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 public:
 
 
-
+    QSettings* _settings;
+    QString _lastSavePath;
+    QString _lastImportPath;
+    QString _lastExportPath;
     void connectDataModel();
     void reset();
     static SCDataModel * singleton();

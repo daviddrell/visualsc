@@ -2770,6 +2770,34 @@ void SCFormView::viewKeybinds()
 
 
 
+
+
+
+}
+
+void SCFormView::setProject(SMProject *pj)
+{
+    _project = pj;
+}
+
+void SCFormView::save()
+{
+
+}
+
+void SCFormView::newClicked()
+{
+    _dm->reset();
+
+}
+void SCFormView::exportClicked()
+{
+
+}
+
+void SCFormView::open()
+{
+
 }
 
 void SCFormView::import()
@@ -2798,6 +2826,7 @@ void SCFormView::handleNewRootMachine(SCState*)
     qDebug() << "SCFormView::handleNewRootMachine";
     this->initTree();
 }
+
 
 
 /**
@@ -2853,22 +2882,27 @@ void SCFormView::createActions()
     newAction = new QAction(tr("N&ew"), this);
     newAction->setShortcut(tr("Ctrl+N"));
     newAction->setStatusTip(tr("Create a new State Machine from scratch"));
-    connect(newAction, SIGNAL(triggered()), this, SLOT(newClicked()));
+    //connect(newAction, SIGNAL(triggered()),  this->_project, SLOT(handleNewClick()));
+connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
 
     openAction = new QAction(tr("O&pen"), this);
     openAction->setShortcut(tr("Ctrl+O"));
     openAction->setStatusTip(tr("Open an .SCXML file"));
-    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+    //connect(openAction, SIGNAL(triggered()), this->_project, SLOT(handleFileOpenClick()));
+    connect(openAction, SIGNAL(triggered()), this, SIGNAL(openClick()));
+
 
     saveAction = new QAction(tr("S&ave"), this);
     saveAction->setShortcut(tr("Ctrl+S"));
     saveAction->setStatusTip(tr("Save this State Machine to an .SCXML"));
-    connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
+//    connect(saveAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileSaveClick()));
+    connect(saveAction, SIGNAL(triggered()),  this, SIGNAL(saveClick()));
 
     exportAction = new QAction(tr("E&xport"), this);
     exportAction->setShortcut(tr("Ctrl+E"));
     exportAction->setStatusTip(tr("Export to .cpp & .h"));
-//    connect(exportAction, SIGNAL(triggered()),
+//    connect(exportAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileExportClick()));
+    connect(exportAction, SIGNAL(triggered()),  this, SIGNAL(exportClick()));
 
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
@@ -2943,8 +2977,13 @@ void SCFormView::handleBoldChanged()
 void SCFormView::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(newAction);
+    fileMenu->addAction(openAction);
+    fileMenu->addAction(saveAction);
+    fileMenu->addSeparator();
     fileMenu->addAction(importAction);
-    fileMenu->addAction(exitAction);
+    fileMenu->addAction(exportAction);
+    //fileMenu->addAction(exitAction);
 
 
     itemMenu = menuBar()->addMenu(tr("&Item"));

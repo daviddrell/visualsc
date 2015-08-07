@@ -40,8 +40,10 @@ SCDataModel::SCDataModel(QObject * parent) :
     _scene(0)
 {
     _reader.setDataModel(this);
+    _settings = new QSettings(this);
 
 }
+
 
 /**
  * @brief SCDataModel::connectDataModel

@@ -37,7 +37,6 @@
 #include "customtablewidgetitem.h"
 
 
-
 class StateSelectionWindow;
 
 
@@ -61,6 +60,7 @@ class QTableWidget;
 class QLabel;
 class SCTextBlock;
 class SCItem;
+class SMProject;
 
 QT_END_NAMESPACE
 
@@ -87,6 +87,13 @@ public:
     void reset();
     void highlightRootItem();
     void highlightPreviousItem();
+    void setProject(SMProject*);
+signals:
+    void openClick();
+    void exportClick();
+    void importClick();
+    void saveClick();
+    void newClick();
 
 private slots:
 
@@ -101,6 +108,11 @@ private slots:
     void bringToFront();
     void sendToBack();
     void import();
+    void newClicked();
+    void open();
+    void save();
+    void exportClicked();
+
     void insertTransition();
     void insertState();
     void textInserted(QGraphicsTextItem *item);
@@ -320,7 +332,7 @@ private:
     QHash<SCItem*, FVItem*> _items;
     //QList<FVItem*> _items;
 
-
+    SMProject* _project;
 
 };
 
