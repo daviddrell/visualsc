@@ -64,6 +64,9 @@ public slots:
     void handleParentStateGraphicMoved(QPointF);
     void handleTargetStateGraphicMoved(QPointF);
 
+    void handleParentStateGraphicReleased();
+    void handleTargetStateGraphicReleased();
+
     void handleParentStateGraphicResized(QRectF,QRectF, int);
     void handleGrandParentStateGraphicResized(QRectF, QRectF, int);
     //void handleParentStateGraphicResized(qreal, qreal, qreal, qreal);

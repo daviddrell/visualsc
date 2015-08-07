@@ -51,9 +51,13 @@ public:
     void setPosSnap(qreal x, qreal y);
 //setPosNoSnap(QPointF);
 //    void setPosNoSnap(qreal x, qreal y);
-    void straightenLines(ElbowGrabber*);
+    void straightenLines();
     int getZone(qreal);
+    int getZone(QPointF);
     qreal distance(ElbowGrabber* one, ElbowGrabber* two);
+    qreal distanceX(QPointF, QPointF);
+    qreal distanceY(QPointF, QPointF);
+
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
     void forceHoverEnterEvent();

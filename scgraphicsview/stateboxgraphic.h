@@ -112,7 +112,10 @@ public slots:
 
 
 private:
-
+    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
+    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+    virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     QRectF* getBufferedBoxRect(qreal buffer,qreal offset);
     double xDistance(QPointF, QPointF);
     double yDistance(QPointF, QPointF);

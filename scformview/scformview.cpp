@@ -2794,13 +2794,13 @@ void SCFormView::createActions()
 {
 
     insertStateAction = new QAction(QIcon(":/SCFormView/cardboardboxnew.png"), tr("Insert State"), this);
-    insertStateAction->setShortcut(tr("S"));
+    insertStateAction->setShortcut(tr("Ctrl+Q"));
     insertStateAction->setStatusTip(tr("Insert State"));
     connect(insertStateAction, SIGNAL(triggered()), this, SLOT(insertState()));
 
 
     insertTransitionAction = new QAction(QIcon(":/SCFormView/rightarrowhollownew.png"), tr("Insert Transition"), this);
-    insertTransitionAction->setShortcut(tr("T"));
+    insertTransitionAction->setShortcut(tr("Ctrl+W"));
     insertTransitionAction->setStatusTip(tr("Insert Transition"));
     connect(insertTransitionAction, SIGNAL(triggered()), this, SLOT(insertTransition()));
 

@@ -108,6 +108,8 @@ signals:
     void stateBoxMoved(QPointF);    // this signal activates when the statebox graphic is moved or resized to alert the transition graphic to be updated as to remained anchored to its target state. Although the sink anchor is still a child of the source state graphic, it should behave like a child of its target state.
     void stateBoxResized(QRectF oldBox, QRectF newBox, int corner);
 
+    void stateBoxReleased();
+
 protected:
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
@@ -121,8 +123,8 @@ protected:
     int _YcornerGrabBuffer;
     qreal   _drawingWidth;
     qreal   _drawingHeight;
-    qreal   _drawingOrigenX;
-    qreal   _drawingOrigenY;
+    qreal   _drawingOriginX;
+    qreal   _drawingOriginY;
     bool    _isHovered;
     bool    _isHighlighted; ///< highlighting is used to indicate visually a group of objects that are related when one of the group is selected
     ShowBoxStyle     _showBoxStyle;
@@ -134,6 +136,20 @@ protected:
     bool isBetween(qreal start, qreal end, qreal point);
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
+    bool _keepInsideParent;
+    qreal   _width;
+    qreal   _height;
+
+    QPointF _cornerDragStart;
+
+
+
+    CornerGrabber*  _corners[4];// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
+
+    void setCornerPositions();
+    void adjustDrawingSize(int x, int y);
+
+    int getHoveredCorner();
 
 private:
 
@@ -153,10 +169,7 @@ private:
     virtual void mousePressEvent(QGraphicsSceneDragDropEvent *event);
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
-    void setCornerPositions();
-    void adjustDrawingSize(int x, int y);
 
-    int getHoveredCorner();
 
 
 
@@ -164,17 +177,6 @@ private:
     //private data
 
 
-
-
-    bool _keepInsideParent;
-    qreal   _width;
-    qreal   _height;
-
-    QPointF _cornerDragStart;
-
-
-
-    CornerGrabber*  _corners[4];// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
 
 
 

@@ -4,7 +4,8 @@
 #include <QDebug>
 
 #define PI                  3.14159265359
-#define ANGLE_SNAP_DEGREE   11
+#define SNAP_ANGLE          11
+#define SNAP_DISTANCE       30
 
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys) :
     mouseDownX(0),
@@ -337,27 +338,36 @@ void ElbowGrabber::setAngle(int angle)
 void ElbowGrabber::setXSnap(qreal x)
 {
     QGraphicsItem::setX(x);
-    straightenLines(this);
+    straightenLines();
 }
 
 void ElbowGrabber::setYSnap(qreal y)
 {
     QGraphicsItem::setY(y);
-    straightenLines(this);
+    straightenLines();
 }
 
 void ElbowGrabber::setPosSnap(QPointF point)
 {
     QGraphicsItem::setPos(point);
-    straightenLines(this);
+    straightenLines();
 }
 
 void ElbowGrabber::setPosSnap(qreal x, qreal y)
 {
     QGraphicsItem::setPos(x,y);
-    straightenLines(this);
+    straightenLines();
 }
 
+qreal ElbowGrabber::distanceX(QPointF one, QPointF two)
+{
+    return fabs(one.x()-two.x());
+}
+
+qreal ElbowGrabber::distanceY(QPointF one, QPointF two)
+{
+    return fabs(one.y()-two.y());
+}
 
 qreal ElbowGrabber::distance(ElbowGrabber* one, ElbowGrabber* two)
 {
@@ -371,12 +381,42 @@ qreal ElbowGrabber::distance(ElbowGrabber* one, ElbowGrabber* two)
 
 int ElbowGrabber::getZone(qreal angle)
 {
-   if( angle > (90 - ANGLE_SNAP_DEGREE) && angle <= 90)
+   if( angle > (90 - SNAP_ANGLE) && angle <= 90)
        return Zone::VERTICAL;
-   else if( angle >= 0 && angle < ANGLE_SNAP_DEGREE)
+   else if( angle >= 0 && angle < SNAP_ANGLE)
        return Zone::FLAT;
 
    return Zone::ANGLED;
+}
+
+int ElbowGrabber::getZone(QPointF pos)
+{
+    qreal x = pos.x();
+    qreal y = pos.y();
+
+    qreal xDist = distanceX(this->pos(), pos);
+    qreal yDist = distanceY(this->pos(), pos);
+
+    bool xCross = xDist <= SNAP_DISTANCE;
+    bool yCross = yDist <= SNAP_DISTANCE;
+
+    if(xCross&&yCross)
+    {
+        return Zone::ANGLED;
+    }
+    else if(xCross )
+    {
+        // check if it is within a range
+        return Zone::VERTICAL;
+    }
+    else if(yCross)
+    {
+        return Zone::FLAT;
+    }
+    else
+    {
+        return Zone::ANGLED;
+    }
 }
 
 
@@ -387,8 +427,12 @@ int ElbowGrabber::getZone(qreal angle)
  * used to snap elbows to other elbows
  *
  */
-void ElbowGrabber::straightenLines(ElbowGrabber* mid)
+void ElbowGrabber::straightenLines()
 {
+
+    ElbowGrabber* mid = this;
+
+
 
     int leftZone = -1;
     int rightZone = -1;
@@ -408,10 +452,9 @@ void ElbowGrabber::straightenLines(ElbowGrabber* mid)
             qreal theta = atan(m);          // find the angle between the two points
             leftDeg = fabs(theta * 180/PI);
 
-            leftZone = getZone(leftDeg);
+            //leftZone = getZone(leftDeg);
+            leftZone = getZone(left->pos());
             //qDebug()<<"angle between left and mid is " << thetaDeg<<" in zone "<<zone;
-
-
         }
     }
 
@@ -426,7 +469,8 @@ void ElbowGrabber::straightenLines(ElbowGrabber* mid)
             qreal theta = atan(m);          // find the angle between the two points
             rightDeg = fabs(theta * 180/PI);
 
-            rightZone = getZone(rightDeg);
+            //rightZone = getZone(rightDeg);
+            rightZone = getZone(right->pos());
             //qDebug()<<"angle between mid and right is " << thetaDeg<<" in zone "<<zone;
 
         }
@@ -498,6 +542,11 @@ void ElbowGrabber::straightenLines(ElbowGrabber* mid)
             }
         }
     }
+
+    // if this is an anchor, ensure that it is still attached to its parent state box graphic
+    if(mid->isAnchor())
+        emit mid->anchorMoved(this->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic()->mapToScene(this->pos()));
+
 }
 
 void ElbowGrabber::updateArrowHead()

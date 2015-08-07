@@ -424,7 +424,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 //_cornerGrabbed = false;
 
                 elbow->setMouseState(ElbowGrabber::kMouseReleased);
-                elbow->straightenLines(elbow);
+                elbow->straightenLines();
                 QApplication::restoreOverrideCursor();
 
                 //straightenLines(elbow);
@@ -507,8 +507,8 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
             line->setMouseState(ElbowGrabber::kMouseReleased);
 
-           // straightenLines(line->getElbow(0));
-//            straightenLines(line->getElbow(1));
+            line->getElbow(0)->straightenLines();
+            line->getElbow(1)->straightenLines();
 
             QApplication::restoreOverrideCursor();
 
@@ -1003,21 +1003,6 @@ void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF ne
  */
 void TransitionGraphic::handleParentStateGraphicMoved(QPointF offset)
 {
-
-    // point will be the coorindate of the statebox after it moved.
-  //  QPointF difference =
-  //  qDebug()<<"the source state graphic has moved. must update the transition anchor" << point;
-    // point will be the difference.
-    //emit _anchors[1]->anchorMoved(_anchors[1]->mapToScene(_anchors[1]->pos()) + point);
-
-    /*
-    QPointF location = _anchors[1]->pos();
-    location-=point;
-    _anchors[1]->setPos(location);
-    updateLineSegments(_anchors[1]);
-    this->updateModel();
-    */
-
     for(int i = 1 ; i < _elbows.count(); i++)
     {
         QPointF location = _elbows[i]->pos();
@@ -1025,6 +1010,20 @@ void TransitionGraphic::handleParentStateGraphicMoved(QPointF offset)
         _elbows[i]->setPos(location);
         _elbows[i]->getSegment(0)->enclosePathInElbows();
     }
+    this->updateModel();
+}
+
+
+void TransitionGraphic::handleParentStateGraphicReleased()
+{
+    _anchors[0]->straightenLines();
+    this->updateModel();
+}
+
+
+void TransitionGraphic::handleTargetStateGraphicReleased()
+{
+    _anchors[1]->straightenLines();
     this->updateModel();
 }
 

@@ -392,6 +392,15 @@ void SCDataModel::openFile(QString fileName)
 
 }
 
+/**
+ * @brief SCDataModel::importFile
+ * @param parent
+ * @param fileName
+ *
+ *
+ * called when inserting a whole scxml file into the parent state
+ *
+ */
 void SCDataModel::importFile(SCState* parent,QString fileName)
 {
     _importedTransitions.clear();

@@ -68,8 +68,8 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _YcornerGrabBuffer(7),
         _drawingWidth(  _width -   _XcornerGrabBuffer),
         _drawingHeight( _height -  _YcornerGrabBuffer),
-        _drawingOrigenX( _XcornerGrabBuffer),
-        _drawingOrigenY( _YcornerGrabBuffer),
+        _drawingOriginX( _XcornerGrabBuffer),
+        _drawingOriginY( _YcornerGrabBuffer),
         _isHighlighted(false),
         _isHovered(false),
         _showBoxStyle(kWhenSelected),
@@ -103,8 +103,8 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
         _YcornerGrabBuffer(7),
         _drawingWidth(  _width -   _XcornerGrabBuffer),
         _drawingHeight( _height -  _YcornerGrabBuffer),
-        _drawingOrigenX( _XcornerGrabBuffer),
-        _drawingOrigenY( _YcornerGrabBuffer),
+        _drawingOriginX( _XcornerGrabBuffer),
+        _drawingOriginY( _YcornerGrabBuffer),
         _isHighlighted(false),
         _isHovered(false),
         _showBoxStyle(kWhenSelected),
@@ -567,7 +567,7 @@ bool SelectableBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * e
             //qDebug() <<"old box: " <<oldBox << "new Box: " << newBox;
             emit stateBoxResized(oldBox, newBox, corner);
         }
-        this->update();
+        //this->update();
     }
 
     return true;// true => do not send event to watched - we are finished with this event
@@ -939,10 +939,10 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 void SelectableBoxGraphic::setCornerPositions()
 {
 
-    _corners[0]->setPos(_drawingOrigenX, _drawingOrigenY);
-    _corners[1]->setPos(_drawingWidth,  _drawingOrigenY);
+    _corners[0]->setPos(_drawingOriginX, _drawingOriginY);
+    _corners[1]->setPos(_drawingWidth,  _drawingOriginY);
     _corners[2]->setPos(_drawingWidth , _drawingHeight);
-    _corners[3]->setPos(_drawingOrigenX, _drawingHeight);
+    _corners[3]->setPos(_drawingOriginX, _drawingHeight);
 
 }
 
@@ -976,8 +976,8 @@ QPointF SelectableBoxGraphic::getVisibleCenter()
 
 QRectF SelectableBoxGraphic::getUsableArea()
 {
-    int x0 = _drawingOrigenX + 2;
-    int y0 = _drawingOrigenY + 2;
+    int x0 = _drawingOriginX + 2;
+    int y0 = _drawingOriginY + 2;
     int width = _drawingWidth -2 ;
     int height = _drawingHeight -2;
 
@@ -990,19 +990,19 @@ QPointF SelectableBoxGraphic::getSideCenterPointInSceneCoord(int side)
     switch (side)
     {
     case NORTH:
-        return mapToScene( QPointF ( (_drawingOrigenX +  _drawingWidth)/2, _drawingOrigenY ));
+        return mapToScene( QPointF ( (_drawingOriginX +  _drawingWidth)/2, _drawingOriginY ));
         break;
 
     case EAST:
-        return  mapToScene( QPointF ( _drawingOrigenX +_drawingWidth, (_drawingOrigenY + _drawingHeight)/2));
+        return  mapToScene( QPointF ( _drawingOriginX +_drawingWidth, (_drawingOriginY + _drawingHeight)/2));
         break;
 
     case SOUTH:
-        return  mapToScene( QPointF ( (_drawingOrigenX +  _drawingWidth)/2,_drawingOrigenY +  _drawingHeight));
+        return  mapToScene( QPointF ( (_drawingOriginX +  _drawingWidth)/2,_drawingOriginY +  _drawingHeight));
         break;
 
     case WEST:
-        return  mapToScene( QPointF ( _drawingOrigenX, (_drawingOrigenY + _drawingHeight)/2));
+        return  mapToScene( QPointF ( _drawingOriginX, (_drawingOriginY + _drawingHeight)/2));
         break;
     }
 
@@ -1028,8 +1028,8 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
 
 
         QLinearGradient gradient;
-        gradient.setStart(_drawingOrigenX,_drawingOrigenY);
-        gradient.setFinalStop( _drawingWidth ,_drawingOrigenY);
+        gradient.setStart(_drawingOriginX,_drawingOriginY);
+        gradient.setFinalStop( _drawingWidth ,_drawingOriginY);
         QColor grey1(125,125,125,125);// starting color of the gradient - can play with the starting color and ,point since its not visible anyway
 
         // grey2 is ending color of the gradient - this is what will show up as the shadow. the last parameter is the alpha blend, its set
@@ -1049,7 +1049,7 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
         pen.setStyle(Qt::NoPen);
         painter->setPen(pen);
 
-        QPointF topLeft (_drawingOrigenX,_drawingOrigenX);
+        QPointF topLeft (_drawingOriginX,_drawingOriginX);
         QPointF bottomRight ( _drawingWidth , _drawingHeight);
 
         QRectF rect (topLeft, bottomRight);
@@ -1091,14 +1091,14 @@ void SelectableBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleO
 
     if ( _boxStyle == kSolidWithShadow )
     {
-        QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
+        QPointF topLeft2 (_drawingOriginX, _drawingOriginY);
         QPointF bottomRight2 ( _drawingWidth - shadowThickness, _drawingHeight - shadowThickness);
 
         rect2 = QRectF (topLeft2, bottomRight2);
     }
     else
     {
-        QPointF topLeft2 (_drawingOrigenX, _drawingOrigenY);
+        QPointF topLeft2 (_drawingOriginX, _drawingOriginY);
         QPointF bottomRight2 ( _drawingWidth, _drawingHeight);
 
         rect2 = QRectF (topLeft2, bottomRight2);

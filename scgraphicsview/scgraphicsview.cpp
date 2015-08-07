@@ -638,6 +638,9 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
 
+    // additionally snap the anchors when done moving the source and sink
+    connect(parentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
+    connect(targetGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleTargetStateGraphicReleased()));
 
     connect(transGraphic->getSourceAnchor(),SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
     connect(transGraphic->getSinkAnchor(),SIGNAL(anchorMoved(QPointF)),targetGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
