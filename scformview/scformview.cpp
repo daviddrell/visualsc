@@ -142,6 +142,8 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
     connect (_dm, SIGNAL(transitionsReadyToConnect(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));        // data model emits this signal for transitions when reading an scxml and all states and transitions have been loaded into the DM
     connect (_dm, SIGNAL(insertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));        // data model emits this signal for when a user inserts a new transition
 
+    connect(_dm, SIGNAL(newRootMachine(SCState*)), this, SLOT(handleNewRootMachine(SCState*)));
+
     // TODO make a handle new textblock for scformview
 
 
@@ -212,6 +214,8 @@ void SCFormView::highlightPreviousItem()
  * @brief SCFormView::reset
  *
  * clears out the tree view and property table and awaits the data model to update
+ *
+ * NOT CURRENTLY USED
  *
  */
 void SCFormView::reset()
@@ -858,7 +862,7 @@ void SCFormView::handleStateDeleted(QObject *s)
     delete fvItem;
 
     // reselect the top state as the selected item
-    highlightRootItem();
+ //   highlightRootItem();
 }
 
 QObject* SCFormView::getNeighborState(QObject*s)
@@ -1476,10 +1480,8 @@ void SCFormView::handleTreeViewItemChanged(QTreeWidgetItem * current, QTreeWidge
     }
     else
     {
-        qDebug() << "ERROR SCFormView::handleTreeViewItemChanged Current Item not an FVItem!!";
+        qDebug() << "ERROR SCFormView::handleTreeViewItemChanged Item does not exist!";
     }
-
-
 }
 
 /**
@@ -2782,6 +2784,19 @@ void SCFormView::import()
     QString fileName;
     fileName = QFileDialog::getOpenFileName(this, tr("Import SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
     _dm->importFile(_currentlySelected->getState(),fileName);
+}
+
+void SCFormView::handleReset()
+{
+    qDebug() << "SCFormView::handleReset";
+    //this->highlightRootItem();
+    //this->initTree();
+}
+
+void SCFormView::handleNewRootMachine(SCState*)
+{
+    qDebug() << "SCFormView::handleNewRootMachine";
+    this->initTree();
 }
 
 

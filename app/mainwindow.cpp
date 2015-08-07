@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include "scformview.h"
+#include <QTime>
 
 
 // adding comments to get the git repository
@@ -53,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect ( ui->actionSave, SIGNAL(triggered()), this, SLOT(handleFileSaveClick()));
     connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
+
 
 #ifdef ENABLE_TEXT_TOOL_BAR
     _textFormatToolBar = new TextFormatToolBar();
@@ -98,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
     */
 
     _project = new SMProject(  ui->centralWidget );
+    connect( this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
    // _project->initNewSM(); moved to constructor
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
     _formEditorWindow = new SCFormView(0, _project->getDM());
@@ -114,10 +117,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #ifndef AUTO_LOAD_FILE
     _project = new SMProject(  ui->centralWidget );
-   // _project->initNewSM(); moved to constructor
+    // _project->initNewSM(); moved to constructor
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
     _formEditorWindow = new SCFormView(0, _project->getDM());
     _formEditorWindow->show();
+
+
+    connect(this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
+    connect(this, SIGNAL(reset()), _formEditorWindow, SLOT(handleReset()));
+    connect(this, SIGNAL(open(QString)), _project->getDM(), SLOT(handleOpen(QString)));
+
 #endif
 
 }
@@ -129,12 +138,89 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+
+    QList<SCState*> states;
+    _project->getDM()->getAllStates(states);
+    qDebug()<<"delay num states: "  <<states.size();
+}
+
+void MainWindow::handleNewClick()
+{
+    emit reset();
+
+    // all states still exist
+  //  QList<SCState*> states;
+  //  _project->getDM()->getAllStates(states);
+   // _formEditorWindow->highlightRootItem();
+
+#if 0
+    _project->getDM()->reset(); // clean out the data model except for the root machine, this will cause the graphicsview and formview to reset as well
+    _formEditorWindow->highlightRootItem(); // select the root machine in the tree view
+  //  _formEditorWindow->reset();
+
+
+    if(false)
+    {
+        if ( _project)
+        {
+            delete _project;
+            _project = NULL;
+        }
+        _project = new SMProject(  ui->centralWidget );
+        //_project->initNewSM(); moved to constructor
+
+        ui->gridLayout->addWidget( _project->getQGraphicsView() );
+        //_formEditorWindow = new SCFormView(0, _project->getDM());
+        //_formEditorWindow->show();
+    }
+#endif
+}
+
 void MainWindow::handleFileOpenClick()
 {
 
-    // clear out the data model
-    _project->getDM()->reset();
 
+    QString prevFilePath=QDir::homePath();
+    QString fileName;
+
+    if( _settings->contains(_keyLastFilePath))
+    {
+        prevFilePath = _settings->value(_keyLastFilePath).toString();
+    }
+
+    fileName = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
+    _settings->setValue(_keyLastFilePath, fileName);
+
+    emit reset();
+
+    QList<SCState*> states;
+    _project->getDM()->getAllStates(states);
+
+    while(states.size()!=0)
+    {
+        for(int i = 0; i < states.size(); i++)
+        {
+            qDebug() << "state was not deleted: "<<states.at(i)->objectName();
+        }
+
+        delay();
+
+        states.clear();
+        _project->getDM()->getAllStates(states);
+    }
+
+    emit open(fileName);
+
+
+#if 0
+   // clear out the data model
+    _project->getDM()->reset();
+    _formEditorWindow->highlightRootItem(); // select the root machine in the tree view
     QString prevFilePath=QDir::homePath();
     QString fileName;
 
@@ -150,20 +236,30 @@ void MainWindow::handleFileOpenClick()
 
 
     //_formEditorWindow->reset();
-
-    // reselect the new root machine tree widget in the tree view
-    _formEditorWindow->highlightRootItem();
-
     //this->handleNewClick();
 
     // open the file
-    _project->getDM()->openFile(fileName);
+    QList<SCState*> states;
+    _project->getDM()->getAllStates(states);
+
+    while(states.size()!=0)
+    {
+        // clear out the data model
+        // _project->getDM()->reset();
+        //qDebug() << "\n";
+        for(int i = 0; i < states.size(); i++)
+        {
+            //states.at(i)->deleteLater();
+            qDebug() << "state was not deleted: "<<states.at(i)->objectName();
+        }
+    }
+    //_project->getDM()->openFile(fileName);
 
 
   //  _formEditorWindow->reset();
 
 
-
+#endif
 
 
 
@@ -255,27 +351,4 @@ void MainWindow::handleExportCodeClick()
 }
 
 
-void MainWindow::handleNewClick()
-{
 
-
-    _project->getDM()->reset(); // clean out the data model except for the root machine, this will cause the graphicsview and formview to reset as well
-    _formEditorWindow->highlightRootItem(); // select the root machine in the tree view
-  //  _formEditorWindow->reset();
-
-
-    if(false)
-    {
-        if ( _project)
-        {
-            delete _project;
-            _project = NULL;
-        }
-        _project = new SMProject(  ui->centralWidget );
-        //_project->initNewSM(); moved to constructor
-
-        ui->gridLayout->addWidget( _project->getQGraphicsView() );
-        //_formEditorWindow = new SCFormView(0, _project->getDM());
-        //_formEditorWindow->show();
-    }
-}

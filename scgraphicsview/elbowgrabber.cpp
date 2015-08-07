@@ -402,7 +402,11 @@ int ElbowGrabber::getZone(QPointF pos)
 
     if(xCross&&yCross)
     {
-        return Zone::ANGLED;
+        if(xDist < yDist)
+            return Zone::VERTICAL;
+        else
+            return Zone::FLAT;
+
     }
     else if(xCross )
     {

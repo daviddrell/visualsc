@@ -128,6 +128,8 @@ public:
 public slots:
     SCState* handleMakeANewState(SCState*, StateAttributes*);
     SCTransition* handleMakeANewTransition(SCState* source, TransitionAttributes*);
+    void handleReset();
+    void handleOpen(QString);
 
 signals:
     void openCompleted(bool sucess, QStringList message);
@@ -136,6 +138,7 @@ signals:
     void newTextBlockSignal(SCTransition*, QString);
     void transitionsReadyToConnect(SCTransition*);
     void insertNewTransitionSignal(SCTransition*);
+    void newRootMachine(SCState*);
 
 
 private slots:

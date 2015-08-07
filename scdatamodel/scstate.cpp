@@ -301,6 +301,7 @@ void SCState::deleteSafely()
     emit markedForDeletion(this);
     //this->removeAllTransitionsIn(); now handled by SCTransition
     this->deleteLater();
+    //this = NULL;
 }
 
 /**

@@ -44,6 +44,10 @@ public:
 
     // void keyPressEvent(QKeyEvent * e);
 
+signals:
+    void reset();
+    void open(QString);
+
 private:
     Ui::MainWindow *ui;
 
@@ -55,7 +59,7 @@ private:
     TextFormatToolBar *_textFormatToolBar;
 
 
-
+    void delay();
 
 private slots:
     void handleFileOpenClick();
@@ -63,6 +67,7 @@ private slots:
     void handleExportCodeClick();
     void handleNewClick();
     void handleReadInputFileDone(bool,QStringList);
+
 };
 
 #endif // MAINWINDOW_H

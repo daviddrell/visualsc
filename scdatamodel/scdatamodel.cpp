@@ -24,6 +24,9 @@
 #include <QMapIterator>
 #include <QGraphicsScene>
 #include <QUuid>
+#include <QEventLoop>
+#include <QTime>
+#include <QCoreApplication>
 
 SCDataModel::SCDataModel(QObject * parent) :
     QObject (parent),
@@ -125,17 +128,24 @@ void SCDataModel::reset()
     }
     _transitions.clear();
 
+    this->initializeEmptyStateMachine();
+    emit newRootMachine(_topState);
+    //_topState->deleteSafely();
+
+
     // reset the name of the state machine and alert the formview that this happened
-    _topState->attributes.value("name")->setValue("State Machine");
-    emit _topState->nameChangedInDataModel(_topState,"State Machine"); // connected to SCFormView::handleItemNameChangedInDataModel()
+ //   _topState->attributes.value("name")->setValue("State Machine");
+ //   emit _topState->nameChangedInDataModel(_topState,"State Machine"); // connected to SCFormView::handleItemNameChangedInDataModel()
 
     // generate another uid for the root machine
-    _topState->getStringAttr("uid")->setValue(QUuid::createUuid().toString());
+  //  _topState->getStringAttr("uid")->setValue(QUuid::createUuid().toString());
 
 
 
     //qDebug() << "AFTER A RESET, YOU HAVE " << _transitions.count() << " TRANSITIONS LISTED IN _transitions";
 }
+
+
 
 void SCDataModel::logError(QString message)
 {
@@ -592,6 +602,41 @@ SCTransition * SCDataModel::getTransitionByName(QString name)
     return NULL;
 }
 
+void SCDataModel::handleOpen(QString fileName)
+{
+    qDebug() << "SCDataModel::handleOpen";
+
+    QList<SCState*> states;
+    this->getAllStates(states);
+
+    while(states.size()!=0)
+    {
+        // clear out the data model
+        // _project->getDM()->reset();
+        //qDebug() << "\n";
+        for(int i = 0; i < states.size(); i++)
+        {
+            //states.at(i)->deleteLater();
+            qDebug() << "state was not deleted: "<<states.at(i)->objectName();
+        }
+        states.clear();
+
+        QTime dieTime= QTime::currentTime().addSecs(1);
+        while (QTime::currentTime() < dieTime)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+
+        this->getAllStates(states);
+    }
+
+    this->openFile(fileName);
+
+}
+
+void SCDataModel::handleReset()
+{
+    qDebug() << "SCDataModel::handleReset";
+    this->reset();
+}
 
 void SCDataModel::getAllStates(QList<SCState *>& list)
 {
