@@ -1,7 +1,7 @@
 #include "cwstatemachine.h"
 
-CWStateMachine::CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString theEntryAction, QString theExitAction):
-    CWState( theStateName, theEntryRelaySlot,  theExitRelaySlot,  theEntryRelaySignal, theExitRelaySignal, theEntryAction,  theExitAction)
+CWStateMachine::CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal):
+    CWState( theStateName, theEntryRelaySlot,  theExitRelaySlot,  theEntryRelaySignal, theExitRelaySignal)
 {
 
 }
@@ -138,25 +138,36 @@ void CWStateMachine::createSignalsAndSlots()
         entryRelaySlot =    "Slot_StateEntry" + stateName+"()";
         exitRelaySlot =     "Slot_StateExit"+ stateName+"()";
 
+        // create this codewriter state and link them using a QHash
+        //cwState = new CWState(stateName,entryRelaySlot,exitRelaySlot,entryRelaySignal,exitRelaySignal,entryAction,exitAction);
+        cwState = new CWState(stateName,entryRelaySlot,exitRelaySlot,entryRelaySignal,exitRelaySignal);
 
 
+        // add all entry actions
         entryAction = state->attributes.value("entryAction")->asString();
-
         if(!entryAction.isEmpty())
         {
-            qDebug()<<"writing entry action: " <<entryAction;
-            entryAction =   "EntryAction_"+toCamel(entryAction)+"()";
-            qDebug()<<"here's entry action: " <<entryAction;
+            QStringList entries = entryAction.split(",");
+            for(int i = 0; i < entries.size(); i++)
+            {
+                QString entry = "EntryAction_"+toCamel(entries.at(i))+"()";
+                cwState->addEntryAction(entry);
+            }
         }
 
+
+        // add all exit actions
         exitAction = state->attributes.value("exitAction")->asString();
         if(!exitAction.isEmpty())
         {
-            exitAction =    "ExitAction_" +toCamel(exitAction)+"()";
+            QStringList exits = exitAction.split(",");
+            for(int i = 0; i < exits.size(); i++)
+            {
+                QString exit = "ExitAction_" +toCamel(exits.at(i))+"()";
+                cwState->addExitAction(exit);
+            }
         }
 
-        // create this codewriter state and link them using a QHash
-        cwState = new CWState(stateName,entryRelaySlot,exitRelaySlot,entryRelaySignal,exitRelaySignal,entryAction,exitAction);  
 
         cwState->setState(state);   // give it a link back to its data model
         _states.append(cwState);

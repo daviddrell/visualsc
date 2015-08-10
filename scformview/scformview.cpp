@@ -1200,13 +1200,40 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
     int numRows = atts->size() - trans->doNotPrintSize();
     propertyTable->setRowCount(numRows);
 
+    // load the event property first
+    IAttribute* attr = atts->value("event");
+
+    CustomTableWidgetItem * propName = new CustomTableWidgetItem("event");
+    propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
+
+    CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
+    propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+
+    propertyTable->setItem(row, 0, propName);
+    propertyTable->setItem(row++, 1, propValue);
+
+
+    connectTransition(_currentlySelected->getTransition(), propValue, "event");
+
     while (i.hasNext())
     {
         QString key  = i.next().key();
 
         // only add the property if it's not in the do not display list
-        if(!trans->doNotPrint(key))
+        if(trans->doNotPrint(key))
         {
+
+        }
+        else if(key == "event")
+        {
+
+
+        }
+        else
+        {
+
+
+
             IAttribute* attr = atts->value(key);
 
             CustomTableWidgetItem * propName = new CustomTableWidgetItem(key);
@@ -1241,11 +1268,32 @@ void SCFormView::loadPropertyTable(SCState* state)
 
     int numRows = atts->count() - state->doNotPrintSize();
     propertyTable->setRowCount(numRows);
+
+    // add the name to the property table first
+
+    {
+        IAttribute* attr = atts->value("name");
+        CustomTableWidgetItem * propName = new CustomTableWidgetItem("name");
+        propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
+
+        CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
+        propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+
+        propertyTable->setItem(row, 0, propName);
+        propertyTable->setItem(row++, 1, propValue);
+
+        connectState(_currentlySelected->getState(), propValue, "name");
+    }
+
     while (i.hasNext())
     {
         QString key  = i.next().key();
 
         if(state->doNotPrint(key))
+        {
+
+        }
+        else if(key == "name")
         {
 
         }
@@ -1352,10 +1400,15 @@ void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, boo
     if(connect)
     {
         int row = 0;
+
+        // insert the name at the top
+
+
         QMapIterator<QString,IAttribute*> i(*atts);
         while (i.hasNext())
         {
             QString key  = i.next().key();
+
             IAttribute* attr = atts->value(key)  ;
 
             //connect ( attr, SIGNAL(changed(IAttribute*)), this, SLOT(handlePropertyChanged(IAttribute*)));

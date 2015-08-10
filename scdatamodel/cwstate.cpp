@@ -1,6 +1,13 @@
 #include "cwstate.h"
 
-CWState::CWState(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString theEntryAction, QString theExitAction):
+CWState::CWState(QString stateName, SCState* state):
+    _myState(state),
+    _stateName(stateName)
+{
+
+}
+
+CWState::CWState(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal):
     _myState(NULL)
 {
     _stateName = theStateName;
@@ -8,8 +15,8 @@ CWState::CWState(QString theStateName,QString theEntryRelaySlot, QString theExit
     _exitRelaySlot = theExitRelaySlot;
     _entryRelaySignal = theEntryRelaySignal;
     _exitRelaySignal = theExitRelaySignal;
-    _entryAction = theEntryAction;
-    _exitAction = theExitAction;
+//    _entryAction = theEntryAction;
+//    _exitAction = theExitAction;
 }
 
 CWState::CWState():
@@ -26,6 +33,16 @@ CWState::~CWState()
 SCState* CWState::getState()
 {
     return _myState;
+}
+
+void CWState::addEntryAction(QString entryAction)
+{
+    _entryActions.append(entryAction);
+}
+
+void CWState::addExitAction(QString exitAction)
+{
+    _exitActions.append(exitAction);
 }
 
 void CWState::setState(SCState * st)

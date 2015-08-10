@@ -7,7 +7,7 @@
 class CWStateMachine : public CWState
 {
 public:
-    CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString theEntryAction, QString theExitAction);
+    CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal);
     CWStateMachine(SCState* state);
    // CWStateMachine(SCState* state, bool isRoot);
     ~CWStateMachine();

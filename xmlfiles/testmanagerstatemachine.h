@@ -1,5 +1,6 @@
 // This header file was generated using VisualSC's Export Code Function
 
+// Visual Statechart is an open source project. Visit us at https://github.com/daviddrell/visualsc
 #ifndef TESTMANAGERSTATEMACHINE_H
 #define TESTMANAGERSTATEMACHINE_H
 
@@ -63,6 +64,14 @@ signals:
     //
     //////// State Machine: _testManagerStateMachine_97b850af ////////
     void EntryAction_startDownload();
+    void EntryAction_doADance();
+    void EntryAction_jump();
+    void EntryAction_slide();
+    void EntryAction_okay();
+    void ExitAction_wow();
+    void ExitAction_no();
+    void ExitAction_suchWow();
+    void ExitAction_amazing();
     void EntryAction_startTests();
 
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////

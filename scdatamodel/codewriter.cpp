@@ -265,6 +265,9 @@ void CodeWriter::cWriteConstructor()
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             CWState* cws = cwsm->_states.at(k);
+
+            // go through every entry/exit
+
             cPrintln("connect("+cws->_stateName+", SIGNAL(entered()), this, SIGNAL("+cws->_entryRelaySignal+"));",1);
             cPrintln("connect("+cws->_stateName+", SIGNAL(exited()), this, SIGNAL("+cws->_exitRelaySignal+"));",1);
         }
@@ -377,11 +380,13 @@ void CodeWriter::cWriteEntryExitSlots()
             CWState* cws = cwsm->_states.at(k);
             cPrintln("void "+className+"::"+cws->_entryRelaySlot+"");
             cPrintln("{");
-            QString entryAction = cws->_entryAction;
 
-            if(!entryAction.isEmpty())
+            if(!cws->_entryActions.isEmpty())
             {
-                cPrintln("emit "+entryAction+";",1);
+                for(int i = 0; i < cws->_entryActions.size(); i++)
+                {
+                    cPrintln("emit "+cws->_entryActions.at(i)+";",1);
+                }
             }
             else
             {
@@ -391,11 +396,13 @@ void CodeWriter::cWriteEntryExitSlots()
 
             cPrintln("void "+className+"::"+cws->_exitRelaySlot+"");
             cPrintln("{");
-            QString exitAction = cws->_exitAction;
 
-            if(!exitAction.isEmpty())
+            if(!cws->_exitActions.isEmpty())
             {
-                cPrintln("emit "+exitAction+";",1);
+                for(int i = 0; i < cws->_exitActions.size(); i++)
+                {
+                    cPrintln("emit "+cws->_exitActions.at(i)+";",1);
+                }
             }
             else
             {
@@ -666,16 +673,20 @@ void CodeWriter::hWriteActionSignals()
         {
             // if there is an entry or exit action, then create a signal for it
             CWState* cws = cwsm->_states.at(k);
-            QString entryAction = cws->_entryAction;
-            if(!entryAction.isEmpty())
+            if(!cws->_entryActions.isEmpty())
             {
-                hPrintln("void "+entryAction+";",1);
+                for(int i = 0; i < cws->_entryActions.size(); i++)
+                {
+                    hPrintln("void "+cws->_entryActions.at(i)+";",1);
+                }
             }
 
-            QString exitAction = cws->_exitAction;
-            if(!exitAction.isEmpty())
+            if(!cws->_exitActions.isEmpty())
             {
-                hPrintln("void "+exitAction+";",1);
+                for(int i = 0; i < cws->_exitActions.size(); i++)
+                {
+                    hPrintln("void "+cws->_exitActions.at(i)+";",1);
+                }
             }
         }
         hPrintln("");
