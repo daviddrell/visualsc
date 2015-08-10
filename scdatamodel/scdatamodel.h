@@ -175,8 +175,8 @@ private:
 
     QString toClassName(QString);
     QString toClassFileName(QString);
-    void connectState(SCState*);
-    void connectTransition(SCTransition*);
+
+
 
     SCXMLReader     _reader;
     QXmlStreamWriter *_writer;

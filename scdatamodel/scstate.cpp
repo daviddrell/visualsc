@@ -246,6 +246,24 @@ SCState* SCState::getFinalState()
     return NULL;
 }
 
+/**
+ * @brief SCState::resetLevels
+ * @param parent
+ *
+ * called in reselectParent when a state is changing it's parent state.
+ * this helper function will also reset the level variable to its new proper value and update each child as well;
+ *
+ */
+void SCState::resetLevels(SCState *parent)
+{
+    this->_level = parent->getLevel()+1;
+    QList<SCState*> directChildren;
+    this->getStates(directChildren);
+    for(int i = 0 ; i < directChildren.size(); i++)
+    {
+        directChildren.at(i)->resetLevels(this);
+    }
+}
 
 /**
  * @brief SCState::reselectParent
@@ -263,7 +281,14 @@ SCState* SCState::getFinalState()
 void SCState::reselectParent(SCState* newParent)
 {
     qDebug() << "SCState::reselectParent";
+
+    // reset the level variables for every state and child state
+    this->resetLevels(newParent);
+
+    // alert the graphicsview and formview
     emit changedParent(this, newParent);
+
+    // set the parent
     setParent(newParent);
 }
 

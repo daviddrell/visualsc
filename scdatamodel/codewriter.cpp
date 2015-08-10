@@ -625,8 +625,9 @@ void CodeWriter::hWriteEventSlots()
         CWStateMachine* cwsm = _machineHash.value(machine);
         hPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
 
-        // write the start machine event
-        hPrintln("void Event_startMachine"+cwsm->_stateName+"();",1);
+        // write the start machine event for the root machine
+        if(machine == _rootMachine)
+            hPrintln("void Event_startMachine"+cwsm->_stateName+"();",1);
 
         // go through each state that belongs to this machine (not including the machine)
         // and add an event for every out transition for that state

@@ -360,7 +360,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
     ElbowGrabber * elbow = dynamic_cast<ElbowGrabber *>(watched);
     LineSegmentGraphic * line = dynamic_cast<LineSegmentGraphic *>(watched);
     QGraphicsSceneMouseEvent * mevent = dynamic_cast <QGraphicsSceneMouseEvent*>(event);
-    QGraphicsSceneHoverEvent * hevent = dynamic_cast <QGraphicsSceneHoverEvent*>(event);
+    //QGraphicsSceneHoverEvent * hevent = dynamic_cast <QGraphicsSceneHoverEvent*>(event);
 
     if(elbow)
     {

@@ -117,8 +117,27 @@ void SelectableTextBlock::resizeToFitParent()
 
 }
 
+
 void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
+
+    /*
+     *                         B
+     *                         U
+     *                         F
+     *                         F
+     *                         E
+     *                         R
+     *  ________________________
+     * |  ____________________  |  BUFFER
+     * | |                    | |
+     * | |      TextBlock     | |
+     * | |   Allowable Area   | |
+     * | |____________________| |
+     * |________________________|
+     *
+     */
+
    // qDebug() << "SelectableTextBlock::handleParentStateGraphicResized";
 
     qreal w = this->getSize().x();
@@ -127,12 +146,14 @@ void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF 
     qreal y = this->pos().y();
 
    // qDebug() << "x: " << x << "y: " << y;
+
+    QRectF box(INSIDE_PARENT_BUFFER,INSIDE_PARENT_BUFFER,newBox.width()-(INSIDE_PARENT_BUFFER+INSIDE_PARENT_BUFFER),newBox.height()-(INSIDE_PARENT_BUFFER+INSIDE_PARENT_BUFFER));
+
     QPointF tl(x,y);
     QPointF tr(x+w,y);
     QPointF br(x+w,y+h);
     QPointF bl(x,y+h);
 
-    QRectF box(INSIDE_PARENT_BUFFER,INSIDE_PARENT_BUFFER,newBox.width()-(INSIDE_PARENT_BUFFER+INSIDE_PARENT_BUFFER),newBox.height()-(INSIDE_PARENT_BUFFER+INSIDE_PARENT_BUFFER));
 
     bool tlloc = getGridLocation(box, tl)== C;
     bool trloc = getGridLocation(box, tr)== C;
@@ -141,35 +162,73 @@ void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF 
 
     //qDebug() << "0: "<<tlloc <<"\t1: " << trloc<<"\t2: " << brloc<<"\t3: "<<blloc;
 
-    qreal newWidth = w;
-    qreal newHeight = h;
+
+    // ensure the text block is inside of the box
+
+
+    // first check if the text block needs to be resized in order to fit.
+    bool changeSize = (w > box.width()) || (h > box.height());
+    if(changeSize)
+    {
+        qreal newWidth = w;
+        qreal newHeight = h;
+        if(!trloc&&!brloc)
+        {
+            // the right wall of the textblock is out of bounds.
+
+
+            // as long as the width of the text block is not greater than its parent...
+            // first adjust the x position until it fits
+    //        x = 0;
+    //        this->setPos(x,y);
+
+            // then adjust the size to fit the parent
+
+            newWidth = newBox.width()-INSIDE_PARENT_BUFFER - x;
+            //qDebug() << "old w: "<<w << "\tnew w: " << newWidth;
+
+        }
+        if(!brloc&&!blloc)
+        {
+            // the bottom wall of the text block is out of bounds
+
+            // adjust the height to fit the parent
+
+            newHeight = newBox.height()-INSIDE_PARENT_BUFFER - y;
+
+        }
+
+        this->setSize(QPoint(newWidth,newHeight));
+
+
+        tl = QPointF(x,y);
+        tr = QPointF(x+newWidth,y);
+        br = QPointF(x+newWidth,y+newHeight);
+        bl = QPointF(x,y+newHeight);
+
+
+        tlloc = getGridLocation(box, tl)== C;
+        trloc = getGridLocation(box, tr)== C;
+        brloc = getGridLocation(box ,br)== C;
+        blloc = getGridLocation(box, bl)== C;
+    }
+
+    // then move the text block to be inside the box
+
     if(!trloc&&!brloc)
     {
         // the right wall of the textblock is out of bounds.
-
-
-        // as long as the width of the text block is not greater than its parent...
-        // first adjust the x position until it fits
-//        x = 0;
-//        this->setPos(x,y);
-
-        // then adjust the size to fit the parent
-
-        newWidth = newBox.width()-INSIDE_PARENT_BUFFER - x;
-        //qDebug() << "old w: "<<w << "\tnew w: " << newWidth;
+        // decrease the x position
+       // qreal newX =
 
     }
     if(!brloc&&!blloc)
     {
         // the bottom wall of the text block is out of bounds
-
-        // adjust the height to fit the parent
-
-        newHeight = newBox.height()-INSIDE_PARENT_BUFFER - y;
+        // decrease the y position
 
     }
 
-    this->setSize(QPoint(newWidth,newHeight));
 
 }
 

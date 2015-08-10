@@ -251,7 +251,7 @@ private:
 
     //private data
 
-
+    void resetLevels(SCState* parent);
     //StateBoxGraphic* _stateBoxGraphic;
     SCTextBlock * _IdTextBlock;
     QList<SCTransition*> _transitingTransitionsOut;

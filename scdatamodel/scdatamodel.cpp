@@ -304,8 +304,8 @@ QString cppFileName;
 
 
     QList<SCState* > all;
-    _topState->getAllStates(all);
     all.append(_topState);
+    _topState->getAllStates(all);
 
 
     for(int i = 0; i < all.size();i++)
@@ -699,9 +699,6 @@ void SCDataModel::initializeEmptyStateMachine()
 
     _currentState  = _topState;
 
-    // connect the top state
-    connectState(_topState);
-
     //emit newStateSignal(_topState);
 
     qDebug() << "initialized empty state machine! " << "_currentState: " <<nm->asString()<<" on level: "<<_level;
@@ -756,9 +753,6 @@ SCState* SCDataModel::handleMakeANewState(SCState* parent,StateAttributes*  sa)
     state->setText(name);
 
 
-
-    // SCState connects. 1 of 2 places where the SCState connects are set up. this is for loading states through the xml
-    connectState(state);
 
     //_currentState  = state;
 
@@ -836,9 +830,6 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
     state->setText(name);
 
     qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
-
-    // SCState connects. 1 of 2 places where the SCState connects are set up. this is for loading states through the xml
-    connectState(state);
 
     _currentState  = state;
 
@@ -946,28 +937,7 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
 
 }
 
-/**
- * @brief SCDataModel::connectState
- * @param state
- *
- * NOT CURRENTLY USED
- *
- * Deprecated function. formview and graphics view will update the data model and listen to the data model but the datamodel will be blind to what connects to it
- *
- */
-void SCDataModel::connectState(SCState* state)
-{
-    /*
-    connect(state, SIGNAL(nameChangedInFormView(SCState*,QString)),     this, SLOT(handleStateNameChangedInFormView(SCState*,QString)));
-    connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
-    connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)),     this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
-    */
-}
 
-void SCDataModel::connectTransition(SCTransition* trans)
-{
-    //connect(trans, SIGNAL(eventChangedInFormView(SCTransition*,QString)), this, SLOT(handleEventNameChangedInFormView(SCTransition*,QString)));
-}
 
 void SCDataModel::handleEventNameChangedInFormView(SCTransition * trans, QString eventName)
 {

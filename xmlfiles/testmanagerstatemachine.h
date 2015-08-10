@@ -35,17 +35,6 @@ public:
 
 
 public slots:
-    //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
-    void Event_startMachine_updateFirmwareAllUnits_53416b9a();
-
-    //////// State Machine: _updatingGSUnits_52c831de ////////
-    void Event_startMachine_updatingGSUnits_52c831de();
-    void Event_gSUpdateSuccess_48c3bcdd();
-
-    //////// State Machine: _updatingWincomm_7778a7d0 ////////
-    void Event_startMachine_updatingWincomm_7778a7d0();
-    void Event_upzipSuccess_f93692c9();
-
     //////// State Machine: _testManagerStateMachine_97b850af ////////
     void Event_startMachine_testManagerStateMachine_97b850af();
     void Event_start_fa1bce49();
@@ -57,6 +46,14 @@ public slots:
     void Event_updateFailure_850da190();
     void Event_updateFirmwareAllUnitsFinished_c9e4b34a();
 
+    //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
+
+    //////// State Machine: _updatingGSUnits_52c831de ////////
+    void Event_gSUpdateSuccess_48c3bcdd();
+
+    //////// State Machine: _updatingWincomm_7778a7d0 ////////
+    void Event_upzipSuccess_f93692c9();
+
 
 signals:
     //
@@ -64,6 +61,10 @@ signals:
     //
     //    Connect to these signals to a slot corresponding to a entryAction or exitAction
     //
+    //////// State Machine: _testManagerStateMachine_97b850af ////////
+    void EntryAction_startDownload();
+    void EntryAction_startTests();
+
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
 
     //////// State Machine: _updatingGSUnits_52c831de ////////
@@ -72,16 +73,25 @@ signals:
     //////// State Machine: _updatingWincomm_7778a7d0 ////////
     void EntryAction_startUnzip();
 
-    //////// State Machine: _testManagerStateMachine_97b850af ////////
-    void EntryAction_startDownload();
-    void EntryAction_startTests();
-
 
     //
     //    STATE CHANGE MONITOR SIGNALS
     //
     //    Connect to these signals to monitor state transitions
     //
+    //////// State Machine: _testManagerStateMachine_97b850af ////////
+    void Signal_StateReady_testManagerStateMachine_97b850af();
+    void Signal_StateEntry_idle_c9dcfd20();
+    void Signal_StateExit_idle_c9dcfd20();
+    void Signal_StateEntry_downloadingAVC_fa1bce49();
+    void Signal_StateExit_downloadingAVC_fa1bce49();
+    void Signal_StateEntry_runningTests_c9e4b34a();
+    void Signal_StateExit_runningTests_c9e4b34a();
+    void Signal_StateEntry_completed_850da190();
+    void Signal_StateExit_completed_850da190();
+    void Signal_StateEntry_updateFirmwareAllUnits_53416b9a();
+    void Signal_StateExit_updateFirmwareAllUnits_53416b9a();
+
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
     void Signal_StateReady_updateFirmwareAllUnits_53416b9a();
     void Signal_StateEntry_updatingGSUnits_52c831de();
@@ -102,19 +112,6 @@ signals:
     void Signal_StateExit_unzipInProgress_9f1f6d0f();
     void Signal_StateEntry_done_f93692c9();
     void Signal_StateExit_done_f93692c9();
-
-    //////// State Machine: _testManagerStateMachine_97b850af ////////
-    void Signal_StateReady_testManagerStateMachine_97b850af();
-    void Signal_StateEntry_idle_c9dcfd20();
-    void Signal_StateExit_idle_c9dcfd20();
-    void Signal_StateEntry_downloadingAVC_fa1bce49();
-    void Signal_StateExit_downloadingAVC_fa1bce49();
-    void Signal_StateEntry_runningTests_c9e4b34a();
-    void Signal_StateExit_runningTests_c9e4b34a();
-    void Signal_StateEntry_completed_850da190();
-    void Signal_StateExit_completed_850da190();
-    void Signal_StateEntry_updateFirmwareAllUnits_53416b9a();
-    void Signal_StateExit_updateFirmwareAllUnits_53416b9a();
 
 
     //////////////////
@@ -143,6 +140,18 @@ private:
 
 private slots:
     // The Entry/Exit Slots that belong to QStates
+    //////// State Machine: _testManagerStateMachine_97b850af ////////
+    void Slot_StateEntry_idle_c9dcfd20();
+    void Slot_StateExit_idle_c9dcfd20();
+    void Slot_StateEntry_downloadingAVC_fa1bce49();
+    void Slot_StateExit_downloadingAVC_fa1bce49();
+    void Slot_StateEntry_runningTests_c9e4b34a();
+    void Slot_StateExit_runningTests_c9e4b34a();
+    void Slot_StateEntry_completed_850da190();
+    void Slot_StateExit_completed_850da190();
+    void Slot_StateEntry_updateFirmwareAllUnits_53416b9a();
+    void Slot_StateExit_updateFirmwareAllUnits_53416b9a();
+
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
     void Slot_StateEntry_updatingGSUnits_52c831de();
     void Slot_StateExit_updatingGSUnits_52c831de();
@@ -161,29 +170,9 @@ private slots:
     void Slot_StateEntry_done_f93692c9();
     void Slot_StateExit_done_f93692c9();
 
-    //////// State Machine: _testManagerStateMachine_97b850af ////////
-    void Slot_StateEntry_idle_c9dcfd20();
-    void Slot_StateExit_idle_c9dcfd20();
-    void Slot_StateEntry_downloadingAVC_fa1bce49();
-    void Slot_StateExit_downloadingAVC_fa1bce49();
-    void Slot_StateEntry_runningTests_c9e4b34a();
-    void Slot_StateExit_runningTests_c9e4b34a();
-    void Slot_StateEntry_completed_850da190();
-    void Slot_StateExit_completed_850da190();
-    void Slot_StateEntry_updateFirmwareAllUnits_53416b9a();
-    void Slot_StateExit_updateFirmwareAllUnits_53416b9a();
-
 
 signals:
     // A Transition/Event slot's corresponding signal emitted in the slot
-    //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
-
-    //////// State Machine: _updatingGSUnits_52c831de ////////
-    void Relay_Event_gSUpdateSuccess_48c3bcdd();
-
-    //////// State Machine: _updatingWincomm_7778a7d0 ////////
-    void Relay_Event_upzipSuccess_f93692c9();
-
     //////// State Machine: _testManagerStateMachine_97b850af ////////
     void Relay_Event_start_fa1bce49();
     void Relay_Event_downloadFailed_850da190();
@@ -194,8 +183,24 @@ signals:
     void Relay_Event_updateFailure_850da190();
     void Relay_Event_updateFirmwareAllUnitsFinished_c9e4b34a();
 
+    //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
+
+    //////// State Machine: _updatingGSUnits_52c831de ////////
+    void Relay_Event_gSUpdateSuccess_48c3bcdd();
+
+    //////// State Machine: _updatingWincomm_7778a7d0 ////////
+    void Relay_Event_upzipSuccess_f93692c9();
+
 
 private:
+    //////// State Machine: _testManagerStateMachine_97b850af ////////
+    QStateMachine*    _testManagerStateMachine_97b850af;
+    QState*    _idle_c9dcfd20;
+    QState*    _downloadingAVC_fa1bce49;
+    QState*    _runningTests_c9e4b34a;
+    QState*    _completed_850da190;
+    QState*    _updateFirmwareAllUnits_53416b9a;
+
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
     // child QState declared elsewhere _updateFirmwareAllUnits_53416b9a
     QState*    _updatingGSUnits_52c831de;
@@ -210,14 +215,6 @@ private:
     // child QState declared elsewhere _updatingWincomm_7778a7d0
     QState*    _unzipInProgress_9f1f6d0f;
     QFinalState*    _done_f93692c9;
-
-    //////// State Machine: _testManagerStateMachine_97b850af ////////
-    QStateMachine*    _testManagerStateMachine_97b850af;
-    QState*    _idle_c9dcfd20;
-    QState*    _downloadingAVC_fa1bce49;
-    QState*    _runningTests_c9e4b34a;
-    QState*    _completed_850da190;
-    QState*    _updateFirmwareAllUnits_53416b9a;
 
 
 };
