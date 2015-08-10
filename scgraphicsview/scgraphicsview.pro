@@ -38,8 +38,7 @@ SOURCES += scgraphicsview.cpp \
     keycontroller.cpp \
     elbowgrabber.cpp \
     mousecontroller.cpp \
-    linesegmentgraphic.cpp \
-    textbox.cpp
+    linesegmentgraphic.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -58,8 +57,7 @@ HEADERS += scgraphicsview.h\
     keycontroller.h \
     elbowgrabber.h \
     mousecontroller.h \
-    linesegmentgraphic.h \
-    textbox.h
+    linesegmentgraphic.h
 
 
 OTHER_FILES += \

@@ -12,7 +12,7 @@
 #include "linesegmentgraphic.h"
 #include "selectabletextblock.h"
 #include <QObject>
-#include "textbox.h"
+
 
 //#define TRANSITION_DEFAULT_COLOR Qt::blue
 //#define TRANSITION_HOVER_COLOR Qt::red

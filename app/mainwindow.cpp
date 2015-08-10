@@ -125,7 +125,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
     connect(_formEditorWindow, SIGNAL(openClick()), this, SLOT(handleFileOpenClick()));
     connect(_formEditorWindow, SIGNAL(saveClick()), this, SLOT(handleFileSaveClick()));
-
+    connect(_formEditorWindow, SIGNAL(importClick()), this, SLOT(on_actionImport_triggered()));
     connect(_formEditorWindow, SIGNAL(exportClick()), this, SLOT(handleExportCodeClick()));
 
     _formEditorWindow->show();

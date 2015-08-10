@@ -97,6 +97,9 @@ public:
     QPointF mapToHighestParent(QPointF pos);
     StateBoxGraphic* parentItemAsStateBoxGraphic();
 
+    void getAllStates(QList<StateBoxGraphic*> &stateList);
+    //void getAllTransitions(QList<TransitionGraphic*> &transList);
+
 protected:
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
@@ -116,6 +119,10 @@ private:
     virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
+    virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
+
+
+    void resizeToFitAll();
     QRectF* getBufferedBoxRect(qreal buffer,qreal offset);
     double xDistance(QPointF, QPointF);
     double yDistance(QPointF, QPointF);

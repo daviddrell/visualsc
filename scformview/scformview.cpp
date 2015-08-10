@@ -61,6 +61,8 @@
 #define BOX_GREEN_OFFSET        0
 #define BOX_BLUE_OFFSET         1
 
+#define POP_UP_X                160
+#define POP_UP_Y                200
 
 
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
@@ -210,23 +212,6 @@ void SCFormView::highlightPreviousItem()
     handleTreeViewItemClicked((QTreeWidgetItem*)twid, 0);
 }
 
-/**
- * @brief SCFormView::reset
- *
- * clears out the tree view and property table and awaits the data model to update
- *
- * NOT CURRENTLY USED
- *
- */
-void SCFormView::reset()
-{
-    //_currentlySelected = _previouslySelected = _dm->getTopState();
-    _currentlySelected->setItem(_dm->getTopState());
-    replantTree();
-    CustomTreeWidgetItem* twid = findItem(_currentlySelected);
-    twid->setSelected(true); // rehighlight the item that was highlighted
-    handleTreeViewItemClicked((QTreeWidgetItem*)twid, 0);
-}
 
 /**
  * @brief SCFormView::initTree
@@ -385,22 +370,7 @@ void SCFormView::handleNewState(SCState* st)
     connectState(st, fvItem->getTreeWidget());   // tree item handler
 }
 
-/**
- * @brief SCFormView::setSelectedTreeItem
- * @param q
- *
- * updates the currently selected tree item and previously selected tree item
- *
- */
-void SCFormView :: setSelectedTreeItem(QObject * q){
-    //_previouslySelected = _currentlySelected;
-    //_currentlySelected = q;
 
-    //_currentlySelected->setItem(dynamic_cast<SCItem*>(q));
-
-    // TODO check this if its null first then do some default protocol if null
-//    qDebug() << "updated the tree items: " << _previouslySelected << " + " << _currentlySelected;
-}
 
 /**
  * @brief SCFormView::updateStateName
@@ -781,19 +751,6 @@ void SCFormView::updateTransitionEvent(SCTransition* trans, QString eventName)
     }
 }
 
-void SCFormView::handleTextBlockDeleted(QObject *t)
-{
-    /*
-    QList<SCState*> states;
-    states.append( _dm->getTopState());
-
-    //stateChartTreeView->clear();
-
- //   replantTree();
-//    loadTree (NULL, states);
-*/
-    //highlightRootItem();
-}
 
 
 void SCFormView::handleTransitionDeleted(QObject *t)
@@ -1212,8 +1169,20 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
     propertyTable->setItem(row, 0, propName);
     propertyTable->setItem(row++, 1, propValue);
 
+    // load the target property second
+    attr = atts->value("target");
 
-    connectTransition(_currentlySelected->getTransition(), propValue, "event");
+    propName = new CustomTableWidgetItem("target");
+    propName->setFlags( (propName->flags() & (~Qt::ItemIsEditable)) | ((Qt::ItemIsEnabled)));
+
+    propValue = new CustomTableWidgetItem(attr->asString());
+    propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+
+    propertyTable->setItem(row, 0, propName);
+    propertyTable->setItem(row++, 1, propValue);
+
+
+    connectTransition(_currentlySelected->getTransition(), propValue, "target");
 
     while (i.hasNext())
     {
@@ -1837,7 +1806,9 @@ void SCFormView::sendMessage(QString title, QString message)
     msgBox.setDefaultButton(QMessageBox::Ok);
 
     msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-    msgBox.move(160,200);
+//    msgBox.move(160,200);
+    QPoint offset(POP_UP_X, POP_UP_Y);
+    msgBox.move(this->pos()+offset);
     msgBox.adjustSize();
     int ret = msgBox.exec();
 
@@ -1874,7 +1845,8 @@ const QString SCFormView::promptTextInput(QString windowTitle, QString message, 
     inp->setTextValue(defaultText);
     //inp->resize(500,309);
     inp->adjustSize();
-    inp->move(160,200);
+    QPoint offset(POP_UP_X, POP_UP_Y);
+    inp->move(this->pos() + offset);
     if(inp->exec() == QDialog::Accepted)
         mText = inp->textValue();
     return mText;
@@ -2048,7 +2020,8 @@ void SCFormView::deleteItem()
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setWindowFlags( Qt::WindowStaysOnTopHint);
-    msgBox.move(160,200);
+    QPoint offset(POP_UP_X, POP_UP_Y);
+    msgBox.move(this->pos() + offset);
     int ret = msgBox.exec();
 
     switch (ret)
@@ -2802,7 +2775,7 @@ void SCFormView::about()
 
     //QMessageBox::about(this, tr("About Visual State Chart"), "");
 
-    QMessageBox::about(this, "About Visual Statechart",
+    /*QMessageBox::about(this, "About Visual Statechart",
                        "https://github.com/daviddrell/visualsc"
                        "\n"
                        "VisualSC is a Statechart Editor which reads/writes from/to SCXML\n"
@@ -2811,7 +2784,17 @@ void SCFormView::about()
                        ""
 
 
-                       "");
+                       "");*/
+
+    sendMessage("About Visualstate Chart","https://github.com/daviddrell/visualsc"
+                                          "\n"
+                                          "VisualSC is a Statechart Editor which reads/writes from/to SCXML\n"
+                                          "\n"
+                                          "This is an open source project by David Drell & Matt Zhan"
+                                          ""
+
+
+                                          "");
 
 
 
@@ -2833,39 +2816,7 @@ void SCFormView::setProject(SMProject *pj)
     _project = pj;
 }
 
-void SCFormView::save()
-{
 
-}
-
-void SCFormView::newClicked()
-{
-    _dm->reset();
-
-}
-void SCFormView::exportClicked()
-{
-
-}
-
-void SCFormView::open()
-{
-
-}
-
-void SCFormView::import()
-{
-    if(!_currentlySelected->isState())
-    {
-        sendMessage("Error","Please select a state to import into");
-        return;
-    }
-    qDebug() << "import!";
-    QString prevFilePath=QDir::homePath();
-    QString fileName;
-    fileName = QFileDialog::getOpenFileName(this, tr("Import SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
-    _dm->importFile(_currentlySelected->getState(),fileName);
-}
 
 void SCFormView::handleReset()
 {
@@ -2969,12 +2920,12 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
     exitAction->setStatusTip(tr("Quit VisualSC Editor"));
-    connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+    connect(exitAction, SIGNAL(triggered()), this, SIGNAL(closeClick()));
 
     importAction = new QAction(tr("I&mport .SCXML"), this);
     importAction->setShortcut(tr("Ctrl+I"));
     importAction->setStatusTip(tr("Import an SCXML state machine into the selected State"));
-    connect(importAction, SIGNAL(triggered()), this, SLOT(import()));
+    connect(importAction, SIGNAL(triggered()), this, SIGNAL(importClick()));
 
     boldAction = new QAction(tr("Bold"), this);
     boldAction->setCheckable(true);
@@ -3049,12 +3000,15 @@ void SCFormView::createMenus()
 
 
     itemMenu = menuBar()->addMenu(tr("&Item"));
+    itemMenu->addAction(insertTransitionAction);
+    itemMenu->addAction(insertStateAction);
+    itemMenu->addSeparator();
+    itemMenu->addAction(reselectParentAction);
+    itemMenu->addAction(reselectTargetAction);
     itemMenu->addAction(deleteAction);
     itemMenu->addSeparator();
     itemMenu->addAction(toFrontAction);
     itemMenu->addAction(sendBackAction);
-    itemMenu->addAction(insertTransitionAction);
-    itemMenu->addAction(insertStateAction);
 
     aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(aboutAction);

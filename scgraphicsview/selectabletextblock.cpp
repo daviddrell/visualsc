@@ -36,11 +36,13 @@
 #define MIN_WIDTH 50
 #define MIN_HEIGHT 36
 
+#define HORIZONTAL_TEXT_MARGIN  5
+
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent,true),
        // _minSize(QPoint(MIN_WIDTH,MIN_HEIGHT)),
         _verticalTextMargin(10),
-        _horizontalTextMargin(10),
+        _horizontalTextMargin(5),
         _textItem(this, QRect(0,0, _minSize.x()-_horizontalTextMargin, _minSize.y()-_verticalTextMargin)),
         _textBlockModel(textBlockModel),
         _centerText(true)
@@ -51,7 +53,9 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     // set the text into the viewable area of the rectangle
     QRectF viewArea = this->getUsableArea();
     _textItem.setPos( viewArea.x() , viewArea.y() );
-
+    QFont serifFont("Arial", 10, QFont::Bold);
+    _textItem.setFont(serifFont);
+    //_textItem.installSceneEventFilter(this);
     // set the initial text to what the datamodel loaded
     //_textItem.setPlainText( _textBlockModel->getText(), true );
     this->setText(_textBlockModel->getText());
@@ -176,16 +180,7 @@ void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF 
         {
             // the right wall of the textblock is out of bounds.
 
-
-            // as long as the width of the text block is not greater than its parent...
-            // first adjust the x position until it fits
-    //        x = 0;
-    //        this->setPos(x,y);
-
-            // then adjust the size to fit the parent
-
             newWidth = newBox.width()-INSIDE_PARENT_BUFFER - x;
-            //qDebug() << "old w: "<<w << "\tnew w: " << newWidth;
 
         }
         if(!brloc&&!blloc)
@@ -251,15 +246,17 @@ void SelectableTextBlock::handleTextChanged()
 
 void SelectableTextBlock::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event )
 {
+    //_textItem.setVisible(false);
     event->accept();
     TextEditBox * editBox = new TextEditBox( _textBlockModel);
     connect (editBox, SIGNAL(saveButtonClicked(QString)), this, SLOT(handleEditBoxSavedText(QString)));
-    QPointF myPos = this->mapToScene( this->pos() );
+     QPointF myPos = this->mapToScene( this->pos() );
     SCDataModel::singleton()->getScene()->addItem( editBox);
-    editBox->setPos( myPos.x(), myPos.y() +100 );
-    editBox->setZValue(999);    // temporary fix for getting the box to appear in front of everything in the scene
+    editBox->setPos(myPos);
+    editBox->setZValue(std::numeric_limits<double>::max());    // temporary fix for getting the box to appear in front of everything in the scene
 
 }
+
 
 void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
 {
@@ -286,6 +283,7 @@ void SelectableTextBlock::handleEditBoxSavedText(QString text)
 {
     //_textItem.setPlainText( text, true );
     this->setText(text);
+    //_textItem.setVisible(true);
     _textBlockModel->setText(text);
 }
 
@@ -533,6 +531,26 @@ void SelectableTextBlock::setSize(QPoint size)
 
 }
 
+int SelectableTextBlock::clamp(int value, int min, int max)
+{
+    if(value < min)
+        return min;
+
+    if(value > max)
+        return max;
+
+    return value;
+}
+
+qreal SelectableTextBlock::clampMin(qreal value, qreal min)
+{
+    if(value < min)
+        return min;
+
+    return value;
+}
+
+
  /**
  * @brief SelectableTextBlock::recenterText
  *
@@ -541,20 +559,20 @@ void SelectableTextBlock::setSize(QPoint size)
  */
 void SelectableTextBlock::recenterText()
 {
-    QRectF viewArea = getUsableArea();
-    qreal height = viewArea.height() - _verticalTextMargin;
+    //QRectF viewArea = getUsableArea();
+    //qreal height = viewArea.height() - _verticalTextMargin;
+    qreal height = this->getSize().y();
     qreal width = this->getSize().x();
-    QRect bRect( 0,0 , width, height);
-    qreal textWidth = _textItem.document()->size().width();
 
-    if(textWidth > width)
-    {
-        _textItem.setPos(0, height/2);
-    }
-    else
-        _textItem.setPos(this->getSize().x()/2-_textItem.document()->size().width()/2, height/2);
-
+    QRect bRect( 0,0 , width-(3*HORIZONTAL_TEXT_MARGIN), height);
     _textItem.setBoundingRect(bRect);
+    qreal textWidth = _textItem.document()->size().width();
+    qreal textHeight = _textItem.document()->size().height();
+
+    qreal xPos = clampMin(width/2 - textWidth/2, HORIZONTAL_TEXT_MARGIN);
+    qreal yPos = clampMin(height/2 - textHeight/2,0);
+
+    _textItem.setPos(xPos,yPos);
 }
 
 /**

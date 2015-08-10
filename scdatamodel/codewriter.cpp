@@ -255,7 +255,10 @@ void CodeWriter::cWriteConstructor()
 
         // RELAY the state's enter/exit signal to the public signal
         cPrintln("\n//    Propogate the private QState signals to public signals",1);
-        cPrintln("connect("+cwsm->_stateName+", SIGNAL(started()), this, SIGNAL("+cwsm->_readyRelaySignal+"));",1);
+
+        // only do this for the root machine
+        if(machine == _rootMachine)
+            cPrintln("connect("+cwsm->_stateName+", SIGNAL(started()), this, SIGNAL("+cwsm->_readyRelaySignal+"));",1);
 
 //        if(cwsm->isParallel())
 //        {

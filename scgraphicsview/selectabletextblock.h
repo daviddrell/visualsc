@@ -74,7 +74,8 @@ private slots:
 private:
 
     // private methods
-
+    int clamp(int,int,int);
+    qreal clampMin(qreal,qreal);
    void connectAttributes(IAttributeContainer *attributes);
    void resizeToFitParent();
    void recenterText();

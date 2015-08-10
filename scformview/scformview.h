@@ -84,7 +84,6 @@ class SCFORMVIEWSHARED_EXPORT SCFormView : public QMainWindow
     Q_OBJECT
 public:
     explicit SCFormView(QWidget *parent = 0, SCDataModel * dm=0);
-    void reset();
     void highlightRootItem();
     void highlightPreviousItem();
     void setProject(SMProject*);
@@ -110,11 +109,6 @@ private slots:
     void pointerGroupClicked(int id);
     void bringToFront();
     void sendToBack();
-    void import();
-    void newClicked();
-    void open();
-    void save();
-    void exportClicked();
 
     void insertTransition();
     void insertState();
@@ -148,14 +142,14 @@ private slots:
     void handleTransitionDeleted(QObject *);
     void handleStateDeleted(QObject*);
     void handleNewState(SCState*);
-    void handleTextBlockDeleted(QObject*);
+//    void handleTextBlockDeleted(QObject*);
     void handlePropertyChanged(IAttribute * attr);
     void handlePropertyCellChanged(int, int);
     void handleTextBlockPropertyCellChanged(int,int);
     void handleStateSelectionWindowStateSelected(SCState *st);
 
 
-    void setSelectedTreeItem(QObject *);
+   // void setSelectedTreeItem(QObject *);
 
     void sendMessage(QString title, QString message);
     const QString promptTextInput(QString windowTitle, QString message, QString defaultText, bool* ok);
