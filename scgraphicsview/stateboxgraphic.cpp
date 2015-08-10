@@ -805,8 +805,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 
 void StateBoxGraphic::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event )
 {
-    qDebug() << "double click a state!";
-    this->resizeToFitAll();
+    emit this->resizeState(this);
 }
 
 void StateBoxGraphic::getAllStates(QList<StateBoxGraphic *> &stateList)
@@ -823,107 +822,6 @@ void StateBoxGraphic::getAllStates(QList<StateBoxGraphic *> &stateList)
 }
 
 
-/**
- * @brief StateBoxGraphic::resizeToFitAll
- *
- * called when a state box is double clicked.
- *
- * resizes in two ways
- * state machines: expands the state to include all children
- * states: finds the first state that is in the same level and changes its size to that
-
- *
- */
-void StateBoxGraphic::resizeToFitAll()
-{
-    QList<StateBoxGraphic*> sbgs;
-    this->getAllStates(sbgs);
-    //QPointF myPos = mapToHighestParent(pos());
-    qreal x = 0;
-    qreal y = 0;
-    qreal newWidth = 0;
-    qreal newHeight = 0;
-    qDebug() << "current size: " << this->getSize();
-    qreal minX = std::numeric_limits<double>::max();
-    qreal minY = std::numeric_limits<double>::max();
-
-    bool onlyState = false;
-    for(int i = 0; i < sbgs.size(); i++)
-    {
-        StateBoxGraphic* sbg = sbgs.at(i);
-
-        QPointF mts = mapFromItem(sbg->parentAsSelectableBoxGraphic(), sbg->pos());
-
-        qreal outX = mts.x() + sbg->getSize().x();
-        qreal outY = mts.y() + sbg->getSize().y();
-
-        qDebug() << "outX: "<<outX << "\toutY:"<<outY;
-
-        if(x+newWidth < outX)
-           newWidth = outX;
-
-        if(y+newHeight < outY)
-           newHeight = outY;
-
-        if(mts.x() < minX)
-            minX = mts.x();
-
-        if(mts.y() < minY)
-            minY = mts.y();
-    }
-
-
-    if(sbgs.size()==0)
-    {
-
-        StateBoxGraphic* parentsbg = this->parentItemAsStateBoxGraphic();
-        if(parentsbg)
-        {
-            onlyState = true;
-            parentsbg->getAllStates(sbgs);
-            for(int i = 0; i < sbgs.size(); i ++)
-            {
-                StateBoxGraphic* sbg = sbgs.at(i);
-                if(sbg == this)
-                {
-
-                }
-                else
-                {
-                    newWidth = sbg->getSize().x();
-                    newHeight = sbg->getSize().y();
-                    break;
-                }
-            }
-        }
-    }
-
-
-
-    if(newWidth!=0 || 0 != newHeight)
-    {
-        if(onlyState)
-        {
-            QRectF oldBox = QRectF(pos().x(), pos().y(), _width, _height);
-            QRectF newBox = QRectF(pos().x(), pos().y(), newWidth, newHeight);
-            this->setSize(QPointF(newWidth,newHeight));
-            setCornerPositions();
-            emit stateBoxResized(oldBox, newBox, 2);
-        }
-        else
-        {
-            QRectF oldBox = QRectF(pos().x(), pos().y(), _width, _height);
-            newWidth+=minX;
-            newHeight+=minY;
-            QRectF newBox = QRectF(pos().x(), pos().y(), newWidth, newHeight);
-            this->setSize(QPointF(newWidth,newHeight));
-            setCornerPositions();
-            emit stateBoxResized(oldBox, newBox, 2);
-        }
-
-    }
-
-}
 
 // for supporting moving the box across the scene
 void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )

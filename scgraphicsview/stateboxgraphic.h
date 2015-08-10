@@ -100,6 +100,9 @@ public:
     void getAllStates(QList<StateBoxGraphic*> &stateList);
     //void getAllTransitions(QList<TransitionGraphic*> &transList);
 
+signals:
+    void resizeState(StateBoxGraphic*);
+
 protected:
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
@@ -121,8 +124,6 @@ private:
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
 
-
-    void resizeToFitAll();
     QRectF* getBufferedBoxRect(qreal buffer,qreal offset);
     double xDistance(QPointF, QPointF);
     double yDistance(QPointF, QPointF);

@@ -77,6 +77,7 @@ public:
     SelectableBoxGraphic(QGraphicsObject*parent, bool keepInsideParent);
     ~SelectableBoxGraphic();
 
+    void setCornerPositions();
     SelectableBoxGraphic* parentAsSelectableBoxGraphic();
     void setPosAndUpdateAnchors(QPointF newPos);
     void setSizeAndUpdateAnchors(QPointF size);
@@ -147,7 +148,7 @@ protected:
 
     CornerGrabber*  _corners[4];// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
 
-    void setCornerPositions();
+
     void adjustDrawingSize(int x, int y);
 
     int getHoveredCorner();

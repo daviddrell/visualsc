@@ -62,6 +62,7 @@ signals:
 
 private slots:
 
+    void handleAutoResize(StateBoxGraphic*);
     void handleNewState(SCState * newState);
     void handleNewTransition(SCTransition*);
     void handleStateDeleted(QObject *state);
@@ -111,7 +112,7 @@ private:
 
     bool eventFilter(QObject* o, QEvent* e);
     virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
-
+   // virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
 
 };
 

@@ -160,6 +160,7 @@ bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
         _mouseController->mouseInput(qgs);
         //_mouseController->printPos();
     }
+
     return false;
 }
 
@@ -168,6 +169,8 @@ void SCGraphicsView::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
     qDebug()<<"mouse moved in moveEvent";
 }
+
+
 
 /**
  * @brief SCGraphicsView::createGraph
@@ -203,6 +206,124 @@ QGraphicsView * SCGraphicsView::getQGraphicsView()
     return & _view;
 }
 
+/**
+ * @brief SCGraphicsView::handleAutoResize
+ * @param stateBoxGraphic
+ *
+ * SLOT
+ * connect in connectState of SCGraphicsView
+ *
+ * this will automatically resize a state box graphic based on if its a state machine or state:
+ * state machines will resize themselves to cover all of its children states.
+ *
+ * states will resize themselves to be the same size as a state in the same state machine, going by earliest added first order.
+ */
+void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
+{
+    QList<StateBoxGraphic*> sbgs;
+    stateBoxGraphic->getAllStates(sbgs);
+    //QPointF myPos = mapToHighestParent(pos());
+    qreal x = 0;
+    qreal y = 0;
+    qreal newWidth = std::numeric_limits<double>::min();        // new dimensions of the state
+    qreal newHeight = std::numeric_limits<double>::min();
+    qreal minX = std::numeric_limits<double>::max();            // auto resize uses the smallest top/left distance to any child to determine the extra buffer zone on the bottom and right walls when resizing
+    qreal minY = std::numeric_limits<double>::max();
+
+    // if this is a state machine, then use all children to calculate the above variables
+    for(int i = 0; i < sbgs.size(); i++)
+    {
+        StateBoxGraphic* sbg = sbgs.at(i);
+
+        QPointF mts = stateBoxGraphic->mapFromItem(sbg->parentAsSelectableBoxGraphic(), sbg->pos());
+
+        qreal outX = mts.x() + sbg->getSize().x();
+        qreal outY = mts.y() + sbg->getSize().y();
+
+        qDebug() << "outX: "<<outX << "\toutY:"<<outY;
+
+        // we must make the new width include the outter most point
+        if(x+newWidth < outX)
+           newWidth = outX;
+
+        // include outter most y point
+        if(y+newHeight < outY)
+           newHeight = outY;
+
+        // determine the smallest buffer zone
+        if(mts.x() < minX)
+            minX = mts.x();
+
+        // determine the smallest buffer zone
+        if(mts.y() < minY)
+            minY = mts.y();
+    }
+
+    // a state will have no children state box graphics
+    bool onlyState = false;
+    if(sbgs.size()==0)
+    {
+        onlyState = true;
+        // must find another state box graphic that is in the same state machine on the same level.
+        SCState* parentState = stateBoxGraphic->getStateModel()->parentAsSCState();
+        QList<SCState*> states;
+        parentState->getStates(states);
+        for(int i = 0 ; i < states.size(); i++)
+        {
+            StateBoxGraphic* sbg = _hashStateToGraphic.value(states.at(i));
+            if(sbg == stateBoxGraphic)
+            {
+
+            }
+            else    // as soon as we find one that isn't the one being changed, we will mimic the size
+            {
+                newWidth = sbg->getSize().x();
+                newHeight = sbg->getSize().y();
+                break;
+            }
+        }
+    }
+
+    // only change the size if the size needs changing
+    if(newWidth!=std::numeric_limits<double>::min() || std::numeric_limits<double>::min() != newHeight)
+    {
+        // if this is a state and not a state machine, we set the size to be the same as one of its sibling states
+        if(onlyState)
+        {
+            QRectF oldBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), stateBoxGraphic->getSize().x(), stateBoxGraphic->getSize().y());
+            QRectF newBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), newWidth, newHeight);
+            stateBoxGraphic->setSize(QPointF(newWidth,newHeight));
+            stateBoxGraphic->setCornerPositions();
+            emit stateBoxGraphic->stateBoxResized(oldBox, newBox, 2);
+        }
+        else        // this is a state machine
+        {
+            // if children states are outside of the state machine from the top or left, then using minX and minY will have undesired results, so reposition all children to be inside of the state machine, then call this function again
+            if(minX < 0 || minY < 0)
+            {
+
+                for(int i = 0; i < sbgs.size(); i++)
+                {
+                    StateBoxGraphic* sbg = sbgs.at(i);
+                    sbg->setPosAndUpdateAnchors(sbg->pos()-QPointF(minX-25,minY-25));
+                }
+
+                // all children are inside of the state machine, so we can call this again
+                this->handleAutoResize(stateBoxGraphic);
+            }
+            else    // all children are in the bottom right of the state machine's origin, so just resize the state machine
+            {
+                QRectF oldBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), stateBoxGraphic->getSize().x(), stateBoxGraphic->getSize().y());
+                newWidth+=minX;
+                newHeight+=minY;
+                QRectF newBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), newWidth, newHeight);
+                stateBoxGraphic->setSize(QPointF(newWidth,newHeight));
+                stateBoxGraphic->setCornerPositions();
+                emit stateBoxGraphic->stateBoxResized(oldBox, newBox, 2);
+            }
+        }
+    }
+}
 
 void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
 {
@@ -607,6 +728,9 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
     // automatically resize text blocks when parents are resized
     connect(stateGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)), stateGraphic->TextItem, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
+
+    // handle when a state is double clicked
+    connect(stateGraphic, SIGNAL(resizeState(StateBoxGraphic*)), this, SLOT(handleAutoResize(StateBoxGraphic*)));
 }
 
 
