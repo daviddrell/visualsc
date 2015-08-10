@@ -184,7 +184,7 @@ void CWStateMachine::createSignalsAndSlots()
             targetName = "_"+toCamel(trans->targetState()->getName())+"_"+trans->targetState()->getUidFirstName();
 
             // create a new codewriter transition and link them with the state's Transition QHash
-            cwTransition = new CWTransition(trans, eventName, relaySignal, targetName);
+            cwTransition = new CWTransition(trans, eventName, relaySignal, targetName, trans->attributes.value("comments")->asString());
             cwState->insertTransition( cwTransition);
         }
 

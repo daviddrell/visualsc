@@ -34,5 +34,7 @@
         <file>diagonalarrowhollow.png</file>
         <file>reselect.png</file>
         <file>reselectgrey.png</file>
+        <file>info.png</file>
+        <file>infow8.png</file>
     </qresource>
 </RCC>

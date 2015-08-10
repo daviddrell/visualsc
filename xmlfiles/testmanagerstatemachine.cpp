@@ -56,7 +56,7 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _testManagerStateMachine_97b850af->addState(_updateFirmwareAllUnits_53416b9a);
 
     //    Add transitions for the QStates using the transitions' private relay signals
-    _idle_c9dcfd20->addTransition(this, SIGNAL(Relay_Event_start_fa1bce49()), _downloadingAVC_fa1bce49);
+    _idle_c9dcfd20->addTransition(this, SIGNAL(Relay_Event_start_fa1bce49()), _downloadingAVC_fa1bce49);     // testing comment
     _downloadingAVC_fa1bce49->addTransition(this, SIGNAL(Relay_Event_downloadFailed_850da190()), _completed_850da190);
     _downloadingAVC_fa1bce49->addTransition(this, SIGNAL(Relay_Event_sHA1IsSame_850da190()), _completed_850da190);
     _downloadingAVC_fa1bce49->addTransition(this, SIGNAL(Relay_Event_sHA1IsDifferent_53416b9a()), _updateFirmwareAllUnits_53416b9a);
@@ -97,7 +97,6 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     //    Add transitions for the QStates using the transitions' private relay signals
 
     //    Propogate the private QState signals to public signals
-    connect(_updateFirmwareAllUnits_53416b9a, SIGNAL(started()), this, SIGNAL(Signal_StateReady_updateFirmwareAllUnits_53416b9a()));
     connect(_updatingGSUnits_52c831de, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_updatingGSUnits_52c831de()));
     connect(_updatingGSUnits_52c831de, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_updatingGSUnits_52c831de()));
     connect(_updatingWincomm_7778a7d0, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_updatingWincomm_7778a7d0()));
@@ -117,7 +116,6 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _updateInProgress_6d5ca4f3->addTransition(this, SIGNAL(Relay_Event_gSUpdateSuccess_48c3bcdd()), _done_48c3bcdd);
 
     //    Propogate the private QState signals to public signals
-    connect(_updatingGSUnits_52c831de, SIGNAL(started()), this, SIGNAL(Signal_StateReady_updatingGSUnits_52c831de()));
     connect(_updateInProgress_6d5ca4f3, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_updateInProgress_6d5ca4f3()));
     connect(_updateInProgress_6d5ca4f3, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_updateInProgress_6d5ca4f3()));
     connect(_done_48c3bcdd, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_done_48c3bcdd()));
@@ -137,7 +135,6 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _unzipInProgress_9f1f6d0f->addTransition(this, SIGNAL(Relay_Event_upzipSuccess_f93692c9()), _done_f93692c9);
 
     //    Propogate the private QState signals to public signals
-    connect(_updatingWincomm_7778a7d0, SIGNAL(started()), this, SIGNAL(Signal_StateReady_updatingWincomm_7778a7d0()));
     connect(_unzipInProgress_9f1f6d0f, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_unzipInProgress_9f1f6d0f()));
     connect(_unzipInProgress_9f1f6d0f, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_unzipInProgress_9f1f6d0f()));
     connect(_done_f93692c9, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_done_f93692c9()));

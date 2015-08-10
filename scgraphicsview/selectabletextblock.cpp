@@ -449,7 +449,7 @@ void SelectableTextBlock::handleAttributeChanged(PositionAttribute* pos)
  */
 void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 {
-    qDebug()<<"selectabletextblock::handleattributechanged";
+    //qDebug()<<"selectabletextblock::handleattributechanged";
     //TODO make these attributes do something
 
 //    FontFamilyAttribute * ff     = dynamic_cast<FontFamilyAttribute *> ( attr);

@@ -233,7 +233,18 @@ void CodeWriter::cWriteConstructor()
             for(int x = 0; x < cws->getTransitions().size(); x++)
             {
                 CWTransition* cwt = cws->getTransitions().at(x);
-                cPrintln(cws->_stateName+"->addTransition(this, SIGNAL("+cwt->_relaySignal+"), "+cwt->_targetName+");",1);
+
+                if(cwt->_comments.isEmpty())
+                {
+
+                    cPrintln(cws->_stateName+"->addTransition(this, SIGNAL("+cwt->_relaySignal+"), "+cwt->_targetName+");",1);
+                }
+                else
+                {
+                     cPrintln(cws->_stateName+"->addTransition(this, SIGNAL("+cwt->_relaySignal+"), "+cwt->_targetName+");     // "+cwt->_comments,1);
+                }
+
+
 
 
                 // for every out transition, check the connectToFinishedAttribute, and connect the finished signal of the state

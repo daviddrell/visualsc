@@ -28,6 +28,10 @@
 #include <QKeyEvent>
 #include "scformview.h"
 #include <QTime>
+#include <QMessageBox>
+
+#define POP_UP_X    160
+#define POP_UP_Y    200
 
 
 // adding comments to get the git repository
@@ -365,4 +369,46 @@ void MainWindow::on_actionImport_triggered()
         _project->getDM()->importFile(current,fileName);
 
 
+}
+
+void MainWindow::on_actionShortcuts_triggered()
+{
+    sendMessage("Shortcuts","State Box\n"
+                            "Double Click - Resize Box Automatically\n"
+                            "\n"
+                            "Text Boxes\n"
+                            "Double Click - Edit Text\n"
+                            "\n"
+                            "Transitions\n"
+                            "N - (hovered) Create Elbow\n"
+                            "D - (hovered) Delete Elbow\n");
+}
+
+
+void MainWindow::sendMessage(QString title, QString message)
+{
+
+    QMessageBox msgBox;
+
+    msgBox.setWindowTitle(title);
+    msgBox.setText(message);
+
+    msgBox.setDefaultButton(QMessageBox::Ok);
+
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    QPoint offset(POP_UP_X, POP_UP_Y);
+    msgBox.move(this->pos()+offset);
+    msgBox.adjustSize();
+    int ret = msgBox.exec();
+
+    switch (ret)
+    {
+    case QMessageBox::Ok:
+        // ok was pressed;
+        break;
+
+    default:
+        // should never be reached
+        break;
+    }
 }

@@ -50,7 +50,7 @@ signals:
 
 private:
     Ui::MainWindow *ui;
-
+    void sendMessage(QString title, QString message);
     SMProject *_project;
     QSettings *_settings;
     static QString _lastImportFilePath;
@@ -71,6 +71,7 @@ private slots:
     void handleReadInputFileDone(bool,QStringList);
     void on_actionImport_triggered();
 
+    void on_actionShortcuts_triggered();
 };
 
 #endif // MAINWINDOW_H

@@ -1147,7 +1147,8 @@ void TransitionGraphic::deleteHoveredElbow()
         LineSegmentGraphic* deadLine = elb->getSegment(1);
         LineSegmentGraphic* leftLine = elb->getSegment(0);
 
-
+        if(!deadLine)
+            return;
 
         ElbowGrabber* rightElb = deadLine->getElbow(1);
 
@@ -1175,7 +1176,7 @@ void TransitionGraphic::deleteHoveredElbow()
 
         leftLine->enclosePathInElbows();    // redraw the line segment's hover box
 
-
+        elb->forceHoverLeaveEvent();
         delete elb;
         delete deadLine;
 

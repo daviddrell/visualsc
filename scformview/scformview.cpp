@@ -1022,7 +1022,6 @@ void SCFormView::loadTreeState(CustomTreeWidgetItem * parentItem, QList<SCState*
  */
 void SCFormView::loadTreeTextBlock(CustomTreeWidgetItem * parentItem , SCTextBlock* textBlock)
 {
-    connect(textBlock, SIGNAL(destroyed(QObject*)), this, SLOT(handleTextBlockDeleted(QObject*)), Qt::QueuedConnection);
     _treeWidgetToTextBlock.insert(parentItem, textBlock);
 }
 
@@ -1193,7 +1192,7 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
         {
 
         }
-        else if(key == "event")
+        else if(key == "event"||key=="target")
         {
 
 
@@ -1847,8 +1846,10 @@ const QString SCFormView::promptTextInput(QString windowTitle, QString message, 
     inp->adjustSize();
     QPoint offset(POP_UP_X, POP_UP_Y);
     inp->move(this->pos() + offset);
-    if(inp->exec() == QDialog::Accepted)
+    if(inp->exec() == QDialog::Accepted){
         mText = inp->textValue();
+        *ok = true;
+    }
     return mText;
 }
 
@@ -1866,7 +1867,7 @@ const QString SCFormView::promptTextInput(QString windowTitle, QString message, 
  */
 void SCFormView::itemPromptProperty()
 {
-
+    qDebug() << "SCFormView::itemPropmtProperty()";
     // check if there is a highlighted tree object to add a property to
     if(_currentlySelected->getType().isEmpty())
     {
@@ -1887,13 +1888,14 @@ void SCFormView::itemPromptProperty()
     }
     else if(input.isEmpty())
     {
-        //sendMessage("Error", "Property Name cannot be empty");
+        sendMessage("Error", "Property Name cannot be empty");
         return;
     }
 
     // check if the input is valid
     if(ok && !input.isEmpty())
     {
+        qDebug() << "inserting property1";
         // the user inputted something so insert this as a new property
         itemInsertProperty((_currentlySelected),input);
     }
@@ -2909,23 +2911,23 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     saveAction->setShortcut(tr("Ctrl+S"));
     saveAction->setStatusTip(tr("Save this State Machine to an .SCXML"));
 //    connect(saveAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileSaveClick()));
-    connect(saveAction, SIGNAL(triggered()),  this, SIGNAL(saveClick()));
+
 
     exportAction = new QAction(tr("E&xport to Code"), this);
     exportAction->setShortcut(tr("Ctrl+E"));
     exportAction->setStatusTip(tr("Export to .cpp & .h"));
 //    connect(exportAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileExportClick()));
-    connect(exportAction, SIGNAL(triggered()),  this, SIGNAL(exportClick()));
+
 
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
     exitAction->setStatusTip(tr("Quit VisualSC Editor"));
-    connect(exitAction, SIGNAL(triggered()), this, SIGNAL(closeClick()));
+
 
     importAction = new QAction(tr("I&mport .SCXML"), this);
     importAction->setShortcut(tr("Ctrl+I"));
     importAction->setStatusTip(tr("Import an SCXML state machine into the selected State"));
-    connect(importAction, SIGNAL(triggered()), this, SIGNAL(importClick()));
+
 
     boldAction = new QAction(tr("Bold"), this);
     boldAction->setCheckable(true);
@@ -2959,16 +2961,48 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     insertTextBox->setStatusTip(tr("Insert a text box for the selected item"));
     connect(insertTextBox, SIGNAL(triggered()), this, SLOT(itemPromptTextBox()));
 
-    insertProperty = new QAction(QIcon(":/SCFormView/plusw10.png"), tr("Add Property"),this);
-    insertProperty->setShortcut(tr("Ctrl+A"));
+    insertProperty = new QAction(QIcon(":/SCFormView/plusw10.png"), tr("Add Attribute"),this);
     insertProperty->setStatusTip(tr("Insert a property for the selected item"));
     connect(insertProperty, SIGNAL(triggered()), this, SLOT(itemPromptProperty()));
 
-    deleteProperty = new QAction(QIcon(":/SCFormView/minusw10.png"), tr("Remove Property"), this);
-    deleteProperty->setShortcut(tr("Ctrl+A"));
+    deleteProperty = new QAction(QIcon(":/SCFormView/minusw10.png"), tr("Remove Attribute"), this);
     deleteProperty->setStatusTip(tr("Insert a property for the selected item"));
     connect(deleteProperty, SIGNAL(triggered()), this, SLOT(itemDeleteSelectedProperty()));
 
+    attributeInfoAction = new QAction(QIcon(":/SCFormView/infow8.png"), tr("About Attributes"), this);
+    attributeInfoAction->setStatusTip(tr("About Attributes"));
+    connect(attributeInfoAction, SIGNAL(triggered()), this, SLOT(aboutAttributes()));
+
+}
+
+void SCFormView::aboutAttributes()
+{
+    if(_currentlySelected->isState())
+    {
+        sendMessage("State Attribute Descriptions",
+                    "name\t\tState's Name\n"
+                    "entryAction\tComma separated list of entry events e.g. \"action1,action2,action3\"\n"
+                    "exitAction\tComma separated list of exit events\n"
+                    "finalState\t(true/false) Final state of the parent state machine [OPTIONAL]\n"
+                    "initialState\t(true/false) Initial state of a state machine [REQUIRED unless parallel]\n"
+                    "isParallelState\t(true/false) True = direct children states are concurrently run\n"
+                    "position\tPosition in parent's coordinate system\n"
+                    "size\t\tSize in pixels\n"
+                    "type\t\tNot in use\n"
+                    "uid\t\tUnique ID used in .SCXML and code generation"
+                    );
+
+    }
+    else if(_currentlySelected->isTransition())
+    {
+        sendMessage("Transition Attribute Descriptions",
+                    "event\t\t\tTransition's Event Name\n"
+                    "target\t\t\tTransition's Target State\n"
+                    "comments\t\tAdds a comment to the addTransition call in constructor\n"
+                    "connectToFinished\t(true/false) Code generator constructor will call \n\t\t\taddTransition for source state's finished() signal\n"
+                    "path\t\t\tElbow positions"
+                    );
+    }
 }
 
 void SCFormView::handleBoldChanged()
@@ -3060,6 +3094,8 @@ void SCFormView::createToolbars()
     propertyToolBar->addAction(insertProperty);
     propertyToolBar->addAction(deleteProperty);
    // propertyToolBar->addAction(insertTextBox);
+    propertyToolBar->addSeparator();
+    propertyToolBar->addAction(attributeInfoAction);
 
     //editToolBar = addToolBar(tr("Edit"));
     editToolBar = new QToolBar("Edit", this);

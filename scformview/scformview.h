@@ -99,7 +99,7 @@ signals:
 
 private slots:
 
-
+    void aboutAttributes();
     void handleNewRootMachine(SCState*);
     void handleReset();
     void handleMakeTransitionConnections(SCTransition* trans);
@@ -171,6 +171,7 @@ private slots:
     void handleItemNameChangedInDataModel(SCTransition*, QString);
 
 private:
+
 
     void changeEditToolBar(int);
 
@@ -273,6 +274,8 @@ private:
     QAction *viewKeybindsAction;
     QAction *reselectParentAction;
     QAction *reselectTargetAction;
+
+    QAction *attributeInfoAction;
 
     QMenu *fileMenu;
     QMenu *itemMenu;
