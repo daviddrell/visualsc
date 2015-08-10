@@ -239,18 +239,11 @@ void TestManagerStateMachine::Slot_StateExit_idle_c9dcfd20()
 void TestManagerStateMachine::Slot_StateEntry_downloadingAVC_fa1bce49()
 {
     emit EntryAction_startDownload();
-    emit EntryAction_doADance();
-    emit EntryAction_jump();
-    emit EntryAction_slide();
-    emit EntryAction_okay();
 }
 
 void TestManagerStateMachine::Slot_StateExit_downloadingAVC_fa1bce49()
 {
-    emit ExitAction_wow();
-    emit ExitAction_no();
-    emit ExitAction_suchWow();
-    emit ExitAction_amazing();
+
 }
 
 void TestManagerStateMachine::Slot_StateEntry_runningTests_c9e4b34a()
