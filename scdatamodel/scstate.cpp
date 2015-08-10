@@ -288,6 +288,9 @@ void SCState::reselectParent(SCState* newParent)
     // alert the graphicsview and formview
     emit changedParent(this, newParent);
 
+    // alert that the graphic has moved
+
+
     // set the parent
     setParent(newParent);
 }

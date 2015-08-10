@@ -241,6 +241,11 @@ void TransitionGraphic::setGrabbersVisible(bool visible)
         _elbows.at(i)->setVisible(visible);
 }
 
+StateBoxGraphic* TransitionGraphic::getTargetStateGraphic()
+{
+    return _targetStateGraphic;
+}
+
 /**
  * @brief TransitionGraphic::parentItemAsStateBoxGraphic
  * @return returns the parent QGraphicsItem of the transition graphic as a StateBoxGraphic

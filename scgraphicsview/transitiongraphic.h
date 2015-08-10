@@ -34,6 +34,7 @@ public:
     explicit TransitionGraphic( StateBoxGraphic *parentState, StateBoxGraphic *targetState, SCTransition *t, KeyController * keys, MouseController* mouse);
     void printInfo();
     StateBoxGraphic* parentItemAsStateBoxGraphic();
+    StateBoxGraphic* getTargetStateGraphic();
     ~TransitionGraphic();
 
     void setTargetStateGraphic(StateBoxGraphic* sbg);

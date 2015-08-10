@@ -673,13 +673,74 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
 
 }
 
+/**
+ * @brief SCGraphicsView::handleChangedParent
+ * @param state
+ * @param newParent
+ *
+ * when the data model is about to change the parent of a state, first make sure that all the anchors are updated properly in the graphics view
+ *
+ */
 void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
 {
     StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
     StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
 
+
+    // first, keep track of all scene based positions of sink anchors, the only transition elbows to stay in place
+    QList<QPointF*> tPoints;
+    QList<SCTransition*> transitions;
+    state->getAllTransitions(transitions);
+    // these are the sink anchors that belong to out transitions of the state
+    for(int i = 0; i < transitions.size(); i++)
+    {
+        SCTransition* trans = transitions.at(i);
+        TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
+        StateBoxGraphic* oldSourceState = _hashStateToGraphic.value(trans->parentSCState());
+        tPoints.append(new QPointF(oldSourceState->mapToScene(transG->getSinkAnchor()->pos())));
+
+    }
+
+    QList<QPointF*> tPointsIn;
+    QList<SCTransition*> transitionsIn;
+    // these are the sink anchors that point to this state
+    transitionsIn = state->getTransitionsIn();
+    for(int i = 0; i < transitionsIn.size(); i++)
+    {
+        SCTransition* trans = transitionsIn.at(i);
+        TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
+        StateBoxGraphic* oldSourceState = _hashStateToGraphic.value(trans->parentSCState());
+        tPointsIn.append(new QPointF(oldSourceState->mapToScene(transG->getSinkAnchor()->pos())));
+    }
+
+    // change the parent of the state box graphic
     stateGraphic->setParentItem(newParentGraphic);
 
+
+
+    // The box will move on the screen because it is changing coordinate systems. so we also must update the anchor positions to snap to their targets once more
+    // update all the state's anchors positions to snap to their targets
+    for(int i = 0; i < transitions.size(); i++)
+    {
+        SCTransition* trans = transitions.at(i);
+        TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
+        emit transG->getSinkAnchor()->anchorMoved(*tPoints.at(i));
+    }
+
+    // update all the transitions in's sink anchors
+    for(int i = 0; i < transitionsIn.size(); i++)
+    {
+        SCTransition* trans = transitionsIn.at(i);
+        TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
+        emit transG->getSinkAnchor()->anchorMoved(*tPointsIn.at(i));
+
+    }
+
+
+
+
+    qDeleteAll(tPoints.begin(), tPoints.end());
+    qDeleteAll(tPointsIn.begin(), tPointsIn.end());
 }
 
 /**
