@@ -200,6 +200,8 @@ void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF 
 
         this->setSize(QPoint(newWidth,newHeight));
 
+        w = newWidth;
+        h = newHeight;
 
         tl = QPointF(x,y);
         tr = QPointF(x+newWidth,y);
@@ -215,19 +217,27 @@ void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF 
 
     // then move the text block to be inside the box
 
+    bool change = false;
+    qreal newX = x;
+    qreal newY = y;
     if(!trloc&&!brloc)
     {
         // the right wall of the textblock is out of bounds.
         // decrease the x position
-       // qreal newX =
+        newX = box.width() - w + box.x();
+        change = true;
 
     }
     if(!brloc&&!blloc)
     {
         // the bottom wall of the text block is out of bounds
         // decrease the y position
-
+        newY = box.height() - h + box.y();
+        change = true;
     }
+
+    if(change)
+        this->setPos(newX, newY);
 
 
 }

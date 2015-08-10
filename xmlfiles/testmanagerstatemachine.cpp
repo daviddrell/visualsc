@@ -64,7 +64,7 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _completed_850da190->addTransition(this, SIGNAL(Relay_Event_pollTimerPopped_fa1bce49()), _downloadingAVC_fa1bce49);
     _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(Relay_Event_updateFailure_850da190()), _completed_850da190);
     _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(Relay_Event_updateFirmwareAllUnitsFinished_c9e4b34a()), _runningTests_c9e4b34a);
-    _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(finished()), _runningTests_c9e4b34a);
+    _updateFirmwareAllUnits_53416b9a->addTransition(_updateFirmwareAllUnits_53416b9a, SIGNAL(finished()), _runningTests_c9e4b34a);
 
     //    Propogate the private QState signals to public signals
     connect(_testManagerStateMachine_97b850af, SIGNAL(started()), this, SIGNAL(Signal_StateReady_testManagerStateMachine_97b850af()));

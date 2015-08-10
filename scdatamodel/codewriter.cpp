@@ -241,7 +241,7 @@ void CodeWriter::cWriteConstructor()
 
                if(cwt->getTransition()->isConnectToFinished())
                {
-                   cPrintln(cws->_stateName+"->addTransition(this, SIGNAL(finished()), "+cwt->_targetName+");",1);
+                   cPrintln(cws->_stateName+"->addTransition("+cws->_stateName+", SIGNAL(finished()), "+cwt->_targetName+");",1);
                    //cPrintln("connect("+cws->_stateName+", SIGNAL(finished()), this, SLOT("+cwt->_eventName+"));",1);
                }
 
