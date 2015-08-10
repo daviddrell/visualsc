@@ -385,18 +385,21 @@ bool SelectableBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * e
 
             if ( corner->getCorner() == 0 )
             {
+                qDebug() << "corner 0 is grabbed!";
                 newXpos = this->pos().x() + deltaWidth;
                 newYpos = this->pos().y() + deltaHeight;
 
 
                 if(newXpos <  0+INSIDE_PARENT_BUFFER)
                 {
+                    qDebug() << "newXPos";
                     deltaWidth = 0+INSIDE_PARENT_BUFFER - pos().x();
                     newXpos = 0+INSIDE_PARENT_BUFFER;
                 }
 
                 if(newYpos < 0+INSIDE_PARENT_BUFFER)
                 {
+                    qDebug() << "newYPos";
                     deltaHeight =0+INSIDE_PARENT_BUFFER - pos().y();
                     newYpos = 0+INSIDE_PARENT_BUFFER;
                 }
@@ -455,29 +458,20 @@ bool SelectableBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * e
             }
             else   if ( corner->getCorner() == 3 )
             {
-
-                if(newWidth + old.x() > parentW - INSIDE_PARENT_BUFFER)
-                    newWidth = parentW - INSIDE_PARENT_BUFFER - old.x();
-
                 if(newHeight + old.y() > parentH - INSIDE_PARENT_BUFFER)
                     newHeight = parentH - INSIDE_PARENT_BUFFER - old.y();
 
 
-
-
-                deltaWidth =   newWidth - _width ;
                 deltaHeight =   newHeight - _height ;
-
-                deltaWidth *= (-1);
                 deltaHeight *= (-1);
+
                 newXpos = this->pos().x() + deltaWidth;
-
-                    if(newXpos < 0+INSIDE_PARENT_BUFFER)
-                    {
-                        deltaWidth = 0+INSIDE_PARENT_BUFFER - pos().x();
-                        newXpos = 0+INSIDE_PARENT_BUFFER;
-                    }
-
+                if(newXpos <  0+INSIDE_PARENT_BUFFER)
+                {
+                    qDebug() << "newXPos";
+                    deltaWidth = 0+INSIDE_PARENT_BUFFER - pos().x();
+                    newXpos = 0+INSIDE_PARENT_BUFFER;
+                }
 
                 this->setPos(newXpos,this->pos().y());
             }

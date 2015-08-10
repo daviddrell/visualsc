@@ -468,6 +468,7 @@ bool CodeWriter::writeHFile()
 
 // intro
     hPrintln("// This header file was generated using VisualSC's Export Code Function\n");
+    hPrintln("// Visual Statechart is an open source project. Visit us at https://github.com/daviddrell/visualsc");
     hPrintln("#ifndef "+ className.toUpper() + "_H\n#define "+className.toUpper()+"_H\n");
     hPrintln("#include <QObject>");
     hPrintln("#include <QStateMachine>");
