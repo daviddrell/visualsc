@@ -7,6 +7,9 @@
 #include <QLabel>
 #include <QDebug>
 
+#define POP_UP_X    315
+#define POP_UP_Y    11
+
 StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
         QMainWindow(parent, Qt::WindowStaysOnTopHint),
         _dm(dm),
@@ -54,7 +57,8 @@ StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
     loadTree (NULL, states);
     this->setWindowTitle("Select A Target State");
     this->resize(402,650);
-    this->move(315,45);
+    QPoint offset(POP_UP_X, POP_UP_Y);
+    this->move(offset);
 
 }
 

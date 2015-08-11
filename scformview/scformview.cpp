@@ -2967,7 +2967,7 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     underlineAction->setShortcut(tr("Ctrl+U"));
     connect(underlineAction, SIGNAL(triggered()), this, SLOT(handleFontChange()));
 
-    aboutAction = new QAction(tr("A&bout"), this);
+    aboutAction = new QAction(QIcon(":/SCFormView/infow8.png"),tr("A&bout"), this);
     aboutAction->setShortcut(tr("Ctrl+H"));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 
