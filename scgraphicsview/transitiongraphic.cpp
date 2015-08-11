@@ -1008,14 +1008,20 @@ void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF ne
  */
 void TransitionGraphic::handleParentStateGraphicMoved(QPointF offset)
 {
-    for(int i = 1 ; i < _elbows.count(); i++)
-    {
-        QPointF location = _elbows[i]->pos();
-        location-=offset;
-        _elbows[i]->setPos(location);
-        _elbows[i]->getSegment(0)->enclosePathInElbows();
-    }
+    QPointF location = _anchors[1]->pos();
+    location-= offset;
+    _anchors[1]->setPos(location);
+    _anchors[1]->getSegment(0)->enclosePathInElbows();
     this->updateModel();
+
+//    for(int i = 1 ; i < _elbows.count(); i++)
+//    {
+//        QPointF location = _elbows[i]->pos();
+//        location-=offset;
+//        _elbows[i]->setPos(location);
+//        _elbows[i]->getSegment(0)->enclosePathInElbows();
+//    }
+//    this->updateModel();
 }
 
 
@@ -1040,32 +1046,29 @@ void TransitionGraphic::handleTargetStateGraphicReleased()
  * when the parent or target stateboxgraphic is moved, the anchor associated with the target graphic will be updated
  * automatically.
  *
- * only one anchor needs to be updated because all children of a state are already updated automatically.
+ * in addition, if the target state box is moved, all elbows except the source elbow will be repositioned with the target.
  *
  * this function is for when the target State is dragged around
  */
 void TransitionGraphic::handleTargetStateGraphicMoved(QPointF point)
 {
+    // point will be the vector
 
-    // point will be the coorindate of the statebox after it moved.
-
-    // point will be the difference.
-
-    for(int i = 1; i < this->_elbows.size(); i++)
-    {
-        ElbowGrabber* elb = _elbows.at(i);
-        QPointF location = elb->pos();
-        location+=point;
-        elb->setPos(location);
-        updateLineSegments(elb);
-    }
-    this->updateModel();
-
-//    QPointF location = _anchors[1]->pos();
-//    location+=point;
-//    _anchors[1]->setPos(location);
-//    updateLineSegments(_anchors[1]);
+//    for(int i = 1; i < this->_elbows.size(); i++)
+//    {
+//        ElbowGrabber* elb = _elbows.at(i);
+//        QPointF location = elb->pos();
+//        location+=point;
+//        elb->setPos(location);
+//        updateLineSegments(elb);
+//    }
 //    this->updateModel();
+
+    QPointF location = _anchors[1]->pos();
+    location+=point;
+    _anchors[1]->setPos(location);
+    updateLineSegments(_anchors[1]);
+    this->updateModel();
 }
 
 

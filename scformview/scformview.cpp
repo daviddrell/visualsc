@@ -2926,6 +2926,7 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     saveAction = new QAction(tr("S&ave"), this);
     saveAction->setShortcut(tr("Ctrl+S"));
     saveAction->setStatusTip(tr("Save this State Machine to an .SCXML"));
+    connect(saveAction, SIGNAL(triggered()), this, SIGNAL(saveClick()));
 //    connect(saveAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileSaveClick()));
 
 
@@ -2933,7 +2934,7 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     exportAction->setShortcut(tr("Ctrl+E"));
     exportAction->setStatusTip(tr("Export to .cpp & .h"));
 //    connect(exportAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileExportClick()));
-
+    connect(exportAction, SIGNAL(triggered()), this, SIGNAL(exportClick()));
 
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);

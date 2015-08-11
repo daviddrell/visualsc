@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml name="State Sequence Machine" uid="{ba72ef13-8d9e-40bf-8107-8f85700d5d94}" xmlns="http://www.w3.org/2005/07/scxml">
+    <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="true" name="Checking All State Sequences" position="-703,-382" size="534,523" type="default type" uid="{d74d8a42-628a-48e8-8fda-0e2c1f594278}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="24,14" size="183,42"/>
+        <state entryAction="" exitAction="" finalState="false" initialState="false" isParallelState="false" name="Checking Call Sequence" position="100,50" size="350,138" type="default type" uid="{78faf58e-191d-4584-9436-ef1442597646}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="94,-2" size="163,52"/>
+            <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="false" name="Waiting" position="25,40" size="131,62" type="default type" uid="{246b7dcb-f715-44d0-99aa-37c48e303173}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="29,10" size="69,40"/>
+                <transition comments="" connectToFinished="false" event="Call Seq Complete" path="M 131 32 L 165 32 " target="Completed" uid="{0b1b5af8-62f8-4e6c-8236-cd1182459777}">
+                    <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-21,9" size="138,47"/>
+                </transition>
+            </state>
+            <state entryAction="" exitAction="" finalState="true" initialState="false" isParallelState="false" name="Completed" position="190,40" size="131,62" type="default type" uid="{0b1b5af8-62f8-4e6c-8236-cd1182459777}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="17,10" size="96,42"/>
+            </state>
+        </state>
+        <state entryAction="" exitAction="" finalState="false" initialState="false" isParallelState="false" name="Checking Conn Sequence" position="100,200" size="350,138" type="default type" uid="{926f34d4-c41e-43f0-a3d6-8e002d90016a}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="100,10" size="151,38"/>
+            <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="false" name="Waiting" position="25,40" size="131,62" type="default type" uid="{c3267d7e-f5b5-40b3-ada8-d5847e08fee1}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="32,10" size="68,40"/>
+                <transition comments="" connectToFinished="false" event="Conn Seq Complete" path="M 131 31 L 165 31 " target="Completed" uid="{57b5d5f6-d4eb-4c91-af52-fab26a026324}">
+                    <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="0,10" size="137,40"/>
+                </transition>
+            </state>
+            <state entryAction="" exitAction="" finalState="true" initialState="false" isParallelState="false" name="Completed" position="190,40" size="131,62" type="default type" uid="{57b5d5f6-d4eb-4c91-af52-fab26a026324}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="19,10" size="91,40"/>
+            </state>
+        </state>
+        <state entryAction="" exitAction="" finalState="false" initialState="false" isParallelState="false" name="Checking Session Seq" position="100,350" size="350,136" type="default type" uid="{9f53745d-a529-4426-be7f-b7770fc4eb46}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="88,9" size="183,43"/>
+            <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="false" name="Waiting" position="25,40" size="131,62" type="default type" uid="{ff5a583f-8107-49ff-a68b-8ed71f196ee2}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="35,10" size="68,40"/>
+                <transition comments="" connectToFinished="false" event="Session Seq Complete" path="M 131 31 L 165 31 " target="Completed" uid="{3967534e-fab3-4a2b-b43c-56d133745de4}">
+                    <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
+                </transition>
+            </state>
+            <state entryAction="" exitAction="" finalState="true" initialState="false" isParallelState="false" name="Completed" position="190,40" size="131,62" type="default type" uid="{3967534e-fab3-4a2b-b43c-56d133745de4}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="20,11" size="79,40"/>
+            </state>
+        </state>
+        <transition comments="" connectToFinished="true" event="Checking All States Completed" path="M 534 331 L 753 331 " target="Success" uid="{914678f0-d657-4858-982e-080be2b4fa99}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="17,-33" size="184,37"/>
+        </transition>
+        <transition comments="" connectToFinished="false" event="Checking Call Sequence Failed" path="M 534 137 L 753 137 " target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="15,-40" size="188,40"/>
+        </transition>
+        <transition comments="" connectToFinished="false" event="Checking Conn Sequence Failed" path="M 534 181 L 753 181 " target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="17,-36" size="187,48"/>
+        </transition>
+        <transition comments="" connectToFinished="false" event="Checking Session Seq Failed" path="M 534 91 L 753 91 " target="Failed" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="14,-40" size="177,46"/>
+        </transition>
+    </state>
+    <state entryAction="" exitAction="" finalState="true" initialState="false" isParallelState="false" name="Failed" position="50,-320" size="221,150" type="default type" uid="{51ea86cc-21f7-435c-a81a-66fad8eea894}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="72,49" size="76,48"/>
+    </state>
+    <state entryAction="" exitAction="" finalState="true" initialState="false" isParallelState="false" name="Success" position="50,-110" size="221,116" type="default type" uid="{914678f0-d657-4858-982e-080be2b4fa99}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="69,33" size="81,45"/>
+    </state>
+</scxml>
