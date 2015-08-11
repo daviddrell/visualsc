@@ -56,11 +56,14 @@ private:
     static QString _lastImportFilePath;
     static QString _keyLastFilePath;
     static QString _codeLastFilePath;
+    static QString _currentFolder;
+    static QString _currentFileFullPath;
+    static QString _currentExportFullPath;
 
     SCFormView *_formEditorWindow;
     TextFormatToolBar *_textFormatToolBar;
 
-
+    bool _savedOnce;
     void delay();
 
 private slots:
@@ -72,6 +75,7 @@ private slots:
     void on_actionImport_triggered();
 
     void on_actionShortcuts_triggered();
+    void on_actionSave_As_triggered();
 };
 
 #endif // MAINWINDOW_H

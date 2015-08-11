@@ -39,6 +39,9 @@
 QString MainWindow::_keyLastFilePath = QString("lastFilePath");
 QString MainWindow::_codeLastFilePath =QString("codeLastFilePath");
 QString MainWindow::_lastImportFilePath = QString("lastImportFilePath");
+QString MainWindow::_currentFolder = QString("");
+QString MainWindow::_currentFileFullPath = QString("");
+QString MainWindow::_currentExportFullPath = QString("");
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -46,7 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
         _project(0),
         _settings(0),
         _formEditorWindow(0),
-        _textFormatToolBar(NULL)
+        _textFormatToolBar(NULL),
+        _savedOnce(false)
 {
     QCoreApplication::setOrganizationName("David W Drell");
     QCoreApplication::setOrganizationDomain("davidwdrell.net");
@@ -122,13 +126,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #ifndef AUTO_LOAD_FILE
     _project = new SMProject(  ui->centralWidget );
-    // _project->initNewSM(); moved to constructor
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
     _formEditorWindow = new SCFormView(0, _project->getDM());
-   // _formEditorWindow->setProject(_project);
+
     connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
     connect(_formEditorWindow, SIGNAL(openClick()), this, SLOT(handleFileOpenClick()));
     connect(_formEditorWindow, SIGNAL(saveClick()), this, SLOT(handleFileSaveClick()));
+    connect(_formEditorWindow, SIGNAL(saveAsClick()), this, SLOT(on_actionSave_As_triggered()));
     connect(_formEditorWindow, SIGNAL(importClick()), this, SLOT(on_actionImport_triggered()));
     connect(_formEditorWindow, SIGNAL(exportClick()), this, SLOT(handleExportCodeClick()));
 
@@ -164,127 +168,23 @@ void MainWindow::delay()
 
 void MainWindow::handleNewClick()
 {
+    // alert the graphics view and form view to reset
     emit reset();
 
-    // all states still exist
-  //  QList<SCState*> states;
-  //  _project->getDM()->getAllStates(states);
-   // _formEditorWindow->highlightRootItem();
-
-#if 0
-    _project->getDM()->reset(); // clean out the data model except for the root machine, this will cause the graphicsview and formview to reset as well
-    _formEditorWindow->highlightRootItem(); // select the root machine in the tree view
-  //  _formEditorWindow->reset();
-
-
-    if(false)
-    {
-        if ( _project)
-        {
-            delete _project;
-            _project = NULL;
-        }
-        _project = new SMProject(  ui->centralWidget );
-        //_project->initNewSM(); moved to constructor
-
-        ui->gridLayout->addWidget( _project->getQGraphicsView() );
-        //_formEditorWindow = new SCFormView(0, _project->getDM());
-        //_formEditorWindow->show();
-    }
-#endif
+    // reset the current save and export files.
+    _currentFileFullPath = "";
+    _currentExportFullPath = "";
 }
 
 void MainWindow::handleFileOpenClick()
 {
+    if(_currentFolder.isEmpty())
+        _currentFolder = QDir::currentPath();
 
-
-    QString prevFilePath=QDir::homePath();
-    QString fileName;
-
-    if( _settings->contains(_keyLastFilePath))
-    {
-        prevFilePath = _settings->value(_keyLastFilePath).toString();
-    }
-
-    fileName = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
-    _settings->setValue(_keyLastFilePath, fileName);
-
+    _currentFileFullPath = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+    _currentFolder = QFileInfo(_currentFileFullPath).path();
     emit reset();
-
-    emit open(fileName);
-
-
-#if 0
-   // clear out the data model
-    _project->getDM()->reset();
-    _formEditorWindow->highlightRootItem(); // select the root machine in the tree view
-    QString prevFilePath=QDir::homePath();
-    QString fileName;
-
-    if( _settings->contains(_keyLastFilePath))
-    {
-        prevFilePath = _settings->value(_keyLastFilePath).toString();
-    }
-
-    fileName = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
-    _settings->setValue(_keyLastFilePath, fileName);
-
-    // reset the datamodel and user the reader to load the new scxml
-
-
-    //_formEditorWindow->reset();
-    //this->handleNewClick();
-
-    // open the file
-    QList<SCState*> states;
-    _project->getDM()->getAllStates(states);
-
-    while(states.size()!=0)
-    {
-        // clear out the data model
-        // _project->getDM()->reset();
-        //qDebug() << "\n";
-        for(int i = 0; i < states.size(); i++)
-        {
-            //states.at(i)->deleteLater();
-            qDebug() << "state was not deleted: "<<states.at(i)->objectName();
-        }
-    }
-    //_project->getDM()->openFile(fileName);
-
-
-  //  _formEditorWindow->reset();
-
-
-#endif
-
-
-
-
-
-
-
-    if(false)
-    {
-    if ( _project)
-    {
-        delete _project;
-        _project = NULL;
-    }
-    QString prevFilePath=QDir::homePath();
-    QString fileName;
-
-    if( _settings->contains(_keyLastFilePath))
-    {
-        prevFilePath = _settings->value(_keyLastFilePath).toString();
-    }
-
-    fileName = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
-    _settings->setValue(_keyLastFilePath, fileName);
-    _project = new SMProject(  ui->centralWidget );
-    connect (_project, SIGNAL(readInputFileCompleted(bool,QStringList)), this, SLOT(handleReadInputFileDone(bool,QStringList)) );
-    _project->readInputFile(fileName);
-    }
+    emit open(_currentFileFullPath);
 }
 
 
@@ -307,20 +207,23 @@ void MainWindow::handleFileSaveClick()
 {
     if ( _project == NULL) return;
 
-    QString prevFilePath=QDir::homePath();
-    QString fileName ;
-
-    if ( _settings->contains(_keyLastFilePath))
+    if(_currentFileFullPath.isEmpty())
     {
-        prevFilePath = _settings->value(_keyLastFilePath).toString();
+        if(_currentFolder.isEmpty())
+            _currentFolder = QDir::currentPath();
+
+
+        _currentFileFullPath = QFileDialog::getSaveFileName(this, tr("Save as .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+        _currentFolder = QFileInfo(_currentFileFullPath).path();
+        qDebug() << "the file folder is " << _currentFolder;
+        qDebug() << "the file path is " << _currentFileFullPath;
+        _project->save(_currentFileFullPath);
     }
-
-    fileName = QFileDialog::getSaveFileName(this,
-                                            tr("Save as SCXML File"), prevFilePath, tr("SCXML Files (*.scxml)"));
-
-    _settings->setValue(_keyLastFilePath, fileName);
-    qDebug() << "the file name is " << fileName;
-    _project->save(fileName);
+    else
+    {
+        qDebug() << "Straight Saving...";
+        _project->save(_currentFileFullPath);
+    }
 }
 
 void MainWindow::handleExportCodeClick()
@@ -328,23 +231,37 @@ void MainWindow::handleExportCodeClick()
     if(_project==NULL)
         return;
 
-    if ( _project == NULL) return;
-
-    QString prevFilePath=QDir::homePath();
-    QString fileName ;
-
-    if ( _settings->contains(_codeLastFilePath))
+    // check if we have exported the file before
+    if(_currentExportFullPath.isEmpty())
     {
-        prevFilePath = _settings->value(_codeLastFilePath).toString();
+        // let the user select a place to put the file.
+        if(_currentFolder.isEmpty())
+            _currentFolder = QDir::currentPath();
+
+
+        _currentExportFullPath = QFileDialog::getSaveFileName(this, tr("Save as .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+        _currentFolder = QFileInfo(_currentExportFullPath).path();
+        _project->exportToCode(_currentExportFullPath);
+    }
+    else
+    {
+        qDebug() << "Straight to export...";
+        _project->exportToCode(_currentExportFullPath);
     }
 
-    fileName = QFileDialog::getSaveFileName(this,
-                                            tr("Save as .cpp and .h Files"), prevFilePath, tr("C++ and Header (*.cpp)"));
 
-    _settings->setValue(_codeLastFilePath, fileName);
-    //_project->save(fileName);
-    qDebug() << "export to code file name: " << fileName;
-    _project->exportToCode(fileName);
+
+    if(_currentFolder.isEmpty())
+        _currentFolder = QDir::currentPath();
+
+
+//    //fileName = QFileDialog::getSaveFileName(this, tr("Save as .cpp and .h Files"), prevFilePath, tr("C++ and Header (*.cpp)"));
+
+//    //_settings->setValue(_codeLastFilePath, fileName);
+//    //_project->save(fileName);
+//    qDebug() << "export to code file name: " << fileName;
+//    _project->exportToCode(fileName);
+////    sendMessage("Saved");
 }
 
 
@@ -352,23 +269,19 @@ void MainWindow::handleExportCodeClick()
 
 void MainWindow::on_actionImport_triggered()
 {
-    QString prevFilePath=QDir::homePath();
-    QString fileName;
-
-    if( _settings->contains(_lastImportFilePath))
-    {
-        prevFilePath = _settings->value(_lastImportFilePath).toString();
-    }
-
-    fileName = QFileDialog::getOpenFileName(this, tr("Import SCXML File"), prevFilePath, tr("SCXML Files (*.scxml)"));
-    _settings->setValue(_lastImportFilePath, fileName);
-
     SCState* current = _formEditorWindow->getCurrentlySelectedState();
 
-    if(current)
-        _project->getDM()->importFile(current,fileName);
+    if(!current)
+    {
+        return;
+    }
 
+    if(_currentFolder.isEmpty())
+        _currentFolder = QDir::currentPath();
 
+    QString importFileName = QFileDialog::getOpenFileName(this, tr("Import .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+    _currentFolder = QFileInfo(importFileName).path();
+    _project->getDM()->importFile(current,importFileName);
 }
 
 void MainWindow::on_actionShortcuts_triggered()
@@ -411,4 +324,20 @@ void MainWindow::sendMessage(QString title, QString message)
         // should never be reached
         break;
     }
+}
+
+void MainWindow::on_actionSave_As_triggered()
+{
+
+    if(_currentFolder.isEmpty())
+    {
+        _currentFolder = QDir::currentPath();
+    }
+
+    _currentFileFullPath = QFileDialog::getSaveFileName(this, tr("Save as .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+    _currentFolder = QFileInfo(_currentFileFullPath).path();
+    qDebug() << "the file folder is " << _currentFolder;
+    qDebug() << "the file path is " << _currentFileFullPath;
+    _project->save(_currentFileFullPath);
+
 }

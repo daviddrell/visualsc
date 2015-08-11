@@ -95,6 +95,7 @@ signals:
     void exportClick();
     void importClick();
     void saveClick();
+    void saveAsClick();
     void newClick();
 
 private slots:
@@ -261,6 +262,7 @@ private:
     QAction *newAction;
     QAction *openAction;
     QAction *saveAction;
+    QAction *saveAsAction;
     QAction *exportAction;
 
 

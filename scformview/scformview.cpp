@@ -2929,6 +2929,9 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     connect(saveAction, SIGNAL(triggered()), this, SIGNAL(saveClick()));
 //    connect(saveAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileSaveClick()));
 
+    saveAsAction = new QAction(tr("S&ave As"), this);
+    saveAsAction->setStatusTip(tr("Save this State Machine as an .SCXML"));
+    connect(saveAsAction, SIGNAL(triggered()), this, SIGNAL(saveAsClick()));
 
     exportAction = new QAction(tr("E&xport to Code"), this);
     exportAction->setShortcut(tr("Ctrl+E"));
@@ -3043,8 +3046,9 @@ void SCFormView::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(newAction);
-    fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
+    fileMenu->addAction(saveAsAction);
+    fileMenu->addAction(openAction);
     fileMenu->addSeparator();
     fileMenu->addAction(importAction);
     fileMenu->addAction(exportAction);
