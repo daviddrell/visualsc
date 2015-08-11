@@ -36,5 +36,10 @@
         <file>reselectgrey.png</file>
         <file>info.png</file>
         <file>infow8.png</file>
+        <file>export.png</file>
+        <file>import.png</file>
+        <file>newfile.png</file>
+        <file>openfolder.png</file>
+        <file>save.png</file>
     </qresource>
 </RCC>

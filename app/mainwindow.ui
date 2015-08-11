@@ -99,6 +99,10 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/newfile.png</normaloff>:/SCFormView/newfile.png</iconset>
+   </property>
    <property name="text">
     <string>New</string>
    </property>
@@ -109,12 +113,16 @@
     <bool>true</bool>
    </property>
    <property name="iconVisibleInMenu">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionOpen">
    <property name="enabled">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/openfolder.png</normaloff>:/SCFormView/openfolder.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -126,6 +134,10 @@
   <action name="actionSave">
    <property name="enabled">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/save.png</normaloff>:/SCFormView/save.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -146,6 +158,10 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/export.png</normaloff>:/SCFormView/export.png</iconset>
+   </property>
    <property name="text">
     <string>Export to Code</string>
    </property>
@@ -154,6 +170,10 @@
    </property>
   </action>
   <action name="actionImport">
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/import.png</normaloff>:/SCFormView/import.png</iconset>
+   </property>
    <property name="text">
     <string>Import .SCXML</string>
    </property>
@@ -162,6 +182,10 @@
    </property>
   </action>
   <action name="actionShortcuts">
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/infow8.png</normaloff>:/SCFormView/infow8.png</iconset>
+   </property>
    <property name="text">
     <string>Shortcuts</string>
    </property>
@@ -170,12 +194,18 @@
    </property>
   </action>
   <action name="actionSave_As">
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/save.png</normaloff>:/SCFormView/save.png</iconset>
+   </property>
    <property name="text">
     <string>Save As</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../scformview/resources/scformview.qrc"/>
+ </resources>
  <connections/>
 </ui>

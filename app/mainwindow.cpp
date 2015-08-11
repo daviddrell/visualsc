@@ -341,3 +341,8 @@ void MainWindow::on_actionSave_As_triggered()
     _project->save(_currentFileFullPath);
 
 }
+
+void MainWindow::on_actionNew_triggered()
+{
+
+}

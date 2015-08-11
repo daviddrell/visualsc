@@ -2910,30 +2910,30 @@ void SCFormView::createActions()
 
 
     // file menu items
-    newAction = new QAction(tr("N&ew"), this);
+    newAction = new QAction(QIcon(":/SCFormView/newfile.png"),tr("N&ew"), this);
     newAction->setShortcut(tr("Ctrl+N"));
     newAction->setStatusTip(tr("Create a new State Machine from scratch"));
     //connect(newAction, SIGNAL(triggered()),  this->_project, SLOT(handleNewClick()));
 connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
 
-    openAction = new QAction(tr("O&pen"), this);
+    openAction = new QAction(QIcon(":/SCFormView/openfolder.png"),tr("O&pen"), this);
     openAction->setShortcut(tr("Ctrl+O"));
     openAction->setStatusTip(tr("Open an .SCXML file"));
     //connect(openAction, SIGNAL(triggered()), this->_project, SLOT(handleFileOpenClick()));
     connect(openAction, SIGNAL(triggered()), this, SIGNAL(openClick()));
 
 
-    saveAction = new QAction(tr("S&ave"), this);
+    saveAction = new QAction(QIcon(":/SCFormView/save.png"),tr("S&ave"), this);
     saveAction->setShortcut(tr("Ctrl+S"));
     saveAction->setStatusTip(tr("Save this State Machine to an .SCXML"));
     connect(saveAction, SIGNAL(triggered()), this, SIGNAL(saveClick()));
 //    connect(saveAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileSaveClick()));
 
-    saveAsAction = new QAction(tr("S&ave As"), this);
+    saveAsAction = new QAction(QIcon(":/SCFormView/save.png"),tr("S&ave As"), this);
     saveAsAction->setStatusTip(tr("Save this State Machine as an .SCXML"));
     connect(saveAsAction, SIGNAL(triggered()), this, SIGNAL(saveAsClick()));
 
-    exportAction = new QAction(tr("E&xport to Code"), this);
+    exportAction = new QAction(QIcon(":/SCFormView/export.png"),tr("E&xport to Code"), this);
     exportAction->setShortcut(tr("Ctrl+E"));
     exportAction->setStatusTip(tr("Export to .cpp & .h"));
 //    connect(exportAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileExportClick()));
@@ -2944,7 +2944,7 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     exitAction->setStatusTip(tr("Quit VisualSC Editor"));
 
 
-    importAction = new QAction(tr("I&mport .SCXML"), this);
+    importAction = new QAction(QIcon(":/SCFormView/import.png"),tr("I&mport .SCXML"), this);
     importAction->setShortcut(tr("Ctrl+I"));
     importAction->setStatusTip(tr("Import an SCXML state machine into the selected State"));
     connect(importAction, SIGNAL(triggered()), this, SIGNAL(importClick()));
