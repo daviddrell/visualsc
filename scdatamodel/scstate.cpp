@@ -123,7 +123,7 @@ void SCState::initCommon()
     QUuid u=QUuid::createUuid();
     StateString * uid= new StateString(this, "uid", u.toString());
 
-    qDebug() << "uid; " << u.toString();
+//    qDebug() << "uid; " << u.toString();
 
     attributes.addItem(name);
     attributes.addItem(size);

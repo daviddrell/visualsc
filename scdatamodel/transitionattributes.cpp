@@ -325,6 +325,7 @@ QList<QPointF> TransitionPathAttribute::asQPointFList()
 
 void TransitionPathAttribute::setValue(const QString inStr)
 {
+    qDebug() << "TransitionPathAttribute::setValue";
     _pathPoints.clear();
 
     QString data = inStr;
@@ -363,6 +364,7 @@ void TransitionPathAttribute::setValue(const QString inStr)
         else
             break;
     }
+    qDebug() << "leaving TPA Setvalue!";
 }
 
 void TransitionPathAttribute::setValue(QList<QPointF>& path )

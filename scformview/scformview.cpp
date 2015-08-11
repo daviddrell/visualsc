@@ -152,6 +152,22 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
     initTree();
 }
 
+
+
+void SCFormView::import()
+{
+    if(!_currentlySelected->isState())
+    {
+        sendMessage("Error","Please select a state to import into");
+        return;
+    }
+    qDebug() << "import!";
+    QString prevFilePath=QDir::homePath();
+    QString fileName;
+    fileName = QFileDialog::getOpenFileName(this, tr("Import SCXML Input File"), prevFilePath, tr("SCXML Files (*.scxml)"));
+    _dm->importFile(_currentlySelected->getState(),fileName);
+}
+
 /**
  * @brief SCFormView::highlightRootItem
  *
@@ -2927,7 +2943,8 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     importAction = new QAction(tr("I&mport .SCXML"), this);
     importAction->setShortcut(tr("Ctrl+I"));
     importAction->setStatusTip(tr("Import an SCXML state machine into the selected State"));
-
+    connect(importAction, SIGNAL(triggered()), this, SIGNAL(importClick()));
+    //connect(importAction, SIGNAL(triggered()), this, SLOT(import()));
 
     boldAction = new QAction(tr("Bold"), this);
     boldAction->setCheckable(true);

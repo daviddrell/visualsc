@@ -99,6 +99,7 @@ signals:
 
 private slots:
 
+    void import();
     void aboutAttributes();
     void handleNewRootMachine(SCState*);
     void handleReset();

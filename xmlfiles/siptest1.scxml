@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml name="State Machine" uid="{319900f3-f8cd-4e77-a87b-968bfc90ad9c}" xmlns="http://www.w3.org/2005/07/scxml">
+    <state entryAction="" exitAction="" finalState="false" initialState="true" isParallelState="false" name="Waiting For System Ready" position="216,-39" size="161,100" type="default type" uid="{85ba7cc3-79f2-440a-a6cf-5a9c5e0c071b}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
+        <transition comments="" connectToFinished="false" event="System Ready" path="M 80.5 100 L 79.5116 200 " target="Running" uid="{897337fc-fa2d-4b2c-b089-0083a9a5570a}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-8,31" size="137,40"/>
+        </transition>
+    </state>
+    <state entryAction="" exitAction="" finalState="false" initialState="false" isParallelState="false" name="Running" position="120,161" size="347,343" type="default type" uid="{897337fc-fa2d-4b2c-b089-0083a9a5570a}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="106,10" size="137,40"/>
+        <state entryAction="dial" exitAction="increment loop counter" finalState="false" initialState="true" isParallelState="false" name="Connecting" position="113,57" size="161,100" type="default type" uid="{a5407b51-8236-4483-bb7b-6b24fa12b8ab}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
+            <transition comments="" connectToFinished="false" event="connected" path="M 119.5 100 L 119.5 138 " target="Connected" uid="{86cf123a-d18f-45ce-b4d0-ae63e2942d29}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-14,-4" size="137,40"/>
+            </transition>
+            <transition comments="" connectToFinished="false" event="dial failed" path="M 161 33 L 345 33 " target="Failed" uid="{35130538-390f-4925-8349-a7749f815433}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="52,-43" size="137,40"/>
+            </transition>
+        </state>
+        <state entryAction="hangup" exitAction="" finalState="false" initialState="false" isParallelState="false" name="Connected" position="112,195" size="161,100" type="default type" uid="{86cf123a-d18f-45ce-b4d0-ae63e2942d29}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
+            <transition comments="" connectToFinished="false" event="disconnected" path="M 42.5 0 L 42.5 -38 " target="Connecting" uid="{a5407b51-8236-4483-bb7b-6b24fa12b8ab}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-115,-42" size="137,40"/>
+            </transition>
+            <transition comments="" connectToFinished="false" event="disconnect failed" path="M 161 44 L 468 44 L 468 -35 " target="Failed" uid="{35130538-390f-4925-8349-a7749f815433}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="70,-33" size="137,40"/>
+            </transition>
+        </state>
+        <transition comments="" connectToFinished="false" event="loop count exceeded" path="M 0 109.859 L -111 110.5 " target="Success" uid="{251c6f56-cc3a-4ead-a990-fe51ea392c77}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-123,-42" size="137,40"/>
+        </transition>
+        <transition comments="" connectToFinished="false" event="equipment failed" path="M 347 134.217 L 458 135 " target="Failed" uid="{35130538-390f-4925-8349-a7749f815433}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-10,-3" size="137,40"/>
+        </transition>
+    </state>
+    <state entryAction="" exitAction="" finalState="true" initialState="false" isParallelState="false" name="Success" position="-152,221" size="161,100" type="default type" uid="{251c6f56-cc3a-4ead-a990-fe51ea392c77}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
+    </state>
+    <state entryAction="" exitAction="" finalState="true" initialState="false" isParallelState="false" name="Failed" position="578,221" size="161,100" type="default type" uid="{35130538-390f-4925-8349-a7749f815433}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
+    </state>
+</scxml>

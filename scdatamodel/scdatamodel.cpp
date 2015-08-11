@@ -709,7 +709,7 @@ void SCDataModel::initializeEmptyStateMachine()
 
 SCState* SCDataModel::handleMakeANewState(SCState* parent,StateAttributes*  sa)
 {
-    qDebug() << "SCDataModel::handleMakeANewState on level " << _level;
+    qDebug() << "SCDataModel::handleMakeANewState on level " << parent->getLevel()+1;
     SCState* state = NULL;
     state = new SCState(parent);
     state->attributes.setAttributes( *sa);
@@ -1098,6 +1098,7 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     transition->attributes.setAttributes(*ta);
     transition->setText(transition->attributes.value("event")->asString());
 
+    qDebug() << "do the dynamic cast on trans path";
     TransitionPathAttribute *path =
             dynamic_cast<TransitionPathAttribute *>( transition->attributes.value("path"));
 

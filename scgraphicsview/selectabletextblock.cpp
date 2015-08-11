@@ -76,7 +76,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     connect ( & _textBlockModel->attributes,SIGNAL(attributeAdded(IAttribute*)), SLOT(handleAttributeAdded(IAttribute*)), Qt::QueuedConnection );
     connect ( & _textBlockModel->attributes,SIGNAL(attributeDeleted(IAttribute*)), SLOT(handleAttributeDeleted(IAttribute*)), Qt::QueuedConnection );
 
-    qDebug() << "SelectableTextBLock::connectAttributes!";
+//    qDebug() << "SelectableTextBLock::connectAttributes!";
 
     // connect the data model attributes to handlers for the graphics object
     connectAttributes( & _textBlockModel->attributes );
@@ -338,7 +338,7 @@ void SelectableTextBlock::connectAttributes(IAttributeContainer *attributes)
     SizeAttribute * size = dynamic_cast<SizeAttribute*> (  attributes->value("size"));
     if ( size )
     {
-        qDebug() << "connecting size!";
+//        qDebug() << "connecting size!";
         connect (size, SIGNAL(changed(SizeAttribute*)), this, SLOT(handleAttributeChanged(SizeAttribute*)), Qt::QueuedConnection);
         handleAttributeChanged(size);
     }

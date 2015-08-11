@@ -45,7 +45,7 @@ public slots:
     void Event_testsCompleted_850da190();
     void Event_pollTimerPopped_fa1bce49();
     void Event_updateFailure_850da190();
-    void Event_updateFirmwareAllUnitsFinished_c9e4b34a();
+    void Event_updateFinishForAllFirmwareUnits_c9e4b34a();
 
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
 
@@ -65,6 +65,7 @@ signals:
     //////// State Machine: _testManagerStateMachine_97b850af ////////
     void EntryAction_startDownload();
     void EntryAction_startTests();
+    void EntryAction_sendEmail();
 
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
 
@@ -182,7 +183,7 @@ signals:
     void Relay_Event_testsCompleted_850da190();
     void Relay_Event_pollTimerPopped_fa1bce49();
     void Relay_Event_updateFailure_850da190();
-    void Relay_Event_updateFirmwareAllUnitsFinished_c9e4b34a();
+    void Relay_Event_updateFinishForAllFirmwareUnits_c9e4b34a();
 
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
 

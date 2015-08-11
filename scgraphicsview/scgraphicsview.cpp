@@ -708,7 +708,7 @@ void SCGraphicsView::handleSendToBack(SCState* state)
  */
 void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 {
-    qDebug() << "SCGraphicsView::connectState";
+//    qDebug() << "SCGraphicsView::connectState";
     connect(state, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
     connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 

@@ -445,7 +445,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 break;
             }
 
-            if ( elbow->getMouseState() == ElbowGrabber::kMouseMoving )
+            if ( elbow->getMouseState() == ElbowGrabber::kMouseMoving && mevent)
             {
                 //qDebug()<< "mevent: " << mevent->pos() << "scene mapped mevent: " << elbow->mapToScene(mevent->pos());
                 // give the scene scope position of the mouse and update the elbow that triggered the scene event
@@ -1048,19 +1048,24 @@ void TransitionGraphic::handleTargetStateGraphicMoved(QPointF point)
 {
 
     // point will be the coorindate of the statebox after it moved.
-  //  QPointF difference =
-  //  qDebug()<<"the target state graphic has moved. must update the transition anchor" << point;
-
 
     // point will be the difference.
 
-
-    //emit _anchors[1]->anchorMoved(_anchors[1]->mapToScene(_anchors[1]->pos()) + point);
-    QPointF location = _anchors[1]->pos();
-    location+=point;
-    _anchors[1]->setPos(location);
-    updateLineSegments(_anchors[1]);
+    for(int i = 1; i < this->_elbows.size(); i++)
+    {
+        ElbowGrabber* elb = _elbows.at(i);
+        QPointF location = elb->pos();
+        location+=point;
+        elb->setPos(location);
+        updateLineSegments(elb);
+    }
     this->updateModel();
+
+//    QPointF location = _anchors[1]->pos();
+//    location+=point;
+//    _anchors[1]->setPos(location);
+//    updateLineSegments(_anchors[1]);
+//    this->updateModel();
 }
 
 

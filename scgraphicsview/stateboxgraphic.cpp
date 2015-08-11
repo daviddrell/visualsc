@@ -38,13 +38,13 @@
 #define PEN_HOVER_WIDTH         4
 
 #define RECT_ROUNDNESS          0
-#define INNER_BORDER_THICKNESS  1.8
+#define INNER_BORDER_THICKNESS  5.0
 
 #define INNER_BORDER_DISTANCE   INNER_BORDER_THICKNESS/2 + PEN_DEFAULT_WIDTH/2
 
 
-#define SOURCE_ANCHOR_BUFFER 2.0    // smaller value means closer to real dimensions
-#define SOURCE_ANCHOR_POS_BUFFER 9.0    // was 2
+#define SOURCE_ANCHOR_BUFFER 2.0    // smaller value means elbow is closer to box's real dimensions
+#define SOURCE_ANCHOR_POS_BUFFER 9.0    //
 
 #define SINK_ANCHOR_BUFFER 5.5
 #define SINK_ANCHOR_POS_BUFFER 8.5

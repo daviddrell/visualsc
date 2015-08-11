@@ -56,14 +56,14 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _testManagerStateMachine_97b850af->addState(_updateFirmwareAllUnits_53416b9a);
 
     //    Add transitions for the QStates using the transitions' private relay signals
-    _idle_c9dcfd20->addTransition(this, SIGNAL(Relay_Event_start_fa1bce49()), _downloadingAVC_fa1bce49);     // testing comment
+    _idle_c9dcfd20->addTransition(this, SIGNAL(Relay_Event_start_fa1bce49()), _downloadingAVC_fa1bce49);
     _downloadingAVC_fa1bce49->addTransition(this, SIGNAL(Relay_Event_downloadFailed_850da190()), _completed_850da190);
     _downloadingAVC_fa1bce49->addTransition(this, SIGNAL(Relay_Event_sHA1IsSame_850da190()), _completed_850da190);
     _downloadingAVC_fa1bce49->addTransition(this, SIGNAL(Relay_Event_sHA1IsDifferent_53416b9a()), _updateFirmwareAllUnits_53416b9a);
     _runningTests_c9e4b34a->addTransition(this, SIGNAL(Relay_Event_testsCompleted_850da190()), _completed_850da190);
     _completed_850da190->addTransition(this, SIGNAL(Relay_Event_pollTimerPopped_fa1bce49()), _downloadingAVC_fa1bce49);
     _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(Relay_Event_updateFailure_850da190()), _completed_850da190);
-    _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(Relay_Event_updateFirmwareAllUnitsFinished_c9e4b34a()), _runningTests_c9e4b34a);
+    _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(Relay_Event_updateFinishForAllFirmwareUnits_c9e4b34a()), _runningTests_c9e4b34a);
     _updateFirmwareAllUnits_53416b9a->addTransition(_updateFirmwareAllUnits_53416b9a, SIGNAL(finished()), _runningTests_c9e4b34a);
 
     //    Propogate the private QState signals to public signals
@@ -197,9 +197,9 @@ void TestManagerStateMachine::Event_updateFailure_850da190()
     emit Relay_Event_updateFailure_850da190();
 }
 
-void TestManagerStateMachine::Event_updateFirmwareAllUnitsFinished_c9e4b34a()
+void TestManagerStateMachine::Event_updateFinishForAllFirmwareUnits_c9e4b34a()
 {
-    emit Relay_Event_updateFirmwareAllUnitsFinished_c9e4b34a();
+    emit Relay_Event_updateFinishForAllFirmwareUnits_c9e4b34a();
 }
 
 
@@ -265,7 +265,7 @@ void TestManagerStateMachine::Slot_StateExit_completed_850da190()
 
 void TestManagerStateMachine::Slot_StateEntry_updateFirmwareAllUnits_53416b9a()
 {
-
+    emit EntryAction_sendEmail();
 }
 
 void TestManagerStateMachine::Slot_StateExit_updateFirmwareAllUnits_53416b9a()
