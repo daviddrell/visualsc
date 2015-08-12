@@ -1,6 +1,7 @@
 VisualSc - Visual Statechart Editor for SCXML.
 
-[Install VisualSc!](https://drive.google.com/open?id=0B1lDetBy1i69ZXlhSmROOFk2MDg)
+Install VisualSc Standalone: 
+https://drive.google.com/open?id=0B1lDetBy1i69ZXlhSmROOFk2MDg
 
 VisualSc is a graphical state chart editor built on Qt.
 It adds graphical attributes to state elements in a SCXML file.
@@ -11,5 +12,3 @@ can design a state machine graphically and transform that image
 into a running statemachine (via SCXML files) bypassing the source
 code phase. Additionally, VisualSc will allow a developer to annimate
 actual state chart execution using debug tracing from the runtime machines.
-
-
