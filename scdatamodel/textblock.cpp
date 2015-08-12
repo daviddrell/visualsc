@@ -4,10 +4,7 @@
 #include "sizeattribute.h"
 #include <QDebug>
 
-#define TEXTBLOCK_DEFAULT_WIDTH     137
-#define TEXTBLOCK_DEFAULT_HEIGHT    40
-#define TEXTBLOCK_DEFAULT_X         10
-#define TEXTBLOCK_DEFAULT_Y         10
+
 
 SCTextBlock::SCTextBlock(): SCItem()
 {

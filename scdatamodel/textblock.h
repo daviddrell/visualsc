@@ -17,7 +17,10 @@
   A SCTextBlock only has attributes and text.
 
 */
-
+#define TEXTBLOCK_DEFAULT_WIDTH     137
+#define TEXTBLOCK_DEFAULT_HEIGHT    40
+#define TEXTBLOCK_DEFAULT_X         10
+#define TEXTBLOCK_DEFAULT_Y         10
 class SCDATAMODELSHARED_EXPORT SCTextBlock : public SCItem
 {
     Q_OBJECT

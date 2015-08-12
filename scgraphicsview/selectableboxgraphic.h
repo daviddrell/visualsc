@@ -17,6 +17,8 @@
 #define BOX_HOVER_PEN_WIDTH 3
 #define INSIDE_PARENT_BUFFER 7
 
+#define BOX_DRAW_BUFFER 2
+
 class CornerGrabber;
 class IAttribute;
 
@@ -65,6 +67,9 @@ enum GridLocation{
     C
 };
 
+
+#define CORNER_GRAB_X_BUFFER 7
+#define CORNER_GRAB_Y_BUFFER 7
 
 class SelectableBoxGraphic :  public QGraphicsObject
 {

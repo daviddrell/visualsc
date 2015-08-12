@@ -998,10 +998,10 @@ QPointF SelectableBoxGraphic::getVisibleCenter()
 
 QRectF SelectableBoxGraphic::getUsableArea()
 {
-    int x0 = _drawingOriginX + 2;
-    int y0 = _drawingOriginY + 2;
-    int width = _drawingWidth -2 ;
-    int height = _drawingHeight -2;
+    int x0 = _drawingOriginX + BOX_DRAW_BUFFER;
+    int y0 = _drawingOriginY + BOX_DRAW_BUFFER;
+    int width = _drawingWidth -BOX_DRAW_BUFFER ;
+    int height = _drawingHeight -BOX_DRAW_BUFFER;
 
     return QRectF(x0,y0, width, height);
 }

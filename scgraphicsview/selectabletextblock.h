@@ -9,6 +9,10 @@
 class QKeyEvent;
 class QGraphicsSceneMouseEvent;
 
+
+#define TEXT_ITEM_X_BUFFER 1
+#define TEXT_ITEM_Y_BUFFER 1
+
 /**
   * \class SelectableTextBlock
   * \ingroup GraphicsView
@@ -47,6 +51,17 @@ public:
 
     void setText(QString);
 
+    void setTextWidth(qreal w);
+    void setTextHeight(qreal h);
+
+    qreal getUsableX();
+    qreal getUsableY();
+    qreal getUsableWidth();
+    qreal getUsableHeight();
+
+    qreal getTotalTextItemBufferX();
+    qreal getTotalTextItemBufferY();
+
 signals:
     void textBlockMoved(QPointF);
 
@@ -60,8 +75,11 @@ protected:
 //    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
 
+
+
 private slots:
 
+    void handleTextItemEdited();
     void handleTextChanged();
     void handleAttributeChanged(IAttribute *attr);
     void handleAttributeChanged(SizeAttribute *attr);
@@ -73,6 +91,7 @@ private slots:
 
 private:
 
+   virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     // private methods
     int clamp(int,int,int);
     qreal clampMin(qreal,qreal);
@@ -85,6 +104,7 @@ private:
 
    int           _verticalTextMargin;
    int           _horizontalTextMargin;
+
    MaskedTextEdit _textItem;
 
    bool _centerText;
