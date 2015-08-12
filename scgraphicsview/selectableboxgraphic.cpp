@@ -78,11 +78,27 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _keepInsideParent(false),
         _minSize(QPoint(40,40))
 {
-
     _corners[0] = NULL;
     _corners[1] = NULL;
     _corners[2] = NULL;
     _corners[3] = NULL;
+
+
+    _corners[0] = new CornerGrabber(this,0, true);
+    _corners[1] = new CornerGrabber(this,1, true);
+    _corners[2] = new CornerGrabber(this,2, true);
+    _corners[3] = new CornerGrabber(this,3, true);
+
+    _corners[0]->setPaintStyle( CornerGrabber::kBox);
+    _corners[1]->setPaintStyle( CornerGrabber::kBox);
+    _corners[2]->setPaintStyle( CornerGrabber::kBox);
+    _corners[3]->setPaintStyle( CornerGrabber::kBox);
+
+    for(int i = 0; i < 4; i++)
+    {
+        _corners[i]->setVisible(false);
+    }
+
 
     this->setAcceptHoverEvents(true);
     //this->installEventFilter(this);
@@ -117,6 +133,22 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
     _corners[1] = NULL;
     _corners[2] = NULL;
     _corners[3] = NULL;
+
+
+    _corners[0] = new CornerGrabber(this,0, true);
+    _corners[1] = new CornerGrabber(this,1, true);
+    _corners[2] = new CornerGrabber(this,2, true);
+    _corners[3] = new CornerGrabber(this,3, true);
+
+    _corners[0]->setPaintStyle( CornerGrabber::kBox);
+    _corners[1]->setPaintStyle( CornerGrabber::kBox);
+    _corners[2]->setPaintStyle( CornerGrabber::kBox);
+    _corners[3]->setPaintStyle( CornerGrabber::kBox);
+
+    for(int i = 0; i < 4; i++)
+    {
+        _corners[i]->setVisible(false);
+    }
 
     this->setAcceptHoverEvents(true);
     //this->installEventFilter(this);
@@ -275,7 +307,7 @@ bool SelectableBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * e
     if ( corner->getMouseState() == CornerGrabber::kMouseMoving )
     {
 
-
+         qDebug() << "corner mouse moving";
         qreal x = mevent->pos().x(), y = mevent->pos().y();
         QPointF mts = mapToScene(pos());
         mts = pos();
@@ -552,14 +584,13 @@ bool SelectableBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * e
         QRectF newBox = QRectF(nmts.x(), nmts.y(), newWidth, newHeight);
         //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
-        int corner = this->getHoveredCorner();
-        if(corner==-1)
+        if(corner==NULL)
             qDebug() << "ERROR there was no hovered corner, should not be allowed";
         else
         {
             //qDebug() << "the corner used: " << corner;
             //qDebug() <<"old box: " <<oldBox << "new Box: " << newBox;
-            emit stateBoxResized(oldBox, newBox, corner);
+            emit stateBoxResized(oldBox, newBox, corner->getCorner());
         }
         //this->update();
     }
@@ -649,7 +680,7 @@ void SelectableBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
  */
 void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
-    //qDebug() << "mouse move event!";
+//    qDebug() << "mouse move event!";
     QPointF newPos = event->pos() ;
     QPointF location = this->pos();
     QPointF diff = newPos -_dragStart;
@@ -713,7 +744,6 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
         //this->graphicHasChanged();
     }
-
 }
 
 void SelectableBoxGraphic::setMinSize(QPoint size)
@@ -875,22 +905,29 @@ void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 
     QApplication::restoreOverrideCursor();
 
-    _corners[0]->setParentItem(NULL);
-    _corners[1]->setParentItem(NULL);
-    _corners[2]->setParentItem(NULL);
-    _corners[3]->setParentItem(NULL);
+    for(int i = 0; i < 4; i++)
+    {
+        _corners[i]->setVisible(false);
+        _corners[i]->removeSceneEventFilter(this);
 
-    delete _corners[0];
-    _corners[0] = NULL;
+    }
 
-    delete _corners[1];
-    _corners[1] = NULL;
+//    _corners[0]->setParentItem(NULL);
+//    _corners[1]->setParentItem(NULL);
+//    _corners[2]->setParentItem(NULL);
+//    _corners[3]->setParentItem(NULL);
 
-    delete _corners[2];
-    _corners[2] = NULL;
+//    delete _corners[0];
+//    _corners[0] = NULL;
 
-    delete _corners[3];
-    _corners[3] = NULL;
+//    delete _corners[1];
+//    _corners[1] = NULL;
+
+//    delete _corners[2];
+//    _corners[2] = NULL;
+
+//    delete _corners[3];
+//    _corners[3] = NULL;
 
    // _pen.setWidthF(_penWidth);
 
@@ -907,20 +944,13 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
     //QApplication::setOverrideCursor(Qt::OpenHandCursor);
 
-    _corners[0] = new CornerGrabber(this,0, true);
-    _corners[1] = new CornerGrabber(this,1, true);
-    _corners[2] = new CornerGrabber(this,2, true);
-    _corners[3] = new CornerGrabber(this,3, true);
 
-    _corners[0]->setPaintStyle( CornerGrabber::kBox);
-    _corners[1]->setPaintStyle( CornerGrabber::kBox);
-    _corners[2]->setPaintStyle( CornerGrabber::kBox);
-    _corners[3]->setPaintStyle( CornerGrabber::kBox);
+    for(int i = 0; i < 4; i++)
+    {
+        _corners[i]->setVisible(true);
+        _corners[i]->installSceneEventFilter(this);
+    }
 
-    _corners[0]->installSceneEventFilter(this);
-    _corners[1]->installSceneEventFilter(this);
-    _corners[2]->installSceneEventFilter(this);
-    _corners[3]->installSceneEventFilter(this);
 
     setCornerPositions();
 
@@ -932,12 +962,10 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 void SelectableBoxGraphic::setCornerPositions()
 {
-
     _corners[0]->setPos(_drawingOriginX, _drawingOriginY);
     _corners[1]->setPos(_drawingWidth,  _drawingOriginY);
     _corners[2]->setPos(_drawingWidth , _drawingHeight);
     _corners[3]->setPos(_drawingOriginX, _drawingHeight);
-
 }
 
 void SelectableBoxGraphic::setPenWidth(qreal defaultWidth, qreal hoverWidth)

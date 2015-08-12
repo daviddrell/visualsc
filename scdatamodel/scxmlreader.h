@@ -58,23 +58,23 @@ public:
     void getReadResult(bool &success, QStringList& message);
 
 signals:
-     void done(bool result, QStringList message);
-     void makeANewState(StateAttributes*);
-     void makeANewChildState(SCState* parent, StateAttributes*);
-     void enterStateElement();
-     void leaveStateElement();
+    void done(bool result, QStringList message);
+    void makeANewState(StateAttributes*);
+    void makeANewChildState(SCState* parent, StateAttributes*);
+    void enterStateElement();
+    void leaveStateElement();
 
-     void changeStateMachineName(QString);
-     void changeStateMachineUid(QString);
-     void enterTransistionElement();
-     void leaveTransistionElement();
-     void makeANewTransistion(TransitionAttributes*);
+    void changeStateMachineName(QString);
+    void changeStateMachineUid(QString);
+    void enterTransistionElement();
+    void leaveTransistionElement();
+    void makeANewTransistion(TransitionAttributes*);
 
-     void enterTransitionPathElement();
-     void leaveTransitionPathElement();
-     void makeANewTransistionPath(QString path);
-     void makeANewIDTextBlockElement( TextBlockAttributes*);
-     void makeANewTransitionTextBlockElement(TextBlockAttributes*);
+    void enterTransitionPathElement();
+    void leaveTransitionPathElement();
+    void makeANewTransistionPath(QString path);
+    void makeANewIDTextBlockElement( TextBlockAttributes*);
+    void makeANewTransitionTextBlockElement(TextBlockAttributes*);
 
 
 
@@ -88,6 +88,7 @@ private:
     int _currentItemType;
     //SCItem* _currentItem;
     SCState* _currentState;
+    SCState* _importedMachine;
     SCTransition* _currentTransition;
 
     void importIDTextBlockElement(SCState* parent);

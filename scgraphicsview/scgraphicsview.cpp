@@ -65,7 +65,8 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     // the root machine needs to update its children if isParalle is changed
     connect(_dm, SIGNAL(newRootMachine(SCState*)), this, SLOT(handleNewRootMachine(SCState*)));
 
-    //connect(_dm, SIGNAL(newTextBlockSignal(SCTransition*,QString)), this, SLOT(handleNewTextBlock(SCTransition,QString)));
+    // when the reader is done importing, signal the graphics view
+    connect(_dm, SIGNAL(importedMachine(SCState*)), this, SLOT(handleNewImportedMachine(SCState*)));
 
     //using openGL
 
@@ -87,7 +88,20 @@ SCGraphicsView::~SCGraphicsView()
     delete _scene;
 }
 
-
+/**
+ * @brief SCGraphicsView::handleNewImportedMachine
+ * @param state
+ *
+ * SLOT
+ * connect in SCGraphicsView construcor
+ *
+ * when a state machine is imported fully, we call this to automatically resize the state machine to enclose all of its substates
+ */
+void SCGraphicsView::handleNewImportedMachine(SCState * state)
+{
+    StateBoxGraphic* sbg = _hashStateToGraphic.value(state);
+    this->handleAutoResize(sbg);
+}
 
 /**
  * @brief SCGraphicsView::handleMakeTransitionConnections
@@ -846,6 +860,7 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     while(grandParentGraphic)
     {
         connect(grandParentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentStateGraphicResized(QRectF, QRectF, int)));
+        connect(grandParentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
         grandParentGraphic = grandParentGraphic->parentItemAsStateBoxGraphic();
     }
 

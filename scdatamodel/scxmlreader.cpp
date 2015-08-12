@@ -66,8 +66,6 @@ void SCXMLReader::importFile(SCState* parent)
     _reader.setDevice(&file);
     _reader.readNext();
 
-
-
     // while the reader hasn't ended, keep reading elements
     while ( !_reader.atEnd())
     {
@@ -82,9 +80,11 @@ void SCXMLReader::importFile(SCState* parent)
         }
     }
 
-    // import the element in
-
+    // close the file
     file.close();
+
+    // alert the graphicsview that the import process was complete
+    emit _dm->importedMachine(_importedMachine);
 
     // not currently conected to anything
     emit done(_error, _resultMessages);
@@ -109,8 +109,9 @@ void SCXMLReader::importElement(SCState* parent)
     {
         qDebug() <<"importing scxml";
         _currentItemType = ItemType::STATE;
-        _currentState = importStateMachine(parent);
 
+        // keep track of the machine that is imported, this will be used later to signal the graphicsview
+        _importedMachine = _currentState = importStateMachine(parent);
         readState = true;
 
     }

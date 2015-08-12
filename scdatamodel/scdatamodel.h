@@ -136,6 +136,7 @@ public slots:
     void handleOpen(QString);
 
 signals:
+    void importedMachine(SCState*);
     void openCompleted(bool sucess, QStringList message);
     void newStateSignal(SCState * newState);
     void newTransitionSignal(SCTransition * newTransition);

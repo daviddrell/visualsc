@@ -65,6 +65,9 @@ void SCDataModel::connectDataModel()
     // connects scxml reader to changing the state machine's name
     connect(&_reader, SIGNAL(changeStateMachineName(QString)), this, SLOT(handleStateMachineNameLoad(QString)));
     connect(&_reader, SIGNAL(changeStateMachineUid(QString)), this, SLOT(handleStateMachineUidLoad(QString)));
+
+
+
 }
 
 SCDataModel * SCDataModel::singleton()
@@ -425,6 +428,8 @@ void SCDataModel::importFile(SCState* parent,QString fileName)
         // alert the graphicsview and formview that the imported transitions are ready
         emit transitionsReadyToConnect(_importedTransitions.at(i));
     }
+
+
 }
 
 

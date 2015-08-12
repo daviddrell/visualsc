@@ -62,6 +62,7 @@ signals:
 
 private slots:
 
+    void handleNewImportedMachine(SCState*);
     void handleRootMachineIsParallelChanged(StateString*);
     void handleNewRootMachine(SCState*);
     void handleAutoResize(StateBoxGraphic*);

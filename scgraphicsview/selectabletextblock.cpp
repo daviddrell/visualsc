@@ -47,6 +47,9 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
         _textBlockModel(textBlockModel),
         _centerText(true)
 {
+
+
+    _textItem.setAcceptHoverEvents(false);
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
     _textItem.setFlag(QGraphicsItem::ItemIsMovable, false );
 

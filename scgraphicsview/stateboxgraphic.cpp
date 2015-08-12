@@ -97,6 +97,9 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     _initialStateColor = QColor(104,237,153,255);
     _finalStateColor = QColor(242,119,119,255);
+
+
+
 }
 
 
@@ -183,18 +186,39 @@ bool StateBoxGraphic::isContained(QRectF rect)
     return ret;
 }
 
+
+/**
+ * @brief StateBoxGraphic::forceUpdate
+ *
+ * SLOT
+ *
+ * connect in SCGraphicsView::connectState
+ *
+ * extends the update function to have a public one
+ */
 void StateBoxGraphic::forceUpdate()
 {
     this->update();
-//    this->update(0,0,this->getSize().x(), this->getSize().y());
 }
 
-
+/**
+ * @brief StateBoxGraphic::handleInitialStateChanged
+ *
+ * SLOT
+ *
+ * connect in SCGraphicsView::connectState
+ *
+ * when a state's initial state attribute is changed, update the screen
+ */
 void StateBoxGraphic::handleInitialStateChanged(StateString *)
 {
     this->update();
 }
 
+/**
+ * @brief StateBoxGraphic::handleFinalStateChanged
+ * when a state's final state attribute is changed, udpate the screen
+ */
 void StateBoxGraphic::handleFinalStateChanged(StateString *)
 {
     this->update();

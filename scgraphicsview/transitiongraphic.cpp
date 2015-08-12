@@ -1024,10 +1024,23 @@ void TransitionGraphic::handleParentStateGraphicMoved(QPointF offset)
 //    this->updateModel();
 }
 
-
+/**
+ * @brief TransitionGraphic::handleParentStateGraphicReleased
+ *
+ * SLOT
+ *
+ * connect in SCGraphicsView::connectTransition
+ *
+ *
+ *
+ */
 void TransitionGraphic::handleParentStateGraphicReleased()
 {
-    _anchors[0]->straightenLines();
+    for(int i = 0 ; i < _elbows.size()-1; i++)
+    {
+        _elbows.at(i)->straightenLines();
+    }
+//    _anchors[0]->straightenLines();
     this->updateModel();
 }
 
