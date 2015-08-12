@@ -183,16 +183,41 @@ bool StateBoxGraphic::isContained(QRectF rect)
     return ret;
 }
 
-// DEPRECATED FUNCTION, now handled inside of StateBoxGraphic::paintWithVisibleBox
-void StateBoxGraphic::handleIsParallelStateChanged(IAttribute*attr)
+void StateBoxGraphic::forceUpdate()
 {
-    if ( attr->asString() == "true")
+    this->update();
+//    this->update(0,0,this->getSize().x(), this->getSize().y());
+}
+
+
+void StateBoxGraphic::handleInitialStateChanged(StateString *)
+{
+    this->update();
+}
+
+void StateBoxGraphic::handleFinalStateChanged(StateString *)
+{
+    this->update();
+}
+
+/**
+ * @brief StateBoxGraphic::handleIsParallelStateChanged
+ * @param ss
+ *
+ * when a state's isParallelState Attribute is changed. update all direct children
+ *
+ */
+void StateBoxGraphic::handleIsParallelStateChanged(StateString* ss)
+{
+
+    QList<StateBoxGraphic*> directChildren;
+    this->getStates(directChildren);
+
+    qDebug () << "attempting to redraw children...";
+    for(int i = 0 ; i < directChildren.size(); i++)
     {
-        setDrawBoxLineStyle(kDrawDotted);
-    }
-    else
-    {
-        setDrawBoxLineStyle(kDrawSolid);
+//        directChildren.at(i)->hoverEnterEvent(
+        directChildren.at(i)->forceUpdate();
     }
 }
 
@@ -599,6 +624,7 @@ void StateBoxGraphic::handleAttributeChanged(PositionAttribute* pos)
     //qDebug() << "StateBoxGraphic::handleAttributeChanged position attr";
     setPosAndUpdateAnchors(pos->asPointF());
 }
+
 
 
 /**
@@ -1526,41 +1552,6 @@ void  StateBoxGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem 
 }
 
 
-/*
-void StateBoxGraphic::handleAttributeChanged(void *attr)
-{
-    qDebug() << "StateBoxGraphic::handleAttributeChanged: ";
-
-    StateName * name = dynamic_cast<StateName *> ((IAttribute*)attr);
-    SizeAttribute * size = dynamic_cast<SizeAttribute *> ( (IAttribute*)attr);
-    PositionAttribute * position =dynamic_cast<PositionAttribute*> ((IAttribute*)attr);
-
-    if ( name )
-    {
-        this->setObjectName(name->asString()); // help debug tracing - id which object this is
-        SCTextBlock * tb  = _stateModel->getIDTextBlock();
-        tb->setText(name->asString());
-        //TextItem.setPlainText(name->asString());
-    }
-    else if ( size )
-    {
-        QPoint pt = size->asPointF().toPoint();
-        SelectableBoxGraphic::setSize(pt);
-    }
-    else if ( position)
-    {
-        QPointF ps = position->asPointF();
-        SelectableBoxGraphic::setPos(ps);
-    }
-
-    QGraphicsItem *parent = this->parentItem();
-    if ( parent)
-        parent->update();
-    else
-        this->update();
-
-}
-*/
 
 
 void StateBoxGraphic::setHighlighted(bool on)

@@ -391,9 +391,6 @@ int ElbowGrabber::getZone(qreal angle)
 
 int ElbowGrabber::getZone(QPointF pos)
 {
-    qreal x = pos.x();
-    qreal y = pos.y();
-
     qreal xDist = distanceX(this->pos(), pos);
     qreal yDist = distanceY(this->pos(), pos);
 

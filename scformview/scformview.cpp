@@ -115,6 +115,9 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
     propertyTable->setColumnWidth(0,PROPERTY_TABLE_WIDTH_1);
     propertyTable->horizontalHeader()->setStretchLastSection(true);
     //propertyTable->setColumnWidth(1,PROPERTY_TABLE_WIDTH_2);
+//    propertyTable->setHorizontalHeaderItem(0, new QTableWidgetItem("Preuba"));
+
+    propertyTable->setHorizontalHeaderLabels(QString("HEADER 1;HEADER 2;HEADER 3").split(";"));
 
     propertyLayout->addWidget( propertyTable );
 
@@ -872,19 +875,18 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
 /**
  * @brief SCFormView::connectState
  * @param state
- * @param tableItem
+ * @param treeItem
  *
+ *  this function sets up connections for a sc states' attributes changing to also update the tree view
  *
- * connect state attributes to the property table widget item
- * NOT CURRENTLY USED
  */
-void SCFormView::connectState(SCState *state, CustomTableWidgetItem* tableItem)
+void SCFormView::connectState(SCState *state, CustomTreeWidgetItem* treeItem)
 {
-    // disconnects happen
-    SizeAttribute* size = dynamic_cast<SizeAttribute*>(state->attributes.value("size"));
-    connect(size, SIGNAL(changed(SizeAttribute*)), tableItem, SLOT(handleAttributeChanged(SizeAttribute*)));
-    //connect(size->)
+    connect(state->getStateNameAttr(), SIGNAL(changed(StateName*)), treeItem, SLOT(handleAttributeChanged(StateName*)));
 }
+
+
+
 
 /**
  * @brief SCFormView::connectState
@@ -900,12 +902,6 @@ void SCFormView::connectState(SCState* st)
     // SCState connects
     connect(st, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
     connect(st, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*,SCState*)));
-    //connect(st, SIGNAL(nameChangedInDataModel(SCState*,QString)), this, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
-    //connect(st, SIGNAL(positionChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCState*,QPointF)));
-    //connect(st, SIGNAL(sizeChangedInDataModel(SCState*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCState*,QPointF)));
-    //connect(st->getIDTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*, QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*, QPointF)));
-    //connect(st->getIDTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));
-
 }
 
 /**
@@ -921,9 +917,6 @@ void SCFormView::connectTransition(SCTransition* trans)
     //qDebug() << "SCFormView::connectTransition for " << trans->attributes.value("event")->asString();
     connect(trans, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
     connect(trans, SIGNAL(changedTarget(SCTransition*,SCState*)), this, SLOT(handleChangedTransitionTarget(SCTransition*,SCState*)));
-    /*connect(trans, SIGNAL(eventChangedInDataModel(SCTransition*, QString)), this, SLOT(handleItemNameChangedInDataModel(SCTransition*,QString)));
-    connect(trans->getEventTextBlock(), SIGNAL(positionChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemPositionChangedInDataModel(SCTextBlock*,QPointF)));
-    connect(trans->getEventTextBlock(), SIGNAL(sizeChangedInDataModel(SCTextBlock*,QPointF)), this, SLOT(handleItemSizeChangedInDataModel(SCTextBlock*,QPointF)));*/
 }
 
 /**
@@ -1135,21 +1128,10 @@ void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, 
         StateString* uid = state->getStringAttr("uid");
         connect(uid, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
     }
+
 }
 
 
-/**
- * @brief SCFormView::connectState
- * @param state
- * @param treeItem
- *
- *  this function sets up connections for a sc states' attributes changing to also update the tree view
- *
- */
-void SCFormView::connectState(SCState *state, CustomTreeWidgetItem* treeItem)
-{
-    connect(state->getStateNameAttr(), SIGNAL(changed(StateName*)), treeItem, SLOT(handleAttributeChanged(StateName*)));
-}
 
 void SCFormView::loadPropertyTable(FVItem* item)
 {
@@ -1161,6 +1143,7 @@ void SCFormView::loadPropertyTable(FVItem* item)
     {
         loadPropertyTable(item->getTransition());
     }
+    propertyTable->setHorizontalHeaderLabels(QString("Attribute;Value").split(";"));
 }
 
 void SCFormView::loadPropertyTable(SCTransition* trans)

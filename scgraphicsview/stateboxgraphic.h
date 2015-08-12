@@ -101,6 +101,10 @@ public:
     void getAllStates(QList<StateBoxGraphic*> &stateList);
     //void getAllTransitions(QList<TransitionGraphic*> &transList);
 
+
+    void forceUpdate();
+
+
 signals:
     void resizeState(StateBoxGraphic*);
 
@@ -110,7 +114,9 @@ protected:
 public slots:
     void handleTransitionLineStartMoved(QPointF newPos);
     void handleTransitionLineEndMoved(QPointF newPos);
-    void handleIsParallelStateChanged(IAttribute*);
+    void handleIsParallelStateChanged(StateString*);
+    void handleInitialStateChanged(StateString*);
+    void handleFinalStateChanged(StateString*);
     void handleAttributeChanged(SizeAttribute*);
     void handleAttributeChanged(PositionAttribute* pos);
     void handleTextBlockAttributeChanged(SizeAttribute*);
@@ -145,7 +151,6 @@ private slots:
 
 private:
     int call;
-    int update;
     int returnClosestWallFace(QPointF mts,QPointF newPos);
     int returnClosestWallFace(qreal a, qreal b, qreal c, qreal d);
     //private data

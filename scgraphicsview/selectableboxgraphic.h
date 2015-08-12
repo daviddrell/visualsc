@@ -105,6 +105,7 @@ public:
     void setPenWidth(qreal, qreal);
     void setMinSize(QPoint);
     //bool eventFilter(QObject *, QEvent *);
+    virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
 signals:
     void stateBoxMoved(QPointF);    // this signal activates when the statebox graphic is moved or resized to alert the transition graphic to be updated as to remained anchored to its target state. Although the sink anchor is still a child of the source state graphic, it should behave like a child of its target state.
@@ -158,7 +159,6 @@ private:
 
     virtual void graphicHasChanged() = 0; ///< subclass must implement this, used to record user changes back to the data model
 
-    virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
     virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events

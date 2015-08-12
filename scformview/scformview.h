@@ -192,7 +192,6 @@ private:
     void initTree();
 
     void connectState(SCState*);
-    void connectState(SCState *, CustomTableWidgetItem*);
     void connectState(SCState*, CustomTableWidgetItem*, QString);
     void connectState(SCState*, CustomTreeWidgetItem*);
 

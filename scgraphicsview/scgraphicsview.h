@@ -62,6 +62,8 @@ signals:
 
 private slots:
 
+    void handleRootMachineIsParallelChanged(StateString*);
+    void handleNewRootMachine(SCState*);
     void handleAutoResize(StateBoxGraphic*);
     void handleNewState(SCState * newState);
     void handleNewTransition(SCTransition*);
@@ -82,7 +84,7 @@ private slots:
 private:
 
     void connectState(SCState*, StateBoxGraphic*);
-    //void connectState(SCState*);
+    void connectState(SCState*);
     void connectTransition(SCTransition*);
 
 

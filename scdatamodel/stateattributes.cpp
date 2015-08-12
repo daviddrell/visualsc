@@ -197,7 +197,7 @@ QString StateString::asString()
 }
 
 
-void    StateString::setValue(const QString value)
+void StateString::setValue(const QString value)
 {
     if ( value != _value )
     {

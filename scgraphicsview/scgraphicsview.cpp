@@ -62,6 +62,9 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     // user inserts a new transition
     connect(_dm, SIGNAL(insertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransitionFormView(SCTransition*)));
 
+    // the root machine needs to update its children if isParalle is changed
+    connect(_dm, SIGNAL(newRootMachine(SCState*)), this, SLOT(handleNewRootMachine(SCState*)));
+
     //connect(_dm, SIGNAL(newTextBlockSignal(SCTransition*,QString)), this, SLOT(handleNewTextBlock(SCTransition,QString)));
 
     //using openGL
@@ -180,6 +183,9 @@ void SCGraphicsView::createGraph()
 {
     QList<SCState*> states;
     _dm->getAllStates(states);
+
+    // connect the top state
+    connectState(_dm->getTopState());
 
     // first load all states
     for(int s = 0; s < states.count(); s++)
@@ -698,6 +704,49 @@ void SCGraphicsView::handleSendToBack(SCState* state)
     sbg->setZValue(zMin-1);
 }
 
+/**
+ * @brief SCGraphicsView::handleNewRootMachine
+ * @param state
+ *
+ *
+ */
+void SCGraphicsView::handleNewRootMachine(SCState* state)
+{
+    this->connectState(state);
+}
+
+/**
+ * @brief SCGraphicsView::handleRootMachineIsParallelChanged
+ *
+ * SLOT
+ * connected specifically to the root machine's isParallelState Attribtue
+ * while other states will have this function in stateboxgraphic, since the root machine has no statebox graphic, update its children graphics will be handled here.
+ *
+ * is parallel state is the only attribute for the root machine that can affect something in the graphics view.
+ */
+void SCGraphicsView::handleRootMachineIsParallelChanged(StateString *)
+{
+    qDebug() << "SCGraphicsView::handleRootMachineIsParallelChanged";
+    QList<SCState*> states;
+    _dm->getTopState()->getStates(states);
+
+    for(int i = 0 ; i < states.size();i ++)
+    {
+        StateBoxGraphic* sbg = _hashStateToGraphic.value(states.at(i));
+        sbg->forceUpdate();
+    }
+}
+
+/**
+ * @brief SCGraphicsView::connectState
+ *  this is called for the root machine.
+ *  the only attribute change for root machines that causes a graphicsview change is toggling parallel state true/false
+ */
+void SCGraphicsView::connectState(SCState* state)
+{
+    StateString* ips = state->getStringAttr("isParallelState");
+    connect(ips, SIGNAL(changed(StateString*)), this, SLOT(handleRootMachineIsParallelChanged(StateString*)));
+}
 
 /**
  * @brief SCGraphicsView::connectState
@@ -723,6 +772,17 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
     PositionAttribute* pos = state->getPosAttr();
     connect(pos, SIGNAL(changed(PositionAttribute*)), stateGraphic, SLOT(handleAttributeChanged(PositionAttribute*)));
 
+    StateString* ips = state->getStringAttr("isParallelState");
+    connect(ips, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleIsParallelStateChanged(StateString*)));
+
+    StateString* initialState = state->getStringAttr("initialState");
+    connect(initialState, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleInitialStateChanged(StateString*)));
+
+    StateString* finalState = state->getStringAttr("finalState");
+    connect(finalState, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleFinalStateChanged(StateString*)));
+
+
+
     //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
     //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
 
@@ -732,6 +792,8 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
     // handle when a state is double clicked
     connect(stateGraphic, SIGNAL(resizeState(StateBoxGraphic*)), this, SLOT(handleAutoResize(StateBoxGraphic*)));
+
+
 }
 
 
@@ -883,6 +945,7 @@ void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
  */
 void SCGraphicsView::handleNewState (SCState *newState)
 {
+    qDebug () << "SCGraphicsView::handleNewState";
     static int zVal = 0;
     // SCState connects
 
@@ -918,12 +981,6 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // this is show by the children being drawn with dotted lines. So inform
     // the children to watch the parent's isParallelAttribute
     //
-    IAttributeContainer * attrs = parentState->getAttributes();
-    IAttribute * attr = attrs->value("isParallelState");
-
-    // moved this to state box paint
-    //connect(attr, SIGNAL(changed(IAttribute*)),stateGraphic,SLOT(handleIsParallelStateChanged(IAttribute*)));
-    //stateGraphic->handleIsParallelStateChanged(attr);
 
     // new states will be on top
     stateGraphic->setZValue(zVal++);
