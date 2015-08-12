@@ -97,6 +97,7 @@ public:
     QPointF mapToHighestParent(QPointF pos);
     StateBoxGraphic* parentItemAsStateBoxGraphic();
 
+    void getStates(QList<StateBoxGraphic*> &stateList);
     void getAllStates(QList<StateBoxGraphic*> &stateList);
     //void getAllTransitions(QList<TransitionGraphic*> &transList);
 

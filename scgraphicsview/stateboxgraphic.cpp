@@ -803,9 +803,38 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
 
 }
 
+/**
+ * @brief StateBoxGraphic::mouseDoubleClickEvent
+ * @param event
+ *
+ * SIGNAL
+ * resizeState
+ *
+ * to
+ * SLOT
+ * handleAutoResize
+ *
+ * connect in SCGraphicsView::connectState
+ *
+ *
+ */
 void StateBoxGraphic::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event )
 {
     emit this->resizeState(this);
+}
+
+
+void StateBoxGraphic::getStates(QList<StateBoxGraphic*> &stateList)
+{
+    for(int i = 0; i < this->childItems().size(); i++)
+    {
+        StateBoxGraphic* state = dynamic_cast<StateBoxGraphic*>(this->childItems()[i]);
+        if(state)
+        {
+            stateList.append(state);
+        }
+    }
+
 }
 
 void StateBoxGraphic::getAllStates(QList<StateBoxGraphic *> &stateList)

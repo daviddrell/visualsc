@@ -221,7 +221,8 @@ QGraphicsView * SCGraphicsView::getQGraphicsView()
 void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
 {
     QList<StateBoxGraphic*> sbgs;
-    stateBoxGraphic->getAllStates(sbgs);
+//    stateBoxGraphic->getAllStates(sbgs);
+    stateBoxGraphic->getStates(sbgs);
     //QPointF myPos = mapToHighestParent(pos());
     qreal x = 0;
     qreal y = 0;
