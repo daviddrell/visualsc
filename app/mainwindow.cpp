@@ -181,8 +181,19 @@ void MainWindow::handleFileOpenClick()
     if(_currentFolder.isEmpty())
         _currentFolder = QDir::currentPath();
 
-    _currentFileFullPath = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+
+    QString newFileFullPath = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+
+
+    // If open was canceled, then stop this function from continuing
+    if(newFileFullPath.isEmpty())
+        return;
+
+
+    _currentFileFullPath = newFileFullPath;
     _currentFolder = QFileInfo(_currentFileFullPath).path();
+
+
     emit reset();
     emit open(_currentFileFullPath);
 }
