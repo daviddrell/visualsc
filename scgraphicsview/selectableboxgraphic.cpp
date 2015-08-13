@@ -953,11 +953,22 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 
     setCornerPositions();
+}
 
+void SelectableBoxGraphic::setCursorToResize(bool on)
+{
+    if(on)
+    {
+        int corner = this->cornerHovered();
+        if(corner < 0)
+            return;
 
-
-    //_pen.setWidthF(_penHoverWidth);
-
+        _corners[corner]->setCursorToResize(true);
+    }
+    else
+    {
+        QApplication::restoreOverrideCursor();
+    }
 }
 
 void SelectableBoxGraphic::setCornerPositions()
@@ -973,6 +984,24 @@ void SelectableBoxGraphic::setPenWidth(qreal defaultWidth, qreal hoverWidth)
     _penWidth = defaultWidth;
     _penHoverWidth = hoverWidth;
     _pen.setWidthF(_penWidth);
+}
+
+int SelectableBoxGraphic::cornerHovered()
+{
+    for(int i = 0 ; i < 4; i++)
+    {
+        if(_corners[i]->isHovered())
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+CornerGrabber* SelectableBoxGraphic::getCornerHovered()
+{
+    int cor = cornerHovered();
+    if(cor >= 0)
+        return _corners[cor];
 }
 
 QRectF SelectableBoxGraphic::boundingRect() const

@@ -52,7 +52,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
 {
 
     // Set accept hover events to false so the corners hover events are not interfered with
-    _textItem.setAcceptHoverEvents(false);
+    _textItem.setAcceptHoverEvents(true);
 
 #ifdef POP_UP_EDIT_MODE
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
@@ -74,7 +74,8 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     QFont serifFont("Arial", 10, QFont::Bold);
     _textItem.setFont(serifFont);
 
-    //_textItem.installSceneEventFilter(this);
+
+
     // set the initial text to what the datamodel loaded
     //_textItem.setPlainText( _textBlockModel->getText());
     this->setText(_textBlockModel->getText());
@@ -163,65 +164,85 @@ void SelectableTextBlock::resizeToFitParent()
 
 }
 
-
-/**
-  * This scene event filter has been registered with all four corner grabber items.
-  * When called, a pointer to the sending item is provided along with a generic
-  * event.  A dynamic_cast is used to determine if the event type is one of the events
-  * we are interrested in.
-  */
-bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * event )
+void SelectableTextBlock::textItemEventHandler(MaskedTextEdit *text, QGraphicsSceneMouseEvent *mevent)
 {
-    //    qDebug() << " QEvent == " + QString::number(event->type());
-
-    CornerGrabber * corner = dynamic_cast<CornerGrabber *>(watched);
-    if ( corner == NULL) return false; // not expected to get here
-
-    QGraphicsSceneMouseEvent * mevent = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-    if ( mevent == NULL)
+#ifndef MTE_MOUSE_EVENTS
+    switch(mevent->type())
     {
-        // this is not one of the mouse events we are interrested in
-        return false;
-    }
-
-
-    switch (event->type() )
-    {
-        // if the mouse went down, record the x,y coords of the press, record it inside the corner object
     case QEvent::GraphicsSceneMousePress:
-        {
-            corner->setMouseState(CornerGrabber::kMouseDown);
-            corner->mouseDownX = mevent->pos().x();
-            corner->mouseDownY = mevent->pos().y();
-            //corner->setHovered(true);
-        }
+    {
+
+    }
         break;
 
     case QEvent::GraphicsSceneMouseRelease:
+    {
+
+    }
+        break;
+    case QEvent::GraphicsSceneMouseMove:
+    {
+
+
+    }
+        break;
+    case QEvent::GraphicsSceneMouseDoubleClick:
+    {
+        if(text->textInteractionFlags() == Qt::TextEditorInteraction)
         {
-            corner->setMouseState(CornerGrabber::kMouseReleased);
-            //corner->setHovered(false);
-            graphicHasChanged();
+            // if editor mode is already on: pass double click events on to the editor:
+            text->mouseDoubleClickEvent(mevent);
+            return;
         }
+
+        // if editor mode is off:
+        // 1. turn editor mode on and set selected and focused:
+        text->setTextInteraction(true, true);
+        text->resizeRectToTextBlock();
+    }
+        break;
+    }
+#endif
+
+}
+
+void SelectableTextBlock::cornerEventHandler(CornerGrabber *corner, QGraphicsSceneMouseEvent *mevent)
+{
+    qDebug() << "corner event";
+    switch (mevent->type() )
+    {
+    // if the mouse went down, record the x,y coords of the press, record it inside the corner object
+    case QEvent::GraphicsSceneMousePress:
+    {
+        corner->setMouseState(CornerGrabber::kMouseDown);
+        corner->mouseDownX = mevent->pos().x();
+        corner->mouseDownY = mevent->pos().y();
+        //corner->setHovered(true);
+    }
+        break;
+
+    case QEvent::GraphicsSceneMouseRelease:
+    {
+        corner->setMouseState(CornerGrabber::kMouseReleased);
+        //corner->setHovered(false);
+        graphicHasChanged();
+    }
         break;
 
     case QEvent::GraphicsSceneMouseMove:
-        {
-            corner->setMouseState(CornerGrabber::kMouseMoving );
-        }
+    {
+        corner->setMouseState(CornerGrabber::kMouseMoving );
+    }
         break;
 
-    default:
-        // we dont care about the rest of the events
-        return false;
-        break;
+
     }
 
 
     if ( corner->getMouseState() == CornerGrabber::kMouseMoving )
     {
 
-         qDebug() << "corner mouse moving";
+        qDebug() << "corner mouse moving";
         qreal x = mevent->pos().x(), y = mevent->pos().y();
         QPointF mts = mapToScene(pos());
         mts = pos();
@@ -236,31 +257,31 @@ bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * ev
         switch( corner->getCorner() )
         {
         case 0:
-            {
-                XaxisSign = +1;
-                YaxisSign = +1;
-            }
+        {
+            XaxisSign = +1;
+            YaxisSign = +1;
+        }
             break;
 
         case 1:
-            {
-                XaxisSign = -1;
-                YaxisSign = +1;
-            }
+        {
+            XaxisSign = -1;
+            YaxisSign = +1;
+        }
             break;
 
         case 2:
-            {
-                XaxisSign = -1;
-                YaxisSign = -1;
-            }
+        {
+            XaxisSign = -1;
+            YaxisSign = -1;
+        }
             break;
 
         case 3:
-            {
-                XaxisSign = +1;
-                YaxisSign = -1;
-            }
+        {
+            XaxisSign = +1;
+            YaxisSign = -1;
+        }
             break;
 
         }
@@ -272,17 +293,10 @@ bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * ev
         //const qreal w = this->getSize().x();
         //const qreal h = this->getSize().y();
 
-
         SelectableBoxGraphic* parentGraphic = this->parentAsSelectableBoxGraphic();
 
-
-         qreal parentW;
-         qreal parentH;
-
-
-
-
-
+        qreal parentW;
+        qreal parentH;
 
         int xMoved = corner->mouseDownX - x;
         int yMoved = corner->mouseDownY - y;
@@ -296,33 +310,14 @@ bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * ev
         int deltaWidth;
         int deltaHeight;
 
-
         // if this box is resized, keep it inside its parent's area
         if(_keepInsideParent&&parentGraphic)
         {
             parentW = parentGraphic->getSize().x();
             parentH = parentGraphic->getSize().y();
 
-
-
-            // applies to when pos is static and width and height are changing
-            // check if the new width and height are too far out
-
-/*
-            if(newWidth + old.x() > parentW - INSIDE_PARENT_BUFFER)
-                newWidth = parentW - INSIDE_PARENT_BUFFER - old.x();
-
-            if(newHeight + old.y() > parentH - INSIDE_PARENT_BUFFER)
-                newHeight = parentH - INSIDE_PARENT_BUFFER - old.y();
-*/
-
-
-
             deltaWidth =   newWidth - _width ;
             deltaHeight =   newHeight - _height ;
-
-
-            //adjustDrawingSize(  deltaWidth ,   deltaHeight);
 
             deltaWidth *= (-1);
             deltaHeight *= (-1);
@@ -334,7 +329,6 @@ bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * ev
                 qDebug() << "corner 0 is grabbed!";
                 newXpos = this->pos().x() + deltaWidth;
                 newYpos = this->pos().y() + deltaHeight;
-
 
                 if(newXpos <  0+INSIDE_PARENT_BUFFER)
                 {
@@ -350,8 +344,6 @@ bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * ev
                     newYpos = 0+INSIDE_PARENT_BUFFER;
                 }
 
-
-
                 this->setPos(newXpos, newYpos);
             }
             else   if ( corner->getCorner() == 1 )
@@ -362,9 +354,6 @@ bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * ev
 
                 if(newHeight + old.y() > parentH - INSIDE_PARENT_BUFFER)
                     newHeight = parentH - INSIDE_PARENT_BUFFER - old.y();
-
-
-
 
                 deltaWidth =   newWidth - _width ;
                 deltaHeight =   newHeight - _height ;
@@ -391,16 +380,11 @@ bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * ev
                 if(newHeight + old.y() > parentH - INSIDE_PARENT_BUFFER)
                     newHeight = parentH - INSIDE_PARENT_BUFFER - old.y();
 
-
-
-
                 deltaWidth =   newWidth - _width ;
                 deltaHeight =   newHeight - _height ;
 
                 deltaWidth *= (-1);
                 deltaHeight *= (-1);
-
-
             }
             else   if ( corner->getCorner() == 3 )
             {
@@ -421,99 +405,83 @@ bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * ev
 
                 this->setPos(newXpos,this->pos().y());
             }
-
-            //this->setPos(newXpos, newYpos);
-
             deltaWidth *= (-1);
             deltaHeight *= (-1);
             qDebug() << "dw: " << deltaWidth << "dh: " <<deltaHeight;
             adjustDrawingSize(  deltaWidth ,   deltaHeight);
         }
-        else
-        {
-
-
-
-            deltaWidth =   newWidth - _width ;
-            deltaHeight =   newHeight - _height ;
-
-
-            //adjustDrawingSize(  deltaWidth ,   deltaHeight);
-
-            deltaWidth *= (-1);
-            deltaHeight *= (-1);
-
-            qreal newXpos, newYpos;
-
-
-            if ( corner->getCorner() == 0 )
-            {
-                 newXpos = this->pos().x() + deltaWidth;
-                 newYpos = this->pos().y() + deltaHeight;
-
-
-
-
-                this->setPos(newXpos, newYpos);
-            }
-            else   if ( corner->getCorner() == 1 )
-            {
-                newYpos = this->pos().y() + deltaHeight;
-
-
-
-                this->setPos(this->pos().x(), newYpos);
-            }
-            else if(corner->getCorner() == 2)
-            {
-                //qDebug() << "corner 2";
-
-
-            }
-            else   if ( corner->getCorner() == 3 )
-            {
-                newXpos = this->pos().x() + deltaWidth;
-
-                this->setPos(newXpos,this->pos().y());
-            }
-
-            deltaWidth *= (-1);
-            deltaHeight *= (-1);
-            adjustDrawingSize(  deltaWidth ,   deltaHeight);
-
-        }
-
-
-
-
-
-
-
-
-
 
         setCornerPositions();
 
         QPointF nmts = pos();
         QRectF newBox = QRectF(nmts.x(), nmts.y(), newWidth, newHeight);
-        //qDebug() << "Drag Start:\t\t"<<_dragStart<<"\nnewPos: "<<newPos<<"\ntest:\t\t"<<test;
 
-        if(corner==NULL)
-            qDebug() << "ERROR there was no hovered corner, should not be allowed";
-        else
-        {
-            //qDebug() << "the corner used: " << corner;
-            //qDebug() <<"old box: " <<oldBox << "new Box: " << newBox;
-            emit stateBoxResized(oldBox, newBox, corner->getCorner());
-            this->recenterText();
-        }
-        //this->update();
+        emit stateBoxResized(oldBox, newBox, corner->getCorner());
+        this->recenterText();
+
     }
-
-    return true;// true => do not send event to watched - we are finished with this event
 }
 
+/**
+  * This scene event filter has been registered with all four corner grabber items.
+  * When called, a pointer to the sending item is provided along with a generic
+  * event.  A dynamic_cast is used to determine if the event type is one of the events
+  * we are interrested in.
+  */
+bool SelectableTextBlock::sceneEventFilter( QGraphicsItem * watched, QEvent * event )
+{
+    //qDebug() << "SelectableTextBlock::sceneEventFilter QEvent == " + QString::number(event->type());
+    QGraphicsSceneMouseEvent* mevent = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+    QGraphicsSceneHoverEvent* hevent = dynamic_cast<QGraphicsSceneHoverEvent*>(event);
 
+    CornerGrabber * corner = dynamic_cast<CornerGrabber *>(watched);
+
+#ifndef MTE_MOUSE_EVENTS
+    MaskedTextEdit* text = dynamic_cast<MaskedTextEdit*>(watched);
+
+    if(hevent && text && cornerHovered() >= 0)
+        qDebug() << "text and corner hovered!!";
+#endif
+
+
+
+    if(corner)
+    {
+        if(mevent)
+        {
+            //corner->setCursorToResize(true);
+            cornerEventHandler(corner, mevent);
+            _textItem.update();
+        }
+        else if (hevent)
+            return false; // pass to hover event for corner grabber
+    }
+#ifndef MTE_MOUSE_EVENTS
+    else if(text)
+    {
+        if(mevent)
+        {
+            textItemEventHandler(text, mevent);
+        }
+    }
+#endif
+    else
+        return false;
+
+   return true;// true => do not send event to watched - we are finished with this event
+}
+
+/**
+ * @brief SelectableTextBlock::handleParentStateGraphicResized
+ * @param oldBox
+ * @param newBox
+ * @param corner
+ *
+ * when the encapsulating parent state box is resized, then the text block will resize itself to always be inside of the of its parent
+ * additionally, the text item itself may also be resized
+ *
+ *
+ */
 void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF newBox, int corner)
 {
 
@@ -627,6 +595,7 @@ void SelectableTextBlock::handleParentStateGraphicResized(QRectF oldBox, QRectF 
         this->setPos(newX, newY);
 
 
+
 }
 
 void SelectableTextBlock::handleTextChanged()
@@ -654,17 +623,7 @@ void SelectableTextBlock::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * eve
 #endif
 
 }
-void SelectableTextBlock::mousePressEvent( QGraphicsSceneMouseEvent * event )
-{
-    qDebug() << "mouse pressed for stb";
 
-//    if(_textItem.textInteractionFlags() == Qt::TextEditorInteraction)
-//    {
-//        _textItem.setTextInteraction(false,false);
-//        qDebug() << "turning off interaction";
-//    }
-    SelectableBoxGraphic::mousePressEvent(event);
-}
 
 void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
 {

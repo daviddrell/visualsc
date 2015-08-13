@@ -11,7 +11,7 @@ MaskedTextEdit::MaskedTextEdit(QGraphicsItem *parent ,QRectF rect ) :
         _rect(rect)
 {
 
-    setFlags(ItemIsSelectable | ItemIsFocusable);
+    setFlags(ItemIsFocusable);
     //setFlag(QGraphicsItem::ItemIsMovable, false );
     setTextInteractionFlags(Qt::NoTextInteraction);
 }
@@ -26,35 +26,15 @@ QRectF MaskedTextEdit::boundingRect()
     return _rect;
 }
 
+//void MaskedTextEdit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+//{
+//    this->installSceneEventFilter(this->parentAsSelectableTextBlock());
+//}
 
-
-void MaskedTextEdit::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *evt)
-{
-    qDebug("mouse double clicke");
-    //qDebug("mouseDoubleClickEvent '%s'", this->toPlainText().toStdString().c_str());
-    if(textInteractionFlags() == Qt::TextEditorInteraction)
-    {
-        // if editor mode is already on: pass double click events on to the editor:
-        QGraphicsTextItem::mouseDoubleClickEvent(evt);
-        return;
-    }
-
-    // if editor mode is off:
-    // 1. turn editor mode on and set selected and focused:
-    setTextInteraction(true, true);
-    resizeRectToTextBlock();
-
-//    // 2. send a single click to this QGraphicsTextItem (this will set the cursor to the mouse position):
-//    // create a new mouse event with the same parameters as evt
-//    QGraphicsSceneMouseEvent *click = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
-//    click->setButton(evt->button());
-//    click->setPos(evt->pos());
-//    QGraphicsTextItem::mousePressEvent(click);
-//    //this->mousePressEvent(click);
-//    delete click; // don't forget to delete the event
-
-
-}
+//void MaskedTextEdit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+//{
+//    this->removeSceneEventFilter(this->parentAsSelectableTextBlock());
+//}
 
 void MaskedTextEdit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -101,6 +81,8 @@ void MaskedTextEdit::focusOutEvent(QFocusEvent *event)
     emit focusOut();
 }
 
+#ifdef MTE_MOUSE_EVENTS
+
 /**
  * @brief MaskedTextEdit::mousePressEvent
  * @param event
@@ -111,6 +93,9 @@ void MaskedTextEdit::focusOutEvent(QFocusEvent *event)
  */
 void MaskedTextEdit::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+
+    SelectableTextBlock* parent = parentAsSelectableTextBlock();
+
     if(this->isSelected())
         QGraphicsTextItem::mousePressEvent(event);
     else
@@ -126,6 +111,8 @@ void MaskedTextEdit::mousePressEvent(QGraphicsSceneMouseEvent *event)
  */
 void MaskedTextEdit::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
+    SelectableTextBlock* parent = parentAsSelectableTextBlock();
+
     if(this->isSelected())
         QGraphicsTextItem::mouseMoveEvent(event);
     else
@@ -139,11 +126,35 @@ void MaskedTextEdit::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 */
 void MaskedTextEdit::mouseReleaseEvent (QGraphicsSceneMouseEvent * event )
 {
+    SelectableTextBlock* parent = parentAsSelectableTextBlock();
+
     if(this->isSelected())
         QGraphicsTextItem::mouseReleaseEvent(event);
+
     else
         parentAsSelectableTextBlock()->mouseReleaseEvent(event);
 }
+
+
+void MaskedTextEdit::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *evt)
+{
+    qDebug("mouse double clicke");
+    //qDebug("mouseDoubleClickEvent '%s'", this->toPlainText().toStdString().c_str());
+    if(textInteractionFlags() == Qt::TextEditorInteraction)
+    {
+        // if editor mode is already on: pass double click events on to the editor:
+        QGraphicsTextItem::mouseDoubleClickEvent(evt);
+        return;
+    }
+
+    // if editor mode is off:
+    // 1. turn editor mode on and set selected and focused:
+    setTextInteraction(true, true);
+    resizeRectToTextBlock();
+
+
+}
+#endif
 
 /**
  * @brief MaskedTextEdit::setTextInteraction

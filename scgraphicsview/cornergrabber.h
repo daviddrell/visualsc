@@ -67,6 +67,8 @@ public:
     bool isHovered();
     void setHovered(bool);
 
+    void setCursorToResize(bool on);
+
 private:
 
 

@@ -127,7 +127,7 @@ void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     _outterborderColor = QColor(0,0,0,140);
 
     // reset the cursor
-    QApplication::restoreOverrideCursor();
+    this->setCursorToResize(false);
 
     this->update(0,0,_width,_height);
 }
@@ -139,14 +139,36 @@ void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
     _outterborderColor = QColor(255,0,0,140);
 
     // change the cursor to the diagonal sizer
-    if(_corner == 0 || _corner == 2)
-        QApplication::setOverrideCursor(Qt::SizeFDiagCursor);
-
-    else if(_corner == 1 || _corner == 3)
-        QApplication::setOverrideCursor(Qt::SizeBDiagCursor);
-
+    this->setCursorToResize(true);
 
     this->update(0,0,_width,_height);
+}
+
+void CornerGrabber::setCursorToResize(bool on)
+{
+    if(on)
+    {
+
+//        if(QApplication::overrideCursor()->shape() == Qt::SizeFDiagCursor || QApplication::overrideCursor()->shape() == Qt::SizeFDiagCursor)
+//            return;
+
+        switch(_corner)
+        {
+        case 0:
+        case 2:
+            QApplication::setOverrideCursor(Qt::SizeFDiagCursor);
+            break;
+
+        case 1:
+        case 3:
+            QApplication::setOverrideCursor(Qt::SizeBDiagCursor);
+            break;
+        }
+    }
+    else
+    {
+        QApplication::restoreOverrideCursor();
+    }
 }
 
 QRectF CornerGrabber::boundingRect() const

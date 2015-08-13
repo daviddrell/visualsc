@@ -61,7 +61,8 @@ public:
 
     qreal getTotalTextItemBufferX();
     qreal getTotalTextItemBufferY();
-    void mousePressEvent (QGraphicsSceneMouseEvent * event );
+    virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
+
 
 signals:
     void textBlockMoved(QPointF);
@@ -91,13 +92,15 @@ private slots:
 
 private:
 
-   virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     // private methods
     int clamp(int,int,int);
     qreal clampMin(qreal,qreal);
    void connectAttributes(IAttributeContainer *attributes);
    void resizeToFitParent();
    void recenterText();
+
+   void cornerEventHandler(CornerGrabber* corner, QGraphicsSceneMouseEvent* mevent);
+   void textItemEventHandler(MaskedTextEdit* text, QGraphicsSceneMouseEvent* mevent);
 
    // private data
 

@@ -6,6 +6,10 @@
 #include <QVariant>
 //#include "selectableboxgraphic.h"
 
+
+#define MTE_MOUSE_EVENTS
+
+
 class SelectableBoxGraphic;
 class SelectableTextBlock;
 /**
@@ -45,12 +49,16 @@ signals:
 
 private:
 
+//    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+//    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 //    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *evt);
     void focusOutEvent(QFocusEvent *event);
+#ifdef MTE_MOUSE_EVENTS
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *evt);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
     void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+#endif
     QRectF _rect;
     QRectF _document;
 };

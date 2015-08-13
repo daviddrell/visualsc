@@ -82,6 +82,9 @@ public:
     SelectableBoxGraphic(QGraphicsObject*parent, bool keepInsideParent);
     ~SelectableBoxGraphic();
 
+    void setCursorToResize(bool on);
+    int cornerHovered();
+    CornerGrabber* getCornerHovered();
     void setCornerPositions();
     SelectableBoxGraphic* parentAsSelectableBoxGraphic();
     void setPosAndUpdateAnchors(QPointF newPos);
