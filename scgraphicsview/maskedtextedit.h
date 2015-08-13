@@ -3,6 +3,7 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsTextItem>
+#include <QVariant>
 //#include "selectableboxgraphic.h"
 
 class SelectableBoxGraphic;
@@ -36,14 +37,20 @@ public:
     void setWidth(qreal w);
     void setHeight(qreal h);
 
+    void setTextInteraction(bool on, bool selectAll);
+
 signals:
     void focusOut();
 
 
 private:
 
+//    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *evt);
     void focusOutEvent(QFocusEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+    void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
     QRectF _rect;
     QRectF _document;
 };

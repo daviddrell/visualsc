@@ -58,10 +58,12 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     _textItem.setTextInteractionFlags(Qt::NoTextInteraction);
 #endif
 #ifndef POP_UP_EDIT_MODE
-    _textItem.setTextInteractionFlags(Qt::TextEditorInteraction);
-//    _textItem.setText
+    //moved to constructor for masked text edit
+ //   _textItem.setTextInteractionFlags(Qt::TextEditorInteraction);
+
+
 #endif
-    _textItem.setFlag(QGraphicsItem::ItemIsMovable, false );
+
     connect(&_textItem, SIGNAL(focusOut()), this, SLOT(handleTextItemEdited()));
 
     // set the text into the viewable area of the rectangle
@@ -77,9 +79,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     //_textItem.setPlainText( _textBlockModel->getText());
     this->setText(_textBlockModel->getText());
     qDebug() << "tb text" << _textBlockModel->getText();
-//    _textItem.resizeRectToTextBlock();
-//    _textItem.setVisible(true);
-//    this->recenterText();
+
 
     setShowBoxLineStyle(SelectableBoxGraphic::kWhenSelected  );
     setDrawBoxLineStyle( SelectableBoxGraphic::kDrawDotted );
@@ -125,6 +125,7 @@ void SelectableTextBlock::handleTextItemEdited()
 
 
     // update the data model for this text
+
     _textBlockModel->setText(_textItem.toPlainText());
     this->recenterText();
 }
@@ -653,7 +654,17 @@ void SelectableTextBlock::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * eve
 #endif
 
 }
+void SelectableTextBlock::mousePressEvent( QGraphicsSceneMouseEvent * event )
+{
+    qDebug() << "mouse pressed for stb";
 
+//    if(_textItem.textInteractionFlags() == Qt::TextEditorInteraction)
+//    {
+//        _textItem.setTextInteraction(false,false);
+//        qDebug() << "turning off interaction";
+//    }
+    SelectableBoxGraphic::mousePressEvent(event);
+}
 
 void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
 {

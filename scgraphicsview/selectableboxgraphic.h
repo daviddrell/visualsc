@@ -111,7 +111,9 @@ public:
     void setMinSize(QPoint);
     //bool eventFilter(QObject *, QEvent *);
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
-
+    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
+    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 signals:
     void stateBoxMoved(QPointF);    // this signal activates when the statebox graphic is moved or resized to alert the transition graphic to be updated as to remained anchored to its target state. Although the sink anchor is still a child of the source state graphic, it should behave like a child of its target state.
     void stateBoxResized(QRectF oldBox, QRectF newBox, int corner);
@@ -158,6 +160,8 @@ protected:
     void adjustDrawingSize(int x, int y);
 
     int getHoveredCorner();
+    virtual void mousePressEvent(QGraphicsSceneDragDropEvent *event);
+
 
 private:
 
@@ -168,12 +172,9 @@ private:
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
     virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
-    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
-    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
-    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
     virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *event);
-    virtual void mousePressEvent(QGraphicsSceneDragDropEvent *event);
+
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
 
