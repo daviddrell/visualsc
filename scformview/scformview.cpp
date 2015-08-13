@@ -470,8 +470,8 @@ void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
             bool xConfirm;
             bool yConfirm;
 
-            int x = xStr.toInt(&xConfirm);
-            int y = yStr.toInt(&yConfirm);
+            qreal x = xStr.toDouble(&xConfirm);
+            qreal y = yStr.toDouble(&yConfirm);
 
             if(xConfirm && yConfirm && x>0 && y>0)
             {
@@ -509,8 +509,8 @@ void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
             bool xConfirm;
             bool yConfirm;
 
-            int x = xStr.toInt(&xConfirm);
-            int y = yStr.toInt(&yConfirm);
+            qreal x = xStr.toDouble(&xConfirm);
+            qreal y = yStr.toDouble(&yConfirm);
 
             if(xConfirm && yConfirm)
             {
@@ -586,8 +586,8 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
                 bool xConfirm;
                 bool yConfirm;
 
-                int x = xStr.toInt(&xConfirm);
-                int y = yStr.toInt(&yConfirm);
+                qreal x = xStr.toDouble(&xConfirm);
+                qreal y = yStr.toDouble(&yConfirm);
 
                 if(xConfirm && yConfirm)
                 {
@@ -621,8 +621,8 @@ void SCFormView::handlePropertyCellChanged(int r, int c)
                 bool xConfirm;
                 bool yConfirm;
 
-                int x = xStr.toInt(&xConfirm);
-                int y = yStr.toInt(&yConfirm);
+                qreal x = xStr.toDouble(&xConfirm);
+                qreal y = yStr.toDouble(&yConfirm);
 
                 if(xConfirm && yConfirm && x>0 && y>0)
                 {

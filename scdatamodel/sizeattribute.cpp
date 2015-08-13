@@ -49,7 +49,7 @@ void  SizeAttribute::setValue(const QString size)
     QStringList sl = size.split(",");
     if ( sl.length() == 2)
     {
-        QPointF nSize(sl[0].toInt(),sl[1].toInt());
+        QPointF nSize(sl[0].toDouble(),sl[1].toDouble());
 
         if ( nSize != _size )
         {

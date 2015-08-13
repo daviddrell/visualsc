@@ -410,6 +410,55 @@ void SelectableTextBlock::cornerEventHandler(CornerGrabber *corner, QGraphicsSce
             qDebug() << "dw: " << deltaWidth << "dh: " <<deltaHeight;
             adjustDrawingSize(  deltaWidth ,   deltaHeight);
         }
+        else     // do not keep in parent
+        {
+            deltaWidth =   newWidth - _width ;
+            deltaHeight =   newHeight - _height ;
+
+
+            //adjustDrawingSize(  deltaWidth ,   deltaHeight);
+
+            deltaWidth *= (-1);
+            deltaHeight *= (-1);
+
+            qreal newXpos, newYpos;
+
+
+            if ( corner->getCorner() == 0 )
+            {
+                 newXpos = this->pos().x() + deltaWidth;
+                 newYpos = this->pos().y() + deltaHeight;
+
+
+
+
+                this->setPos(newXpos, newYpos);
+            }
+            else   if ( corner->getCorner() == 1 )
+            {
+                newYpos = this->pos().y() + deltaHeight;
+
+
+
+                this->setPos(this->pos().x(), newYpos);
+            }
+            else if(corner->getCorner() == 2)
+            {
+                //qDebug() << "corner 2";
+
+
+            }
+            else   if ( corner->getCorner() == 3 )
+            {
+                newXpos = this->pos().x() + deltaWidth;
+
+                this->setPos(newXpos,this->pos().y());
+            }
+
+            deltaWidth *= (-1);
+            deltaHeight *= (-1);
+            adjustDrawingSize(  deltaWidth ,   deltaHeight);
+        }
 
         setCornerPositions();
 
@@ -418,7 +467,7 @@ void SelectableTextBlock::cornerEventHandler(CornerGrabber *corner, QGraphicsSce
 
         emit stateBoxResized(oldBox, newBox, corner->getCorner());
         this->recenterText();
-
+        this->update();
     }
 }
 
@@ -931,12 +980,18 @@ void SelectableTextBlock::recenterText()
     // sets the width and height of the textItem based on the plainText
     _textItem.adjustSize();
 
-    // check if the text width is less than the width availble for this text item
+    // update the rect for the text item
     qreal textWidth = _textItem.document()->size().width();
-    qreal width = this->getUsableWidth();
+    _textItem.setWidth(textWidth);
 
+    qreal textHeight = _textItem.document()->size().height();
+    _textItem.setHeight(textHeight);
+
+    // check if the text width is less than the width availble for this text item
+    qreal width = this->getUsableWidth();
+    qreal height = this->getUsableHeight();
     // if it will not fit, then resize the text item to the dimensions of the allowable area
-    if(width < textWidth)
+    if(width < textWidth || height < textHeight)
     {
         _textItem.resizeRectToTextBlock();
     }

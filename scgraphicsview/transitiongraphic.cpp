@@ -31,7 +31,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _mouseController(mouse),
     _hasMovedSinceCreatingElbow(true),
     _isCurrentlyDeleting(false),
-    _eventText(new SelectableTextBlock(this, t->getEventTextBlock()))
+    _eventText(NULL)
 {
 
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -210,7 +210,9 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _transitionTextBox->setPos(100,100);
     */
 
-    _eventText->setParentItem(_anchors[0]);
+    _eventText = new SelectableTextBlock((QGraphicsObject*) _anchors[0], t->getEventTextBlock());
+//    _eventText->recenterText();
+    _eventText->setPos(0,0);
 
 }   // end of constructor
 

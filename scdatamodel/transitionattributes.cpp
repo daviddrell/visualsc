@@ -497,8 +497,8 @@ void TransitionPositionAttribute::setValue(const QString position)
     QStringList sl = position.split(",");
     if ( sl.length() == 2)
     {
-        _position.setX( sl[0].toInt() );
-        _position.setY( sl[1].toInt() );
+        _position.setX( sl[0].toDouble() );
+        _position.setY( sl[1].toDouble() );
         emit changed(this);
     }
 }
