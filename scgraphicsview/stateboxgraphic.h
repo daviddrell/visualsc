@@ -119,6 +119,7 @@ public slots:
     void handleFinalStateChanged(StateString*);
     void handleAttributeChanged(SizeAttribute*);
     void handleAttributeChanged(PositionAttribute* pos);
+    void handleAttributeChanged(StateName*);
     void handleTextBlockAttributeChanged(SizeAttribute*);
     void handleTextBlockAttributeChanged(PositionAttribute*);
     void handleTextBlockMoved(QPointF);

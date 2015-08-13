@@ -97,6 +97,12 @@ SCTransition::~SCTransition()
     delete _eventTextBlock;
 }
 
+void SCTransition::handleTargetStateNameChanged(StateName * stateName)
+{
+    qDebug() << "SCTransition::handleTargetStateNameChanged";
+    this->attributes.value("target")->setValue(stateName->asString());
+}
+
 TransitionStringAttribute* SCTransition::getTransStringAttr(QString key)
 {
     return dynamic_cast<TransitionStringAttribute*>(this->attributes.value(key));

@@ -649,6 +649,12 @@ void StateBoxGraphic::handleAttributeChanged(PositionAttribute* pos)
     setPosAndUpdateAnchors(pos->asPointF());
 }
 
+void StateBoxGraphic::handleAttributeChanged(StateName* name)
+{
+    qDebug() << "StateBoxGraphic::handleAttributeChanged";
+    this->TextItem->setText(name->asString());
+}
+
 
 
 /**

@@ -100,6 +100,7 @@ public:
 
     void setTargetState(SCState*);
 
+
 signals:
 
     void eventChangedInFormView(SCTransition*, QString);
@@ -113,6 +114,7 @@ private slots:
     //void handleLineSelected();
    //void handleLineUnSelected();
 
+    void handleTargetStateNameChanged(StateName*);
     void detachFromSource(QObject*);
     void detachFromSink(QObject*);
     void handleTextBlockChanged();

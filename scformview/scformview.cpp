@@ -902,6 +902,8 @@ void SCFormView::connectState(SCState* st)
     // SCState connects
     connect(st, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
     connect(st, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*,SCState*)));
+
+
 }
 
 /**
@@ -917,6 +919,10 @@ void SCFormView::connectTransition(SCTransition* trans)
     //qDebug() << "SCFormView::connectTransition for " << trans->attributes.value("event")->asString();
     connect(trans, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
     connect(trans, SIGNAL(changedTarget(SCTransition*,SCState*)), this, SLOT(handleChangedTransitionTarget(SCTransition*,SCState*)));
+
+    // when the target's name changes, also change the transition's attribute
+    StateName* targetStateName = trans->targetState()->getStateNameAttr();
+    connect(targetStateName, SIGNAL(changed(StateName*)), trans, SLOT(handleTargetStateNameChanged(StateName*)));
 }
 
 /**
@@ -1084,6 +1090,11 @@ void SCFormView::connectTransition(SCTransition * trans, CustomTableWidgetItem *
         TransitionStringAttribute* tsa = trans->getTransStringAttr(attributeKey);
         connect(tsa, SIGNAL(changed(TransitionStringAttribute*)), tableItem, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
     }
+    else if(attributeKey == "target")
+    {
+        TransitionStringAttribute* tar = trans->getTransStringAttr(attributeKey);
+        connect(tar, SIGNAL(changed(TransitionStringAttribute*)), tableItem, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
+    }
 }
 
 void SCFormView::connectTransition(SCTransition *trans, CustomTreeWidgetItem* treeItem)
@@ -1122,6 +1133,7 @@ void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, 
     {
         StateName* name = state->getStateNameAttr();
         connect(name, SIGNAL(changed(StateName*)), tableItem, SLOT(handleAttributeChanged(StateName*)));
+
     }
     else if(attributeKey == "uid")
     {

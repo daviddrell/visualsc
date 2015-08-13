@@ -1067,10 +1067,10 @@ void SelectableTextBlock::setTextWidth(qreal w)
 void SelectableTextBlock::setText(QString text)
 {
     _textItem.setPlainText(text);
-//    if(_centerText)
-//    {
-//        recenterText();
-//    }
+    if(_centerText)
+    {
+        recenterText();
+    }
 }
 
 void SelectableTextBlock::setTextHeight(qreal h)

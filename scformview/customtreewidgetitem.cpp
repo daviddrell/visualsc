@@ -71,3 +71,4 @@ void CustomTreeWidgetItem::handleAttributeChanged(TransitionStringAttribute* tsa
 {
     this->setText(0, tsa->asString());
 }
+

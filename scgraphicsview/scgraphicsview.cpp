@@ -780,6 +780,10 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
     connect(state, SIGNAL(bringToFront(SCState*)), this, SLOT(handleBringToFront(SCState*)));
     connect(state, SIGNAL(sendToBack(SCState*)), this, SLOT(handleSendToBack(SCState*)));
 
+
+    StateName* name = state->getStateNameAttr();
+    connect(name, SIGNAL(changed(StateName*)), stateGraphic, SLOT(handleAttributeChanged(StateName*)));
+
     SizeAttribute* size = state->getSizeAttr();
     connect(size, SIGNAL(changed(SizeAttribute*)), stateGraphic, SLOT(handleAttributeChanged(SizeAttribute*)));
 
