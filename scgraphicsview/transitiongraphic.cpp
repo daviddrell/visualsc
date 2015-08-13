@@ -297,47 +297,6 @@ void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
     LineSegmentGraphic* one = elbow->getSegment(0);
     LineSegmentGraphic* two = elbow->getSegment(1);
 
-//#define RIGHT_ANGLE_MODE
-#ifdef RIGHT_ANGLE_MODE
-    // at most two line segments will be updated. so update each of those line segment's elbows as well
-
-    if(one)
-    {
-        ElbowGrabber* left = one->getElbow(0);
-
-        if(left)
-        {
-            qreal xDiff = fabs(elbow->x()-left->x());
-            qreal yDiff = fabs(elbow->y()-left->y());
-
-            if(xDiff < yDiff)
-                left->setX(elbow->x());
-            else
-                left->setY(elbow->y());
-        }
-    }
-    if(two)
-    {
-
-        ElbowGrabber* right = two->getElbow(1);
-
-
-
-
-        if(right)
-        {
-            qreal xDiff = fabs(elbow->x()-right->x());
-            qreal yDiff = fabs(elbow->y()-right->y());
-
-            if(xDiff < yDiff)
-                right->setX(elbow->x());
-            else
-                right->setY(elbow->y());
-        }
-    }
-
-
-#endif
     if(one) // check if object exists
     {
         one->enclosePathInElbows();
