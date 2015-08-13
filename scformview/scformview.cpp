@@ -1082,6 +1082,14 @@ void SCFormView::loadTreeTransition(CustomTreeWidgetItem * parentItem , QList<SC
     }
 }
 
+/**
+ * @brief SCFormView::connectTransition
+ * @param trans
+ * @param tableItem
+ * @param attributeKey
+ *
+ * connects transition string attributes to table items so when the attribute changes, the table will also update
+ */
 void SCFormView::connectTransition(SCTransition * trans, CustomTableWidgetItem * tableItem, QString attributeKey)
 {
 

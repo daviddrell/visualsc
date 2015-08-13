@@ -83,6 +83,8 @@ public:
     void reset();
     static SCDataModel * singleton();
 
+    QString getCFileName();
+
     // direct interface
     void importFile(SCState* parent,QString scxmlFileName);
     void openFile(QString scxmlFileName);

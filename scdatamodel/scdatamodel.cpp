@@ -270,15 +270,24 @@ QString SCDataModel::toClassName(QString className)
 }
 
 
+QString SCDataModel::getCFileName()
+{
+    QString name = _topState->getName();
+    name.replace(" ","");
+    return name.toLower()+".cpp";
+}
+
 bool SCDataModel::exportToCode(QString fileName, QString &errorMessage)
 {
 qDebug() << "time to save files " << fileName;
 
 QString hFileName;
 QString cppFileName;
-#define FORCE_STATE_MACHINE_NAME
+QString className = toClassName(_topState->attributes.value("name")->asString());
+//#define FORCE_STATE_MACHINE_NAME
 #ifndef FORCE_STATE_MACHINE_NAME
     // get the file name minus cpp and add h
+    cppFileName = fileName;
     hFileName = fileName.mid(0,fileName.size()-3) + "h";
 
 #endif
@@ -296,7 +305,7 @@ QString cppFileName;
     hFileName = smFileName+classFileName+".h";
 
     // Test State Machine -> TestStateMachine
-    QString className = toClassName(_topState->attributes.value("name")->asString());
+
 #endif
 
     CodeWriter cw(this->getTopState(), className, cppFileName, hFileName);

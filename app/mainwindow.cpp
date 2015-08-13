@@ -249,8 +249,10 @@ void MainWindow::handleExportCodeClick()
         if(_currentFolder.isEmpty())
             _currentFolder = QDir::currentPath();
 
-
-        _currentExportFullPath = QFileDialog::getSaveFileName(this, tr("Save as .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+        QFileDialog qfd(this);
+        QString classNameLower = _project->getDM()->getCFileName();
+        QString defaultSave = _currentFolder + QString("\\"+classNameLower);
+        _currentExportFullPath = qfd.getSaveFileName(this, tr("Save as .cpp and .h Files"), defaultSave, tr("C++ and Header (*.cpp)"));
         _currentFolder = QFileInfo(_currentExportFullPath).path();
         _project->exportToCode(_currentExportFullPath);
     }
@@ -259,12 +261,6 @@ void MainWindow::handleExportCodeClick()
         qDebug() << "Straight to export...";
         _project->exportToCode(_currentExportFullPath);
     }
-
-
-
-    if(_currentFolder.isEmpty())
-        _currentFolder = QDir::currentPath();
-
 
 //    //fileName = QFileDialog::getSaveFileName(this, tr("Save as .cpp and .h Files"), prevFilePath, tr("C++ and Header (*.cpp)"));
 

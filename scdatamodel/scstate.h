@@ -66,6 +66,7 @@ public:
    // void setGraphic(StateBoxGraphic*);
 
 
+
     //void prepareForDelete();
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
     QString getUid();

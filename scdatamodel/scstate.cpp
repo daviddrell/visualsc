@@ -370,6 +370,7 @@ StateString* SCState::getStringAttr(QString attrName)
     return dynamic_cast<StateString*>(attributes.value(attrName));
 }
 
+
 /**
  * @brief SCState::setSize
  * @param size
