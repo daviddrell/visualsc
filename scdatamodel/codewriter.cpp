@@ -839,16 +839,32 @@ void CodeWriter::hWriteStates()
 
 void CodeWriter::hPrint(QString text)
 {
+    if(text.isEmpty())
+    {
+        return;
+    }
     hOut << text;
 }
 
 void CodeWriter::hPrintln(QString text)
 {
+    if(text.isEmpty())
+    {
+        hOut<< "\n";
+        return;
+    }
     hOut << text <<"\n";
 }
 
 void CodeWriter::hPrintln(QString text, int tabLevel)
 {
+
+    if(text.isEmpty())
+    {
+        hOut<< "\n";
+        return;
+    }
+
     if(text.at(0)=='\n')
     {
         hOut << "\n";
@@ -870,11 +886,20 @@ void CodeWriter::hPrintln(QString text, int tabLevel)
 
 void CodeWriter::cPrint(QString text)
 {
+    if(text.isEmpty())
+    {
+        return;
+    }
     cOut << text;
 }
 
 void CodeWriter::cPrintln(QString text)
 {
+    if(text.isEmpty())
+    {
+        cOut << "\n";
+        return;
+    }
     cOut << text <<"\n";
 }
 

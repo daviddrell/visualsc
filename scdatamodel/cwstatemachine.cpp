@@ -147,6 +147,7 @@ void CWStateMachine::createSignalsAndSlots()
         entryAction = state->attributes.value("entryAction")->asString();
         if(!entryAction.isEmpty())
         {
+            entryAction.replace(" ","");
             QStringList entries = entryAction.split(",");
             for(int i = 0; i < entries.size(); i++)
             {
