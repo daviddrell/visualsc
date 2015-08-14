@@ -194,9 +194,9 @@ void FixedTextBlock::switchPen(int style)
     switch(style)
     {
     case PenStyle::Default:
-        _pen.setWidthF(1);
-        _pen.setStyle(Qt::DotLine);
-        _pen.setColor(Qt::gray);
+        _pen.setWidthF(2);
+        _pen.setStyle(Qt::SolidLine);
+        _pen.setColor(Qt::black);
         break;
 
     }
@@ -206,7 +206,11 @@ void FixedTextBlock::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 {
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-    painter->drawRoundRect(this->boundingRect(),0,0);
+    //painter->drawRoundRect(this->boundingRect(),0,0);
+
+    painter->setPen(_pen);
+    QRectF r = this->boundingRect();
+    painter->drawLine(r.bottomLeft(),r.bottomRight());
 }
 
 QRectF FixedTextBlock::boundingRect() const

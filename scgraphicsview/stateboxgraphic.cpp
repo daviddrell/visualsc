@@ -69,7 +69,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _diagLineEnd(),
         _diagLineDrawIt(false),
         _intersection(),
-        _stateTitle(new FixedTextBlock(this, 0.0, 25, true))
+        _stateTitle(new FixedTextBlock(this, 0.0, 23, true))
 {
 
 
