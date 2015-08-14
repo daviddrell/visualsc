@@ -179,37 +179,25 @@ void SCFormView::import()
  */
 void SCFormView::highlightRootItem()
 {
-    // unselect any selected item;
-    clearSelectedItems();
-
-    // reset the currently selected state to the top state;
     _currentlySelected = _topState;
-    _topState->getTreeWidget()->setSelected(true);
-
-    // load property table for this
-    handleTreeViewItemClicked((QTreeWidgetItem*)_topState->getTreeWidget(), 0);
+    stateChartTreeView->setCurrentItem(_currentlySelected->getTreeWidget());
 }
 
 
 void SCFormView::highlightItem(SCItem* item)
 {
-    // unselect any selected item
-    clearSelectedItems();
-
-    // set currently selected
     FVItem* fvitem = _items.value(item);
     _currentlySelected = fvitem;
-
-    // select the fv item
-    fvitem->getTreeWidget()->setSelected(true);
-    handleTreeViewItemClicked((QTreeWidgetItem*) fvitem->getTreeWidget(), 0);
+    stateChartTreeView->setCurrentItem(_currentlySelected->getTreeWidget());
 }
 
 void SCFormView::clearSelectedItems()
 {
     QList<QTreeWidgetItem*> selected = stateChartTreeView->selectedItems();
-    foreach(QTreeWidgetItem* sel, selected)
-        sel->setSelected(false);
+    for(int i =0 ; i < selected.size(); i++)
+    {
+        selected.at(i)->setSelected(false);
+    }
 }
 
 /**
@@ -1015,6 +1003,7 @@ void SCFormView::loadTreeState(CustomTreeWidgetItem * parentItem, QList<SCState*
         {
             item = new CustomTreeWidgetItem();
             stateChartTreeView->addTopLevelItem((QTreeWidgetItem*)item);
+
         }
         else
             item = new CustomTreeWidgetItem(parentItem);
@@ -1525,6 +1514,7 @@ void SCFormView::clearTextBlockPropertyTable()
 
 void SCFormView::handleTreeViewItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous)
 {
+
     CustomTreeWidgetItem * item = dynamic_cast<CustomTreeWidgetItem*>(current);
 
     if(item)
