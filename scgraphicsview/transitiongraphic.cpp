@@ -23,7 +23,7 @@
 
 TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys, MouseController* mouse) :
     QGraphicsObject(NULL),
-    _transitionDM(t),
+    _transitionModel(t),
     _lineSegments(),
     _elbows(),
     _targetStateGraphic(targetGraphic),
@@ -214,6 +214,12 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
 }   // end of constructor
 
+SCTransition* TransitionGraphic::getTransitionModel()
+{
+    return _transitionModel;
+}
+
+
 ElbowGrabber* TransitionGraphic::getSourceAnchor()
 {
     return _anchors[0];
@@ -346,7 +352,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
             case QEvent::GraphicsSceneMousePress:
             {
-                emit clicked(this->_transitionDM);
+                emit clicked(this->_transitionModel);
                 //qDebug() << "mouse press";
                 elbow->setMouseState(ElbowGrabber::kMouseDown);
                 QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -439,7 +445,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
         case QEvent::GraphicsSceneMousePress:
         {
-            emit clicked(this->_transitionDM);
+            emit clicked(this->_transitionModel);
            // qDebug() << "line mouse press";
             line->setMouseState(ElbowGrabber::kMouseDown);
             QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -1269,7 +1275,7 @@ void TransitionGraphic::updateModel()
 
 
 
-    if ( _transitionDM )                                 // check if the data model for this transition exists
+    if ( _transitionModel )                                 // check if the data model for this transition exists
     {
         // use elbows to create the path attribute
         QList<QPointF> path;
@@ -1278,9 +1284,9 @@ void TransitionGraphic::updateModel()
             path.append(_elbows.at(i)->pos());
 
         }
-        TransitionPathAttribute * pathAttr = dynamic_cast<TransitionPathAttribute *> (_transitionDM->attributes.value("path"));
+        TransitionPathAttribute * pathAttr = dynamic_cast<TransitionPathAttribute *> (_transitionModel->attributes.value("path"));
 
-        pathAttr->setValue(path);   // update the path values of _transitionDM, the data model object for this transition
+        pathAttr->setValue(path);   // update the path values of _transitionModel, the data model object for this transition
     }
 }
 

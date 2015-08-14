@@ -54,6 +54,7 @@ public:
     ElbowGrabber* getSourceAnchor();
     ElbowGrabber* getSinkAnchor();
 
+    SCTransition* getTransitionModel();
 
 
 signals:
@@ -97,7 +98,7 @@ private :
     void createCustomPath(QPointF mouseLocation, ElbowGrabber*);
 
     // private data
-    SCTransition  * _transitionDM;  // data model for the transition object
+    SCTransition  * _transitionModel;  // data model for the transition object
     //QList<SelectableLineSegmentGraphic *>  _lineSegments;
     QList<LineSegmentGraphic *> _lineSegments;
     QList<ElbowGrabber *> _elbows;

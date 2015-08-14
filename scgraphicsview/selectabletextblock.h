@@ -64,6 +64,8 @@ public:
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     void recenterText();
 
+    void mousePressEvent(QGraphicsSceneMouseEvent* event);
+
 signals:
     void textBlockMoved(QPointF);
 

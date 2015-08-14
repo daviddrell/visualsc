@@ -29,6 +29,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QTextDocument>
+#include "transitiongraphic.h"
 
 #define DEFAULT_PEN_WIDTH 1
 #define HOVER_PEN_WIDTH 1
@@ -656,6 +657,39 @@ void SelectableTextBlock::handleTextChanged()
     {
         recenterText();
     }
+}
+
+/**
+ * @brief SelectableTextBlock::mousePressEvent
+ * @param event
+ *
+ * text blocks will first call their parent's clicked signal, then do the default mouse press event procedure
+ *
+ */
+void SelectableTextBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    ElbowGrabber* eg = dynamic_cast<ElbowGrabber*>(this->parentItem());
+    StateBoxGraphic* sbg = dynamic_cast<StateBoxGraphic*>(this->parentItem());
+//    qDebug() << "stb mpe";
+    // check if this a transition's text block (attached to elbow grabber)
+    if(eg)
+    {
+//        qDebug() << "eg exists";
+        TransitionGraphic* tg = eg->parentAsTransitionGraphic();
+        if(tg)
+        {
+//            qDebug() << "tg exists";
+            emit tg->clicked(tg->getTransitionModel());
+        }
+    }
+    // check if this is a child of a state box graphic
+    else if(sbg)
+    {
+//        qDebug() << "sbg exists";
+        emit sbg->clicked(sbg->getStateModel());
+    }
+
+    SelectableBoxGraphic::mousePressEvent(event);
 }
 
 void SelectableTextBlock::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event )
