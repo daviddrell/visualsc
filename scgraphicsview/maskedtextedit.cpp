@@ -4,6 +4,7 @@
 #include <QTextEdit>
 #include "selectableboxgraphic.h"
 #include "selectabletextblock.h"
+#include <QApplication>
 
 
 MaskedTextEdit::MaskedTextEdit(QGraphicsItem *parent ,QRectF rect ) :
@@ -14,6 +15,7 @@ MaskedTextEdit::MaskedTextEdit(QGraphicsItem *parent ,QRectF rect ) :
     setFlags(ItemIsFocusable);
     //setFlag(QGraphicsItem::ItemIsMovable, false );
     setTextInteractionFlags(Qt::NoTextInteraction);
+    this->setAcceptHoverEvents(true);
 }
 
 void MaskedTextEdit::setBoundingRect(QRectF rect)
@@ -26,15 +28,17 @@ QRectF MaskedTextEdit::boundingRect()
     return _rect;
 }
 
-//void MaskedTextEdit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-//{
-//    this->installSceneEventFilter(this->parentAsSelectableTextBlock());
-//}
+void MaskedTextEdit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    QApplication::setOverrideCursor(Qt::IBeamCursor);
+    QGraphicsTextItem::hoverEnterEvent(event);
+}
 
-//void MaskedTextEdit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-//{
-//    this->removeSceneEventFilter(this->parentAsSelectableTextBlock());
-//}
+void MaskedTextEdit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    QApplication::restoreOverrideCursor();
+    QGraphicsTextItem::hoverLeaveEvent(event);
+}
 
 void MaskedTextEdit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -96,7 +100,7 @@ void MaskedTextEdit::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     SelectableTextBlock* parent = parentAsSelectableTextBlock();
 
-    if(this->isSelected())
+    if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mousePressEvent(event);
     else
         parentAsSelectableTextBlock()->mousePressEvent(event);
@@ -113,7 +117,7 @@ void MaskedTextEdit::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
     SelectableTextBlock* parent = parentAsSelectableTextBlock();
 
-    if(this->isSelected())
+    if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mouseMoveEvent(event);
     else
         parentAsSelectableTextBlock()->mouseMoveEvent(event);
@@ -128,7 +132,7 @@ void MaskedTextEdit::mouseReleaseEvent (QGraphicsSceneMouseEvent * event )
 {
     SelectableTextBlock* parent = parentAsSelectableTextBlock();
 
-    if(this->isSelected())
+    if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mouseReleaseEvent(event);
 
     else
@@ -171,7 +175,7 @@ void MaskedTextEdit::setTextInteraction(bool on, bool selectAll)
         setTextInteractionFlags(Qt::TextEditorInteraction);
         // manually do what a mouse click would do else:
         setFocus(Qt::MouseFocusReason); // this gives the item keyboard focus
-        setSelected(true); // this ensures that itemChange() gets called when we click out of the item
+//        this->setSelected(true); // this ensures that itemChange() gets called when we click out of the item
         if(selectAll) // option to select the whole text (e.g. after creation of the TextItem)
         {
             QTextCursor c = textCursor();
@@ -188,7 +192,7 @@ void MaskedTextEdit::setTextInteraction(bool on, bool selectAll)
         c.clearSelection();
         this->setTextCursor(c);
         clearFocus();
-        setSelected(false);
+//        this->setSelected(false);
     }
 }
 

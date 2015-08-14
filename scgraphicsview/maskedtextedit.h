@@ -49,8 +49,8 @@ signals:
 
 private:
 
-//    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-//    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 //    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
     void focusOutEvent(QFocusEvent *event);
 #ifdef MTE_MOUSE_EVENTS
