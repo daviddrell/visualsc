@@ -225,10 +225,10 @@ void MaskedTextEdit::resizeRectToTextBlock()
     this->setPos(editRect.topLeft()+offset);
 }
 
-void MaskedTextEdit::resizeRectToTextSize()
-{
-    this->adjustSize();
-    qreal width = this->textWidth();
-    //qreal height = this->document().
-   // _rect.setWidth(document()->size().width());
-}
+//void MaskedTextEdit::resizeRectToTextSize()
+//{
+//    this->adjustSize();
+//    qreal width = this->textWidth();
+//    //qreal height = this->document().
+//   // _rect.setWidth(document()->size().width());
+//}

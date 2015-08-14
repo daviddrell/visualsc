@@ -36,26 +36,29 @@
 
 // adding comments to get the git repository
 
-QString MainWindow::_keyLastFilePath = QString("lastFilePath");
-QString MainWindow::_codeLastFilePath =QString("codeLastFilePath");
-QString MainWindow::_lastImportFilePath = QString("lastImportFilePath");
-QString MainWindow::_currentFolder = QString("");
-QString MainWindow::_currentFileFullPath = QString("");
-QString MainWindow::_currentExportFullPath = QString("");
+
+
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
         ui(new Ui::MainWindow),
         _project(0),
-        _settings(0),
+        //_settings(0),
         _formEditorWindow(0),
-        _textFormatToolBar(NULL),
-        _savedOnce(false)
+        _textFormatToolBar(NULL)
 {
+
+
+
     QCoreApplication::setOrganizationName("David W Drell");
     QCoreApplication::setOrganizationDomain("davidwdrell.net");
     QCoreApplication::setApplicationName("Visual Statechart Editor");
-    _settings  = new QSettings(this);
+
+
+
+
+
+
 
     ui->setupUi(this);
 
@@ -75,22 +78,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->resize(1272,1000);
     this->move(633,0);
-
-/*
-    _project = new SMProject(  ui->centralWidget );
-
-    _project->initNewSM();
-
-    _project->setObjectName("TEST");
-
-    ui->gridLayout->addWidget( _project->getQGraphicsView() );
-
-
-
-   _formEditorWindow = new SCFormView(0, _project->getDM());
-   _formEditorWindow->show();
-
-*/
 
 
 
@@ -146,13 +133,72 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #endif
 
+
+
+    _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
+    qDebug () << "settings file " << _settingsFileName;
+    loadSettings();
+
+
+
 }
 
 MainWindow::~MainWindow()
 {
-    delete _settings;
+    //delete _settings;
     delete _project;
     delete ui;
+}
+
+/**
+ * @brief MainWindow::saveSettings
+ * save settings to settings.ini
+ */
+void MainWindow::saveSettings()
+{
+    QSettings settings(_settingsFileName, QSettings::IniFormat);
+    settings.setValue("workingDirectory",_currentFolder);
+    settings.sync();
+    qDebug ()<< "saveSettings " << settings.fileName();
+}
+
+/**
+ * @brief MainWindow::loadSettings
+ * load settings from settings.ini
+ */
+void MainWindow::loadSettings()
+{
+    QSettings settings(_settingsFileName, QSettings::IniFormat);
+
+    if(settings.childKeys().size()==0)
+    {
+        qDebug() << "Could not find settings.ini ... creating new settings.ini file.";
+        createSettings();
+        return;
+    }
+
+    const QStringList keys = settings.childKeys();
+    foreach(const QString &key, keys)
+    {
+        qDebug() << "loading key: " <<key <<"\t with value: "<<settings.value(key);
+        if(key=="workingDirectory")
+            _currentFolder = settings.value(key).toString();
+    }
+}
+
+/**
+ * @brief MainWindow::createSettings
+ * there was no settings file, so create one
+ */
+void MainWindow::createSettings()
+{
+    if(_currentFolder.isEmpty())
+        _currentFolder = QDir::currentPath();
+
+    QSettings settings(_settingsFileName, QSettings::IniFormat);
+    settings.setValue("workingDirectory",_currentFolder);
+    settings.sync();
+    qDebug() << "creating settings in " << _settingsFileName;
 }
 
 void MainWindow::delay()
@@ -174,6 +220,10 @@ void MainWindow::handleNewClick()
     // reset the current save and export files.
     _currentFileFullPath = "";
     _currentExportFullPath = "";
+
+    this->setWindowTitle("Visual Statechart Editor");
+
+    loadSettings();
 }
 
 void MainWindow::handleFileOpenClick()
@@ -193,6 +243,7 @@ void MainWindow::handleFileOpenClick()
     _currentFileFullPath = newFileFullPath;
     _currentFolder = QFileInfo(_currentFileFullPath).path();
 
+    this->setWindowTitle(_currentFileFullPath);
 
     emit reset();
     emit open(_currentFileFullPath);
@@ -214,26 +265,68 @@ void MainWindow::handleReadInputFileDone(bool ,QStringList)
 
 }
 
+
+
 void MainWindow::handleFileSaveClick()
 {
     if ( _project == NULL) return;
 
+    // check if there is a current file, save it immediately, otherwise browse for one
     if(_currentFileFullPath.isEmpty())
     {
         if(_currentFolder.isEmpty())
             _currentFolder = QDir::currentPath();
 
+        QString saveName = QFileDialog::getSaveFileName(this, tr("Save as .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
 
-        _currentFileFullPath = QFileDialog::getSaveFileName(this, tr("Save as .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+        // check if the saveName is valid
+        if(saveName.isEmpty())
+        {
+
+        }
+        else
+        {
+            _currentFileFullPath = saveName;
+            _currentFolder = QFileInfo(_currentFileFullPath).path();
+            _project->save(_currentFileFullPath);
+            this->setWindowTitle(_currentFileFullPath);
+        }
+    }
+    else
+    {
+        _project->save(_currentFileFullPath);
+        this->setWindowTitle(_currentFileFullPath);
+    }
+
+    saveSettings();
+}
+
+void MainWindow::on_actionSave_As_triggered()
+{
+
+    if(_project==NULL) return;
+
+    if(_currentFolder.isEmpty())
+    {
+        _currentFolder = QDir::currentPath();
+    }
+
+    QString saveName;
+    saveName = QFileDialog::getSaveFileName(this, tr("Save as .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+
+
+    if(saveName.isEmpty())
+    {
+
+    }
+    else
+    {
+        _currentFileFullPath = saveName;
         _currentFolder = QFileInfo(_currentFileFullPath).path();
         qDebug() << "the file folder is " << _currentFolder;
         qDebug() << "the file path is " << _currentFileFullPath;
         _project->save(_currentFileFullPath);
-    }
-    else
-    {
-        qDebug() << "Straight Saving...";
-        _project->save(_currentFileFullPath);
+        this->setWindowTitle(_currentFileFullPath);
     }
 }
 
@@ -249,26 +342,30 @@ void MainWindow::handleExportCodeClick()
         if(_currentFolder.isEmpty())
             _currentFolder = QDir::currentPath();
 
-        QFileDialog qfd(this);
+
         QString classNameLower = _project->getDM()->getCFileName();
         QString defaultSave = _currentFolder + QString("\\"+classNameLower);
-        _currentExportFullPath = qfd.getSaveFileName(this, tr("Save as .cpp and .h Files"), defaultSave, tr("C++ and Header (*.cpp)"));
-        _currentFolder = QFileInfo(_currentExportFullPath).path();
-        _project->exportToCode(_currentExportFullPath);
+        QString exportName = QFileDialog::getSaveFileName(this, tr("Save as .cpp and .h Files"), defaultSave, tr("C++ and Header (*.cpp)"));
+
+        // check if the exportname is valid
+        if(exportName.isEmpty())
+        {
+
+        }
+        else
+        {
+            _currentExportFullPath = exportName;
+            _currentFolder = QFileInfo(_currentExportFullPath).path();
+            _project->exportToCode(_currentExportFullPath);
+            this->setWindowTitle("Exported to "+_currentExportFullPath);
+        }
+
     }
     else
     {
-        qDebug() << "Straight to export...";
         _project->exportToCode(_currentExportFullPath);
+        this->setWindowTitle("Exported to "+_currentExportFullPath);
     }
-
-//    //fileName = QFileDialog::getSaveFileName(this, tr("Save as .cpp and .h Files"), prevFilePath, tr("C++ and Header (*.cpp)"));
-
-//    //_settings->setValue(_codeLastFilePath, fileName);
-//    //_project->save(fileName);
-//    qDebug() << "export to code file name: " << fileName;
-//    _project->exportToCode(fileName);
-////    sendMessage("Saved");
 }
 
 
@@ -287,8 +384,22 @@ void MainWindow::on_actionImport_triggered()
         _currentFolder = QDir::currentPath();
 
     QString importFileName = QFileDialog::getOpenFileName(this, tr("Import .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
-    _currentFolder = QFileInfo(importFileName).path();
-    _project->getDM()->importFile(current,importFileName);
+
+    if(importFileName.isEmpty())
+    {
+
+    }
+    else
+    {
+        _currentFolder = QFileInfo(importFileName).path();
+        _project->getDM()->importFile(current,importFileName);
+
+        this->setWindowTitle("Imported file "+importFileName+" into state: " + current->getName());
+
+
+    }
+
+
 }
 
 void MainWindow::on_actionShortcuts_triggered()
@@ -333,21 +444,7 @@ void MainWindow::sendMessage(QString title, QString message)
     }
 }
 
-void MainWindow::on_actionSave_As_triggered()
-{
 
-    if(_currentFolder.isEmpty())
-    {
-        _currentFolder = QDir::currentPath();
-    }
-
-    _currentFileFullPath = QFileDialog::getSaveFileName(this, tr("Save as .SCXML File"), _currentFolder, tr("SCXML Files (*.scxml)"));
-    _currentFolder = QFileInfo(_currentFileFullPath).path();
-    qDebug() << "the file folder is " << _currentFolder;
-    qDebug() << "the file path is " << _currentFileFullPath;
-    _project->save(_currentFileFullPath);
-
-}
 
 void MainWindow::on_actionNew_triggered()
 {

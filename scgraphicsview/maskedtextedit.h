@@ -36,7 +36,7 @@ public:
     SelectableTextBlock* parentAsSelectableTextBlock();
 
     void resizeRectToTextBlock();
-    void resizeRectToTextSize();
+//    void resizeRectToTextSize();
 
     void setWidth(qreal w);
     void setHeight(qreal h);

@@ -147,6 +147,7 @@ void CWStateMachine::createSignalsAndSlots()
         entryAction = state->attributes.value("entryAction")->asString();
         if(!entryAction.isEmpty())
         {
+            // delete any spaces, this will cause an error
             entryAction.replace(" ","");
             QStringList entries = entryAction.split(",");
             for(int i = 0; i < entries.size(); i++)
@@ -161,6 +162,8 @@ void CWStateMachine::createSignalsAndSlots()
         exitAction = state->attributes.value("exitAction")->asString();
         if(!exitAction.isEmpty())
         {
+            // delete any spaces, otherwise an assertion error is thrown
+            exitAction.replace(" ","");
             QStringList exits = exitAction.split(",");
             for(int i = 0; i < exits.size(); i++)
             {

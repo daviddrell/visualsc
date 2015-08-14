@@ -52,19 +52,20 @@ private:
     Ui::MainWindow *ui;
     void sendMessage(QString title, QString message);
     SMProject *_project;
-    QSettings *_settings;
-    static QString _lastImportFilePath;
-    static QString _keyLastFilePath;
-    static QString _codeLastFilePath;
-    static QString _currentFolder;
-    static QString _currentFileFullPath;
-    static QString _currentExportFullPath;
+
+    QString _currentFolder;
+    QString _currentFileFullPath;
+    QString _currentExportFullPath;
+
+    QString _settingsFileName;
 
     SCFormView *_formEditorWindow;
     TextFormatToolBar *_textFormatToolBar;
-
-    bool _savedOnce;
     void delay();
+
+    void loadSettings();
+    void saveSettings();
+    void createSettings();
 
 private slots:
     void handleFileOpenClick();
