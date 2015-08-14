@@ -33,13 +33,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2179535F91A242988D2236919095D24C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2BCF0EAE747E4C17A50F2DADEEC80B0B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4B0DD160D67C486B9610C4C7A94B0962"
+        "MsmKey" = "8:_3A3BDF73840F4B16AB14041CF33FF6D4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -63,19 +69,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_6AD70A96EE5340E1A126292796AC1873"
+        "MsmKey" = "8:_97BFD8C629864E50A3AF4C50480B0838"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B2C8890E216A4798850EDB27D838ACD6"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C455B860F5574501AF52248988386D21"
+        "MsmKey" = "8:_A1D6EF8D4BF14DB495168188F927EF62"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -103,6 +103,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -119,6 +127,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -200,6 +216,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2179535F91A242988D2236919095D24C"
+            {
+            "SourcePath" = "8:..\\..\\bin\\release\\scgraphicsview.dll"
+            "TargetName" = "8:scgraphicsview.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2BCF0EAE747E4C17A50F2DADEEC80B0B"
             {
             "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\Qt Dependencies\\Qt5Widgets.dll"
@@ -220,10 +256,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B0DD160D67C486B9610C4C7A94B0962"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3A3BDF73840F4B16AB14041CF33FF6D4"
             {
-            "SourcePath" = "8:..\\..\\bin\\release\\scformview.dll"
-            "TargetName" = "8:scformview.dll"
+            "SourcePath" = "8:..\\..\\bin\\release\\visualsc.exe"
+            "TargetName" = "8:visualsc.exe"
             "Tag" = "8:"
             "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Condition" = "8:"
@@ -300,10 +336,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6AD70A96EE5340E1A126292796AC1873"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_97BFD8C629864E50A3AF4C50480B0838"
             {
-            "SourcePath" = "8:..\\..\\bin\\release\\visualsc.exe"
-            "TargetName" = "8:visualsc.exe"
+            "SourcePath" = "8:..\\..\\bin\\release\\scformview.dll"
+            "TargetName" = "8:scformview.dll"
             "Tag" = "8:"
             "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Condition" = "8:"
@@ -320,27 +356,7 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2C8890E216A4798850EDB27D838ACD6"
-            {
-            "SourcePath" = "8:..\\..\\bin\\release\\scgraphicsview.dll"
-            "TargetName" = "8:scgraphicsview.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C455B860F5574501AF52248988386D21"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A1D6EF8D4BF14DB495168188F927EF62"
             {
             "SourcePath" = "8:..\\..\\bin\\release\\scdatamodel.dll"
             "TargetName" = "8:scdatamodel.dll"
@@ -568,7 +584,7 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_4AACF1FB7CA040828A9C38F119F5EC59"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_BC35A138713949FF936AABCFA24442A9"
             {
             "Name" = "8:Visual Statechart"
             "Arguments" = "8:"
@@ -576,10 +592,10 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_6AD70A96EE5340E1A126292796AC1873"
+            "Target" = "8:_3A3BDF73840F4B16AB14041CF33FF6D4"
             "Folder" = "8:_97647CB0098E49F9BA0E2ECA3FD75D32"
             "WorkingFolder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
-            "Icon" = "8:_FC3A5A9CB6594315B2F2AF7CE17B6915"
+            "Icon" = "8:"
             "Feature" = "8:"
             }
         }
