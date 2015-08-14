@@ -86,10 +86,15 @@ public:
     explicit SCFormView(QWidget *parent = 0, SCDataModel * dm=0);
     void highlightRootItem();
     void highlightPreviousItem();
+    void highlightItem(SCItem*);
+    void clearSelectedItems();
     void setProject(SMProject*);
 
     SCState* getCurrentlySelectedState();
 
+public slots:
+    void handleItemClicked(SCState*);
+    void handleItemClicked(SCTransition*);
 signals:
     void openClick();
     void exportClick();

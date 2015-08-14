@@ -221,7 +221,7 @@ signals:
 
 
      void aboutToBeDeleted(QObject*);
-
+     void clicked(SCState*);
      void changed();
      void attributeChangedSignal(IAttribute*);
 

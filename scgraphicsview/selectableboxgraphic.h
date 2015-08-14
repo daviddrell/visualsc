@@ -123,6 +123,8 @@ signals:
 
     void stateBoxReleased();
 
+
+
 protected:
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event

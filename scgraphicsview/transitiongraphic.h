@@ -59,6 +59,7 @@ public:
 signals:
   // void startEndMoved(QPointF newPos);
   // void anchorMoved(QPointF newPos);
+    void clicked(SCTransition*);
 
 public slots:
     void updateModel ();

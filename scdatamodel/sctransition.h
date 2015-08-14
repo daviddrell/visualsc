@@ -105,6 +105,7 @@ signals:
 
     void eventChangedInFormView(SCTransition*, QString);
     void eventChangedInDataModel(SCTransition*, QString);
+    void clicked(SCTransition*);
     void selected();
     void unselected();
     void transitionAddTextBlock(SCTextBlock*);          // connected in scformview::loadtree for sctransitions. connected to the parentitem's treeAddTextBlock(SCTextBlock) in customtreewidgetitem

@@ -939,6 +939,9 @@ void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 // for supporting moving the box across the scene
 void StateBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
+
+    qDebug() << "emitting clicked";
+    emit clicked(this->getStateModel());
     event->setAccepted(true);
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
     _dragStart = event->pos();
@@ -1021,7 +1024,7 @@ void StateBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event )
 {
-    //    qDebug() << " QEvent == " + QString::number(event->type());
+        qDebug() << " QEvent == " + QString::number(event->type());
 
     CornerGrabber * corner = dynamic_cast<CornerGrabber *>(watched);
     if ( corner == NULL) return false; // not expected to get here
@@ -1043,6 +1046,8 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
             corner->mouseDownX = mevent->pos().x();
             corner->mouseDownY = mevent->pos().y();
             //corner->setHovered(true);
+
+
         }
         break;
 

@@ -177,8 +177,7 @@ bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
         _mouseController->mouseInput(qgs);
         //_mouseController->printPos();
     }
-
-    return false;
+    return false; // propogate the event further
 }
 
 // for supporting moving the box across the scene
@@ -782,6 +781,8 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
     connect(state, SIGNAL(bringToFront(SCState*)), this, SLOT(handleBringToFront(SCState*)));
     connect(state, SIGNAL(sendToBack(SCState*)), this, SLOT(handleSendToBack(SCState*)));
 
+    // when the graphic is clicked also emit clicked for the state
+    connect(stateGraphic, SIGNAL(clicked(SCState*)), state, SIGNAL(clicked(SCState*)));
 
     StateName* name = state->getStateNameAttr();
     connect(name, SIGNAL(changed(StateName*)), stateGraphic, SLOT(handleAttributeChanged(StateName*)));
@@ -882,7 +883,8 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     TransitionStringAttribute* eventName = trans->getTransStringAttr("event");
     connect(eventName, SIGNAL(changed(TransitionStringAttribute*)), transGraphic, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
 
-
+    // when the transition graphic emits clicked, also emit it for the sctransition
+    connect(transGraphic, SIGNAL(clicked(SCTransition*)), trans, SIGNAL(clicked(SCTransition*)));
 }
 
 /**

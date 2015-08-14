@@ -107,6 +107,7 @@ public:
 
 signals:
     void resizeState(StateBoxGraphic*);
+    void clicked(SCState*);
 
 protected:
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);

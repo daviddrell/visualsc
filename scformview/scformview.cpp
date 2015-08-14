@@ -180,11 +180,7 @@ void SCFormView::import()
 void SCFormView::highlightRootItem()
 {
     // unselect any selected item;
-    QList<QTreeWidgetItem*> selected = stateChartTreeView->selectedItems();
-    for(int i = 0; i < selected.size();i++)
-    {
-        selected.at(i)->setSelected(false);
-    }
+    clearSelectedItems();
 
     // reset the currently selected state to the top state;
     _currentlySelected = _topState;
@@ -194,6 +190,27 @@ void SCFormView::highlightRootItem()
     handleTreeViewItemClicked((QTreeWidgetItem*)_topState->getTreeWidget(), 0);
 }
 
+
+void SCFormView::highlightItem(SCItem* item)
+{
+    // unselect any selected item
+    clearSelectedItems();
+
+    // set currently selected
+    FVItem* fvitem = _items.value(item);
+    _currentlySelected = fvitem;
+
+    // select the fv item
+    fvitem->getTreeWidget()->setSelected(true);
+    handleTreeViewItemClicked((QTreeWidgetItem*) fvitem->getTreeWidget(), 0);
+}
+
+void SCFormView::clearSelectedItems()
+{
+    QList<QTreeWidgetItem*> selected = stateChartTreeView->selectedItems();
+    foreach(QTreeWidgetItem* sel, selected)
+        sel->setSelected(false);
+}
 
 /**
  * @brief SCFormView::highlightPreviousItem
@@ -860,6 +877,16 @@ QObject* SCFormView::getNeighborState(QObject*s)
     return prev;
 }
 
+void SCFormView::handleItemClicked(SCState* st)
+{
+    this->highlightItem(st);
+}
+
+void SCFormView::handleItemClicked(SCTransition* tr)
+{
+    this->highlightItem(tr);
+}
+
 void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem *tableItem, QString key)
 {
     if(key=="size")
@@ -878,6 +905,7 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
  * @param treeItem
  *
  *  this function sets up connections for a sc states' attributes changing to also update the tree view
+ *
  *
  */
 void SCFormView::connectState(SCState *state, CustomTreeWidgetItem* treeItem)
@@ -903,6 +931,8 @@ void SCFormView::connectState(SCState* st)
     connect(st, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
     connect(st, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*,SCState*)));
 
+    // when a state emits the clicked signal, select it in form view
+    connect(st, SIGNAL(clicked(SCState*)), this, SLOT(handleItemClicked(SCState*)));
 
 }
 
@@ -924,6 +954,8 @@ void SCFormView::connectTransition(SCTransition* trans)
     StateName* targetStateName = trans->targetState()->getStateNameAttr();
     connect(targetStateName, SIGNAL(changed(StateName*)), trans, SLOT(handleTargetStateNameChanged(StateName*)));
 
+    // highlight the transition when it is clicked
+    connect(trans, SIGNAL(clicked(SCTransition*)), this,SLOT(handleItemClicked(SCTransition*)));
 
 }
 
@@ -1185,6 +1217,8 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
 
     CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
     propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+    QFont bold("Arial", 8, QFont::Bold);
+    propValue->setFont(bold);
 
     propertyTable->setItem(row, 0, propName);
     propertyTable->setItem(row++, 1, propValue);
@@ -1270,6 +1304,8 @@ void SCFormView::loadPropertyTable(SCState* state)
 
         CustomTableWidgetItem * propValue = new CustomTableWidgetItem(attr->asString());
         propValue->setFlags(propValue->flags() | (Qt::ItemIsEditable) | (Qt::ItemIsEnabled));
+        QFont bold("Arial", 8, QFont::Bold);
+        propValue->setFont(bold);
 
         propertyTable->setItem(row, 0, propName);
         propertyTable->setItem(row++, 1, propValue);

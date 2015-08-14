@@ -211,8 +211,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     */
 
     _eventText = new SelectableTextBlock((QGraphicsObject*) _anchors[0], t->getEventTextBlock());
-//    _eventText->recenterText();
- //   _eventText->update();
 
 }   // end of constructor
 
@@ -348,6 +346,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
             case QEvent::GraphicsSceneMousePress:
             {
+                emit clicked(this->_transitionDM);
                 //qDebug() << "mouse press";
                 elbow->setMouseState(ElbowGrabber::kMouseDown);
                 QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -440,6 +439,7 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
         case QEvent::GraphicsSceneMousePress:
         {
+            emit clicked(this->_transitionDM);
            // qDebug() << "line mouse press";
             line->setMouseState(ElbowGrabber::kMouseDown);
             QApplication::setOverrideCursor(Qt::ClosedHandCursor);
