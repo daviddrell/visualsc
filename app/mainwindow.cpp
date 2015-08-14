@@ -223,7 +223,7 @@ void MainWindow::handleNewClick()
 
     this->setWindowTitle("Visual Statechart Editor");
 
-    loadSettings();
+    //
 }
 
 void MainWindow::handleFileOpenClick()
@@ -247,6 +247,8 @@ void MainWindow::handleFileOpenClick()
 
     emit reset();
     emit open(_currentFileFullPath);
+
+    saveSettings();
 }
 
 
@@ -290,15 +292,17 @@ void MainWindow::handleFileSaveClick()
             _currentFolder = QFileInfo(_currentFileFullPath).path();
             _project->save(_currentFileFullPath);
             this->setWindowTitle(_currentFileFullPath);
+            saveSettings();
         }
     }
     else
     {
         _project->save(_currentFileFullPath);
         this->setWindowTitle(_currentFileFullPath);
+        saveSettings();
     }
 
-    saveSettings();
+
 }
 
 void MainWindow::on_actionSave_As_triggered()
@@ -327,6 +331,7 @@ void MainWindow::on_actionSave_As_triggered()
         qDebug() << "the file path is " << _currentFileFullPath;
         _project->save(_currentFileFullPath);
         this->setWindowTitle(_currentFileFullPath);
+        saveSettings();
     }
 }
 
@@ -358,6 +363,7 @@ void MainWindow::handleExportCodeClick()
             _currentFolder = QFileInfo(_currentExportFullPath).path();
             _project->exportToCode(_currentExportFullPath);
             this->setWindowTitle("Exported to "+_currentExportFullPath);
+            saveSettings();
         }
 
     }
@@ -365,6 +371,7 @@ void MainWindow::handleExportCodeClick()
     {
         _project->exportToCode(_currentExportFullPath);
         this->setWindowTitle("Exported to "+_currentExportFullPath);
+        saveSettings();
     }
 }
 
@@ -395,8 +402,7 @@ void MainWindow::on_actionImport_triggered()
         _project->getDM()->importFile(current,importFileName);
 
         this->setWindowTitle("Imported file "+importFileName+" into state: " + current->getName());
-
-
+        saveSettings();
     }
 
 

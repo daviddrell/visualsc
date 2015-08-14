@@ -49,6 +49,8 @@ class QPoint;
 
   */
 
+#define DEFAULT_STATE_WIDTH  160
+#define DEFAULT_STATE_HEIGHT 100
 
 class SCDATAMODELSHARED_EXPORT  SCState : public SCItem
 {
@@ -76,7 +78,7 @@ public:
     enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };
     void addTransitionReference(SCTransition*, TransitionTransitDirection );
 
-    void setStateName(QString n);
+
     void addTransistion(SCTransition*);
     void addState(SCState *);
 
@@ -238,8 +240,9 @@ signals:
      void bringToFront(SCState*);
      void sendToBack(SCState*);
 
-public slots:
 
+public slots:
+     void setStateName(QString n);
 
 private slots:   
      void handleTextBlockChanged();

@@ -25,6 +25,7 @@
 
 #include "selectableboxgraphic.h"
 #include "selectabletextblock.h"
+#include "fixedtextblock.h"
 
 
 
@@ -81,7 +82,7 @@ public:
     StateBoxGraphic(QGraphicsObject*parent, SCState * state);
     ~StateBoxGraphic();
 
-    SelectableTextBlock* TextItem;    ///<  text to go in the title area.
+   // SelectableTextBlock* TextItem;    ///<  text to go in the title area.
 
 
     int getGridLocation(QPointF mts,QPointF point);
@@ -101,13 +102,17 @@ public:
     void getAllStates(QList<StateBoxGraphic*> &stateList);
     //void getAllTransitions(QList<TransitionGraphic*> &transList);
 
-
+    FixedTextBlock* getStateTitle();
     void forceUpdate();
+
+    void setName(QString);
+    QString getStateName();
 
 
 signals:
     void resizeState(StateBoxGraphic*);
     void clicked(SCState*);
+    void nameChanged(QString);
 
 protected:
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
@@ -166,6 +171,8 @@ private:
 
     QColor  _finalStateColor;
     QColor  _initialStateColor;
+
+    FixedTextBlock* _stateTitle;
 
 };
 

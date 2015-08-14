@@ -24,8 +24,6 @@
 #include <QVariant>
 #include <QDebug>
 
-#define DEFAULT_STATE_WIDTH  160
-#define DEFAULT_STATE_HEIGHT 100
 
 SCState::SCState(QObject *parent) :
     SCItem(parent),
@@ -152,6 +150,9 @@ void SCState::initCommon()
     connect (_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
     connect(name, SIGNAL(changed(StateName*)), _IdTextBlock, SLOT(handleAttributeChanged(StateName*)));
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
+
+
+
 }
 
 

@@ -808,12 +808,12 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
     //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
 
 
-    // automatically resize text blocks when parents are resized
-    connect(stateGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)), stateGraphic->TextItem, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
 
     // handle when a state is double clicked
     connect(stateGraphic, SIGNAL(resizeState(StateBoxGraphic*)), this, SLOT(handleAutoResize(StateBoxGraphic*)));
 
+    // handle a state name change from the graphics view
+    connect(stateGraphic, SIGNAL(nameChanged(QString)), state, SLOT(setStateName(QString)));
 
 }
 
@@ -1043,5 +1043,8 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // make the parent bigger to hold this state
     // and since its bigger, make its parent bigger.....
     increaseSizeOfAllAncestors (newState);
+
+    stateGraphic->getStateTitle()->resize();
+    stateGraphic->getStateTitle()->recenterText();
 
 }

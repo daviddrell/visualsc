@@ -61,8 +61,8 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _pen(),
         _dragStart(0,0),
         _gridSpace(10),
-        _width(0),
-        _height(0),
+        _width(DEFAULT_STATE_WIDTH),
+        _height(DEFAULT_STATE_HEIGHT),
         _cornerDragStart(0,0),
         _XcornerGrabBuffer(7),
         _YcornerGrabBuffer(7),
@@ -112,8 +112,8 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
         _pen(),
         _dragStart(0,0),
         _gridSpace(10),
-        _width(0),
-        _height(0),
+        _width(DEFAULT_STATE_WIDTH),
+        _height(DEFAULT_STATE_HEIGHT),
         _cornerDragStart(0,0),
         _XcornerGrabBuffer(7),
         _YcornerGrabBuffer(7),
@@ -222,6 +222,7 @@ void SelectableBoxGraphic::setSize(QPointF size)
 
     _drawingWidth =  _width - _XcornerGrabBuffer;
     _drawingHeight=  _height - _YcornerGrabBuffer;
+
 }
 
 /**
@@ -1027,12 +1028,21 @@ QPointF SelectableBoxGraphic::getVisibleCenter()
 
 QRectF SelectableBoxGraphic::getUsableArea()
 {
-    int x0 = _drawingOriginX + BOX_DRAW_BUFFER;
-    int y0 = _drawingOriginY + BOX_DRAW_BUFFER;
-    int width = _drawingWidth -BOX_DRAW_BUFFER ;
-    int height = _drawingHeight -BOX_DRAW_BUFFER;
+    int x0 =  getTotalBufferX();
+    int y0 =  getTotalBufferY();
+    int width =  this->getSize().x()- 2*getTotalBufferX();
+    int height =  this->getSize().y()-2*getTotalBufferY();
 
     return QRectF(x0,y0, width, height);
+}
+
+qreal SelectableBoxGraphic::getTotalBufferX()
+{
+    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER;
+}
+qreal SelectableBoxGraphic::getTotalBufferY()
+{
+    return CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER;
 }
 
 

@@ -63,12 +63,13 @@
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         SelectableBoxGraphic(parent),
         //TextItem(parent,stateModel->getIDTextBlock()),
-        TextItem(new SelectableTextBlock(this, stateModel->getIDTextBlock())),
+        //TextItem(new SelectableTextBlock(this, stateModel->getIDTextBlock())),
         _stateModel(stateModel),
         _diagLineStart(),
         _diagLineEnd(),
         _diagLineDrawIt(false),
-        _intersection()
+        _intersection(),
+        _stateTitle(new FixedTextBlock(this, 0.0, 25, true))
 {
 
 
@@ -99,6 +100,15 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     _finalStateColor = QColor(242,119,119,255);
 
 
+    // proprogate the fixed text block's nameChanged Signal
+    connect(_stateTitle, SIGNAL(nameChanged(QString)), this, SIGNAL(nameChanged(QString)));
+
+ //  connect(this, SIGNAL(stateBoxResized(QRectF,QRectF,int)), _stateTitle, SLOT(handleStateBoxResized)
+
+//    // automatically resize text blocks when parents are resized
+//    connect(stateGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)), stateGraphic->TextItem, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
+
+    connect(this, SIGNAL(stateBoxResized(QRectF, QRectF, int)), _stateTitle, SLOT(handleStateBoxResized(QRectF,QRectF,int)));
 
 }
 
@@ -635,12 +645,19 @@ int StateBoxGraphic::getGridLocation(QPointF mts,QPointF point)
 
 }
 
+FixedTextBlock* StateBoxGraphic::getStateTitle()
+{
+    return _stateTitle;
+}
 
 void StateBoxGraphic::handleAttributeChanged(SizeAttribute* size)
 {
     //qDebug() << "StateBoxGraphic::handleAttributeChanged(SizeAttribute*)";
     QPoint sz = size->asPointF().toPoint();
     setSizeAndUpdateAnchors(sz);
+    this->_stateTitle->resize();
+    this->_stateTitle->recenterText();
+
 }
 
 void StateBoxGraphic::handleAttributeChanged(PositionAttribute* pos)
@@ -652,10 +669,21 @@ void StateBoxGraphic::handleAttributeChanged(PositionAttribute* pos)
 void StateBoxGraphic::handleAttributeChanged(StateName* name)
 {
     qDebug() << "StateBoxGraphic::handleAttributeChanged";
-    this->TextItem->setText(name->asString());
+    //this->TextItem->setText(name->asString());
+
+    // sets the fixed text block's plain text
+    this->setName(name->asString());
 }
 
+void StateBoxGraphic::setName(QString stateName)
+{
+    this->_stateTitle->setText(stateName);
+}
 
+QString StateBoxGraphic::getStateName()
+{
+    return this->getStateModel()->getStateNameAttr()->asString();
+}
 
 /**
  * @brief StateBoxGraphic::returnClosestWallFace

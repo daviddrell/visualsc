@@ -4,6 +4,7 @@
 #include <QTextEdit>
 #include "selectableboxgraphic.h"
 #include "selectabletextblock.h"
+#include "fixedtextblock.h"
 #include <QApplication>
 
 
@@ -102,8 +103,12 @@ void MaskedTextEdit::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mousePressEvent(event);
+    else if(parent)
+        parent->mousePressEvent(event);
     else
-        parentAsSelectableTextBlock()->mousePressEvent(event);
+    {
+
+    }
 }
 
 /**
@@ -119,8 +124,14 @@ void MaskedTextEdit::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
     if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mouseMoveEvent(event);
+    else if(parent)
+    {
+        parent->mouseMoveEvent(event);
+    }
     else
-        parentAsSelectableTextBlock()->mouseMoveEvent(event);
+    {
+
+    }
 }
 /**
  * @brief MaskedTextEdit::mouseReleaseEvent
@@ -135,8 +146,10 @@ void MaskedTextEdit::mouseReleaseEvent (QGraphicsSceneMouseEvent * event )
     if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mouseReleaseEvent(event);
 
-    else
-        parentAsSelectableTextBlock()->mouseReleaseEvent(event);
+    else if(parent)
+    {
+        parent->mouseReleaseEvent(event);
+    }
 }
 
 
@@ -154,7 +167,14 @@ void MaskedTextEdit::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *evt)
     // if editor mode is off:
     // 1. turn editor mode on and set selected and focused:
     setTextInteraction(true, true);
-    resizeRectToTextBlock();
+
+    SelectableTextBlock* stb = this->parentAsSelectableTextBlock();
+    FixedTextBlock* ftb = this->parentAsFixedTextBlock();
+    if(stb)
+        resizeRectToTextBlock();
+    else if(ftb)
+        resizeRectToFixedTextBlock();
+
 
 
 }
@@ -209,6 +229,25 @@ void MaskedTextEdit::setTextInteraction(bool on, bool selectAll)
 //    return QGraphicsTextItem::itemChange(change, value);
 //}
 
+FixedTextBlock* MaskedTextEdit::parentAsFixedTextBlock()
+{
+    return dynamic_cast<FixedTextBlock*>(this->parentItem());
+}
+
+void MaskedTextEdit::resizeRectToFixedTextBlock()
+{
+    FixedTextBlock* ftb = this->parentAsFixedTextBlock();
+
+
+    QRectF editRect(0,0, ftb->getSize().x(), ftb->getSize().y());
+
+    this->setWidth(editRect.width());
+    this->setHeight(editRect.height());
+
+
+    this->setPos(editRect.topLeft());
+}
+
 void MaskedTextEdit::resizeRectToTextBlock()
 {
     SelectableTextBlock* stb = this->parentAsSelectableTextBlock();
@@ -236,3 +275,5 @@ void MaskedTextEdit::resizeRectToTextBlock()
 //    //qreal height = this->document().
 //   // _rect.setWidth(document()->size().width());
 //}
+
+

@@ -21,6 +21,9 @@
 #define TEXTBLOCK_DEFAULT_HEIGHT    40
 #define TEXTBLOCK_DEFAULT_X         10
 #define TEXTBLOCK_DEFAULT_Y         10
+#define TEXT_ITEM_X_BUFFER 2
+#define TEXT_ITEM_Y_BUFFER 2
+
 class SCDATAMODELSHARED_EXPORT SCTextBlock : public SCItem
 {
     Q_OBJECT

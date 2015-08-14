@@ -9,7 +9,7 @@
 
 #define MTE_MOUSE_EVENTS
 
-
+class FixedTextBlock;
 class SelectableBoxGraphic;
 class SelectableTextBlock;
 /**
@@ -34,7 +34,8 @@ public:
     SelectableBoxGraphic* parentAsSelectableBoxGraphic();
 
     SelectableTextBlock* parentAsSelectableTextBlock();
-
+    FixedTextBlock* parentAsFixedTextBlock();
+    void resizeRectToFixedTextBlock();
     void resizeRectToTextBlock();
 //    void resizeRectToTextSize();
 

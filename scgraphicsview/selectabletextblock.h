@@ -10,8 +10,7 @@ class QKeyEvent;
 class QGraphicsSceneMouseEvent;
 
 
-#define TEXT_ITEM_X_BUFFER 2
-#define TEXT_ITEM_Y_BUFFER 2
+
 
 /**
   * \class SelectableTextBlock
