@@ -212,7 +212,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
 
     _eventText = new SelectableTextBlock((QGraphicsObject*) _anchors[0], t->getEventTextBlock());
 //    _eventText->recenterText();
-    _eventText->setPos(0,0);
+ //   _eventText->update();
 
 }   // end of constructor
 
@@ -1295,6 +1295,19 @@ void TransitionGraphic::setTextSize(qreal w, qreal h)
 {
     QPoint size(w,h);
     _eventText->setSize(size);
+}
+
+/**
+ * @brief TransitionGraphic::handleAttributeChanged
+ * @param tsa
+ * SLOT
+ * connect in SCGraphicsView::connectTransition
+ *
+ * when the data model is updated, change the event text in the graphics view
+ */
+void TransitionGraphic::handleAttributeChanged(TransitionStringAttribute *tsa)
+{
+    _eventText->setText(tsa->asString());
 }
 
 void TransitionGraphic::getClosestSides(int* sourceSide, int* targetSide)

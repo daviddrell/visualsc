@@ -570,6 +570,7 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
     _mapTransitionToGraphic.insert(t, transGraphic);
     _hashTransitionToGraphic.insert(t, transGraphic);
 
+
     // set the event text box position of this transition
     PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
     transGraphic->setTextPos(textPos->asPointF());
@@ -875,6 +876,10 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
         connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
         grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
     }
+
+    // connect the event name data model to the text block
+    TransitionStringAttribute* eventName = trans->getTransStringAttr("event");
+    connect(eventName, SIGNAL(changed(TransitionStringAttribute*)), transGraphic, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
 
 
 }

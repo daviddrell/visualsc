@@ -923,6 +923,8 @@ void SCFormView::connectTransition(SCTransition* trans)
     // when the target's name changes, also change the transition's attribute
     StateName* targetStateName = trans->targetState()->getStateNameAttr();
     connect(targetStateName, SIGNAL(changed(StateName*)), trans, SLOT(handleTargetStateNameChanged(StateName*)));
+
+
 }
 
 /**
@@ -1187,6 +1189,9 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
     propertyTable->setItem(row, 0, propName);
     propertyTable->setItem(row++, 1, propValue);
 
+    // connect this to the table widget item
+    connectTransition(_currentlySelected->getTransition(), propValue, "event");
+
     // load the target property second
     attr = atts->value("target");
 
@@ -1199,7 +1204,7 @@ void SCFormView::loadPropertyTable(SCTransition* trans)
     propertyTable->setItem(row, 0, propName);
     propertyTable->setItem(row++, 1, propValue);
 
-
+    // connect this to the table widget item
     connectTransition(_currentlySelected->getTransition(), propValue, "target");
 
     while (i.hasNext())
