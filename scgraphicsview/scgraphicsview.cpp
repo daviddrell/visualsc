@@ -520,10 +520,11 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     _mapTransitionToGraphic.insert(t, transGraphic);
     _hashTransitionToGraphic.insert(t, transGraphic);
 
-    // set the text position of the event attribute
-    PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
-    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
-    transGraphic->setTextPos(textPos->asPointF());
+    // this is done later
+//    // set the text position of the event attribute
+//    PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
+//    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
+//    transGraphic->setTextPos(textPos->asPointF());
 
     // wait to do connect calls
 

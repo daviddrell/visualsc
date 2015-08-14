@@ -1160,18 +1160,7 @@ void SCDataModel::handleMakeANewTransitionProperty(const QString name)
     qDebug() << "handle make a new transition property " << name;
 
 }
-/**
- * @brief SCDataModel::handleMakeANewIDTextBlock
- * @param attributes
 
- SLOT
- connect in SCDataModel::open()
-    connect(&_reader, SIGNAL(makeANewIDTextBlockElement(TextBlockAttributes*)), this, SLOT(handleMakeANewIDTextBlock(TextBlockAttributes*)), Qt::DirectConnection);
-
-
-
-
-*/
 
 /**
  * @brief SCDataModel::handleMakeANewIDTextBlock
@@ -1213,7 +1202,7 @@ void SCDataModel::handleMakeANewEventTextBlock( TextBlockAttributes* attributes)
     qDebug () << "SCDataModel::handleMakeANewEventTextBlock";
 
     SCTextBlock *textBlock = _currentTransition->getEventTextBlock();
-    textBlock->attributes.setAttributes(*attributes);
+    textBlock->attributes.setAttributes(*attributes); 
     delete attributes;
 }
 

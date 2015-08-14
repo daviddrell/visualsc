@@ -24,7 +24,7 @@
 #include <QVariant>
 #include <QDebug>
 
-#define DEFAULT_STATE_WIDTH  161
+#define DEFAULT_STATE_WIDTH  160
 #define DEFAULT_STATE_HEIGHT 100
 
 SCState::SCState(QObject *parent) :
