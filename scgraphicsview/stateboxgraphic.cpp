@@ -59,6 +59,8 @@
 #define MIN_WIDTH       105
 #define MIN_HEIGHT      65
 
+#define STATE_NAME_HEIGHT   26
+
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         SelectableBoxGraphic(parent),
@@ -69,7 +71,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _diagLineEnd(),
         _diagLineDrawIt(false),
         _intersection(),
-        _stateTitle(new FixedTextBlock(this, 0.0, 23, true))
+        _stateTitle(new FixedTextBlock(this, 0.0, STATE_NAME_HEIGHT, true))
 {
 
 
@@ -238,7 +240,7 @@ void StateBoxGraphic::handleFinalStateChanged(StateString *)
  * @brief StateBoxGraphic::handleIsParallelStateChanged
  * @param ss
  *
- * when a state's isParallelState Attribute is changed. update all direct children
+ * when a state's parallelState Attribute is changed. update all direct children
  *
  */
 void StateBoxGraphic::handleIsParallelStateChanged(StateString* ss)

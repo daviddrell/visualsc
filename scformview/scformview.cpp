@@ -2119,7 +2119,7 @@ void SCFormView::reselectTarget()
         //SCTransition* trans = _currentlySelected->getTransition();
 
         // create a new state tree window to select a state from
-        _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
+        _targetStateSelectionWindow = new StateSelectionWindow(this, _dm);
 
         // Pass the target and the target name to handleStateSelectionWindowStateSelected
         connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectTransitionTarget(SCState*)));
@@ -2146,7 +2146,7 @@ void SCFormView::reselectParent()
         }
 
         // create a new state tree window to select a state from
-        _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
+        _targetStateSelectionWindow = new StateSelectionWindow(this, _dm);
 
         // Pass the target and the target name to handleStateSelectionWindowStateSelected
         connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectParent(SCState*)));
@@ -2160,7 +2160,7 @@ void SCFormView::reselectParent()
         //SCTransition* trans = _currentlySelected->getTransition();
 
         // create a new state tree window to select a state from
-        _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
+        _targetStateSelectionWindow = new StateSelectionWindow(this, _dm);
 
         // Pass the target and the target name to handleStateSelectionWindowStateSelected
         connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleReselectTransitionParent(SCState*)));
@@ -2287,7 +2287,7 @@ void SCFormView::insertTransition()
     // need to force the user to select a target state for this new transition
 
     // create a new state tree window to select a state from
-    _targetStateSelectionWindow = new StateSelectionWindow(NULL, _dm);
+    _targetStateSelectionWindow = new StateSelectionWindow(this, _dm);
 
     // Pass the target and the target name to handleStateSelectionWindowStateSelected
     connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleStateSelectionWindowStateSelected(SCState*)));
@@ -3041,7 +3041,7 @@ void SCFormView::aboutAttributes()
                     "exitAction\tComma separated list of exit events\n"
                     "finalState\t(true/false) Final state of the parent state machine [OPTIONAL]\n"
                     "initialState\t(true/false) Initial state of a state machine [REQUIRED unless parallel]\n"
-                    "isParallelState\t(true/false) True = direct children states are concurrently run\n"
+                    "parallelState\t(true/false) True = direct children states are concurrently run\n"
                     "position\tPosition in parent's coordinate system\n"
                     "size\t\tSize in pixels\n"
                     "type\t\tNot in use\n"

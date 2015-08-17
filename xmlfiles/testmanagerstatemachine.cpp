@@ -63,7 +63,7 @@ TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     _runningTests_c9e4b34a->addTransition(this, SIGNAL(Relay_Event_testsCompleted_850da190()), _completed_850da190);
     _completed_850da190->addTransition(this, SIGNAL(Relay_Event_pollTimerPopped_fa1bce49()), _downloadingAVC_fa1bce49);
     _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(Relay_Event_updateFailure_850da190()), _completed_850da190);
-    _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(Relay_Event_updateFinishForAllFirmwareUnits_c9e4b34a()), _runningTests_c9e4b34a);
+    _updateFirmwareAllUnits_53416b9a->addTransition(this, SIGNAL(Relay_Event_updateFirmwareAllUnitsFinished_c9e4b34a()), _runningTests_c9e4b34a);
     _updateFirmwareAllUnits_53416b9a->addTransition(_updateFirmwareAllUnits_53416b9a, SIGNAL(finished()), _runningTests_c9e4b34a);
 
     //    Propogate the private QState signals to public signals
@@ -197,9 +197,9 @@ void TestManagerStateMachine::Event_updateFailure_850da190()
     emit Relay_Event_updateFailure_850da190();
 }
 
-void TestManagerStateMachine::Event_updateFinishForAllFirmwareUnits_c9e4b34a()
+void TestManagerStateMachine::Event_updateFirmwareAllUnitsFinished_c9e4b34a()
 {
-    emit Relay_Event_updateFinishForAllFirmwareUnits_c9e4b34a();
+    emit Relay_Event_updateFirmwareAllUnitsFinished_c9e4b34a();
 }
 
 
@@ -235,7 +235,7 @@ void TestManagerStateMachine::Slot_StateExit_idle_c9dcfd20()
 
 void TestManagerStateMachine::Slot_StateEntry_downloadingAVC_fa1bce49()
 {
-    emit EntryAction_startDownload();
+    emit EntryAction_startdownload();
 }
 
 void TestManagerStateMachine::Slot_StateExit_downloadingAVC_fa1bce49()
@@ -245,7 +245,7 @@ void TestManagerStateMachine::Slot_StateExit_downloadingAVC_fa1bce49()
 
 void TestManagerStateMachine::Slot_StateEntry_runningTests_c9e4b34a()
 {
-    emit EntryAction_startTests();
+    emit EntryAction_starttests();
 }
 
 void TestManagerStateMachine::Slot_StateExit_runningTests_c9e4b34a()
@@ -265,7 +265,7 @@ void TestManagerStateMachine::Slot_StateExit_completed_850da190()
 
 void TestManagerStateMachine::Slot_StateEntry_updateFirmwareAllUnits_53416b9a()
 {
-    emit EntryAction_sendEmail();
+
 }
 
 void TestManagerStateMachine::Slot_StateExit_updateFirmwareAllUnits_53416b9a()
@@ -299,7 +299,7 @@ void TestManagerStateMachine::Slot_StateExit_updatingWincomm_7778a7d0()
     //////// State Machine: _updatingGSUnits_52c831de ////////
 void TestManagerStateMachine::Slot_StateEntry_updateInProgress_6d5ca4f3()
 {
-    emit EntryAction_startGSUpdate();
+    emit EntryAction_startGSupdate();
 }
 
 void TestManagerStateMachine::Slot_StateExit_updateInProgress_6d5ca4f3()
@@ -321,7 +321,7 @@ void TestManagerStateMachine::Slot_StateExit_done_48c3bcdd()
     //////// State Machine: _updatingWincomm_7778a7d0 ////////
 void TestManagerStateMachine::Slot_StateEntry_unzipInProgress_9f1f6d0f()
 {
-    emit EntryAction_startUnzip();
+    emit EntryAction_startunzip();
 }
 
 void TestManagerStateMachine::Slot_StateExit_unzipInProgress_9f1f6d0f()

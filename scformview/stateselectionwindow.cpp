@@ -57,8 +57,9 @@ StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
     loadTree (NULL, states);
     this->setWindowTitle("Select A Target State");
     this->resize(402,650);
+    QPoint parentPos = this->parentWidget()->pos();
     QPoint offset(POP_UP_X, POP_UP_Y);
-    this->move(offset);
+    this->move(parentPos+offset);
 
 }
 

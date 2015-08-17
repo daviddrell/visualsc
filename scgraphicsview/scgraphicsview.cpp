@@ -736,7 +736,7 @@ void SCGraphicsView::handleNewRootMachine(SCState* state)
  * @brief SCGraphicsView::handleRootMachineIsParallelChanged
  *
  * SLOT
- * connected specifically to the root machine's isParallelState Attribtue
+ * connected specifically to the root machine's parallelState Attribtue
  * while other states will have this function in stateboxgraphic, since the root machine has no statebox graphic, update its children graphics will be handled here.
  *
  * is parallel state is the only attribute for the root machine that can affect something in the graphics view.
@@ -761,7 +761,7 @@ void SCGraphicsView::handleRootMachineIsParallelChanged(StateString *)
  */
 void SCGraphicsView::connectState(SCState* state)
 {
-    StateString* ips = state->getStringAttr("isParallelState");
+    StateString* ips = state->getStringAttr("parallelState");
     connect(ips, SIGNAL(changed(StateString*)), this, SLOT(handleRootMachineIsParallelChanged(StateString*)));
 }
 
@@ -795,7 +795,7 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
     PositionAttribute* pos = state->getPosAttr();
     connect(pos, SIGNAL(changed(PositionAttribute*)), stateGraphic, SLOT(handleAttributeChanged(PositionAttribute*)));
 
-    StateString* ips = state->getStringAttr("isParallelState");
+    StateString* ips = state->getStringAttr("parallelState");
     connect(ips, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleIsParallelStateChanged(StateString*)));
 
     StateString* initialState = state->getStringAttr("initialState");

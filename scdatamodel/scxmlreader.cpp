@@ -553,6 +553,11 @@ void SCXMLReader::readState(STATE_TYPE stateType)
             PositionAttribute * sa  = new PositionAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
             stateAttributes->addItem( sa );
         }
+        else if( XmlAttr.name() == "isParallelState")   // retroactive change to make this parallelState instead
+        {
+            StateString * sa  = new StateString(NULL,"parallelState", XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
         else // unknown attribute
         {
             StateString * sa  = new StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());

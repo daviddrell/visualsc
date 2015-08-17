@@ -45,7 +45,7 @@ public slots:
     void Event_testsCompleted_850da190();
     void Event_pollTimerPopped_fa1bce49();
     void Event_updateFailure_850da190();
-    void Event_updateFinishForAllFirmwareUnits_c9e4b34a();
+    void Event_updateFirmwareAllUnitsFinished_c9e4b34a();
 
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
 
@@ -63,17 +63,16 @@ signals:
     //    Connect to these signals to a slot corresponding to a entryAction or exitAction
     //
     //////// State Machine: _testManagerStateMachine_97b850af ////////
-    void EntryAction_startDownload();
-    void EntryAction_startTests();
-    void EntryAction_sendEmail();
+    void EntryAction_startdownload();
+    void EntryAction_starttests();
 
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
 
     //////// State Machine: _updatingGSUnits_52c831de ////////
-    void EntryAction_startGSUpdate();
+    void EntryAction_startGSupdate();
 
     //////// State Machine: _updatingWincomm_7778a7d0 ////////
-    void EntryAction_startUnzip();
+    void EntryAction_startunzip();
 
 
     //
@@ -183,7 +182,7 @@ signals:
     void Relay_Event_testsCompleted_850da190();
     void Relay_Event_pollTimerPopped_fa1bce49();
     void Relay_Event_updateFailure_850da190();
-    void Relay_Event_updateFinishForAllFirmwareUnits_c9e4b34a();
+    void Relay_Event_updateFirmwareAllUnitsFinished_c9e4b34a();
 
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
 

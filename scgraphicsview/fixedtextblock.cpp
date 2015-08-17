@@ -3,6 +3,8 @@
 #include <QTextDocument>
 #include "stateboxgraphic.h"
 
+
+
 /**
  * @brief FixedTextBlock::FixedTextBlock
  * @param parent
@@ -30,8 +32,8 @@
 FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal topFraction, qreal bottom, bool fixedHeight):
     QGraphicsObject(parent),
     _pen(),
-    _width(70),
-    _height(40),
+    _width(TEXTBLOCK_DEFAULT_WIDTH),
+    _height(TEXTBLOCK_DEFAULT_HEIGHT),
     _topFraction(topFraction),
     _bottom(bottom),
     _fixedHeight(fixedHeight),
@@ -39,7 +41,8 @@ FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal topFraction, qreal
 {
     switchPen(PenStyle::Default);
 
-
+    QFont font("Arial", 10, QFont::Bold);
+    _textItem.setFont(font);
     _textItem.setPlainText(this->parentAsStateBoxGraphic()->getStateName());
     connect(&_textItem, SIGNAL(focusOut()), this, SLOT(handleTextItemEdited()));
     reposition();

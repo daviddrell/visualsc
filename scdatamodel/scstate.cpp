@@ -103,7 +103,7 @@ void SCState::initCommon()
     }
 
 
-    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"isParallelState"<<"finalState"<<"initialState"<<"uid"; // type is added to the state in scxml reader.
+    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"parallelState"<<"finalState"<<"initialState"<<"uid"; // type is added to the state in scxml reader.
 
     //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
@@ -116,7 +116,7 @@ void SCState::initCommon()
     StateString * onExitAction = new StateString(this, "exitAction", "");
     StateString * finalState = new StateString(this, "finalState", "false");
     StateString * initialState = new StateString(this, "initialState", "false");
-    StateString * isParallelState = new StateString(this, "isParallelState", "false");
+    StateString * parallelState = new StateString(this, "parallelState", "false");
 
     QUuid u=QUuid::createUuid();
     StateString * uid= new StateString(this, "uid", u.toString());
@@ -131,7 +131,7 @@ void SCState::initCommon()
     attributes.addItem(onExitAction);
     attributes.addItem(finalState);
     attributes.addItem(initialState);
-    attributes.addItem(isParallelState);
+    attributes.addItem(parallelState);
     attributes.addItem(uid);
 
     this->setObjectName(defaultName);// to support debug tracing
@@ -197,7 +197,7 @@ bool SCState::isInitial()
 
 bool SCState::isParallel()
 {
-    return (attributes.value("isParallelState")->asString()=="true");
+    return (attributes.value("parallelState")->asString()=="true");
 }
 
 bool SCState::isStateMachine()
