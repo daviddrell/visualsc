@@ -46,6 +46,7 @@
 #include <QHeaderView>
 #include <QFileDialog>
 
+
 #define PROPERTY_TABLE_WIDTH_1  108     // smallest value while still having clearance for the longest attribute name connectToFinished
 #define PROPERTY_TABLE_WIDTH_2  170
 

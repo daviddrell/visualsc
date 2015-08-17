@@ -33,6 +33,7 @@
 #include <QKeyEvent>
 #include <QGraphicsSceneMouseEvent>
 
+
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     QWidget (parentWidget),
     _scene(new QGraphicsScene(this)),
@@ -70,6 +71,7 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
 
     //using openGL
 
+//    _view.setViewport(new QWidget());
     _view.setViewport( new QGLWidget (QGLFormat(QGL::SampleBuffers) ));
     _view.setScene( _scene);
     _view.show();
