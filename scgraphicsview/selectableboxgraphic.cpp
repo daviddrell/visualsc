@@ -1003,6 +1003,9 @@ CornerGrabber* SelectableBoxGraphic::getCornerHovered()
     int cor = cornerHovered();
     if(cor >= 0)
         return _corners[cor];
+
+
+    return NULL;
 }
 
 QRectF SelectableBoxGraphic::boundingRect() const

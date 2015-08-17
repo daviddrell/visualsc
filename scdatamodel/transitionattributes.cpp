@@ -72,8 +72,6 @@ void TransitionAttributes::addAttribute(const QString attrName)
         IAttribute* newAttr=NULL;
 
         TransitionStringAttribute *str;
-
-
         TransitionStringAttribute * newStr = new TransitionStringAttribute (*str);
         newStr->setValue(attrName);
         addItem(newStr);
@@ -93,7 +91,6 @@ void TransitionAttributes::addAttribute(const QString attrName)
 void TransitionAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 {
     QMapIterator<QString,IAttribute*> i(sourceAttrList);
-
     while(i.hasNext())
     {
         QString key = i.next().key();

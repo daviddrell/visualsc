@@ -75,6 +75,7 @@ IAttributeContainer* FVItem::getAttributes()
     else
     {
         qDebug() << "FVItem::getAttributes ERROR unexpected type";
+        return NULL;
     }
 }
 
@@ -91,6 +92,7 @@ IAttributeContainer* FVItem::getTextBlockAttributes()
     else
     {
         qDebug() << "FVItem::getTextBlockAttributes ERROR unexpected type";
+        return NULL;
     }
 }
 
