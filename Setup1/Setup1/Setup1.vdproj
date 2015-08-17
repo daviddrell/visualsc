@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_19112AA04010489E9173B8D8244856F3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2FAC4AD672E242A3A26A8166BD871236"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -46,6 +52,12 @@
         "Entry"
         {
         "MsmKey" = "8:_32D003372959423986C68D6DBB746A5E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_346537C541E54D069998D7965974D29D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -87,12 +99,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_6CC946F54C5C4BB8856BDAC6507359BB"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_7094982253234FEBB0D27D4E1F4B0A9B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -123,12 +129,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_91B2060E230E469D866455CE1A1B8FF0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_9BFC633E77124297831693C2A3D67BBF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -141,7 +141,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A1D2F8608545459C86F3DEC06CAFF7BE"
+        "MsmKey" = "8:_A4FDAE19E9334075BC5012EBD9EF3ADD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -183,13 +183,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_ED80B39A90434711878BB99A60D745D1"
+        "MsmKey" = "8:_E548D39E01674A3BBF6D3E05E0F2892E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_F7FA2100DAF341BE96552E2A37A87022"
+        "MsmKey" = "8:_ED80B39A90434711878BB99A60D745D1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -356,6 +356,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_19112AA04010489E9173B8D8244856F3"
+            {
+            "SourcePath" = "8:..\\..\\bin\\release\\scdatamodel.dll"
+            "TargetName" = "8:scdatamodel.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2FAC4AD672E242A3A26A8166BD871236"
             {
             "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\Qt5Core.dll"
@@ -400,6 +420,26 @@
             {
             "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\D3Dcompiler_47.dll"
             "TargetName" = "8:D3Dcompiler_47.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_346537C541E54D069998D7965974D29D"
+            {
+            "SourcePath" = "8:..\\..\\bin\\release\\scgraphicsview.dll"
+            "TargetName" = "8:scgraphicsview.dll"
             "Tag" = "8:"
             "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Condition" = "8:"
@@ -536,26 +576,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6CC946F54C5C4BB8856BDAC6507359BB"
-            {
-            "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\scgraphicsview.dll"
-            "TargetName" = "8:scgraphicsview.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7094982253234FEBB0D27D4E1F4B0A9B"
             {
             "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\imageformats\\qgif.dll"
@@ -656,26 +676,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_91B2060E230E469D866455CE1A1B8FF0"
-            {
-            "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\scformview.dll"
-            "TargetName" = "8:scformview.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9BFC633E77124297831693C2A3D67BBF"
             {
             "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\Qt5Widgets.dll"
@@ -716,10 +716,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A1D2F8608545459C86F3DEC06CAFF7BE"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A4FDAE19E9334075BC5012EBD9EF3ADD"
             {
-            "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\scdatamodel.dll"
-            "TargetName" = "8:scdatamodel.dll"
+            "SourcePath" = "8:..\\..\\bin\\release\\visualsc.exe"
+            "TargetName" = "8:visualsc.exe"
             "Tag" = "8:"
             "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Condition" = "8:"
@@ -856,12 +856,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ED80B39A90434711878BB99A60D745D1"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E548D39E01674A3BBF6D3E05E0F2892E"
             {
-            "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\imageformats\\qico.dll"
-            "TargetName" = "8:qico.dll"
+            "SourcePath" = "8:..\\..\\bin\\release\\scformview.dll"
+            "TargetName" = "8:scformview.dll"
             "Tag" = "8:"
-            "Folder" = "8:_D5AD908A0EDF4A2F8562FA9119E5F2F3"
+            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -876,12 +876,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F7FA2100DAF341BE96552E2A37A87022"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ED80B39A90434711878BB99A60D745D1"
             {
-            "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\visualsc.exe"
-            "TargetName" = "8:visualsc.exe"
+            "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\imageformats\\qico.dll"
+            "TargetName" = "8:qico.dll"
             "Tag" = "8:"
-            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
+            "Folder" = "8:_D5AD908A0EDF4A2F8562FA9119E5F2F3"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1016,15 +1016,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Visual Statechart"
-        "ProductCode" = "8:{33CB006A-CC25-4967-97DD-1B5719D30CFE}"
-        "PackageCode" = "8:{3EDA2499-F529-474C-A6F4-0168C3E43C77}"
+        "ProductCode" = "8:{0AE87E3A-DFD7-495A-BD2E-966C1AD7C9FB}"
+        "PackageCode" = "8:{1F61B54E-0F48-4244-A72C-88CFB6B5255C}"
         "UpgradeCode" = "8:{D709AE66-BF74-4E55-876B-8F4B9F9CBF2E}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.4"
+        "ProductVersion" = "8:1.0.5"
         "Manufacturer" = "8:Visual Statechart"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1145,7 +1145,7 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_F7FA2100DAF341BE96552E2A37A87022"
+            "Target" = "8:_A4FDAE19E9334075BC5012EBD9EF3ADD"
             "Folder" = "8:_97647CB0098E49F9BA0E2ECA3FD75D32"
             "WorkingFolder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Icon" = "8:_FC3A5A9CB6594315B2F2AF7CE17B6915"
