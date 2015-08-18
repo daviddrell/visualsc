@@ -68,9 +68,15 @@ SCTransition::SCTransition(QObject * parent):
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
     connect(event, SIGNAL(changed(TransitionStringAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
+
+    // state handle transition deletion, unhook from source and sink before deleting the state
     SCState* parentState = dynamic_cast<SCState*>(parent);
     connect(parentState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSource(QObject*)));
-    //connect(targetState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
+
+    // this is done elsewhere, since target states may not be known when loading a file
+
+    // SCState* targetState
+    // connect(targetState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
     /*
 
     TransitionStringAttribute * cond = new TransitizgonStringAttribute (this, "cond",QString());
@@ -286,34 +292,33 @@ bool SCTransition::isConnectToFinished()
 void SCTransition::deleteSafely()
 {
     emit markedForDeletion(this);
-/*
-    SCState* source = parentSCState();
-    SCState* target = targetState();
-    if(source)
-        source->removeTransitionReferenceOut(this);
 
-    if(target)
-        target->removeTransitionReferenceIn(this);
-        */
+    // when a transition is deleted, ensure that is removed from its state's lists
+    this->detachFromSource(NULL);
+    this->detachFromSink(NULL);
 
     this->deleteLater();
 }
 
 void SCTransition::detachFromSource(QObject* o)
 {
-    SCState* source = parentSCState();
+    SCState* source = this->parentSCState();
     if(source)
-        source->removeTransitionReferenceOut(this);
+    {
 
+        source->removeTransitionReferenceOut(this);
+        qDebug() << "detachFromSource Transition: "<< this->getEventName() << "from source: " << source->getName();
+    }
 }
 
 void SCTransition::detachFromSink(QObject* o)
 {
-    SCState* target = targetState();
+    SCState* target = this->targetState();
     if(target)
+    {
         target->removeTransitionReferenceIn(this);
-
-    this->deleteSafely();
+    qDebug() << "detachFromSink Transition: " << this->getEventName() << " from target: " << target->getName();
+    }
 }
 
 /*
