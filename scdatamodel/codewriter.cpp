@@ -722,7 +722,9 @@ void CodeWriter::hWriteStateChangeSignals()
         CWStateMachine* cwsm = _machineHash.value(machine);
         hPrintln("//////// State Machine: "+cwsm->_stateName+" ////////",1);
 
-        hPrintln("void "+cwsm->_readyRelaySignal+";",1);
+        // only create a state ready signal for the root machine
+        if(machine == _rootMachine)
+            hPrintln("void "+cwsm->_readyRelaySignal+";",1);
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {

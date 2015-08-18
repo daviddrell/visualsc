@@ -54,37 +54,6 @@ CWStateMachine::CWStateMachine(SCState *state):
         }
     }
 }
-/*
-CWStateMachine::CWStateMachine(SCState *state, bool isRoot)
-{
-    // this constructor is for creating a state machine that is the root machine
-    if(isRoot)
-    {
-
-        // a CWStateMachine is a state with children states, so it has all the things a normal state would, but we also want to keep track of each of its states/statemachines
-        _myState = state;
-
-
-        QString stateName;          // _stateName                       state's name in camel case and preceeding "_"
-        stateName =         "_" + toCamel(state->getName())+"_"+state->getUidFirstName();
-
-        this->setParallel(state->isParallel());
-
-        if(state->isParallel())
-        {
-            //QString finishedRelaySlot;  // Slot_StateFinished_stateName     A parallel StateMachine's private slot that is called when finished is emitted from all of its children states
-            //QString finishedRelaySignal;// Signal_StateFinished_stateName   A parallel StateMachine's public signal that is emitted when finished is emitted from all of its children states
-
-            _finishedRelaySlot = "Slot_StateFinished"+stateName+"()";
-            _finishedRelaySignal = "Signal_StateFinished"+stateName+"()";
-        }
-
-        // set the function names for this State Machine
-        _stateName = stateName;
-        _readyRelaySignal = "Signal_StateReady"+stateName+"()";
-    }
-}
-*/
 CWStateMachine::~CWStateMachine()
 {
 
