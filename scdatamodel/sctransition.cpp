@@ -97,6 +97,12 @@ SCTransition::SCTransition(QObject * parent):
 
 SCTransition::~SCTransition()
 {
+
+    // when a transition is deleted, ensure that is removed from its state's lists
+    this->detachFromSource(NULL);
+    this->detachFromSink(NULL);
+
+
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
 
 
@@ -293,9 +299,6 @@ void SCTransition::deleteSafely()
 {
     emit markedForDeletion(this);
 
-    // when a transition is deleted, ensure that is removed from its state's lists
-    this->detachFromSource(NULL);
-    this->detachFromSink(NULL);
 
     this->deleteLater();
 }
