@@ -7,6 +7,7 @@
 #include "stateboxgraphic.h"
 #include "fixedtextblock.h"
 #include <QApplication>
+#include <QKeyEvent>
 
 
 MaskedTextEdit::MaskedTextEdit(QGraphicsItem *parent ,QRectF rect ) :
@@ -50,7 +51,6 @@ void MaskedTextEdit::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     QGraphicsTextItem::paint(painter, option, widget);
 }
 
-
 SelectableTextBlock* MaskedTextEdit::parentAsSelectableTextBlock()
 {
     return dynamic_cast<SelectableTextBlock*> (this->parentItem());
@@ -59,6 +59,33 @@ SelectableTextBlock* MaskedTextEdit::parentAsSelectableTextBlock()
 FixedTextBlock* MaskedTextEdit::parentAsFixedTextBlock()
 {
     return dynamic_cast<FixedTextBlock*> (this->parentItem());
+}
+
+
+/**
+ * @brief MaskedTextEdit::eventFilter
+ * @param o
+ * @param e
+ * @return
+ *
+ *
+ * Listen for the enter key to be pressed
+ * once it's pressed, we leave edit mode instead of adding a new line
+ */
+bool MaskedTextEdit::eventFilter(QObject* o, QEvent * e)
+{
+    if(e->type()==QEvent::KeyPress)
+    {
+        QKeyEvent *key = static_cast<QKeyEvent*>(e);
+        //qDebug() << "eventFiler in ftb " << key->key();
+        if(key->key() == Qt::Key_Return)
+        {
+
+            qDebug() << "Masked Text Edit enter pressed";
+            this->setTextInteraction(false, false);
+        }
+    }
+    return false; // propogate the event further
 }
 
 /**
@@ -214,6 +241,8 @@ void MaskedTextEdit::setTextInteraction(bool on, bool selectAll)
 {
     if(on && textInteractionFlags() == Qt::NoTextInteraction)
     {
+        // turn on the event filter
+        this->installEventFilter(this);
         // switch on editor mode:
         setTextInteractionFlags(Qt::TextEditorInteraction);
         // manually do what a mouse click would do else:
@@ -228,6 +257,8 @@ void MaskedTextEdit::setTextInteraction(bool on, bool selectAll)
     }
     else if(!on && textInteractionFlags() == Qt::TextEditorInteraction)
     {
+        // remove the event filter
+        this->removeEventFilter(this);
         // turn off editor mode:
         setTextInteractionFlags(Qt::NoTextInteraction);
         // deselect text (else it keeps gray shade):

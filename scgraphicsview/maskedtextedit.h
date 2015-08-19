@@ -49,6 +49,7 @@ signals:
 
 private:
 
+    bool eventFilter(QObject* o, QEvent* e);
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 //    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
