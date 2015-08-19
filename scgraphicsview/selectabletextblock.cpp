@@ -31,14 +31,11 @@
 #include <QTextDocument>
 #include "transitiongraphic.h"
 
-#define DEFAULT_PEN_WIDTH 1
-#define HOVER_PEN_WIDTH 1
+#define DEFAULT_PEN_WIDTH       1
+#define HOVER_PEN_WIDTH         1
 
-#define MIN_WIDTH 50
-#define MIN_HEIGHT      24+ 2*(CORNER_GRAB_Y_BUFFER+BOX_DRAW_BUFFER+TEXT_ITEM_Y_BUFFER)
-
-#define HORIZONTAL_TEXT_MARGIN  5
-#define VERTICAL_TEXT_MARGIN    5
+#define MIN_WIDTH               50
+#define MIN_HEIGHT              24 + 2*(CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_Y_BUFFER)
 
 //#define POP_UP_EDIT_MODE
 
@@ -1048,12 +1045,12 @@ void SelectableTextBlock::recenterText()
 
 qreal SelectableTextBlock::getTotalTextItemBufferX()
 {
-    return CORNER_GRAB_X_BUFFER +BOX_DRAW_BUFFER+ TEXT_ITEM_X_BUFFER;
+    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_X_BUFFER;
 }
 
 qreal SelectableTextBlock::getTotalTextItemBufferY()
 {
-    return CORNER_GRAB_Y_BUFFER +BOX_DRAW_BUFFER+ TEXT_ITEM_Y_BUFFER;
+    return CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_Y_BUFFER;
 }
 
 /**

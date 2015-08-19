@@ -29,15 +29,23 @@
  * top fraction works the same, but height will be fixed at bottom's value
  *
  */
+
+#define DEFAULT_WIDTH       50
+#define DEFAULT_HEIGHT      50
+#define TEXT_BUFFER         5
+
+// the text position will be pushed down to its position in edit mode
+#define TEXT_PUSH_DOWN      1
+
 FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal topFraction, qreal bottom, bool fixedHeight):
     QGraphicsObject(parent),
     _pen(),
-    _width(TEXTBLOCK_DEFAULT_WIDTH),
-    _height(TEXTBLOCK_DEFAULT_HEIGHT),
+    _width(DEFAULT_WIDTH),
+    _height(DEFAULT_HEIGHT),
     _topFraction(topFraction),
     _bottom(bottom),
     _fixedHeight(fixedHeight),
-    _textItem(this, QRect(0,0, TEXTBLOCK_DEFAULT_WIDTH-2*(TEXT_ITEM_X_BUFFER), TEXTBLOCK_DEFAULT_HEIGHT-2*(TEXT_ITEM_Y_BUFFER)))
+    _textItem(this, QRect(0,0, DEFAULT_WIDTH-2*(TEXT_BUFFER), DEFAULT_HEIGHT-2*(TEXT_BUFFER)))      // doesn't matter what this is set to here because attributes get loaded anyways
 {
     switchPen(PenStyle::Default);
 
@@ -90,7 +98,6 @@ void FixedTextBlock::handleStateBoxResized(QRectF, QRectF, int)
 {
     this->resize();
     this->recenterText();
-
 }
 
 StateBoxGraphic* FixedTextBlock::parentAsStateBoxGraphic()
@@ -125,15 +132,18 @@ void FixedTextBlock::recenterText()
     // if it will not fit, then resize the text item to the dimensions of the allowable area
     if(width < textWidth)
     {
-        qDebug() << "width < text WIdth";
+        qDebug() << "width < text Width resizing rect to to fixed text block size";
         _textItem.resizeRectToFixedTextBlock();
+
+        // adjust y position of text to match where it is in the edit mode
+        _textItem.setPos(_textItem.pos().x(), _textItem.pos().y()-TEXT_PUSH_DOWN);
     }
     else    // center the text in the text block
     {
         // set the position to be in the middle of the text block
         qreal newX = this->getSize().x()/2.0 - _textItem.document()->size().width()/2.0;
         qreal newY = this->getSize().y()/2.0 - _textItem.document()->size().height()/2.0;
-        _textItem.setPos(this->clampMin(newX,0), this->clampMin(newY,0));
+        _textItem.setPos(this->clampMin(newX,0), this->clampMin(newY,0)-TEXT_PUSH_DOWN);
     }
 
     //_textItem.document()->setPageSize(QSizeF(_width,_height));

@@ -266,6 +266,7 @@ void MaskedTextEdit::resizeRectToTextBlock()
     // set the position to be at the top left point plus the total offsets
     QPointF offset(stb->getTotalTextItemBufferX(), stb->getTotalTextItemBufferY());
     this->setPos(editRect.topLeft()+offset);
+
 }
 
 //void MaskedTextEdit::resizeRectToTextSize()
