@@ -105,12 +105,18 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     // proprogate the fixed text block's nameChanged Signal
     connect(_stateTitle, SIGNAL(nameChanged(QString)), this, SIGNAL(nameChanged(QString)));
 
+    // connect the size attribute of this state model to the state title box
+    SizeAttribute* sa = this->getStateModel()->getSizeAttr();
+    connect(sa, SIGNAL(changed(SizeAttribute*)), this->_stateTitle, SLOT(handleStateSizeChanged(SizeAttribute*)));
+
+
  //  connect(this, SIGNAL(stateBoxResized(QRectF,QRectF,int)), _stateTitle, SLOT(handleStateBoxResized)
 
 //    // automatically resize text blocks when parents are resized
 //    connect(stateGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)), stateGraphic->TextItem, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
 
-    connect(this, SIGNAL(stateBoxResized(QRectF, QRectF, int)), _stateTitle, SLOT(handleStateBoxResized(QRectF,QRectF,int)));
+//    connect(this, SIGNAL(stateBoxResized(QRectF, QRectF, int)), _stateTitle, SLOT(handleStateBoxResized(QRectF,QRectF,int)));
+
 
 }
 
@@ -1397,7 +1403,7 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
             //qDebug() <<"old box: " <<oldBox << "new Box: " << newBox;
             emit stateBoxResized(oldBox, newBox, corner);
         }
-       //this->update();
+       graphicHasChanged();
     }
 
     return true;// true => do not send event to watched - we are finished with this event
@@ -1647,8 +1653,7 @@ QString StateBoxGraphic::getSizeAsString()
 
 void StateBoxGraphic::setSize(QPointF size)
 {
-    return SelectableBoxGraphic::setSize(size);
-
+    SelectableBoxGraphic::setSize(size);
     if ( _stateModel )
     {
         _stateModel->setSize (size );

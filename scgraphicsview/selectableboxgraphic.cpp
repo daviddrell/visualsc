@@ -249,6 +249,8 @@ void SelectableBoxGraphic::adjustDrawingSize(int x, int y)
     _drawingWidth =  _width - _XcornerGrabBuffer;
     _drawingHeight=  _height - _YcornerGrabBuffer;
 
+
+
 }
 
 /**

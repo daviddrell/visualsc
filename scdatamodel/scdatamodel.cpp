@@ -401,7 +401,11 @@ void SCDataModel::importFile(SCState* parent,QString fileName)
 {
     _importedTransitions.clear();
     _reader.readFile(fileName);
-    _reader.importFile(parent);
+
+    // this function will emit signal importedMachine()
+    SCState* importedMachine = _reader.importFile(parent);
+    qDebug() << "imported Machine: " <<importedMachine->objectName();
+
 
     connectTransitionsToStatePath(_importedTransitions);
     for(int i = 0; i < _importedTransitions.count(); i++)
@@ -409,8 +413,6 @@ void SCDataModel::importFile(SCState* parent,QString fileName)
         // alert the graphicsview and formview that the imported transitions are ready
         emit transitionsReadyToConnect(_importedTransitions.at(i));
     }
-
-
 }
 
 

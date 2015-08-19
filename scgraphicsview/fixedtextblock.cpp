@@ -74,6 +74,13 @@ QPointF FixedTextBlock::getSize()
     return QPointF(_width,_height);
 }
 
+void FixedTextBlock::handleStateSizeChanged(SizeAttribute *)
+{
+    qDebug() << "FixedTextBlock::handleStateSizeChanged";
+    this->resize();
+    this->recenterText();
+}
+
 /**
  * @brief FixedTextBlock::handleTextItemEdited
  *

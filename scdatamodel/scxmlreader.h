@@ -53,7 +53,7 @@ public:
     SCXMLReader(SCDataModel* dm);
     void readFile(QString infile);
     virtual void run();
-    void importFile(SCState* parent);
+    SCState* importFile(SCState* parent);
     void setDataModel(SCDataModel* dm);
     void getReadResult(bool &success, QStringList& message);
 

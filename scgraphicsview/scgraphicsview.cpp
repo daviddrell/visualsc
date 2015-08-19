@@ -99,10 +99,24 @@ SCGraphicsView::~SCGraphicsView()
  *
  * when a state machine is imported fully, we call this to automatically resize the state machine to enclose all of its substates
  */
-void SCGraphicsView::handleNewImportedMachine(SCState * state)
+void SCGraphicsView::handleNewImportedMachine(SCState * importedMachine)
 {
-    StateBoxGraphic* sbg = _hashStateToGraphic.value(state);
+    StateBoxGraphic* sbg = _hashStateToGraphic.value(importedMachine);
     this->handleAutoResize(sbg);
+
+    // the top level children of this state machine were using scene based coordinates.
+    // now they get a parent state box graphic, which automatically maps their coordinates to this new parent state box graphic
+    // we also must update the data model with the updated position
+    QList<SCState*> directChildren = importedMachine->getStates();
+    for(int i = 0; i < directChildren.size(); i++)
+    {
+        SCState* child = directChildren.at(i);
+        StateBoxGraphic* childG = _hashStateToGraphic.value(child);
+
+        QPointF machineMapped = childG->pos();
+        child->setPosition(machineMapped);
+    }
+
 }
 
 /**
@@ -1046,7 +1060,7 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     // make the parent bigger to hold this state
     // and since its bigger, make its parent bigger.....
-    increaseSizeOfAllAncestors (newState);
+   // increaseSizeOfAllAncestors (newState);
 
     stateGraphic->getStateTitle()->resize();
     stateGraphic->getStateTitle()->recenterText();

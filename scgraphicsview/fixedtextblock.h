@@ -39,6 +39,7 @@ signals:
 public slots:
     void handleTextItemEdited();
     void handleStateBoxResized(QRectF, QRectF, int);
+    void handleStateSizeChanged(SizeAttribute*);
 
 protected:
     qreal clampMin(qreal value, qreal min);

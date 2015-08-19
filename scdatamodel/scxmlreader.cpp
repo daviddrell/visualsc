@@ -50,7 +50,7 @@ void SCXMLReader::readFile(QString infile)
     _file = infile;
 }
 
-void SCXMLReader::importFile(SCState* parent)
+SCState* SCXMLReader::importFile(SCState* parent)
 {
     //_currentItem = parent;
     _currentState = parent;
@@ -88,6 +88,8 @@ void SCXMLReader::importFile(SCState* parent)
 
     // not currently conected to anything
     emit done(_error, _resultMessages);
+
+    return _importedMachine;
 }
 
 /**
