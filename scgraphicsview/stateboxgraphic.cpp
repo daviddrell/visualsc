@@ -1054,7 +1054,7 @@ void StateBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event )
 {
-        qDebug() << " QEvent == " + QString::number(event->type());
+//        qDebug() << " QEvent == " + QString::number(event->type());
 
     CornerGrabber * corner = dynamic_cast<CornerGrabber *>(watched);
     if ( corner == NULL) return false; // not expected to get here

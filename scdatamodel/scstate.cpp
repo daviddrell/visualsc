@@ -89,34 +89,30 @@ void SCState::initCommon()
 
     _initialState = NULL;
 
-
-
     SCState * parent = dynamic_cast<SCState *>(this->parent());
 
-    if  ( parent )
+    if(parent)
     {
-        QString parentsName = parent->attributes.value("name")->asString();
-
+        QString parentName = parent->attributes.value("name")->asString();
         int childCount = parent->getStateCount();
-
-        defaultName = "" + parentsName + "_" + QString::number(childCount);
+        defaultName = "" + parentName + "_" + QString::number(childCount);
     }
 
-
-    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"parallelState"<<"finalState"<<"initialState"<<"uid"; // type is added to the state in scxml reader.
-
+    // add each of the default attributes
+    DEFAULT_ATTRIBUTES_LIST << "name" << "size" << "position" <<"entryAction"<<"exitAction"<<"parallelState"<<"finalState"<<"initialState"<<"uid" <<"comments"<<"type"; // type is added to the state in scxml reader.
     //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
     // set the initial attributes and size
     StateName * name = new StateName (this, "name",defaultName);
     SizeAttribute * size = new SizeAttribute (this, "size",QPoint(DEFAULT_STATE_WIDTH,DEFAULT_STATE_HEIGHT));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
-    StateString * type = new StateString(this, "type", "default type");
+    StateString * type = new StateString(this, "type", "");
     StateString * onEntryAction = new StateString(this, "entryAction","");
     StateString * onExitAction = new StateString(this, "exitAction", "");
     StateString * finalState = new StateString(this, "finalState", "false");
     StateString * initialState = new StateString(this, "initialState", "false");
     StateString * parallelState = new StateString(this, "parallelState", "false");
+    StateString * comments = new StateString(this, "comments", "");
 
     QUuid u=QUuid::createUuid();
     StateString * uid= new StateString(this, "uid", u.toString());
@@ -133,46 +129,27 @@ void SCState::initCommon()
     attributes.addItem(initialState);
     attributes.addItem(parallelState);
     attributes.addItem(uid);
+    attributes.addItem(comments);
 
     this->setObjectName(defaultName);// to support debug tracing
 
     _IdTextBlock->setParent(this);
     _IdTextBlock->setText(name->asString());     // default state text
-    //_IdTextBlock->setText("DEFAULT ID TEXT");
 
-    // connect change the state name to handleNameChanged
-
-
-   // connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
-   // connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleSizeChanged(IAttribute*)));
-
+    // the set of connects inherent to an SCState are for its data model text block
     // connect changing the SCTextBlock to handleTextBlockChanged()
-    connect (_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
+    connect(_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
+
+    // connect changing the name attribute to the text block
     connect(name, SIGNAL(changed(StateName*)), _IdTextBlock, SLOT(handleAttributeChanged(StateName*)));
+
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
-
-
-
 }
 
 
 bool SCState::isFinal()
 {
     return (attributes.value("finalState")->asString()=="true");
-}
-
-void SCState::setInitial(QString boolString)
-{
-    if(boolString=="true")
-    {
-        this->parentAsSCState()->setInitialState(this);
-        attributes.value("initialState")->setValue(boolString);
-    }
-    else if(boolString != "true")
-    {
-        this->parentAsSCState()->setInitialState(NULL);
-        attributes.value("initialState")->setValue("false");
-    }
 }
 
 bool SCState::hasAnInitialState()
@@ -188,6 +165,27 @@ SCState* SCState::getInitialStateMember()
 void SCState::setInitialState(SCState * st)
 {
     _initialState = st;
+}
+
+/**
+ * @brief SCState::setInitial
+ * @param boolString
+ *
+ *
+ */
+void SCState::setInitial(QString boolString)
+{
+    boolString = boolString.toLower();
+    if(boolString=="true")
+    {
+        this->parentAsSCState()->setInitialState(this);
+        attributes.value("initialState")->setValue("true");
+    }
+    else
+    {
+        this->parentAsSCState()->setInitialState(NULL);
+        attributes.value("initialState")->setValue("false");
+    }
 }
 
 bool SCState::isInitial()
@@ -316,21 +314,68 @@ void SCState::setText(QString text)
     _IdTextBlock->setText(text);
 
     // this is in SCTextBlock's setText
-    /*if  ( text != _text)
-    {
-         _text = text;
-        this->setObjectName(text);
-        emit textChanged();
-    }*/
+//    if  ( text != _text)
+//    {
+//         _text = text;
+//        this->setObjectName(text);
+//        emit textChanged();
+//    }
 }
 
+/**
+ * @brief SCState::deleteAllSafely
+ * this recursively deletes all child states, beginning with the youngest descendant, then deletes this state
+ * called in deleteSafely()
+ */
+void SCState::deleteAllSafely()
+{
+    QList<SCState*> directChildren = this->getStates();
 
+    // base case, its ok to delete this child. this child has no children of its own, so we've gone down as far as the chain can go with this family tree.
+    if(directChildren.size()==0)
+    {
+        qDebug() << "no children, deleting state";
+        emit markedForDeletion(this);
+        this->deleteLater();
+    }
+    else    // this state has decendant(s), so those must be deleted before
+    {
+        for(int i = 0; i < directChildren.size(); i++)
+        {
+            SCState* st = directChildren.at(i);
+            st->deleteAllSafely();
+        }
+        qDebug() << "deleted " << directChildren.size() <<" children, now deleting self";
+        emit markedForDeletion(this);
+        this->deleteLater();
+    }
+}
+
+/**
+ * @brief SCState::deleteSafely
+ * this function is called in place of delete
+ *
+ * the problem with delete is that the QObject deconstructor gets called before the deconstructor here.
+ * this resolves that problem by using the signal markedForDeletion to properly handle deleting this state
+ * in the formview and graphicsview BEFORE its data model is destroyed.
+ *
+ * will first deleteSafely all transitions belonging to the state machine
+ * then deletes all children states, starting with descendants with no children
+ *
+ */
 void SCState::deleteSafely()
 {
-    emit markedForDeletion(this);
-    //this->removeAllTransitionsIn(); now handled by SCTransition
-    this->deleteLater();
-    //this = NULL;
+    // first delete all transitions that belong to this state machine
+    QList<SCTransition*> allTransitionChildren;
+    this->getAllTransitions(allTransitionChildren);
+    for(int i = 0; i < allTransitionChildren.size(); i++)
+    {
+        SCTransition* trans = allTransitionChildren.at(i);
+        trans->deleteSafely();
+    }
+
+    // next delete all states that belong to this state machine and itself
+    this->deleteAllSafely();
 }
 
 /**
@@ -463,7 +508,7 @@ IAttributeContainer * SCState::getAttributes()
 
 bool SCState::removeAttribute(QString key)
 {
-    if(DEFAULT_PROPERTIES_LIST.indexOf(key)==-1)
+    if(DEFAULT_ATTRIBUTES_LIST.indexOf(key)==-1)
     {
         attributes.remove(key);
         return true;

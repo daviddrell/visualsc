@@ -558,7 +558,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
             StateString * sa  = new StateString(NULL,"parallelState", XmlAttr.value().toString());
             stateAttributes->addItem( sa );
         }
-        else // unknown attribute
+        else // unknown attribute, generalize it as a string attribute and add it
         {
             StateString * sa  = new StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
             stateAttributes->addItem( sa );

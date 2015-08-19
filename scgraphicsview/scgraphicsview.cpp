@@ -613,7 +613,9 @@ void SCGraphicsView::handleStateDeleted(QObject *state)
             qDebug() << "deleting children for state "<<" with num children: " << children.count();
             for(int k = 0; k < children.count(); k++)
             {
-                this->handleStateDeleted( (SCState*)(children.at(k)) );
+                SCState* childState = dynamic_cast<SCState*>(children.at(k));
+                if(childState)
+                    this->handleStateDeleted( (SCState*)(children.at(k)) );
             }
 
             delete i.value();

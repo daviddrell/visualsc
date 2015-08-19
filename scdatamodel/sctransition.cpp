@@ -41,7 +41,7 @@ SCTransition::SCTransition(QObject * parent):
      path
      */
 
-    DEFAULT_PROPERTIES_LIST << "target" << "event" << "comments" << "path" << "uid";
+    DEFAULT_ATTRIBUTES_LIST << "target" << "event" << "comments" << "path" << "uid";
 
     //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
@@ -70,8 +70,9 @@ SCTransition::SCTransition(QObject * parent):
     connect(event, SIGNAL(changed(TransitionStringAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
 
     // state handle transition deletion, unhook from source and sink before deleting the state
-    SCState* parentState = dynamic_cast<SCState*>(parent);
-    connect(parentState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSource(QObject*)));
+    // i don't think this is need because the source state is getting deleted anyways
+//    SCState* parentState = dynamic_cast<SCState*>(parent);
+//    connect(parentState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSource(QObject*)));
 
     // this is done elsewhere, since target states may not be known when loading a file
 
@@ -98,10 +99,10 @@ SCTransition::SCTransition(QObject * parent):
 SCTransition::~SCTransition()
 {
 
-    // when a transition is deleted, ensure that is removed from its state's lists
-    this->detachFromSource(NULL);
-    this->detachFromSink(NULL);
-
+    // when a transition is deleted, ensure that is removed from its states' lists
+//    this->detachFromSource(NULL);
+//    this->detachFromSink(NULL);
+//    this->deleteSafely();
 
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
 
@@ -273,7 +274,7 @@ void SCTransition::addAttribute(QString key, QString value)
 
 bool SCTransition::removeAttribute(QString key)
 {
-    if(DEFAULT_PROPERTIES_LIST.indexOf(key)==-1)   // remove the attribute it it's not part of the core properties
+    if(DEFAULT_ATTRIBUTES_LIST.indexOf(key)==-1)   // remove the attribute it it's not part of the core properties
     {
         attributes.remove(key);
         return true;
@@ -297,9 +298,8 @@ bool SCTransition::isConnectToFinished()
 
 void SCTransition::deleteSafely()
 {
+    qDebug() << "emit markedForDeletion in SCTransiton::deleteSafely()";
     emit markedForDeletion(this);
-
-
     this->deleteLater();
 }
 
@@ -308,7 +308,6 @@ void SCTransition::detachFromSource(QObject* o)
     SCState* source = this->parentSCState();
     if(source)
     {
-
         source->removeTransitionReferenceOut(this);
         qDebug() << "detachFromSource Transition: "<< this->getEventName() << "from source: " << source->getName();
     }
@@ -320,7 +319,7 @@ void SCTransition::detachFromSink(QObject* o)
     if(target)
     {
         target->removeTransitionReferenceIn(this);
-    qDebug() << "detachFromSink Transition: " << this->getEventName() << " from target: " << target->getName();
+        qDebug() << "detachFromSink Transition: " << this->getEventName() << " from target: " << target->getName();
     }
 }
 

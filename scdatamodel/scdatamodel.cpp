@@ -106,48 +106,20 @@ void SCDataModel::handleStateMachineUidLoad(QString uid)
 
 /**
  * @brief SCDataModel::reset
- * will reset the datamodel, clearing all transitions and states bar the Root Machine State
+ * will reset the datamodel, clearing all transitions and states and make another root machine scstate
  */
 void SCDataModel::reset()
 {
-    _currentState = _topState;
+    // reset reader variables
     _currentTransition = NULL;
-    _topLevel =_level = 0;
-    _topState->setLevel(_level);
-    {
-
-        // delete all states except the root machine
-        QList<SCState *> list;
-        _topState->getAllStates(list);
-
-        // delete highest level states, this will automatically delete all sub states
-        QList<SCState*> directChildren;
-        _topState->getStates(directChildren);
-        for(int i = 0 ; i < directChildren.count(); i++)
-        {
-            SCState* st = directChildren.at(i);
-
-                qDebug() << "removing state: " << st->attributes.value("name")->asString();
-                st->deleteSafely();
-        }
-    }
     _transitions.clear();
+    _topLevel =_level = 0;
 
+    // make another top state and set the current state to it
     this->initializeEmptyStateMachine();
+
+    // alert the formview and graphicsview that there is a new top state
     emit newRootMachine(_topState);
-    //_topState->deleteSafely();
-
-
-    // reset the name of the state machine and alert the formview that this happened
- //   _topState->attributes.value("name")->setValue("State Machine");
- //   emit _topState->nameChangedInDataModel(_topState,"State Machine"); // connected to SCFormView::handleItemNameChangedInDataModel()
-
-    // generate another uid for the root machine
-  //  _topState->getStringAttr("uid")->setValue(QUuid::createUuid().toString());
-
-
-
-    //qDebug() << "AFTER A RESET, YOU HAVE " << _transitions.count() << " TRANSITIONS LISTED IN _transitions";
 }
 
 

@@ -121,7 +121,7 @@ private slots:
     void handleTextBlockChanged();
 
 private:
-    QList<QString> DEFAULT_PROPERTIES_LIST;
+    QList<QString> DEFAULT_ATTRIBUTES_LIST;
     QHash<QString,int> DO_NOT_DISPLAY_HASH;
     SCState *       _targetState;
 

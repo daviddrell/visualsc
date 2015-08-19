@@ -63,6 +63,7 @@ public:
 
 
     void deleteSafely();
+    void deleteAllSafely();
 
     QString getName();
    // void setGraphic(StateBoxGraphic*);
@@ -265,7 +266,7 @@ private:
     QList<SCTextBlock*> _textBlocks;
 
     int _level ; ///< distance from top state in terms of parent-child relationships
-    QList<QString> DEFAULT_PROPERTIES_LIST;
+    QList<QString> DEFAULT_ATTRIBUTES_LIST;
 
     QList<QString> DO_NOT_DISPLAY_LIST; // attributes that can be ignored in the property table
     QHash<QString,int> DO_NOT_DISPLAY_HASH;

@@ -783,10 +783,17 @@ void SCFormView::handleTransitionDeleted(QObject *t)
 
     SCTransition* trans = (SCTransition*) t;
 
-    qDebug () << "deleting fromview item for transiton: " << trans->attributes.value("event")->asString();
 
     // get the FVItem and Tree Widget associated with the transition
     FVItem* fvItem = _items.take(trans);
+
+    if(fvItem==NULL)
+    {
+        qDebug()<< "SCFormView::handleTransitionDeleted did not have a transition to delete";
+        return;
+    }
+    qDebug () << "deleting fromview item for transiton: " << trans->attributes.value("event")->asString();
+
     CustomTreeWidgetItem* fvTreeItem = fvItem->getTreeWidget();
 
     // deselect the tree item
@@ -828,10 +835,17 @@ void SCFormView::handleStateDeleted(QObject *s)
 {
     SCState* state = (SCState*) s;
 
-    qDebug () << "deleting form view item for state: " <<state->objectName();
+    qDebug () << "deleting form view item for state: ";
+//    qDebug () << "deleting form view item for state: " <<state->objectName();
 
     // get the FVItem and TreeWidget associated with the state
     FVItem* fvItem = _items.take(state);
+
+    if(fvItem==NULL)
+    {
+        qDebug() << "SCFormView::handleStateDeleted did not have a state to delete";
+        return;
+    }
     CustomTreeWidgetItem* fvTreeItem = fvItem->getTreeWidget();
 
     // deselect the tree item
