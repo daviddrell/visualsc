@@ -1,7 +1,7 @@
 #include "cwstatemachine.h"
 
-CWStateMachine::CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal):
-    CWState( theStateName, theEntryRelaySlot,  theExitRelaySlot,  theEntryRelaySignal, theExitRelaySignal)
+CWStateMachine::CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString comments):
+    CWState( theStateName, theEntryRelaySlot,  theExitRelaySlot,  theEntryRelaySignal, theExitRelaySignal, comments)
 {
 
 }
@@ -38,8 +38,8 @@ CWStateMachine::CWStateMachine(SCState *state):
     _stateName = stateName;
     _readyRelaySignal = "Signal_StateReady"+stateName+"()";
 
-
-
+    // set the comments variable
+    _comments = state->attributes.value("comments")->asString();
 
     // find all transitions that belong to the state and have true for connectedToFinish
     QList<SCTransition*> transitions;
@@ -89,7 +89,7 @@ void CWStateMachine::createSignalsAndSlots()
     QString relaySignal;
     QString targetName;
     CWTransition* cwTransition;
-
+    QString comments;
 
     QList<SCState*> directChildren;
     _myState->getStates(directChildren);
@@ -107,9 +107,10 @@ void CWStateMachine::createSignalsAndSlots()
         entryRelaySlot =    "Slot_StateEntry" + stateName+"()";
         exitRelaySlot =     "Slot_StateExit"+ stateName+"()";
 
+        comments = state->attributes.value("comments")->asString();
         // create this codewriter state and link them using a QHash
         //cwState = new CWState(stateName,entryRelaySlot,exitRelaySlot,entryRelaySignal,exitRelaySignal,entryAction,exitAction);
-        cwState = new CWState(stateName,entryRelaySlot,exitRelaySlot,entryRelaySignal,exitRelaySignal);
+        cwState = new CWState(stateName,entryRelaySlot,exitRelaySlot,entryRelaySignal,exitRelaySignal,comments);
 
 
         // add all entry actions

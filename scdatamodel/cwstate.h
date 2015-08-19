@@ -31,7 +31,7 @@ class CWState
 
 public:
     CWState(QString stateName, SCState* );
-    CWState(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal);
+    CWState(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString comments);
     CWState();
     ~CWState();
 
@@ -51,6 +51,8 @@ public:
 
     QString _readyRelaySignal;   // Signal_StateReady_stateName      signal reserved for the inital state of this machine
 
+
+    QString _comments;
 
     QString toCamel(QString);
 

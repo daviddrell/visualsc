@@ -7,7 +7,7 @@ CWState::CWState(QString stateName, SCState* state):
 
 }
 
-CWState::CWState(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal):
+CWState::CWState(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal, QString comments):
     _myState(NULL)
 {
     _stateName = theStateName;
@@ -17,6 +17,7 @@ CWState::CWState(QString theStateName,QString theEntryRelaySlot, QString theExit
     _exitRelaySignal = theExitRelaySignal;
 //    _entryAction = theEntryAction;
 //    _exitAction = theExitAction;
+    _comments = comments;
 }
 
 CWState::CWState():

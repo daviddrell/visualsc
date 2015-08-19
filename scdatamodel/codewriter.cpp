@@ -25,7 +25,6 @@ void CodeWriter::createStateMachines()
         cwsm->createSignalsAndSlots();      // creates the signals and slots for all states that belong to this state machine
         _machineHash.insert(machine, cwsm);
     }
-
 }
 
 void CodeWriter::addStateMachine(SCState* state)
@@ -236,7 +235,6 @@ void CodeWriter::cWriteConstructor()
 
                 if(cwt->_comments.isEmpty())
                 {
-
                     cPrintln(cws->_stateName+"->addTransition(this, SIGNAL("+cwt->_relaySignal+"), "+cwt->_targetName+");",1);
                 }
                 else
@@ -815,7 +813,14 @@ void CodeWriter::hWriteStates()
 
         if(machine == _rootMachine)
         {
-            hPrintln("QStateMachine*    "+cwsm->_stateName+";",1);
+            if(cwsm->_comments.isEmpty())
+            {
+                hPrintln("QStateMachine*    "+cwsm->_stateName+";",1);
+            }
+            else
+            {
+                hPrintln("QStateMachine*    "+cwsm->_stateName+";    // "+cwsm->_comments,1);
+            }
         }
         else
         {
@@ -827,12 +832,21 @@ void CodeWriter::hWriteStates()
             CWState* cws = cwsm->_states.at(k);
             if(cws->getState()->isFinal())
             {
-                hPrintln("QFinalState*    "+cws->_stateName+";",1);
+                if(cws->_comments.isEmpty())
+                    hPrintln("QFinalState*    "+cws->_stateName+";",1);
+                else
+                    hPrintln("QFinalState*    "+cws->_stateName+";    // "+cws->_comments,1);
+
             }
             else
             {
-                hPrintln("QState*    "+ cws->_stateName+";",1);
+                if(cws->_comments.isEmpty())
+                    hPrintln("QState*    "+ cws->_stateName+";",1);
+                else
+                    hPrintln("QState*    "+ cws->_stateName+";    // "+cws->_comments,1);
+
             }
+
 
         }
         hPrintln("");

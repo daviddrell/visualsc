@@ -94,21 +94,18 @@ signals:
     void Signal_StateExit_updateFirmwareAllUnits_53416b9a();
 
     //////// State Machine: _updateFirmwareAllUnits_53416b9a ////////
-    void Signal_StateReady_updateFirmwareAllUnits_53416b9a();
     void Signal_StateEntry_updatingGSUnits_52c831de();
     void Signal_StateExit_updatingGSUnits_52c831de();
     void Signal_StateEntry_updatingWincomm_7778a7d0();
     void Signal_StateExit_updatingWincomm_7778a7d0();
 
     //////// State Machine: _updatingGSUnits_52c831de ////////
-    void Signal_StateReady_updatingGSUnits_52c831de();
     void Signal_StateEntry_updateInProgress_6d5ca4f3();
     void Signal_StateExit_updateInProgress_6d5ca4f3();
     void Signal_StateEntry_done_48c3bcdd();
     void Signal_StateExit_done_48c3bcdd();
 
     //////// State Machine: _updatingWincomm_7778a7d0 ////////
-    void Signal_StateReady_updatingWincomm_7778a7d0();
     void Signal_StateEntry_unzipInProgress_9f1f6d0f();
     void Signal_StateExit_unzipInProgress_9f1f6d0f();
     void Signal_StateEntry_done_f93692c9();
@@ -197,7 +194,7 @@ private:
     //////// State Machine: _testManagerStateMachine_97b850af ////////
     QStateMachine*    _testManagerStateMachine_97b850af;
     QState*    _idle_c9dcfd20;
-    QState*    _downloadingAVC_fa1bce49;
+    QState*    _downloadingAVC_fa1bce49;    // incredibel sfajlsdfasdf
     QState*    _runningTests_c9e4b34a;
     QState*    _completed_850da190;
     QState*    _updateFirmwareAllUnits_53416b9a;
@@ -210,7 +207,7 @@ private:
     //////// State Machine: _updatingGSUnits_52c831de ////////
     // child QState declared elsewhere _updatingGSUnits_52c831de
     QState*    _updateInProgress_6d5ca4f3;
-    QFinalState*    _done_48c3bcdd;
+    QFinalState*    _done_48c3bcdd;    // wowwoowowo
 
     //////// State Machine: _updatingWincomm_7778a7d0 ////////
     // child QState declared elsewhere _updatingWincomm_7778a7d0

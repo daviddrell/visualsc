@@ -6,7 +6,7 @@
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="100,60"/>
         </transition>
     </state>
-    <state comments="" entryAction="start download" exitAction="" finalState="false" initialState="false" name="Downloading AVC" parallelState="false" position="88,-99" size="164,93" type="normal" uid="{fa1bce49-4d61-403f-83e0-f8ed95bdf10c}">
+    <state comments="incredibel sfajlsdfasdf" entryAction="start download" exitAction="" finalState="false" initialState="false" name="Downloading AVC" parallelState="false" position="88,-99" size="164,93" type="normal" uid="{fa1bce49-4d61-403f-83e0-f8ed95bdf10c}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,11" size="123,47"/>
         <transition comments="" connectToFinished="false" event="download failed" path="M 0 39.5517 L -60 40 L -60 489 L 3 489 " target="Completed" uid="{850da190-f7df-4847-8e28-ad3d5223fe75}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-95,-46" size="100,60"/>
@@ -36,11 +36,11 @@
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="43,7" size="137,40"/>
             <state comments="" entryAction="start GS update" exitAction="" finalState="false" initialState="true" name="update in progress" parallelState="false" position="50,54" size="160,100" type="default type" uid="{6d5ca4f3-b02f-47e7-8d78-205cb835705b}">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
-                <transition comments="" connectToFinished="false" event="GS update success" path="M 77 100 L 77.5 141 " target="Done" uid="{48c3bcdd-9777-4694-9381-6dfb1e59b1ef}">
+                <transition comments="" connectToFinished="false" event="GS update success" path="M 77 100 L 77 141 " target="Done" uid="{48c3bcdd-9777-4694-9381-6dfb1e59b1ef}">
                     <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-21,3" size="137,40"/>
                 </transition>
             </state>
-            <state comments="" entryAction="" exitAction="" finalState="true" initialState="false" name="Done" parallelState="false" position="47,195" size="161,100" type="default type" uid="{48c3bcdd-9777-4694-9381-6dfb1e59b1ef}">
+            <state comments="wowwoowowo" entryAction="" exitAction="" finalState="true" initialState="false" name="Done" parallelState="false" position="47,195" size="161,100" type="default type" uid="{48c3bcdd-9777-4694-9381-6dfb1e59b1ef}">
                 <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="137,40"/>
             </state>
         </state>

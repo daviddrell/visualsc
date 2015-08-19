@@ -7,19 +7,12 @@
 class CWStateMachine : public CWState
 {
 public:
-    CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal);
+    CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString comments);
     CWStateMachine(SCState* state);
-   // CWStateMachine(SCState* state, bool isRoot);
     ~CWStateMachine();
-
-
     void createSignalsAndSlots();
 
-    //QList<CWState*> _children;
-    //QList<SCState*> _children;
-
     // direct descendants of this state
-    //QHash<SCState*, CWState*> _states;
     QList<CWState*>     _states;
 
     //SCState*    _myState;
