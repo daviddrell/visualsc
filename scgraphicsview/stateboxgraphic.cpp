@@ -1065,22 +1065,25 @@ void StateBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     else
     {
         emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their sink anchors
-        QList<SelectableBoxGraphic*> children;
-        this->getAllChildren(children);
 
-        // also emit statebox moved for all children STATE BOXES
+        // disabled this because it was causing strange behavior for transition graphics, not sure why this is used in the first place
 
-        for(int i = 0; i < children.size();i++)
-        {
-            SelectableBoxGraphic* st = dynamic_cast<SelectableBoxGraphic*>(children.at(i));
-            SelectableTextBlock* tb = dynamic_cast<SelectableTextBlock*> (children.at(i));
+//        // also emit statebox moved for all children STATE BOXES
+//        QList<SelectableBoxGraphic*> children;
+//        this->getAllChildren(children);
+//        for(int i = 0; i < children.size();i++)
+//        {
+//            SelectableBoxGraphic* st = dynamic_cast<SelectableBoxGraphic*>(children.at(i));
+//            SelectableTextBlock* tb = dynamic_cast<SelectableTextBlock*> (children.at(i));
 
-            // enforce that this is a state and not a text block
-            if(st && !tb)
-            {
-                emit children.at(i)->stateBoxMoved(diff);
-            }
-        }
+//            // enforce that this is a state and not a text block
+//            if(st && !tb)
+//            {
+//                emit children.at(i)->stateBoxMoved(diff);
+//            }
+//        }
+
+
         this->setPos(location);
 
         //this->graphicHasChanged();

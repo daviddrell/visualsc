@@ -856,6 +856,12 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
 
+    StateBoxGraphic* firstGrandParent = parentGraphic->parentItemAsStateBoxGraphic();
+    if(firstGrandParent)
+    {
+        //connect(firstGrandParent, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
+    }
+
     // additionally snap the anchors when done moving the source and sink
     connect(parentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
     connect(targetGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleTargetStateGraphicReleased()));
@@ -886,6 +892,7 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     {
         connect(grandParentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentStateGraphicResized(QRectF, QRectF, int)));
         connect(grandParentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
+
         grandParentGraphic = grandParentGraphic->parentItemAsStateBoxGraphic();
     }
 
