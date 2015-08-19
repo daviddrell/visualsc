@@ -33,6 +33,9 @@
 #include <QKeyEvent>
 #include <QGraphicsSceneMouseEvent>
 
+#define QREAL_MAX   std::numeric_limits<double>::max()
+#define QREAL_MIN   std::numeric_limits<double>::min()
+
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     QWidget (parentWidget),
@@ -221,6 +224,11 @@ QGraphicsView * SCGraphicsView::getQGraphicsView()
     return & _view;
 }
 
+qreal SCGraphicsView::distance(QPointF a, QPointF b)
+{
+    return sqrt( (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y()));
+}
+
 /**
  * @brief SCGraphicsView::handleAutoResize
  * @param stateBoxGraphic
@@ -280,24 +288,90 @@ void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
     if(sbgs.size()==0)
     {
         onlyState = true;
-        // must find another state box graphic that is in the same state machine on the same level.
-        SCState* parentState = stateBoxGraphic->getStateModel()->parentAsSCState();
-        QList<SCState*> states;
-        parentState->getStates(states);
-        for(int i = 0 ; i < states.size(); i++)
-        {
-            StateBoxGraphic* sbg = _hashStateToGraphic.value(states.at(i));
-            if(sbg == stateBoxGraphic)
-            {
 
-            }
-            else    // as soon as we find one that isn't the one being changed, we will mimic the size
+        QList<SCState*> children;
+        stateBoxGraphic->getStateModel()->parentAsSCState()->getStates(children);
+
+        SCState* myState = stateBoxGraphic->getStateModel();
+        SCState* closestState = NULL;
+        qreal dist = QREAL_MAX;
+
+
+        for(int i = 0 ; i < children.size(); i++)
+        {
+            SCState* st = children.at(i);
+            if(st!=myState)
             {
-                newWidth = sbg->getSize().x();
-                newHeight = sbg->getSize().y();
-                break;
+                QPointF pos = st->getPosAttr()->asPointF();
+                qreal d = distance(stateBoxGraphic->pos(), pos);
+                if(d < dist)
+                {
+                    dist = d;
+                    closestState = st;
+                    qDebug() << "replacing shorter distance: " << d<<"\t closest state: " << closestState->objectName();
+                }
             }
         }
+
+        // is my
+        if(children.size() == 1)
+        {
+            qDebug() << "!! looking for other children on the same level";
+            int level = stateBoxGraphic->getStateModel()->getLevel();
+            QList<SCState*> allChildren;
+            this->_dm->getTopState()->getAllStates(allChildren);
+
+            for(int i = 0; i < allChildren.size(); i++)
+            {
+                SCState* st = allChildren.at(i);
+                if(st!=myState && st->getLevel() == level)
+                {
+                    QPointF pos = st->getPosAttr()->asPointF();
+                    qreal d = distance(stateBoxGraphic->pos(), pos);
+                    if(d < dist)
+                    {
+                        dist = d;
+                        closestState = st;
+                        qDebug() << "replacing shorter distance: " << d<<"\t closest state: " << closestState->objectName();
+                    }
+                }
+            }
+        }
+
+
+
+        if(closestState)
+        {
+            qDebug() << "abs closest state is : "<<closestState->objectName();
+            StateBoxGraphic* sbg = _hashStateToGraphic.value(closestState);
+            newWidth = sbg->getSize().x();
+            newHeight = sbg->getSize().y();
+        }
+        else
+        {
+            qDebug() << "ERROR did not find a closest state to resize to.";
+        }
+
+
+
+//        // must find another state box graphic that is in the same state machine on the same level.
+//        SCState* parentState = stateBoxGraphic->getStateModel()->parentAsSCState();
+//        QList<SCState*> states;
+//        parentState->getStates(states);
+//        for(int i = 0 ; i < states.size(); i++)
+//        {
+//            StateBoxGraphic* sbg = _hashStateToGraphic.value(states.at(i));
+//            if(sbg == stateBoxGraphic)
+//            {
+
+//            }
+//            else    // as soon as we find one that isn't the one being changed, we will mimic the size
+//            {
+//                newWidth = sbg->getSize().x();
+//                newHeight = sbg->getSize().y();
+//                break;
+//            }
+//        }
     }
 
     // only change the size if the size needs changing

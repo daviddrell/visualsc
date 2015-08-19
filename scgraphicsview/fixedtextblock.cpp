@@ -99,11 +99,10 @@ QPointF FixedTextBlock::getSize()
 
 void FixedTextBlock::handleStateSizeChanged(SizeAttribute *)
 {
-    qDebug() << "FixedTextBlock::handleStateSizeChanged";
+//    qDebug() << "FixedTextBlock::handleStateSizeChanged";
     this->resize();
     this->reposition();
     this->recenterText();
-
 }
 
 /**

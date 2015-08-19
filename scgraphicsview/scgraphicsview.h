@@ -88,7 +88,7 @@ private:
     void connectState(SCState*);
     void connectTransition(SCTransition*);
 
-
+    qreal distance(QPointF a, QPointF b);
     // private data
 
     QGraphicsScene  *_scene;
