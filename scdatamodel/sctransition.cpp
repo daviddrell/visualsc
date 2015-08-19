@@ -98,15 +98,7 @@ SCTransition::SCTransition(QObject * parent):
 
 SCTransition::~SCTransition()
 {
-
-    // when a transition is deleted, ensure that is removed from its states' lists
-//    this->detachFromSource(NULL);
-//    this->detachFromSink(NULL);
-//    this->deleteSafely();
-
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
-
-
     delete _eventTextBlock;
 }
 
@@ -299,6 +291,11 @@ bool SCTransition::isConnectToFinished()
 void SCTransition::deleteSafely()
 {
     qDebug() << "emit markedForDeletion in SCTransiton::deleteSafely()";
+
+    // unhook the transition from its parent and target before deleting it
+    this->detachFromSink(this);
+    this->detachFromSource(this);
+
     emit markedForDeletion(this);
     this->deleteLater();
 }
