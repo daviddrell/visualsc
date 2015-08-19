@@ -491,6 +491,11 @@ void SCState::setStateName(QString n)
     // no need to set the textblock here, its been connected to the name attribute
 }
 
+void SCState::handleEntryActionChanged(QString ea)
+{
+    this->attributes.value("entryAction")->setValue(ea);
+}
+
 QString SCState::getAttributeValue(QString key)
 {
     IAttribute * attr = attributes.value(key);

@@ -10,18 +10,24 @@
 #include "textblock.h"
 
 class StateBoxGraphic;
+enum Font{
+        Normal,
+        Small
+    };
+enum PenStyle{
+    Default,
+    Experimental
+};
+
 
 class FixedTextBlock : public QGraphicsObject
 {
     Q_OBJECT
 
-    enum PenStyle{
-        Default,
-        Experimental
-    };
+
 
 public:
-    FixedTextBlock(QGraphicsObject* parent,qreal topFraction, qreal bottomFraction, bool fixedHeight);
+    FixedTextBlock(QGraphicsObject* parent,qreal topFraction, qreal bottomFraction, bool attachedToTop);
     ~FixedTextBlock();
     void switchPen(int);
     virtual QRectF boundingRect() const;
@@ -32,9 +38,14 @@ public:
     void recenterText();
     QPointF getSize();
     void setText(QString);
+    void setFont(int);
+
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+    void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
 signals:
-    void nameChanged(QString);
+    void changed(QString);
 
 public slots:
     void handleTextItemEdited();
@@ -46,9 +57,9 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     qreal _width;
     qreal _height;
-    qreal _topFraction;
+    qreal _top;
     qreal _bottom;
-    bool _fixedHeight;
+    bool _attachedToTop;
     QPen _pen;
 
 private:

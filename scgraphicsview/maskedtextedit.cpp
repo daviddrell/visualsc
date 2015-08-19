@@ -4,6 +4,7 @@
 #include <QTextEdit>
 #include "selectableboxgraphic.h"
 #include "selectabletextblock.h"
+#include "stateboxgraphic.h"
 #include "fixedtextblock.h"
 #include <QApplication>
 
@@ -49,16 +50,16 @@ void MaskedTextEdit::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     QGraphicsTextItem::paint(painter, option, widget);
 }
 
-SelectableBoxGraphic* MaskedTextEdit::parentAsSelectableBoxGraphic()
-{
-    return dynamic_cast<SelectableBoxGraphic*>(this->parentItem());
-}
 
 SelectableTextBlock* MaskedTextEdit::parentAsSelectableTextBlock()
 {
     return dynamic_cast<SelectableTextBlock*> (this->parentItem());
 }
 
+FixedTextBlock* MaskedTextEdit::parentAsFixedTextBlock()
+{
+    return dynamic_cast<FixedTextBlock*> (this->parentItem());
+}
 
 /**
  * @brief MaskedTextEdit::setWidth
@@ -98,13 +99,21 @@ void MaskedTextEdit::focusOutEvent(QFocusEvent *event)
  */
 void MaskedTextEdit::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-
+    FixedTextBlock* ftb = parentAsFixedTextBlock();
     SelectableTextBlock* parent = parentAsSelectableTextBlock();
 
     if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mousePressEvent(event);
+    else if(ftb)
+    {
+        qDebug() << "m press event ftb";
+        ftb->mousePressEvent(event);
+    }
     else if(parent)
+    {
+        qDebug() << "m press event stext block";
         parent->mousePressEvent(event);
+    }
     else
     {
 
@@ -120,12 +129,19 @@ void MaskedTextEdit::mousePressEvent(QGraphicsSceneMouseEvent *event)
  */
 void MaskedTextEdit::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
+    FixedTextBlock* ftb = parentAsFixedTextBlock();
     SelectableTextBlock* parent = parentAsSelectableTextBlock();
 
     if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mouseMoveEvent(event);
+    else if(ftb)
+    {
+        qDebug() << "m move event ftb";
+        ftb->mouseMoveEvent(event);
+    }
     else if(parent)
     {
+        qDebug () << "m move event stextblock";
         parent->mouseMoveEvent(event);
     }
     else
@@ -141,13 +157,20 @@ void MaskedTextEdit::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 */
 void MaskedTextEdit::mouseReleaseEvent (QGraphicsSceneMouseEvent * event )
 {
+    FixedTextBlock* ftb = parentAsFixedTextBlock();
     SelectableTextBlock* parent = parentAsSelectableTextBlock();
 
     if(textInteractionFlags() == Qt::TextEditorInteraction)
         QGraphicsTextItem::mouseReleaseEvent(event);
-
+    else if (ftb)
+    {
+        qDebug() << "MaskedTextEdit::mouseReleaseEvent for ftb";
+        ftb->mouseReleaseEvent(event);
+    }
     else if(parent)
     {
+        qDebug() << "MaskedTextEdit::mouseReleaseEvent for selectableTextBlock";
+
         parent->mouseReleaseEvent(event);
     }
 }
@@ -229,10 +252,6 @@ void MaskedTextEdit::setTextInteraction(bool on, bool selectAll)
 //    return QGraphicsTextItem::itemChange(change, value);
 //}
 
-FixedTextBlock* MaskedTextEdit::parentAsFixedTextBlock()
-{
-    return dynamic_cast<FixedTextBlock*>(this->parentItem());
-}
 
 void MaskedTextEdit::resizeRectToFixedTextBlock()
 {

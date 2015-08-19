@@ -108,16 +108,24 @@ public:
     void setName(QString);
     QString getStateName();
 
+    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
+    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+
 
 signals:
     void resizeState(StateBoxGraphic*);
     void clicked(SCState*);
     void nameChanged(QString);
+    void exitActionChanged(QString);
+    void entryActionChanged(QString);
+
 
 protected:
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
 public slots:
+    void updateTextBlocks();
     void handleTransitionLineStartMoved(QPointF newPos);
     void handleTransitionLineEndMoved(QPointF newPos);
     void handleIsParallelStateChanged(StateString*);
@@ -126,15 +134,15 @@ public slots:
     void handleAttributeChanged(SizeAttribute*);
     void handleAttributeChanged(PositionAttribute* pos);
     void handleAttributeChanged(StateName*);
+    void handleExitActionChanged(StateString*);
+    void handleEntryActionChanged(StateString*);
     void handleTextBlockAttributeChanged(SizeAttribute*);
     void handleTextBlockAttributeChanged(PositionAttribute*);
     void handleTextBlockMoved(QPointF);
 
 
 private:
-    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
-    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
-    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
 
@@ -173,6 +181,8 @@ private:
     QColor  _initialStateColor;
 
     FixedTextBlock* _stateTitle;
+    FixedTextBlock* _entryActionTitle;
+    FixedTextBlock* _exitActionTitle;
 
 };
 

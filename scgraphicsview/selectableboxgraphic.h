@@ -122,7 +122,7 @@ signals:
     void stateBoxResized(QRectF oldBox, QRectF newBox, int corner);
 
     void stateBoxReleased();
-
+    void cornerReleased();
 
 
 protected:

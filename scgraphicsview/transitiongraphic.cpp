@@ -975,20 +975,20 @@ void TransitionGraphic::handleTargetStateGraphicResized(QRectF oldBox, QRectF ne
  */
 void TransitionGraphic::handleParentStateGraphicMoved(QPointF offset)
 {
-    QPointF location = _anchors[1]->pos();
-    location-= offset;
-    _anchors[1]->setPos(location);
-    _anchors[1]->getSegment(0)->enclosePathInElbows();
-    this->updateModel();
-
-//    for(int i = 1 ; i < _elbows.count(); i++)
-//    {
-//        QPointF location = _elbows[i]->pos();
-//        location-=offset;
-//        _elbows[i]->setPos(location);
-//        _elbows[i]->getSegment(0)->enclosePathInElbows();
-//    }
+//    QPointF location = _anchors[1]->pos();
+//    location-= offset;
+//    _anchors[1]->setPos(location);
+//    _anchors[1]->getSegment(0)->enclosePathInElbows();
 //    this->updateModel();
+
+    for(int i = 1 ; i < _elbows.count(); i++)
+    {
+        QPointF location = _elbows[i]->pos();
+        location-=offset;
+        _elbows[i]->setPos(location);
+        _elbows[i]->getSegment(0)->enclosePathInElbows();
+    }
+    this->updateModel();
 }
 
 /**
@@ -1017,6 +1017,23 @@ void TransitionGraphic::handleTargetStateGraphicReleased()
     _anchors[1]->straightenLines();
     this->updateModel();
 }
+
+void TransitionGraphic::handleParentStateGraphicResizedReleased()
+{
+    for(int i = 0 ; i < _elbows.size()-1; i++)
+    {
+        _elbows.at(i)->straightenLines();
+    }
+//    _anchors[0]->straightenLines();
+    this->updateModel();
+}
+
+void TransitionGraphic::handleTargetStateGraphicResizedReleased()
+{
+    _anchors[1]->straightenLines();
+    this->updateModel();
+}
+
 
 /**
  * @brief TransitionGraphic::handleTargetStateGraphicMoved

@@ -244,6 +244,7 @@ signals:
 
 public slots:
      void setStateName(QString n);
+     void handleEntryActionChanged(QString);
 
 private slots:   
      void handleTextBlockChanged();

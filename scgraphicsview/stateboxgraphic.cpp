@@ -59,7 +59,12 @@
 #define MIN_WIDTH       105
 #define MIN_HEIGHT      65
 
+
+// height of the state name fixed text block
 #define STATE_NAME_HEIGHT   26
+
+#define ENTRY_TOP           STATE_NAME_HEIGHT+2
+#define ENTRY_HEIGHT        24
 
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
@@ -71,9 +76,20 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _diagLineEnd(),
         _diagLineDrawIt(false),
         _intersection(),
-        _stateTitle(new FixedTextBlock(this, 0.0, STATE_NAME_HEIGHT, true))
+        _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, true)),
+        _entryActionTitle(new FixedTextBlock(this, ENTRY_TOP, ENTRY_HEIGHT, true)),
+        _exitActionTitle(new FixedTextBlock(this, 0, ENTRY_HEIGHT, false))
 {
+    // set the default text
+    _stateTitle->setText(this->getStateName());
 
+    _entryActionTitle->setText(this->getStateModel()->getStringAttr("entryAction")->asString());
+    _entryActionTitle->setFont(Font::Small);
+    _entryActionTitle->switchPen(PenStyle::Experimental);
+
+    _exitActionTitle->setText(this->getStateModel()->getStringAttr("exitAction")->asString());
+    _exitActionTitle->setFont(Font::Small);
+    _exitActionTitle->switchPen(PenStyle::Experimental);
 
     // this graphic representation of a state is linked to a state in the model
 
@@ -90,36 +106,50 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     //qDebug() << "setting position: " << mapFromScene(position->asPointF());
     //qDebug() << "setting position: " << mapToScene(position->asPointF());
     //qDebug() << "setting position: " << mapToParent(position->asPointF());
-    //TextItem.setPos(position->asPointF());
-
-    //connect(_stateModel->getIDTextBlock()->getSizeAttr(), SIGNAL(changed(SizeAttribute*)), this, SLOT(handleTextBlockAttributeChanged(SizeAttribute*)));
-
-    //connect(_stateModel->getIDTextBlock()->getPosAttr(), SIGNAL(changed(PositionAttribute*)), this, SLOT(handleTextBlockAttributeChanged(PositionAttribute*)));
-
-    //connect(TextItem, SIGNAL(textBlockMoved(QPointF)), this, SLOT(handleTextBlockMoved(QPointF)));
 
     _initialStateColor = QColor(104,237,153,255);
     _finalStateColor = QColor(242,119,119,255);
 
-
     // proprogate the fixed text block's nameChanged Signal
-    connect(_stateTitle, SIGNAL(nameChanged(QString)), this, SIGNAL(nameChanged(QString)));
+    connect(_stateTitle, SIGNAL(changed(QString)), this, SIGNAL(nameChanged(QString)));
+    connect(_entryActionTitle, SIGNAL(changed(QString)), this, SIGNAL(entryActionChanged(QString)));
+    connect(_exitActionTitle, SIGNAL(changed(QString)), this, SIGNAL(exitActionChanged(QString)));
 
     // connect the size attribute of this state model to the state title box
     SizeAttribute* sa = this->getStateModel()->getSizeAttr();
     connect(sa, SIGNAL(changed(SizeAttribute*)), this->_stateTitle, SLOT(handleStateSizeChanged(SizeAttribute*)));
+    connect(sa, SIGNAL(changed(SizeAttribute*)), this->_entryActionTitle, SLOT(handleStateSizeChanged(SizeAttribute*)));
+    connect(sa, SIGNAL(changed(SizeAttribute*)), this->_exitActionTitle, SLOT(handleStateSizeChanged(SizeAttribute*)));
 
-
- //  connect(this, SIGNAL(stateBoxResized(QRectF,QRectF,int)), _stateTitle, SLOT(handleStateBoxResized)
-
-//    // automatically resize text blocks when parents are resized
-//    connect(stateGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)), stateGraphic->TextItem, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
-
-//    connect(this, SIGNAL(stateBoxResized(QRectF, QRectF, int)), _stateTitle, SLOT(handleStateBoxResized(QRectF,QRectF,int)));
-
-
+    _stateTitle->reposition();
+    _entryActionTitle->reposition();
+    _exitActionTitle->reposition();
 }
 
+void StateBoxGraphic::handleExitActionChanged(StateString *ss )
+{
+    this->_exitActionTitle->setText(ss->asString());
+}
+
+void StateBoxGraphic::handleEntryActionChanged(StateString * ss)
+{
+    this->_entryActionTitle->setText(ss->asString());
+}
+
+void StateBoxGraphic::updateTextBlocks()
+{
+    _stateTitle->resize();
+    _stateTitle->reposition();
+    _stateTitle->recenterText();
+
+    _entryActionTitle->resize();
+    _entryActionTitle->reposition();
+    _entryActionTitle->recenterText();
+
+    _exitActionTitle->resize();
+    _exitActionTitle->reposition();
+    _exitActionTitle->recenterText();
+}
 
 StateBoxGraphic::~StateBoxGraphic()
 {
@@ -1091,6 +1121,7 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
         {
             corner->setMouseState(CornerGrabber::kMouseReleased);
             //corner->setHovered(false);
+            emit cornerReleased();
             graphicHasChanged();
         }
         break;

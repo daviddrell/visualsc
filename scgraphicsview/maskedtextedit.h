@@ -12,6 +12,7 @@
 class FixedTextBlock;
 class SelectableBoxGraphic;
 class SelectableTextBlock;
+class StateBoxGraphic;
 /**
     \class MaskedTextEdit
     \brief this class provides a QGraphicsTextItem but with a controlable display area.
@@ -31,8 +32,6 @@ public:
 
     virtual QRectF boundingRect();
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    SelectableBoxGraphic* parentAsSelectableBoxGraphic();
-
     SelectableTextBlock* parentAsSelectableTextBlock();
     FixedTextBlock* parentAsFixedTextBlock();
     void resizeRectToFixedTextBlock();

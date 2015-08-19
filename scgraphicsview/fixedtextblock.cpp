@@ -37,21 +37,19 @@
 // the text position will be pushed down to its position in edit mode
 #define TEXT_PUSH_DOWN      1
 
-FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal topFraction, qreal bottom, bool fixedHeight):
+FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal top, qreal bottom, bool attachedToTop):
     QGraphicsObject(parent),
     _pen(),
     _width(DEFAULT_WIDTH),
     _height(DEFAULT_HEIGHT),
-    _topFraction(topFraction),
+    _top(top),
     _bottom(bottom),
-    _fixedHeight(fixedHeight),
+    _attachedToTop(attachedToTop),
     _textItem(this, QRect(0,0, DEFAULT_WIDTH-2*(TEXT_BUFFER), DEFAULT_HEIGHT-2*(TEXT_BUFFER)))      // doesn't matter what this is set to here because attributes get loaded anyways
 {
     switchPen(PenStyle::Default);
+    setFont(Font::Normal);
 
-    QFont font("Arial", 10, QFont::Bold);
-    _textItem.setFont(font);
-    _textItem.setPlainText(this->parentAsStateBoxGraphic()->getStateName());
     connect(&_textItem, SIGNAL(focusOut()), this, SLOT(handleTextItemEdited()));
     reposition();
     resize();
@@ -61,6 +59,33 @@ FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal topFraction, qreal
 FixedTextBlock::~FixedTextBlock()
 {
 
+}
+
+void FixedTextBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    this->parentAsStateBoxGraphic()->mouseMoveEvent(event);
+}
+
+void FixedTextBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    this->parentAsStateBoxGraphic()->mouseReleaseEvent(event);
+}
+
+void FixedTextBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    this->parentAsStateBoxGraphic()->mousePressEvent(event);
+}
+
+void FixedTextBlock::setFont(int font)
+{
+    switch (font) {
+    case Font::Normal:
+        _textItem.setFont(QFont("Arial",10,QFont::Bold));
+        break;
+    case Font::Small:
+        _textItem.setFont(QFont("Arial",8));
+        break;
+    }
 }
 
 void FixedTextBlock::setText(QString text)
@@ -78,7 +103,9 @@ void FixedTextBlock::handleStateSizeChanged(SizeAttribute *)
 {
     qDebug() << "FixedTextBlock::handleStateSizeChanged";
     this->resize();
+    this->reposition();
     this->recenterText();
+
 }
 
 /**
@@ -95,7 +122,7 @@ void FixedTextBlock::handleStateSizeChanged(SizeAttribute *)
 void FixedTextBlock::handleTextItemEdited()
 {
     // update data model
-    emit nameChanged(_textItem.toPlainText());
+    emit changed(_textItem.toPlainText());
 
     // recenter the text
     this->recenterText();
@@ -171,37 +198,39 @@ qreal FixedTextBlock::clampMin(qreal value, qreal min)
  * @brief FixedTextBlock::reposition
  *
  * moves the fixed text block to hug the left wall of the usable area of its parent
- * and down to the percentage level of _topFraction
+ * and down to the percentage level of _top
  */
 void FixedTextBlock::reposition()
 {
-    QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
-    qreal x = pRect.x();
-    qreal y = pRect.height() * _topFraction + pRect.y();
-    this->setPos(x,y);
+    if(_attachedToTop)
+    {
+        QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
+        qreal x = pRect.x();
+        qreal y = _top + pRect.y();
+        this->setPos(x,y);
+    }
+    else
+    {
+        QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
+        qreal x = pRect.x();
+        qreal y = pRect.y()+pRect.height() - (_bottom) + 2;
+        this->setPos(x,y);
+    }
 }
-
 
 
 /**
  * @brief FixedTextBlock::resize
  *
  * resizes the width so the right wall hugs the usable area of its parent
- * adjusts the height to match the level given in _bottomFraction
+ * adjusts the height to match the level given in _bottom
  *
  */
 void FixedTextBlock::resize()
 {
     QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
     _width = pRect.width();
-    if(_fixedHeight)
-    {
-        _height = _bottom;
-    }
-    else
-    {
-        _height = pRect.height() * (_bottom-_topFraction);
-    }
+    _height = _bottom;
 }
 
 SelectableBoxGraphic* FixedTextBlock::parentAsSelectableBoxGraphic()
@@ -219,6 +248,12 @@ void FixedTextBlock::switchPen(int style)
         _pen.setColor(Qt::black);
         break;
 
+    case PenStyle::Experimental:
+        _pen.setWidthF(0.25);
+        _pen.setStyle(Qt::DashLine);
+        _pen.setColor(Qt::blue);
+        break;
+
     }
 }
 
@@ -230,7 +265,18 @@ void FixedTextBlock::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     painter->setPen(_pen);
     QRectF r = this->boundingRect();
-    painter->drawLine(r.bottomLeft(),r.bottomRight());
+
+    if(this->_textItem.document()->toPlainText().isEmpty())
+        return;
+
+    if(_attachedToTop)
+    {
+        painter->drawLine(r.bottomLeft(),r.bottomRight());
+    }
+    else
+    {
+        painter->drawLine(r.topLeft()+QPointF(0,-2),r.topRight()+QPointF(0,-2));
+    }
 }
 
 QRectF FixedTextBlock::boundingRect() const

@@ -374,8 +374,8 @@ void SCDataModel::openFile(QString fileName)
     if(ok)
     {
        // set up the transition connections in the data model
-        QList<SCTransition*> tlist;
-        _topState->getAllTransitions(tlist);
+       QList<SCTransition*> tlist;
+       _topState->getAllTransitions(tlist);
        connectTransitionsToStatePath(tlist);
 
        // set up the transition connections in the graphics
@@ -385,7 +385,6 @@ void SCDataModel::openFile(QString fileName)
            emit transitionsReadyToConnect(_transitions.at(i));
        }
     }
-
 }
 
 /**

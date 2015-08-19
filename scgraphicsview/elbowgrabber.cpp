@@ -430,10 +430,7 @@ int ElbowGrabber::getZone(QPointF pos)
  */
 void ElbowGrabber::straightenLines()
 {
-
     ElbowGrabber* mid = this;
-
-
 
     int leftZone = -1;
     int rightZone = -1;

@@ -1186,7 +1186,16 @@ void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, 
         StateString* uid = state->getStringAttr("uid");
         connect(uid, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
     }
-
+    else if(attributeKey == "entryAction")
+    {
+        StateString* ea = state->getStringAttr("entryAction");
+        connect(ea, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
+    }
+    else if(attributeKey == "exitAction")
+    {
+        StateString* ea = state->getStringAttr("exitAction");
+        connect(ea, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
+    }
 }
 
 
