@@ -495,6 +495,10 @@ void SCState::handleEntryActionChanged(QString ea)
 {
     this->attributes.value("entryAction")->setValue(ea);
 }
+void SCState::handleExitActionChanged(QString exa)
+{
+    this->getStringAttr("exitAction")->setValue(exa);
+}
 
 QString SCState::getAttributeValue(QString key)
 {

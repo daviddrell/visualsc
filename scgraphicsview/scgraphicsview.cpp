@@ -826,6 +826,9 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
     // handle a state entry action change
     connect(stateGraphic, SIGNAL(entryActionChanged(QString)), state, SLOT(handleEntryActionChanged(QString)));
+
+    // handle state exit action change to update the data model
+    connect(stateGraphic, SIGNAL(exitActionChanged(QString)), state, SLOT(handleExitActionChanged(QString)));
 }
 
 
@@ -856,12 +859,6 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
 
-    StateBoxGraphic* firstGrandParent = parentGraphic->parentItemAsStateBoxGraphic();
-    if(firstGrandParent)
-    {
-        //connect(firstGrandParent, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
-    }
-
     // additionally snap the anchors when done moving the source and sink
     connect(parentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
     connect(targetGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleTargetStateGraphicReleased()));
@@ -878,13 +875,9 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
     emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
 
-
     // create the connect to automatically move anchor elbows when state graphics are moved.
     connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
     connect(targetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleTargetStateGraphicResized(QRectF, QRectF, int)));
-
-
-
 
     // connect this state box's grand parents update anchors when they are resized
     StateBoxGraphic* grandParentGraphic = parentGraphic->parentItemAsStateBoxGraphic();
@@ -924,7 +917,6 @@ void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
 {
     StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
     StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
-
 
     // first, keep track of all scene based positions of sink anchors, the only transition elbows to stay in place
     QList<QPointF*> tPoints;

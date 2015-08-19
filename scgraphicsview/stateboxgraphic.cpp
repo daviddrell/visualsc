@@ -78,7 +78,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _intersection(),
         _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, true)),
         _entryActionTitle(new FixedTextBlock(this, ENTRY_TOP, ENTRY_HEIGHT, true)),
-        _exitActionTitle(new FixedTextBlock(this, 0, ENTRY_HEIGHT, false))
+        _exitActionTitle(new FixedTextBlock(this, ENTRY_HEIGHT,0 , false))
 {
     // set the default text
     _stateTitle->setText(this->getStateName());

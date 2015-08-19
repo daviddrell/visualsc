@@ -16,17 +16,15 @@
  *
  * the fixed box will always match the width of the usable area of its parent
  *
- * topFraction is the percentage at which the box will begin
- * bottom fraction is the percetange at which the box ends
  *
+ * If attached to top is true, then the fixed text block will be fixed on the north wall of the state
+ *  top determines how far from the top the box will be
+ *  bottom = height
  *
- * so if topFraction is 0.4 and bottom fraction is 0.6
+ * If attached to top is false, then the fixed text block will be fixed on the south wall of the state
+ *  top = height
+ *  bottom determines how far from the bottom the box will be
  *
- * then 40% from the top of the box, the fixed box will start and end at 60% of the box's height (20% total height)
- *
- *
- * ALTNERATE MODE: fixed height
- * top fraction works the same, but height will be fixed at bottom's value
  *
  */
 
@@ -141,10 +139,7 @@ StateBoxGraphic* FixedTextBlock::parentAsStateBoxGraphic()
 
 void FixedTextBlock::recenterText()
 {
-
-
     // sets the width and height of the textItem based on the plainText
-
     _textItem.adjustSize();
 
 
@@ -213,7 +208,7 @@ void FixedTextBlock::reposition()
     {
         QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
         qreal x = pRect.x();
-        qreal y = pRect.y()+pRect.height() - (_bottom) + 2;
+        qreal y = pRect.y()+pRect.height() - _bottom - (_top) + 2;
         this->setPos(x,y);
     }
 }
@@ -230,7 +225,11 @@ void FixedTextBlock::resize()
 {
     QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
     _width = pRect.width();
-    _height = _bottom;
+
+    if(_attachedToTop)
+        _height = _bottom;
+    else
+        _height = _top;
 }
 
 SelectableBoxGraphic* FixedTextBlock::parentAsSelectableBoxGraphic()
