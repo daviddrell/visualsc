@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml name="State Machine" uid="{6931fca4-31c3-402c-9d7f-582ec20e316d}" xmlns="http://www.w3.org/2005/07/scxml">
+    <state comments="" entryAction="" exitAction="" experasdf="eargaergadrg" finalState="false" initialState="true" name="a" parallelState="false" position="-539,-161" size="637,364" type="" uid="{1d2b58df-a741-4910-a214-5f2ba401c3c6}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        <state comments="" entryAction="" exitAction="" finalState="false" initialState="true" name="x" parallelState="false" position="58,90" size="160,100" type="" uid="{018cf40f-1e7e-40ca-946b-19263b8aa40f}" xrr="asdfasdfa">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+            <transition comments="" connectToFinished="false" event="x to y" fgsdgfsfd="ergsergsdfg" path="M 160 49 L 367 49 " target="y" uid="{ed2e8abd-dd29-440e-a067-61c8d8c87dfb}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+            </transition>
+        </state>
+        <state comments="" entryAction="" exitAction="" finalState="true" initialState="false" name="y" parallelState="false" position="425,88" rshtsrhtsrthsrth="srthsrthsrh" size="160,100" type="" uid="{ed2e8abd-dd29-440e-a067-61c8d8c87dfb}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        </state>
+        <transition comments="" connectToFinished="false" event="event" path="M 318.5 364 L 318.5 527 " rsthrsthrst="srhtsrhtsrht" target="b" uid="{44668251-a7cf-471c-9c1c-e45b6163f009}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        </transition>
+    </state>
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="b" parallelState="false" position="-316,366" size="160,100" tttttttttt="rrr" type="" uid="{44668251-a7cf-471c-9c1c-e45b6163f009}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        <transition comments="" connectToFinished="false" event="sr" path="M 0 70 L -339 70 L -339 -361 L -223 -361 " target="a" thsrthrht="srthrsth" uid="{1d2b58df-a741-4910-a214-5f2ba401c3c6}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        </transition>
+    </state>
+</scxml>

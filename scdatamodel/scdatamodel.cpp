@@ -41,7 +41,6 @@ SCDataModel::SCDataModel(QObject * parent) :
 {
     _reader.setDataModel(this);
     _settings = new QSettings(this);
-
 }
 
 
@@ -185,6 +184,7 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     }
 
     _writer = new QXmlStreamWriter(&file);
+    _writer->setCodec("UTF-8");
     _writer->setAutoFormatting(true);
     _writer->writeStartDocument();
 

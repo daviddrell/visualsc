@@ -3067,7 +3067,7 @@ void SCFormView::aboutAttributes()
                     "parallelState\t(true/false) True = direct children states are concurrently run\n"
                     "position\tPosition in parent's coordinate system\n"
                     "size\t\tSize in pixels\n"
-                    "type\t\tNot in use\n"
+                    "type\t\tfor state machine recognition\n"
                     "uid\t\tUnique ID used in .SCXML and code generation"
                     );
 
