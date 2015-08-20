@@ -30,10 +30,14 @@ class CWState
 {
 
 public:
-    CWState(QString stateName, SCState* );
+    CWState(SCState* state, QString stateName);
     CWState(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString comments);
     CWState();
     ~CWState();
+
+
+    void createSignalsAndSlots();
+
 
     QList<CWTransition*> getTransitions();
 
@@ -62,7 +66,7 @@ public:
     void setState(SCState*);
     SCState* getState();
 
-
+    int _parentNameLevel;
 
 protected:
 

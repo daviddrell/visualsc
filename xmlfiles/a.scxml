@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml name="a" uid="{3fa67e8e-b221-45d8-9813-591a6c47ea96}" xmlns="http://www.w3.org/2005/07/scxml">
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="a" parallelState="false" position="0,0" size="160,100" type="" uid="{55ac6a18-4b6a-4fc5-bc44-cc8e1c689edc}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+    </state>
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="a" parallelState="false" position="142,322" size="160,100" type="" uid="{ab81a686-6412-4551-a095-ec7e34ec0f76}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+    </state>
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="a" parallelState="false" position="358,-109" size="160,100" type="" uid="{c67f423a-9b5a-4c82-83cd-270ce8f2ce2c}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+    </state>
+</scxml>

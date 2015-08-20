@@ -53,6 +53,8 @@ public:
     QGraphicsView * getQGraphicsView();
     SCDataModel  * getDM();
 
+    SCGraphicsView* getSCGraphicsView();
+
 signals:
     void error(QString err);
     void readInputFileCompleted (bool,QStringList );

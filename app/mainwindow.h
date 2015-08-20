@@ -78,6 +78,7 @@ private slots:
     void on_actionShortcuts_triggered();
     void on_actionSave_As_triggered();
     void on_actionNew_triggered();
+    void on_actionZoomOut_triggered();
 };
 
 #endif // MAINWINDOW_H

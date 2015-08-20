@@ -457,3 +457,8 @@ void MainWindow::on_actionNew_triggered()
 {
 
 }
+
+void MainWindow::on_actionZoomOut_triggered()
+{
+    _project->getSCGraphicsView()->zoomIn();
+}

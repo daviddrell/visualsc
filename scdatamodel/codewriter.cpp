@@ -10,21 +10,174 @@ CodeWriter::CodeWriter(SCState* rootMachine, QString classNameString,QString cFi
     className(classNameString)
 {
 
-
 }
+
+
 
 void CodeWriter::createStateMachines()
 {
     SCState* machine;
     CWStateMachine* cwsm;
+    QList<CWState*> allStates;
+    QList<CWStateMachine*> machs;
 
     for(int i = 0; i < _machines.size(); i++)
     {
         machine = _machines.at(i);
-        cwsm = new CWStateMachine(machine); // creates a state machine
-        cwsm->createSignalsAndSlots();      // creates the signals and slots for all states that belong to this state machine
+        cwsm = new CWStateMachine(machine, _stateHash); // creates a state machine
+//        cwsm->createSignalsAndSlots();      // creates the signals and slots for all states that belong to this state machine
+        cwsm->createChildren();
+        //allStates.append(cwsm);
+        allStates.append(cwsm->getStates());
         _machineHash.insert(machine, cwsm);
+        machs.append(cwsm);
     }
+    // add the root machine's cwstatemachine
+    allStates.append(_machineHash.value(_rootMachine));
+    resolveCollisions(allStates);
+
+//    this->resolveCollisionsInsideStateMachines(machs);
+//    this->resolveCollisionsBetweenStateMachines(machs);
+
+    for(int i = 0 ; i < machs.size(); i++)
+    {
+        machs.at(i)->createSignalsAndSlots();
+        machs.at(i)->createTransitions();
+    }
+
+}
+
+//void CodeWriter::resolveCollisionsInsideStateMachines(QList<CWStateMachine *> stateMachines)
+//{
+//    qDebug() << "CodeWriter::resolveCollisions INSIDE on states";
+//    for(int i = 0; i < stateMachines.size(); i++)
+//    {
+//        CWStateMachine* cwsm = stateMachines.at(i);
+//        for(int k = 0 ; k < cwsm->getStates().size()-1; k++)
+//        {
+//            CWState* one = cwsm->getStates().at(k);
+//            for(int q = k+1; q < cwsm->getStates().size(); q++)
+//            {
+//                CWState* two = cwsm->getStates().at(q);
+//                if(one->_stateName == two->_stateName)
+//                {
+//                    resolveCollision(one,two);
+//                }
+//            }
+//        }
+//    }
+//}
+
+
+
+//void CodeWriter::resolveCollisionsBetweenStateMachines(QList<CWStateMachine *> stateMachines)
+//{
+//    qDebug() << "CodeWriter::resolveCollisions BETWEEN on states";
+//    bool collision = false;
+//    for(int i = 0; i < stateMachines.size() - 1 ; i++)
+//    {
+//        CWStateMachine* cwsm = stateMachines.at(i);
+//        for(int k = i + 1; k < stateMachines.size(); k++)
+//        {
+//            CWStateMachine *cwsmOther = stateMachines.at(k);
+//            for(int x = 0; x < cwsm->getStates().size(); x ++)
+//            {
+//                // compare the children states of these two state machines
+//                CWState* cws = cwsm->getStates().at(x);
+//                for(int y = 0; y < cwsmOther->getStates().size(); y++)
+//                {
+//                    CWState* cwsOther = cwsmOther->getStates().at(y);
+
+//                    // if there exists two children states that have the same stateName, then modify both of them
+//                    if(cws->_stateName == cwsOther->_stateName)
+//                    {
+//                        collision = true;
+//                        this->resolveCollision(cws, cwsOther);
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+//    // if there was a collision, run this method again to check for any further induced collisions
+//    if(collision)
+//    {
+//        resolveCollisionsBetweenStateMachines(stateMachines);
+//    }
+//}
+
+
+/**
+ * @brief CodeWriter::resolveCollisions
+ * @param states
+ *
+ * clears up any name collisions between any two states in the list
+ * if a collision occurs, resolveCollision is called, which recursively sets state name until the names are unique
+ *
+ */
+void CodeWriter::resolveCollisions(QList<CWState*> states)
+{
+    bool collision = false;
+
+    // compare two different CWState's state Name
+    for(int i = 0; i < states.size()-1; i++)
+    {
+        CWState* x = states.at(i);
+        for(int k = i+1 ; k < states.size(); k++)
+        {
+            CWState* y = states.at(k);
+
+            // if they are equivalent, then call resolve collision
+            qDebug() << "i: " << i<<"\tk: "<<k<<"\tx: "<<x->_stateName<<"\ty: "<<y->_stateName;
+            if(x->_stateName == y->_stateName)
+            {
+                collision = true;
+                qDebug() << "collision found: " << x->_stateName<<"\t"<<y->_stateName;
+                this->resolveCollision(x,y);
+            }
+        }
+    }
+
+    // if we fixed at least one collision, then ensure any new names have no collisions either
+    if(collision)
+        this->resolveCollisions(states);
+}
+
+
+/**
+ * @brief CodeWriter::resolveCollision
+ * @param one
+ * @param two
+ *
+ * given two CWStates, recursively add parent names to the state name until no collision occurs
+ * if the ancestor is NULL( top level children collide) or is at any time the same one, then this scheme will not resolve the collision
+ * so we attach the uid if all else fails.
+ *
+ */
+void CodeWriter::resolveCollision(CWState* one, CWState* two)
+{
+    // get the ancestor at the CWState's current ancestor level
+    SCState* xParent = one->getState()->parentAt(one->_parentNameLevel++);
+    SCState* yParent = two->getState()->parentAt(two->_parentNameLevel++);
+
+    // if at least one of them is a top level child or they share a parent, then we resolve the collision using the uid
+    if(!xParent || !yParent || xParent == yParent)
+    {
+        // there are no more grand parents to use, so use the uid
+        //qDebug() << "CodeWriter::resolveCollisions ran out of options for states: "<<one->getState()->objectName()<<"\t"<<two->getState()->objectName();
+
+        one->_stateName.append("___"+one->getState()->getUidFirstName());
+        two->_stateName.append("___"+two->getState()->getUidFirstName());
+    }
+    else // append the parent's name
+    {
+        one->_stateName.append("___" + toCamel(xParent->getName()));
+        two->_stateName.append("___" + toCamel(yParent->getName()));
+    }
+
+    // while the names are still equivalent, run this function again
+    if(one->_stateName == two->_stateName)
+        resolveCollision(one, two);
 }
 
 void CodeWriter::addStateMachine(SCState* state)

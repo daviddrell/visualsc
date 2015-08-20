@@ -6,30 +6,56 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1018</width>
-    <height>794</height>
+    <width>1272</width>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="5" column="0">
-     <layout class="QGridLayout" name="gridLayout"/>
-    </item>
-    <item row="4" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="3" column="0">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <property name="spacing">
+       <number>0</number>
+      </property>
      </layout>
     </item>
    </layout>
@@ -42,7 +68,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1018</width>
+     <width>1272</width>
      <height>21</height>
     </rect>
    </property>
@@ -70,17 +96,27 @@
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-  </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="mouseTracking">
+    <bool>false</bool>
+   </property>
+   <property name="acceptDrops">
     <bool>false</bool>
    </property>
    <property name="movable">
     <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::AllToolBarAreas</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -91,6 +127,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionZoomOut"/>
   </widget>
   <action name="actionNew">
    <property name="checkable">
@@ -200,6 +237,15 @@
    </property>
    <property name="text">
     <string>Save As</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/minusw10.png</normaloff>:/SCFormView/minusw10.png</iconset>
+   </property>
+   <property name="text">
+    <string>zoomOut</string>
    </property>
   </action>
  </widget>

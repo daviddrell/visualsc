@@ -73,7 +73,6 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         //_previouslySelected(NULL)
 {
 this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
-
     createActions();
     createMenus();
     createToolbars();
@@ -81,9 +80,15 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
     // central widget and outter layout
 
     QHBoxLayout *layout = new QHBoxLayout;  // main layout, horizontal
+        layout->setContentsMargins(6,0,6,6);
     QWidget *widget = new QWidget;
+//    widget->setContentsMargins(6,6,6,6);
     widget->setLayout(layout);
     setCentralWidget(widget);
+
+//     this->addToolBar(editToolBar);
+//    editToolBar->setMovable(false);
+
 
     //  start tree view
 
@@ -109,7 +114,10 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
     //propertyLayout->addWidget( selectedChartItem);     // sec
     propertyLayout->addWidget( propertyToolBar);
 
+
     //  property table
+
+
 
     propertyTable = new QTableWidget();
     propertyTable->setColumnCount(2);

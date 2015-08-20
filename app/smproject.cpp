@@ -47,6 +47,11 @@ SCDataModel * SMProject::getDM()
     return _dm;
 }
 
+SCGraphicsView* SMProject::getSCGraphicsView()
+{
+    return _graphicsView;
+}
+
 QGraphicsView * SMProject::getQGraphicsView()
 {
     if ( _graphicsView == NULL )

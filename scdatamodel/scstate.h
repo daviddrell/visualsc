@@ -74,6 +74,7 @@ public:
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
     QString getUid();
     QString getUidFirstName();
+    QString getFamilyId();
     bool doNotPrint(QString);
     int doNotPrintSize();
     enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };
@@ -121,6 +122,7 @@ public:
 
     void setPosition (QPointF& size);
 
+    SCState* parentAt(int levelUp);
 
     void removeTargetsTransitionIn();
     void removeSourcesTransitionOut();

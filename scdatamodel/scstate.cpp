@@ -167,6 +167,17 @@ void SCState::setInitialState(SCState * st)
     _initialState = st;
 }
 
+
+SCState* SCState::parentAt(int levelUp)
+{
+    SCState* ret = this->parentAsSCState();
+    for(int i = 0 ; i < levelUp; i++)
+    {
+        ret = ret->parentAsSCState();
+    }
+    return ret;
+}
+
 /**
  * @brief SCState::setInitial
  * @param boolString
@@ -940,6 +951,18 @@ QString SCState::getUidFirstName()
 {
     QStringList qsl = getUid().split("-");
     return qsl.at(0).mid(1,qsl.at(0).size());
+}
+
+/**
+ * @brief SCState::getFamilyId
+ * @return
+ *
+ * appends the name of the parent
+ *
+ */
+QString SCState::getFamilyId()
+{
+    return "getFamilyId";
 }
 
 /**

@@ -42,6 +42,11 @@ private:
     void hWriteActionRelaySlots();
     void hWriteStates();
 
+    void resolveCollisions(QList<CWState*>);
+    void resolveCollision(CWState* one, CWState* two);
+//    void resolveCollisionsInsideStateMachines(QList<CWStateMachine*>);
+//    void resolveCollisionsBetweenStateMachines(QList<CWStateMachine*>);
+
     QString toCamel(QString);
     void hPrint(QString);
     void hPrintln(QString);
@@ -64,8 +69,9 @@ private:
     //zQList<SCState*> _childrenMachines;
     QList<SCState*> _machines;
 
-    //QHash<SCState*, CWState*> _states;
+    QHash<SCState*, CWState*> _stateHash;
     QHash<SCState*, CWStateMachine*> _machineHash;
+
     //QHash<SCTransition*, CWTransition*> _transitions;
 
 

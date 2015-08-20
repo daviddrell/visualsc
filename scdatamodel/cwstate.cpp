@@ -1,8 +1,9 @@
 #include "cwstate.h"
 
-CWState::CWState(QString stateName, SCState* state):
+CWState::CWState( SCState* state, QString stateName):
     _myState(state),
-    _stateName(stateName)
+    _stateName(stateName),
+    _parentNameLevel(0)
 {
 
 }
@@ -18,10 +19,12 @@ CWState::CWState(QString theStateName,QString theEntryRelaySlot, QString theExit
 //    _entryAction = theEntryAction;
 //    _exitAction = theExitAction;
     _comments = comments;
+    _parentNameLevel = 0;
 }
 
 CWState::CWState():
-    _myState(NULL)
+    _myState(NULL),
+    _parentNameLevel(0)
 {
 
 }
@@ -44,6 +47,48 @@ void CWState::addEntryAction(QString entryAction)
 void CWState::addExitAction(QString exitAction)
 {
     _exitActions.append(exitAction);
+}
+
+void CWState::createSignalsAndSlots()
+{
+    _comments = _myState->attributes.value("comments")->asString();
+
+    _entryRelaySignal =  "Signal_StateEntry"+_stateName+"()";
+    _exitRelaySignal =   "Signal_StateExit"+_stateName+"()";
+
+    _entryRelaySlot =    "Slot_StateEntry" + _stateName+"()";
+    _exitRelaySlot =     "Slot_StateExit"+ _stateName+"()";
+
+
+
+    // add all entry actions
+    QString entryAction = _myState->getStringAttr("entryAction")->asString();
+    if(!entryAction.isEmpty())
+    {
+        // delete any spaces, this will cause an error
+        entryAction.replace(" ","");
+        QStringList entries = entryAction.split(",");
+        for(int i = 0; i < entries.size(); i++)
+        {
+            QString entry = "EntryAction_"+toCamel(entries.at(i))+"()";
+            this->addEntryAction(entry);
+        }
+    }
+
+
+    // add all exit actions
+    QString exitAction = _myState->getStringAttr("exitAction")->asString();
+    if(!exitAction.isEmpty())
+    {
+        // delete any spaces, otherwise an assertion error is thrown
+        exitAction.replace(" ","");
+        QStringList exits = exitAction.split(",");
+        for(int i = 0; i < exits.size(); i++)
+        {
+            QString exit = "ExitAction_" +toCamel(exits.at(i))+"()";
+            this->addExitAction(exit);
+        }
+    }
 }
 
 void CWState::setState(SCState * st)

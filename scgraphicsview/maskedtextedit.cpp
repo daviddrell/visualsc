@@ -163,12 +163,12 @@ void MaskedTextEdit::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
         QGraphicsTextItem::mouseMoveEvent(event);
     else if(ftb)
     {
-        qDebug() << "m move event ftb";
+//        qDebug() << "m move event ftb";
         ftb->mouseMoveEvent(event);
     }
     else if(parent)
     {
-        qDebug () << "m move event stextblock";
+//        qDebug () << "m move event stextblock";
         parent->mouseMoveEvent(event);
     }
     else
@@ -191,13 +191,12 @@ void MaskedTextEdit::mouseReleaseEvent (QGraphicsSceneMouseEvent * event )
         QGraphicsTextItem::mouseReleaseEvent(event);
     else if (ftb)
     {
-        qDebug() << "MaskedTextEdit::mouseReleaseEvent for ftb";
+//        qDebug() << "MaskedTextEdit::mouseReleaseEvent for ftb";
         ftb->mouseReleaseEvent(event);
     }
     else if(parent)
     {
-        qDebug() << "MaskedTextEdit::mouseReleaseEvent for selectableTextBlock";
-
+//        qDebug() << "MaskedTextEdit::mouseReleaseEvent for selectableTextBlock";
         parent->mouseReleaseEvent(event);
     }
 }
@@ -205,7 +204,7 @@ void MaskedTextEdit::mouseReleaseEvent (QGraphicsSceneMouseEvent * event )
 
 void MaskedTextEdit::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *evt)
 {
-    qDebug("mouse double clicke");
+//    qDebug("mouse double clicke");
     //qDebug("mouseDoubleClickEvent '%s'", this->toPlainText().toStdString().c_str());
     if(textInteractionFlags() == Qt::TextEditorInteraction)
     {

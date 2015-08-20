@@ -11,14 +11,17 @@
         <state comments="" entryAction="" exitAction="" finalState="true" initialState="false" name="y" parallelState="false" position="425,88" rshtsrhtsrthsrth="srthsrthsrh" size="160,100" type="" uid="{ed2e8abd-dd29-440e-a067-61c8d8c87dfb}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
         </state>
-        <transition comments="" connectToFinished="false" event="event" path="M 318.5 364 L 318.5 527 " rsthrsthrst="srhtsrhtsrht" target="b" uid="{44668251-a7cf-471c-9c1c-e45b6163f009}">
+        <transition comments="" connectToFinished="false" event="event" path="M 318.5 364 L 318.5 422 " rsthrsthrst="srhtsrhtsrht" target="b" uid="{44668251-a7cf-471c-9c1c-e45b6163f009}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
         </transition>
     </state>
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="b" parallelState="false" position="-316,366" size="160,100" tttttttttt="rrr" type="" uid="{44668251-a7cf-471c-9c1c-e45b6163f009}">
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="b" parallelState="false" position="-415,261" size="408,420" tttttttttt="rrr" type="" uid="{44668251-a7cf-471c-9c1c-e45b6163f009}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
-        <transition comments="" connectToFinished="false" event="sr" path="M 0 70 L -339 70 L -339 -361 L -223 -361 " target="a" thsrthrht="srthrsth" uid="{1d2b58df-a741-4910-a214-5f2ba401c3c6}">
-            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        <transition comments="" connectToFinished="false" event="sr" path="M 0 226.8 L -240 226.8 L -240 -256 L -124 -256 " target="a" thsrthrht="srthrsth" uid="{1d2b58df-a741-4910-a214-5f2ba401c3c6}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-203,-15" size="122,42"/>
         </transition>
+        <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="x" parallelState="false" position="82,91" size="160,100" type="" uid="{14889719-f3b7-424c-9d09-6c1a35c6436f}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        </state>
     </state>
 </scxml>

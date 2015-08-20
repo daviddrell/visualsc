@@ -58,6 +58,8 @@ public:
 
     QGraphicsView * getQGraphicsView();
 
+    void zoomIn();
+
 signals:
 
 private slots:
