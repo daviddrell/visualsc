@@ -3002,6 +3002,7 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
 //    connect(saveAction, SIGNAL(triggered()),  this->_project, SLOT(handleFileSaveClick()));
 
     saveAsAction = new QAction(QIcon(":/SCFormView/save.png"),tr("S&ave As"), this);
+    saveAsAction->setShortcut(tr("Ctrl+Shift+S"));
     saveAsAction->setStatusTip(tr("Save this State Machine as an .SCXML"));
     connect(saveAsAction, SIGNAL(triggered()), this, SIGNAL(saveAsClick()));
 

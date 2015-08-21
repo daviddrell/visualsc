@@ -366,7 +366,6 @@ void MainWindow::handleExportCodeClick()
             this->setWindowTitle("Exported to "+_currentExportFullPath);
             saveSettings();
         }
-
     }
     else
     {
@@ -512,7 +511,7 @@ void MainWindow::on_actionSaveImage_triggered()
     if ( _project == NULL) return;
 
     // check if there is a current file, save it immediately, otherwise browse for one
-    if(_currentImageFullPath.isEmpty())
+//    if(_currentImageFullPath.isEmpty())
     {
         if(_currentFolder.isEmpty())
             _currentFolder = QDir::currentPath();
@@ -534,10 +533,10 @@ void MainWindow::on_actionSaveImage_triggered()
             saveSettings();
         }
     }
-    else
-    {
-        _project->getSCGraphicsView()->saveImage(_currentImageFullPath);
-        this->setWindowTitle("Saved .png "+_currentImageFullPath);
-        saveSettings();
-    }
+//    else
+//    {
+//        _project->getSCGraphicsView()->saveImage(_currentImageFullPath);
+//        this->setWindowTitle("Saved .png "+_currentImageFullPath);
+//        saveSettings();
+//    }
 }
