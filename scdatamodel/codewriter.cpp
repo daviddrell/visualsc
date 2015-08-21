@@ -1,6 +1,8 @@
 #include "codewriter.h"
 #include <QDebug>
 
+#define UNDER_SCORES    "_"
+
 CodeWriter::CodeWriter(SCState* rootMachine, QString classNameString,QString cFileName, QString hFileName):
     cFile(cFileName),
     hFile(hFileName),
@@ -166,13 +168,13 @@ void CodeWriter::resolveCollision(CWState* one, CWState* two)
         // there are no more grand parents to use, so use the uid
         //qDebug() << "CodeWriter::resolveCollisions ran out of options for states: "<<one->getState()->objectName()<<"\t"<<two->getState()->objectName();
 
-        one->_stateName.append("___"+one->getState()->getUidFirstName());
-        two->_stateName.append("___"+two->getState()->getUidFirstName());
+        one->_stateName.append(UNDER_SCORES + one->getState()->getUidFirstName());
+        two->_stateName.append(UNDER_SCORES + two->getState()->getUidFirstName());
     }
     else // append the parent's name
     {
-        one->_stateName.append("___" + toCamel(xParent->getName()));
-        two->_stateName.append("___" + toCamel(yParent->getName()));
+        one->_stateName.append(UNDER_SCORES + toCamel(xParent->getName()));
+        two->_stateName.append(UNDER_SCORES + toCamel(yParent->getName()));
     }
 
     // while the names are still equivalent, run this function again
@@ -488,7 +490,7 @@ void CodeWriter::cWriteEventSlots()
 
         if(machine==_rootMachine)
         {
-            cPrintln("void "+className+"::Event_startMachine"+cwsm->_stateName+"()");
+            cPrintln("void "+className+"::"+cwsm->_startEventName);
             cPrintln("{");
             cPrintln(cwsm->_stateName+"->start();",1);
             cPrintln("}\n");
@@ -800,7 +802,7 @@ void CodeWriter::hWriteEventSlots()
 
         // write the start machine event for the root machine
         if(machine == _rootMachine)
-            hPrintln("void Event_startMachine"+cwsm->_stateName+"();",1);
+            hPrintln("void "+cwsm->_startEventName+";",1);
 
         // go through each state that belongs to this machine (not including the machine)
         // and add an event for every out transition for that state

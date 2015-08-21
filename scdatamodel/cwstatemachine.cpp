@@ -117,7 +117,8 @@ void CWStateMachine::createSignalsAndSlots()
 
     CWState* cwState;
 //    this->resolveCollisions(_states);
-     _readyRelaySignal = "Signal_StateReady"+_stateName+"()";
+     _readyRelaySignal = "Signal_StateReady__"+_stateName+"()";
+     _startEventName = "Event_startMachine__"+_stateName+"()";
 
      // set the comments variable
      _comments = _myState->attributes.value("comments")->asString();

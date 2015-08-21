@@ -1611,6 +1611,7 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
         _pen.setWidthF(INNER_BORDER_THICKNESS);
         _pen.setCapStyle(Qt::RoundCap);
         _pen.setJoinStyle(Qt::MiterJoin);
+        _pen.setStyle( Qt::SolidLine );
         painter->setPen(_pen);
 
         painter->drawRoundRect(rect3,RECT_ROUNDNESS,RECT_ROUNDNESS);
@@ -1623,6 +1624,7 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
         _pen.setWidthF(INNER_BORDER_THICKNESS);
         _pen.setCapStyle(Qt::RoundCap);
         _pen.setJoinStyle(Qt::MiterJoin);
+        _pen.setStyle( Qt::SolidLine );
         painter->setPen(_pen);
         painter->drawRoundRect(rect3,RECT_ROUNDNESS,RECT_ROUNDNESS); 
     }

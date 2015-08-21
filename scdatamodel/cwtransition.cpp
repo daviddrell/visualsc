@@ -1,11 +1,12 @@
 #include "cwtransition.h"
 
-
+#define UNDERSCORES_PARENT  "__"
+#define UNDERSCORES         "___"
 
 CWTransition::CWTransition(SCTransition *trans, QString sourceName, QString targetName):
     _transModel(trans),
     _targetName(targetName),
-    _eventName("Event_"+toCamel(trans->getEventName())+"__"+sourceName+"()"),
+    _eventName("Event___"+toCamel(trans->getEventName())+""+sourceName+"()"),
     _comments(trans->getTransStringAttr("comments")->asString()),
     _relaySignal("Relay_"+_eventName)
 {

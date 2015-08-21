@@ -1,5 +1,7 @@
 #include "cwstate.h"
 
+#define UNDERSCORES         "__"
+
 CWState::CWState( SCState* state, QString stateName):
     _myState(state),
     _stateName(stateName),
@@ -53,11 +55,11 @@ void CWState::createSignalsAndSlots()
 {
     _comments = _myState->attributes.value("comments")->asString();
 
-    _entryRelaySignal =  "Signal_StateEntry"+_stateName+"()";
-    _exitRelaySignal =   "Signal_StateExit"+_stateName+"()";
+    _entryRelaySignal =  "Signal_StateEntry__"+_stateName+"()";
+    _exitRelaySignal =   "Signal_StateExit__"+_stateName+"()";
 
-    _entryRelaySlot =    "Slot_StateEntry" + _stateName+"()";
-    _exitRelaySlot =     "Slot_StateExit"+ _stateName+"()";
+    _entryRelaySlot =    "Slot_StateEntry__" + _stateName+"()";
+    _exitRelaySlot =     "Slot_StateExit__"+ _stateName+"()";
 
 
 
@@ -70,7 +72,7 @@ void CWState::createSignalsAndSlots()
         QStringList entries = entryAction.split(",");
         for(int i = 0; i < entries.size(); i++)
         {
-            QString entry = "EntryAction_"+toCamel(entries.at(i))+"()";
+            QString entry = "EntryAction___"+toCamel(entries.at(i))+"()";
             this->addEntryAction(entry);
         }
     }
@@ -85,7 +87,7 @@ void CWState::createSignalsAndSlots()
         QStringList exits = exitAction.split(",");
         for(int i = 0; i < exits.size(); i++)
         {
-            QString exit = "ExitAction_" +toCamel(exits.at(i))+"()";
+            QString exit = "ExitAction___"+toCamel(exits.at(i))+"()";
             this->addExitAction(exit);
         }
     }

@@ -37,12 +37,12 @@ public:
 
 public slots:
     //////// State Machine: _stateMachine ////////
-    void Event_startMachine_stateMachine();
-    void Event_event___a();
-    void Event_sr___b();
+    void Event_startMachine___stateMachine();
+    void Event___event_a();
+    void Event___sr_b();
 
     //////// State Machine: _a ////////
-    void Event_xToY___x___a();
+    void Event___xToY_x_a();
 
     //////// State Machine: _b ////////
 
@@ -54,6 +54,12 @@ signals:
     //    Connect to these signals to a slot corresponding to a entryAction or exitAction
     //
     //////// State Machine: _stateMachine ////////
+    void EntryAction___jump();
+    void EntryAction___sleep();
+    void EntryAction___dance();
+    void ExitAction___fall();
+    void ExitAction___down();
+    void ExitAction___into();
 
     //////// State Machine: _a ////////
 
@@ -66,21 +72,21 @@ signals:
     //    Connect to these signals to monitor state transitions
     //
     //////// State Machine: _stateMachine ////////
-    void Signal_StateReady_stateMachine();
-    void Signal_StateEntry_a();
-    void Signal_StateExit_a();
-    void Signal_StateEntry_b();
-    void Signal_StateExit_b();
+    void Signal_StateReady___stateMachine();
+    void Signal_StateEntry___a();
+    void Signal_StateExit___a();
+    void Signal_StateEntry___b();
+    void Signal_StateExit___b();
 
     //////// State Machine: _a ////////
-    void Signal_StateEntry_x___a();
-    void Signal_StateExit_x___a();
-    void Signal_StateEntry_y();
-    void Signal_StateExit_y();
+    void Signal_StateEntry___x_a();
+    void Signal_StateExit___x_a();
+    void Signal_StateEntry___y();
+    void Signal_StateExit___y();
 
     //////// State Machine: _b ////////
-    void Signal_StateEntry_x___b();
-    void Signal_StateExit_x___b();
+    void Signal_StateEntry___x_b();
+    void Signal_StateExit___x_b();
 
 
     //////////////////
@@ -110,30 +116,30 @@ private:
 private slots:
     // The Entry/Exit Slots that belong to QStates
     //////// State Machine: _stateMachine ////////
-    void Slot_StateEntry_a();
-    void Slot_StateExit_a();
-    void Slot_StateEntry_b();
-    void Slot_StateExit_b();
+    void Slot_StateEntry___a();
+    void Slot_StateExit___a();
+    void Slot_StateEntry___b();
+    void Slot_StateExit___b();
 
     //////// State Machine: _a ////////
-    void Slot_StateEntry_x___a();
-    void Slot_StateExit_x___a();
-    void Slot_StateEntry_y();
-    void Slot_StateExit_y();
+    void Slot_StateEntry___x_a();
+    void Slot_StateExit___x_a();
+    void Slot_StateEntry___y();
+    void Slot_StateExit___y();
 
     //////// State Machine: _b ////////
-    void Slot_StateEntry_x___b();
-    void Slot_StateExit_x___b();
+    void Slot_StateEntry___x_b();
+    void Slot_StateExit___x_b();
 
 
 signals:
     // A Transition/Event slot's corresponding signal emitted in the slot
     //////// State Machine: _stateMachine ////////
-    void Relay_Event_event___a();
-    void Relay_Event_sr___b();
+    void Relay_Event___event_a();
+    void Relay_Event___sr_b();
 
     //////// State Machine: _a ////////
-    void Relay_Event_xToY___x___a();
+    void Relay_Event___xToY_x_a();
 
     //////// State Machine: _b ////////
 
@@ -146,12 +152,12 @@ private:
 
     //////// State Machine: _a ////////
     // child QState declared elsewhere _a
-    QState*    _x___a;
+    QState*    _x_a;
     QFinalState*    _y;
 
     //////// State Machine: _b ////////
     // child QState declared elsewhere _b
-    QState*    _x___b;
+    QState*    _x_b;
 
 
 };

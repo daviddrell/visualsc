@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml name="State Machine" uid="{0670ac31-8888-4c3d-be99-aaf44759c6af}" xmlns="http://www.w3.org/2005/07/scxml">
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="x" parallelState="false" position="-564,-375" size="160,100" type="" uid="{d87e0181-264a-4903-b350-e769da1eec8a}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        <transition comments="" connectToFinished="false" event="event" path="M 160 53 L 300 53 " target="y" uid="{baa28bdb-bf0f-42a9-b26d-19c9a5136cfe}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="7,-43" size="122,42"/>
+        </transition>
+    </state>
+    <state comments="" entryAction="" exitAction="" finalState="true" initialState="false" name="y" parallelState="false" position="-264,-372" size="160,100" type="" uid="{baa28bdb-bf0f-42a9-b26d-19c9a5136cfe}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+    </state>
+</scxml>

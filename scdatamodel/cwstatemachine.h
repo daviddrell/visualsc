@@ -31,6 +31,9 @@ public:
 
     void createTransition(CWState* state);
     void createTransitions();
+
+
+    QString _startEventName;
 private:
 
 

@@ -15,7 +15,7 @@
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
         </transition>
     </state>
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="b" parallelState="false" position="-415,261" size="408,420" tttttttttt="rrr" type="" uid="{44668251-a7cf-471c-9c1c-e45b6163f009}">
+    <state comments="" entryAction="jump, sleep, dance" exitAction="fall, down, into" finalState="false" initialState="false" name="b" parallelState="false" position="-415,261" size="408,420" tttttttttt="rrr" type="" uid="{44668251-a7cf-471c-9c1c-e45b6163f009}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
         <transition comments="" connectToFinished="false" event="sr" path="M 0 226.8 L -240 226.8 L -240 -256 L -124 -256 " target="a" thsrthrht="srthrsth" uid="{1d2b58df-a741-4910-a214-5f2ba401c3c6}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-203,-15" size="122,42"/>

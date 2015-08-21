@@ -32,11 +32,11 @@ StateMachine::StateMachine(QObject* parent):
     _b(new QState()),
 
     //////// State Machine: _a ////////
-    _x___a(new QState(_a)),
+    _x_a(new QState(_a)),
     _y(new QFinalState(_a)),
 
     //////// State Machine: _b ////////
-    _x___b(new QState(_b))
+    _x_b(new QState(_b))
 
 {
     //////// State Machine: _stateMachine ////////
@@ -45,40 +45,40 @@ StateMachine::StateMachine(QObject* parent):
     _stateMachine->addState(_b);
 
     //    Add transitions for the QStates using the transitions' private relay signals
-    _a->addTransition(this, SIGNAL(Relay_Event_event___a()), _b);
-    _b->addTransition(this, SIGNAL(Relay_Event_sr___b()), _a);
+    _a->addTransition(this, SIGNAL(Relay_Event___event_a()), _b);
+    _b->addTransition(this, SIGNAL(Relay_Event___sr_b()), _a);
 
     //    Propogate the private QState signals to public signals
-    connect(_stateMachine, SIGNAL(started()), this, SIGNAL(Signal_StateReady_stateMachine()));
-    connect(_a, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_a()));
-    connect(_a, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_a()));
-    connect(_b, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_b()));
-    connect(_b, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_b()));
+    connect(_stateMachine, SIGNAL(started()), this, SIGNAL(Signal_StateReady___stateMachine()));
+    connect(_a, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___a()));
+    connect(_a, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___a()));
+    connect(_b, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___b()));
+    connect(_b, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___b()));
 
     //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_a, SIGNAL(entered()), this, SLOT(Slot_StateEntry_a()));
-    connect(_a, SIGNAL(exited()), this, SLOT(Slot_StateExit_a()));
-    connect(_b, SIGNAL(entered()), this, SLOT(Slot_StateEntry_b()));
-    connect(_b, SIGNAL(exited()), this, SLOT(Slot_StateExit_b()));
+    connect(_a, SIGNAL(entered()), this, SLOT(Slot_StateEntry___a()));
+    connect(_a, SIGNAL(exited()), this, SLOT(Slot_StateExit___a()));
+    connect(_b, SIGNAL(entered()), this, SLOT(Slot_StateEntry___b()));
+    connect(_b, SIGNAL(exited()), this, SLOT(Slot_StateExit___b()));
 
 
     //////// State Machine: _a ////////
-    _a->setInitialState(_x___a);
+    _a->setInitialState(_x_a);
 
     //    Add transitions for the QStates using the transitions' private relay signals
-    _x___a->addTransition(this, SIGNAL(Relay_Event_xToY___x___a()), _y);
+    _x_a->addTransition(this, SIGNAL(Relay_Event___xToY_x_a()), _y);
 
     //    Propogate the private QState signals to public signals
-    connect(_x___a, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_x___a()));
-    connect(_x___a, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_x___a()));
-    connect(_y, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_y()));
-    connect(_y, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_y()));
+    connect(_x_a, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___x_a()));
+    connect(_x_a, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___x_a()));
+    connect(_y, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___y()));
+    connect(_y, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___y()));
 
     //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_x___a, SIGNAL(entered()), this, SLOT(Slot_StateEntry_x___a()));
-    connect(_x___a, SIGNAL(exited()), this, SLOT(Slot_StateExit_x___a()));
-    connect(_y, SIGNAL(entered()), this, SLOT(Slot_StateEntry_y()));
-    connect(_y, SIGNAL(exited()), this, SLOT(Slot_StateExit_y()));
+    connect(_x_a, SIGNAL(entered()), this, SLOT(Slot_StateEntry___x_a()));
+    connect(_x_a, SIGNAL(exited()), this, SLOT(Slot_StateExit___x_a()));
+    connect(_y, SIGNAL(entered()), this, SLOT(Slot_StateEntry___y()));
+    connect(_y, SIGNAL(exited()), this, SLOT(Slot_StateExit___y()));
 
 
     //////// State Machine: _b ////////
@@ -86,12 +86,12 @@ StateMachine::StateMachine(QObject* parent):
     //    Add transitions for the QStates using the transitions' private relay signals
 
     //    Propogate the private QState signals to public signals
-    connect(_x___b, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry_x___b()));
-    connect(_x___b, SIGNAL(exited()), this, SIGNAL(Signal_StateExit_x___b()));
+    connect(_x_b, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___x_b()));
+    connect(_x_b, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___x_b()));
 
     //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_x___b, SIGNAL(entered()), this, SLOT(Slot_StateEntry_x___b()));
-    connect(_x___b, SIGNAL(exited()), this, SLOT(Slot_StateExit_x___b()));
+    connect(_x_b, SIGNAL(entered()), this, SLOT(Slot_StateEntry___x_b()));
+    connect(_x_b, SIGNAL(exited()), this, SLOT(Slot_StateExit___x_b()));
 
 
 }
@@ -104,26 +104,26 @@ StateMachine::~StateMachine()
 //    these functions connect external Event slots to internal signals to drive the inputs to the state machine
 //    Each State Machine Section shows all transitions between its direct children
     //////// State Machine: _stateMachine ////////
-void StateMachine::Event_startMachine_stateMachine()
+void StateMachine::Event_startMachine___stateMachine()
 {
     _stateMachine->start();
 }
 
-void StateMachine::Event_event___a()
+void StateMachine::Event___event_a()
 {
-    emit Relay_Event_event___a();
+    emit Relay_Event___event_a();
 }
 
-void StateMachine::Event_sr___b()
+void StateMachine::Event___sr_b()
 {
-    emit Relay_Event_sr___b();
+    emit Relay_Event___sr_b();
 }
 
 
     //////// State Machine: _a ////////
-void StateMachine::Event_xToY___x___a()
+void StateMachine::Event___xToY_x_a()
 {
-    emit Relay_Event_xToY___x___a();
+    emit Relay_Event___xToY_x_a();
 }
 
 
@@ -133,56 +133,60 @@ void StateMachine::Event_xToY___x___a()
 //    these slots register the state entry/exits to generate event signals for any given entry or exit events
 //
     //////// State Machine: _stateMachine ////////
-void StateMachine::Slot_StateEntry_a()
+void StateMachine::Slot_StateEntry___a()
 {
 
 }
 
-void StateMachine::Slot_StateExit_a()
+void StateMachine::Slot_StateExit___a()
 {
 
 }
 
-void StateMachine::Slot_StateEntry_b()
+void StateMachine::Slot_StateEntry___b()
 {
-
+    emit EntryAction___jump();
+    emit EntryAction___sleep();
+    emit EntryAction___dance();
 }
 
-void StateMachine::Slot_StateExit_b()
+void StateMachine::Slot_StateExit___b()
 {
-
+    emit ExitAction___fall();
+    emit ExitAction___down();
+    emit ExitAction___into();
 }
 
 
     //////// State Machine: _a ////////
-void StateMachine::Slot_StateEntry_x___a()
+void StateMachine::Slot_StateEntry___x_a()
 {
 
 }
 
-void StateMachine::Slot_StateExit_x___a()
+void StateMachine::Slot_StateExit___x_a()
 {
 
 }
 
-void StateMachine::Slot_StateEntry_y()
+void StateMachine::Slot_StateEntry___y()
 {
 
 }
 
-void StateMachine::Slot_StateExit_y()
+void StateMachine::Slot_StateExit___y()
 {
 
 }
 
 
     //////// State Machine: _b ////////
-void StateMachine::Slot_StateEntry_x___b()
+void StateMachine::Slot_StateEntry___x_b()
 {
 
 }
 
-void StateMachine::Slot_StateExit_x___b()
+void StateMachine::Slot_StateExit___x_b()
 {
 
 }
