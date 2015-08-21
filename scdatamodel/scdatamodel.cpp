@@ -1073,8 +1073,6 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target,
 
     _transitions.append(transition);        // add to the total list of transitions
 
-    qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
-
     emit insertNewTransitionSignal(transition);
     return transition;
 }

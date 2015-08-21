@@ -2304,9 +2304,6 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
     stateWidget->setExpanded(true);
 
 
-
-
-// BUG HERE,
     QList<SCTransition*> transitions;
     state->getAllTransitions(transitions);
     // these are the sink anchors that belong to out transitions of the state
@@ -2317,12 +2314,7 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
         QString pathStr = trans->getPathAttr()->asString();
         qDebug() << "pathStr: " << pathStr;
         _dm->deleteItem(trans);
-
-        SCTransition* newTrans = _dm->insertNewTransition(state, trans->targetState(), eventName, pathStr);
-//        newTrans->setEventName(eventName);
-
-        // transition path attribute is set, but no elbows are created
-//        newTrans->setPathAttr(pathStr);
+        _dm->insertNewTransition(state, trans->targetState(), eventName, pathStr);
     }
 
 
