@@ -142,7 +142,7 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
     //textBlockPropertyTable->setColumnWidth(1,180);
     //textBlockPropertyTable->columnViewportPosition(1);
 
-//    propertyLayout->addWidget(textBlockPropertyTable);
+    propertyLayout->addWidget(textBlockPropertyTable);
 
     setWindowTitle(tr("Tree Statechart Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
