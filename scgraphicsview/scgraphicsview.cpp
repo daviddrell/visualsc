@@ -36,6 +36,10 @@
 #define QREAL_MAX   std::numeric_limits<double>::max()
 #define QREAL_MIN   std::numeric_limits<double>::min()
 
+#define SCENE_DEFAULT_WIDTH     4000
+#define SCENE_DEFAULT_HEIGHT    4000
+
+
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     QWidget (parentWidget),
@@ -71,12 +75,16 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
 
 //    _view.setViewport(new QWidget());
     _view.setViewport( new QGLWidget (QGLFormat(QGL::SampleBuffers) ));
+
     _view.setScene(_scene);
     _view.show();
 
     createGraph();
 
     _scene->installEventFilter(this);
+
+    // set the scene to be big, by a default amount
+    _scene->setSceneRect(0 - SCENE_DEFAULT_WIDTH/2, 0 - SCENE_DEFAULT_HEIGHT/2, SCENE_DEFAULT_WIDTH, SCENE_DEFAULT_HEIGHT);
 }
 
 SCGraphicsView::~SCGraphicsView()
@@ -182,6 +190,7 @@ bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
 void SCGraphicsView::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
     qDebug()<<"mouse moved in moveEvent";
+
 }
 
 /**
@@ -199,7 +208,7 @@ void SCGraphicsView::createGraph()
     // first load all states
     for(int s = 0; s < states.count(); s++)
     {
-        handleNewState( states[s]);
+        handleNewState(states[s]);
     }
 
     // load all transitions
@@ -217,7 +226,7 @@ void SCGraphicsView::createGraph()
 
 QGraphicsView * SCGraphicsView::getQGraphicsView()
 {
-    return & _view;
+    return dynamic_cast<QGraphicsView*>(& _view);
 }
 
 qreal SCGraphicsView::distance(QPointF a, QPointF b)
@@ -606,6 +615,57 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
 }
 
 /**
+ * @brief SCGraphicsView::saveImage
+ *
+ * saves an auto resized version of the scene to a png image
+ *
+ */
+void SCGraphicsView::saveImage(QString fileName)
+{
+    // use these values to keep track of the scene bounding rect and the view position
+    QRectF viewRect = _view.viewport()->rect();
+    qreal w = viewRect.width();
+    qreal h = viewRect.height();
+
+    // keep track of the decimal, because mapToScene only accepts ints
+    qreal xDecimal = viewRect.x() - (int)viewRect.x();
+    qreal yDecimal = viewRect.x() - (int)viewRect.y();
+
+    // use the top left point as the reference
+    QPointF center = _view.mapToScene(QPoint(viewRect.x(), viewRect.y()));
+
+    // get the scene based center point by adding back the decimal and half of the width and height to x and y
+    center+= QPointF(xDecimal+w/2.0, yDecimal+h/2.0);
+
+    // save the rect of the scene
+    QRectF rect = _scene->sceneRect();
+//    qDebug() << "scene rect before save: " << _scene->sceneRect()<<"\t"<<center;
+
+    // resize the rect to bound all items
+    _scene->setSceneRect(_scene->itemsBoundingRect());
+    QImage image(_scene->sceneRect().size().toSize(), QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
+
+
+
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    _scene->render(&painter);
+
+    // save the image
+    image.save(fileName);
+
+    // resize the scene back to the old rect
+    _scene->setSceneRect(rect);
+
+    // recenter the view back on the center point
+    _view.centerOn(center);
+
+//    qDebug() << "scene rect after save: " << _scene->sceneRect() << "\t"<< _view.mapToScene(_view.viewport()->rect().center());
+}
+
+/**
  * @brief SCGraphicsView::handleNewTransitionFormView
  * @param t
  *
@@ -650,9 +710,9 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
     PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
     transGraphic->setTextPos(textPos->asPointF());
 
-
     connectTransition(t);
 
+    transGraphic->getSourceAnchor()->straightenLines();
 }
 
 
@@ -934,6 +994,8 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
 
+
+
     // additionally snap the anchors when done moving the source and sink
     connect(parentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
     connect(targetGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleTargetStateGraphicReleased()));
@@ -956,10 +1018,25 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
 
     // connect this state box's grand parents update anchors when they are resized
     StateBoxGraphic* grandParentGraphic = parentGraphic->parentItemAsStateBoxGraphic();
+    bool isSibling = false;
     while(grandParentGraphic)
     {
         connect(grandParentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentStateGraphicResized(QRectF, QRectF, int)));
         connect(grandParentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
+
+
+        // this is a special case of connect for the transition
+        // we connect a sink anchor to stay in place, unless the target graphic is a sibling of the source graphic
+        // if the two are siblings, the anchor is already updated because the source and target are moving together
+        if(grandParentGraphic->childItems().contains(transGraphic->getTargetStateGraphic()) && !isSibling)
+        {
+            isSibling = true;
+        }
+
+        if(!isSibling)
+        {
+            connect(grandParentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
+        }
 
         grandParentGraphic = grandParentGraphic->parentItemAsStateBoxGraphic();
     }

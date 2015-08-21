@@ -39,7 +39,8 @@ SOURCES += scgraphicsview.cpp \
     elbowgrabber.cpp \
     mousecontroller.cpp \
     linesegmentgraphic.cpp \
-    fixedtextblock.cpp
+    fixedtextblock.cpp \
+    customgraphicsview.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -59,7 +60,8 @@ HEADERS += scgraphicsview.h\
     elbowgrabber.h \
     mousecontroller.h \
     linesegmentgraphic.h \
-    fixedtextblock.h
+    fixedtextblock.h \
+    customgraphicsview.h
 
 
 OTHER_FILES += \

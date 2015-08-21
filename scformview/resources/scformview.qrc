@@ -43,5 +43,6 @@
         <file>save.png</file>
         <file>zoomin.png</file>
         <file>zoomout.png</file>
+        <file>picture.png</file>
     </qresource>
 </RCC>

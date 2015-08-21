@@ -9,5 +9,6 @@
         <file>red_x_16_16.png</file>
         <file>red_x_depressed_16_16.png</file>
         <file>red_x_hovered_16_16.png</file>
+        <file>picture.png</file>
     </qresource>
 </RCC>

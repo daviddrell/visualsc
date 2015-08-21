@@ -25,12 +25,13 @@
 #include "scdatamodel.h"
 #include "keycontroller.h"
 #include <QObject>
-#include <QGraphicsView>
+//#include <QGraphicsView>
 #include "stateattributes.h"
 #include "stateboxgraphic.h"
 #include "transitiongraphic.h"
 #include "textformattoolbar.h"
 #include "mousecontroller.h"
+#include "customgraphicsview.h"
 #include <QMap>
 
 /**
@@ -58,6 +59,7 @@ public:
 
     QGraphicsView * getQGraphicsView();
 
+    void saveImage(QString fileName);
 
 signals:
 
@@ -93,7 +95,7 @@ private:
     // private data
 
     QGraphicsScene  *_scene;
-    QGraphicsView   _view;
+    CustomGraphicsView   _view;
     SCDataModel    *_dm;
     QMap<SCState*,StateBoxGraphic*> _mapStateToGraphic;
     QMap<SCTransition*,TransitionGraphic *> _mapTransitionToGraphic;

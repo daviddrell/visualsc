@@ -2990,6 +2990,11 @@ connect(newAction, SIGNAL(triggered()),  this, SIGNAL(newClick()));
     connect(openAction, SIGNAL(triggered()), this, SIGNAL(openClick()));
 
 
+    saveImageAction = new QAction(QIcon(":/SCFormView/picture.png"), tr ("S&ave Image"), this);
+    saveImageAction->setShortcut(tr("Ctrl+P"));
+    saveImageAction->setStatusTip(tr("Save to .png"));
+    connect(saveImageAction, SIGNAL(triggered()), this, SIGNAL(saveImageClick()));
+
     saveAction = new QAction(QIcon(":/SCFormView/save.png"),tr("S&ave"), this);
     saveAction->setShortcut(tr("Ctrl+S"));
     saveAction->setStatusTip(tr("Save this State Machine to an .SCXML"));
@@ -3119,6 +3124,8 @@ void SCFormView::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(importAction);
     fileMenu->addAction(exportAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(saveImageAction);
     //fileMenu->addAction(exitAction);
 
 

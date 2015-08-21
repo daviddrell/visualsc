@@ -434,6 +434,8 @@ int StateBoxGraphic::findNearestWall(QRectF box, QPointF point)
         break;
 
     }
+
+    return -1;
 }
 
 /**

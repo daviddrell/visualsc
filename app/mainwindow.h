@@ -56,6 +56,7 @@ private:
     QString _currentFolder;
     QString _currentFileFullPath;
     QString _currentExportFullPath;
+    QString _currentImageFullPath;
 
     QString _settingsFileName;
 
@@ -86,6 +87,7 @@ private slots:
     void on_actionNew_triggered();
     void on_actionZoomOut_triggered();
     void on_actionZoomIn_triggered();
+    void on_actionSaveImage_triggered();
 };
 
 #endif // MAINWINDOW_H

@@ -248,7 +248,7 @@ void FixedTextBlock::switchPen(int style)
 
     case PenStyle::Experimental:
         _pen.setWidthF(0.25);
-        _pen.setStyle(Qt::DashLine);
+        _pen.setStyle(Qt::SolidLine);
         _pen.setColor(Qt::blue);
         break;
 

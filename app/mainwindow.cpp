@@ -123,6 +123,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
     connect(_formEditorWindow, SIGNAL(openClick()), this, SLOT(handleFileOpenClick()));
+    connect(_formEditorWindow, SIGNAL(saveImageClick()), this, SLOT(on_actionSaveImage_triggered()));
     connect(_formEditorWindow, SIGNAL(saveClick()), this, SLOT(handleFileSaveClick()));
     connect(_formEditorWindow, SIGNAL(saveAsClick()), this, SLOT(on_actionSave_As_triggered()));
     connect(_formEditorWindow, SIGNAL(importClick()), this, SLOT(on_actionImport_triggered()));
@@ -303,8 +304,6 @@ void MainWindow::handleFileSaveClick()
         this->setWindowTitle(_currentFileFullPath);
         saveSettings();
     }
-
-
 }
 
 void MainWindow::on_actionSave_As_triggered()
@@ -506,4 +505,39 @@ void MainWindow::scale(qreal step)
     _project->getQGraphicsView()->scale(mult, mult);
     _scale *= mult;
     qDebug() << "setting scale to : " << _scale;
+}
+
+void MainWindow::on_actionSaveImage_triggered()
+{
+    if ( _project == NULL) return;
+
+    // check if there is a current file, save it immediately, otherwise browse for one
+    if(_currentImageFullPath.isEmpty())
+    {
+        if(_currentFolder.isEmpty())
+            _currentFolder = QDir::currentPath();
+
+        QString defaultSave = _currentFolder + QString("\\"+_project->getDM()->getTopState()->getName());
+        QString saveName = QFileDialog::getSaveFileName(this, tr("Save as .png"), defaultSave, tr(".png (*.png)"));
+
+        // check if the saveName is valid
+        if(saveName.isEmpty())
+        {
+
+        }
+        else
+        {
+            _currentImageFullPath = saveName;
+            _currentFolder = QFileInfo(_currentImageFullPath).path();
+            _project->getSCGraphicsView()->saveImage(_currentImageFullPath);
+            this->setWindowTitle(_currentImageFullPath);
+            saveSettings();
+        }
+    }
+    else
+    {
+        _project->getSCGraphicsView()->saveImage(_currentImageFullPath);
+        this->setWindowTitle("Saved .png "+_currentImageFullPath);
+        saveSettings();
+    }
 }

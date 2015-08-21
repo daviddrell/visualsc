@@ -99,6 +99,7 @@ signals:
     void openClick();
     void exportClick();
     void importClick();
+    void saveImageClick();
     void saveClick();
     void saveAsClick();
     void newClick();
@@ -264,6 +265,7 @@ private:
     QAction *importAction;
     QAction *newAction;
     QAction *openAction;
+    QAction *saveImageAction;
     QAction *saveAction;
     QAction *saveAsAction;
     QAction *exportAction;
