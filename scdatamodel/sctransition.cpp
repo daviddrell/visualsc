@@ -102,6 +102,17 @@ SCTransition::~SCTransition()
     delete _eventTextBlock;
 }
 
+TransitionPathAttribute* SCTransition::getPathAttr()
+{
+    return dynamic_cast<TransitionPathAttribute*>(this->attributes.value("path"));
+}
+
+void SCTransition::setPathAttr(QString pathString)
+{
+    this->getPathAttr()->setValue(pathString);
+}
+
+
 void SCTransition::handleTargetStateNameChanged(StateName * stateName)
 {
     qDebug() << "SCTransition::handleTargetStateNameChanged";

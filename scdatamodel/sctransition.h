@@ -73,9 +73,11 @@ public:
     void setText(QString eventText);
 
     TransitionStringAttribute* getTransStringAttr(QString key);
+    TransitionPathAttribute* getPathAttr();
 
     virtual IAttributeContainer * getAttributes(); //reimplemented from base SCItem
     void    setAttributeValue(QString key, QString value);
+    void setPathAttr(QString pathString);
     QString getAttributeValue(QString key);
     void addAttribute(QString key, QString value);
     bool removeAttribute(QString key);

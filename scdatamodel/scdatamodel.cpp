@@ -1044,6 +1044,41 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     return transition;
 }
 
+/**
+ * @brief SCDataModel::insertNewTransition
+ * @param source
+ * @param target
+ * @param eventName
+ * @param pathString
+ * @return
+ *
+ * functions similarly to insertNewTransition with only source and target, but sets the event name and path
+ *
+ */
+SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target, QString eventName, QString pathString )
+{
+    if ( source == NULL)  return NULL;
+
+    SCTransition * transition = new SCTransition(source);
+
+    transition->setAttributeValue("target", target->attributes.value("name")->asString());
+    transition->setAttributeValue("event", eventName);
+    transition->setAttributeValue("uid",target->getUid());
+    transition->setObjectName(eventName);
+    target->addTransitionReference(transition, SCState::kTransitIn);
+    source->addTransitionReference(transition, SCState::kTransitOut);
+    transition->setTargetState(target);
+
+    transition->setPathAttr(pathString);
+
+    _transitions.append(transition);        // add to the total list of transitions
+
+    qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
+
+    emit insertNewTransitionSignal(transition);
+    return transition;
+}
+
 
 SCTransition* SCDataModel::handleMakeANewTransition(SCState* source, TransitionAttributes* ta)
 {

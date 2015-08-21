@@ -23,7 +23,6 @@ CustomGraphicsView::~CustomGraphicsView()
 
 }
 
-
 void CustomGraphicsView::enterEvent(QEvent *event)
 {
     QGraphicsView::enterEvent(event);

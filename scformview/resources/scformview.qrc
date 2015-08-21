@@ -44,5 +44,6 @@
         <file>zoomin.png</file>
         <file>zoomout.png</file>
         <file>picture.png</file>
+        <file>center.png</file>
     </qresource>
 </RCC>

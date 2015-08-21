@@ -1057,6 +1057,9 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     connect(transGraphic, SIGNAL(clicked(SCTransition*)), trans, SIGNAL(clicked(SCTransition*)));
 }
 
+
+//#define REMAKE_TRANSITIONS
+
 /**
  * @brief SCGraphicsView::handleChangedParent
  * @param state
@@ -1067,6 +1070,18 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
  */
 void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
 {
+
+#ifdef REMAKE_TRANSITIONS
+    StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
+    StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
+
+    stateGraphic->setParentItem(newParentGraphic);
+
+
+
+#endif
+
+#ifndef REMAKE_TRANSITIONS
     StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
     StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
 
@@ -1081,7 +1096,6 @@ void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
         TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
         StateBoxGraphic* oldSourceState = _hashStateToGraphic.value(trans->parentSCState());
         tPoints.append(new QPointF(oldSourceState->mapToScene(transG->getSinkAnchor()->pos())));
-
     }
 
     QList<QPointF*> tPointsIn;
@@ -1096,7 +1110,12 @@ void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
         tPointsIn.append(new QPointF(oldSourceState->mapToScene(transG->getSinkAnchor()->pos())));
     }
 
+
+
+
+
     // change the parent of the state box graphic
+//    QPointF oldPos = newParentGraphic->mapFromScene(stateGraphic->mapToHighestParent())
     stateGraphic->setParentItem(newParentGraphic);
 
 
@@ -1124,6 +1143,7 @@ void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
 
     qDeleteAll(tPoints.begin(), tPoints.end());
     qDeleteAll(tPointsIn.begin(), tPointsIn.end());
+#endif
 }
 
 /**

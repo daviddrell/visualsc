@@ -142,7 +142,7 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
     //textBlockPropertyTable->setColumnWidth(1,180);
     //textBlockPropertyTable->columnViewportPosition(1);
 
-    propertyLayout->addWidget(textBlockPropertyTable);
+//    propertyLayout->addWidget(textBlockPropertyTable);
 
     setWindowTitle(tr("Tree Statechart Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
@@ -2276,12 +2276,24 @@ void SCFormView::handleReselectParent(SCState * target)
     _targetStateSelectionWindow = NULL;
 }
 
+/**
+ * @brief SCFormView::handleChangedParent
+ * @param state
+ * @param newParent
+ *
+ * state changed parent to newParent
+ *
+ * deletes all out transitions and recreates them using their old properties
+ *
+ *
+ *
+ */
 void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
 {
     qDebug() << "SCFormView::handleChangedParent";
-    QTreeWidgetItem* stateWidget = _items.value(state)->getTreeWidget();
-    QTreeWidgetItem* currentParentWidget = _items.value(state->getParentState())->getTreeWidget();
-    QTreeWidgetItem* newParentWidget = _items.value(newParent)->getTreeWidget();
+    QTreeWidgetItem* stateWidget            = _items.value(state)->getTreeWidget();
+    QTreeWidgetItem* currentParentWidget    = _items.value(state->getParentState())->getTreeWidget();
+    QTreeWidgetItem* newParentWidget        = _items.value(newParent)->getTreeWidget();
 
     //stateWidget->setParent();
 
@@ -2290,6 +2302,29 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
     currentParentWidget->removeChild(stateWidget);
     newParentWidget->addChild(stateWidget);
     stateWidget->setExpanded(true);
+
+
+
+
+// BUG HERE,
+    QList<SCTransition*> transitions;
+    state->getAllTransitions(transitions);
+    // these are the sink anchors that belong to out transitions of the state
+    for(int i = 0; i < transitions.size(); i++)
+    {
+        SCTransition* trans = transitions.at(i);
+        QString eventName = trans->getEventName();
+        QString pathStr = trans->getPathAttr()->asString();
+        qDebug() << "pathStr: " << pathStr;
+        _dm->deleteItem(trans);
+
+        SCTransition* newTrans = _dm->insertNewTransition(state, trans->targetState(), eventName, pathStr);
+//        newTrans->setEventName(eventName);
+
+        // transition path attribute is set, but no elbows are created
+//        newTrans->setPathAttr(pathStr);
+    }
+
 
     highlightRootItem();
 }
