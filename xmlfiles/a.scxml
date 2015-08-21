@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scxml name="a" uid="{3fa67e8e-b221-45d8-9813-591a6c47ea96}" xmlns="http://www.w3.org/2005/07/scxml">
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="a" parallelState="false" position="0,0" size="160,100" type="" uid="{55ac6a18-4b6a-4fc5-bc44-cc8e1c689edc}">
+<scxml comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine" parallelState="true" position="0,0" size="160,100" type="machine" uid="{8c137df7-9f95-4771-bb2d-461b3af7a23e}" xmlns="http://www.w3.org/2005/07/scxml">
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_1" parallelState="false" position="-8,-23" size="160,100" type="" uid="{d29e5b1b-b0b2-475e-b417-71767af39b4e}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
     </state>
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="a" parallelState="false" position="142,322" size="160,100" type="" uid="{ab81a686-6412-4551-a095-ec7e34ec0f76}">
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_2" parallelState="false" position="-218,80" size="160,100" type="" uid="{f1d65599-2a3e-4842-931b-dc8be4ad71bb}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
     </state>
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="a" parallelState="false" position="358,-109" size="160,100" type="" uid="{c67f423a-9b5a-4c82-83cd-270ce8f2ce2c}">
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_3" parallelState="false" position="-227,-148" size="160,100" type="" uid="{9bd2d3e1-94ed-4474-8ded-6f4ab1e905ec}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
     </state>
 </scxml>

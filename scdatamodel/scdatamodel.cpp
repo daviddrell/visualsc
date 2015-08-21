@@ -194,9 +194,20 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     if ( type  && ( type->asString() == "machine"))
     {
         _writer->writeStartElement("scxml");
-        _writer->writeAttribute("name", _topState->attributes.value("name")->asString());
-        _writer->writeAttribute("uid", _topState->getUid());
-        _writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
+//        _writer->writeAttribute("name", _topState->attributes.value("name")->asString());
+//        _writer->writeAttribute("uid", _topState->getUid());
+//        _writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
+
+        // get the keys of the attributes
+        QMapIterator<QString, IAttribute*> i(_topState->attributes);
+
+        // for every attribute of this state, write into the scxml
+        while(i.hasNext())
+        {
+            QString key = i.next().key();
+            qDebug() << "writing " << key <<"...";
+            _writer->writeAttribute(key, _topState->attributes.value(key)->asString());
+        }
     }
 
     // recursively write out all the state elements

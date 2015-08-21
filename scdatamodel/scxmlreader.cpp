@@ -275,6 +275,12 @@ SCState* SCXMLReader::importStateMachine(SCState *parent)
             PositionAttribute * sa  = new PositionAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
             stateAttributes->addItem( sa );
         }
+        else if(XmlAttr.name() == "type")
+        {
+            // change the type from "machine"
+            StateString* sa = new StateString(NULL, XmlAttr.name().toString(), "imported machine");
+            stateAttributes->addItem(sa);
+        }
         else    // string attribute
         {
             StateString * sa  = new StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
