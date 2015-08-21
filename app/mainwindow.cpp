@@ -34,6 +34,9 @@
 #define POP_UP_X    160
 #define POP_UP_Y    200
 
+#define SCALE_STEP 0.161803398875
+#define SCALE_MIN   0.1
+#define SCALE_MAX   3
 
 // adding comments to get the git repository
 
@@ -46,7 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
         _project(0),
         //_settings(0),
         _formEditorWindow(0),
-        _textFormatToolBar(NULL)
+        _textFormatToolBar(NULL),
+        _scale(1)
 {
 
 
@@ -139,9 +143,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
     qDebug () << "settings file " << _settingsFileName;
     loadSettings();
-
-
-
 }
 
 MainWindow::~MainWindow()
@@ -452,13 +453,57 @@ void MainWindow::sendMessage(QString title, QString message)
 }
 
 
+qreal MainWindow::clamp(qreal val, qreal min, qreal max)
+{
+    if(val < min)
+        return min;
+    if(val > max)
+        return max;
+
+    return val;
+}
 
 void MainWindow::on_actionNew_triggered()
 {
 
 }
 
+
+
 void MainWindow::on_actionZoomOut_triggered()
 {
-    _project->getSCGraphicsView()->zoomIn();
+    // do not zoom out if it will take it below the minimum
+    if ((_scale - SCALE_STEP) < SCALE_MIN)
+        return;
+
+    scale(-1.0*SCALE_STEP);
+}
+
+void MainWindow::on_actionZoomIn_triggered()
+{
+    // do not zoom if it another step will take it above the max.
+    if((_scale + SCALE_STEP) > SCALE_MAX)
+        return;
+
+    scale(SCALE_STEP);
+}
+
+/**
+ * @brief MainWindow::scale
+ * @param scale
+ *
+ * Pass a step size to scale by.
+ *
+ * E.g. going from 1.0 to 0.9, Pass step -0.1
+ *
+ * calls QGraphicsView::scale( (0.9)/(1.0) ) which sets the scale from 1.0 to 0.9
+ *
+ *
+ */
+void MainWindow::scale(qreal step)
+{
+    qreal mult = (_scale+step)/(_scale);
+    _project->getQGraphicsView()->scale(mult, mult);
+    _scale *= mult;
+    qDebug() << "setting scale to : " << _scale;
 }

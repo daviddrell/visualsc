@@ -171,7 +171,7 @@ private slots:
 
     void handleStateMachineNameLoad(QString);
     void handleStateMachineUidLoad(QString);
-
+    void handleStateMachineAttributeLoad(QString key, QString value);
 
 private:
 

@@ -64,6 +64,7 @@ signals:
     void enterStateElement();
     void leaveStateElement();
 
+    void changeStateMachineAttribute(QString, QString);
     void changeStateMachineName(QString);
     void changeStateMachineUid(QString);
     void enterTransistionElement();

@@ -58,7 +58,6 @@ public:
 
     QGraphicsView * getQGraphicsView();
 
-    void zoomIn();
 
 signals:
 

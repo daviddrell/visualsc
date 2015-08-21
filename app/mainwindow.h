@@ -67,6 +67,12 @@ private:
     void saveSettings();
     void createSettings();
 
+
+    qreal _scale;
+    qreal clamp(qreal val, qreal min, qreal max);
+    void scale(qreal scale);
+
+
 private slots:
     void handleFileOpenClick();
     void handleFileSaveClick();
@@ -79,6 +85,7 @@ private slots:
     void on_actionSave_As_triggered();
     void on_actionNew_triggered();
     void on_actionZoomOut_triggered();
+    void on_actionZoomIn_triggered();
 };
 
 #endif // MAINWINDOW_H

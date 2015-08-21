@@ -922,6 +922,7 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
 void SCFormView::connectState(SCState *state, CustomTreeWidgetItem* treeItem)
 {
     connect(state->getStateNameAttr(), SIGNAL(changed(StateName*)), treeItem, SLOT(handleAttributeChanged(StateName*)));
+
 }
 
 
@@ -1189,21 +1190,28 @@ void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, 
         connect(name, SIGNAL(changed(StateName*)), tableItem, SLOT(handleAttributeChanged(StateName*)));
 
     }
-    else if(attributeKey == "uid")
+    else    // this is a string attribute, so connect it
     {
-        StateString* uid = state->getStringAttr("uid");
-        connect(uid, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
+        StateString * ss = state->getStringAttr(attributeKey);
+        connect(ss, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
     }
-    else if(attributeKey == "entryAction")
-    {
-        StateString* ea = state->getStringAttr("entryAction");
-        connect(ea, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
-    }
-    else if(attributeKey == "exitAction")
-    {
-        StateString* ea = state->getStringAttr("exitAction");
-        connect(ea, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
-    }
+//    else if(attributeKey == "uid")
+//    {
+//        StateString* uid = state->getStringAttr("uid");
+//        connect(uid, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
+//    }
+//    else if(attributeKey == "entryAction")
+//    {
+//        StateString* ea = state->getStringAttr("entryAction");
+//        connect(ea, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
+//    }
+//    else if(attributeKey == "exitAction")
+//    {
+//        StateString* ea = state->getStringAttr("exitAction");
+//        connect(ea, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
+//    }
+
+
 }
 
 
@@ -2901,13 +2909,6 @@ void SCFormView::setProject(SMProject *pj)
 }
 
 
-
-void SCFormView::handleReset()
-{
-    qDebug() << "SCFormView::handleReset";
-    //this->highlightRootItem();
-    //this->initTree();
-}
 
 void SCFormView::handleNewRootMachine(SCState*)
 {

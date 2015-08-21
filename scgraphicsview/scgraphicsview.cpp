@@ -413,27 +413,6 @@ void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
 
 
 
-void SCGraphicsView::zoomIn()
-{
-    QList<SCState*> states;
-    _dm->getTopState()->getAllStates(states);
-    qreal mod = 0.876;
-    for(int i = 0; i < states.size(); i++)
-    {
-        SCState* state = states.at(i);
-        QPointF size = state->getSizeAttr()->asPointF();
-        size.setX(size.x()*mod);
-        size.setY(size.y()*mod);
-
-        state->setSize(size);
-
-        QPointF pos = state->getPosAttr()->asPointF();
-        pos.setX(pos.x()*mod);
-        pos.setY(pos.y()*mod);
-
-        state->setPosition(pos);
-    }
-}
 
 
 

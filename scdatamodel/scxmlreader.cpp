@@ -362,6 +362,18 @@ void SCXMLReader::readStateMachine()
         {
             emit changeStateMachineUid(xmlAttr.value().toString());
         }
+        else if(xmlAttr.name() == "size")
+        {
+
+        }
+        else if(xmlAttr.name() == "position")
+        {
+
+        }
+        else
+        {
+            emit changeStateMachineAttribute(xmlAttr.name().toString(), xmlAttr.value().toString());
+        }
     }
 }
 

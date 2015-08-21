@@ -128,6 +128,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionZoomOut"/>
+   <addaction name="actionZoomIn"/>
   </widget>
   <action name="actionNew">
    <property name="checkable">
@@ -242,10 +243,19 @@
   <action name="actionZoomOut">
    <property name="icon">
     <iconset resource="../scformview/resources/scformview.qrc">
-     <normaloff>:/SCFormView/minusw10.png</normaloff>:/SCFormView/minusw10.png</iconset>
+     <normaloff>:/SCFormView/zoomout.png</normaloff>:/SCFormView/zoomout.png</iconset>
    </property>
    <property name="text">
     <string>zoomOut</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="icon">
+    <iconset resource="../scformview/resources/scformview.qrc">
+     <normaloff>:/SCFormView/zoomin.png</normaloff>:/SCFormView/zoomin.png</iconset>
+   </property>
+   <property name="text">
+    <string>zoomIn</string>
    </property>
   </action>
  </widget>

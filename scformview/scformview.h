@@ -108,7 +108,6 @@ private slots:
     void import();
     void aboutAttributes();
     void handleNewRootMachine(SCState*);
-    void handleReset();
     void handleMakeTransitionConnections(SCTransition* trans);
     void backgroundButtonGroupClicked(QAbstractButton *button);
     void buttonGroupClicked(int id);

@@ -64,7 +64,7 @@ void SCDataModel::connectDataModel()
     // connects scxml reader to changing the state machine's name
     connect(&_reader, SIGNAL(changeStateMachineName(QString)), this, SLOT(handleStateMachineNameLoad(QString)));
     connect(&_reader, SIGNAL(changeStateMachineUid(QString)), this, SLOT(handleStateMachineUidLoad(QString)));
-
+    connect(&_reader, SIGNAL(changeStateMachineAttribute(QString, QString)), this, SLOT(handleStateMachineAttributeLoad(QString,QString)));
 
 
 }
@@ -100,6 +100,11 @@ void SCDataModel::handleStateMachineNameLoad(QString machineName)
 void SCDataModel::handleStateMachineUidLoad(QString uid)
 {
     _topState->attributes.value("uid")->setValue(uid);
+}
+
+void SCDataModel::handleStateMachineAttributeLoad(QString key, QString value)
+{
+    _topState->getStringAttr(key)->setValue(value);
 }
 
 
