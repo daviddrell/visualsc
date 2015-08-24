@@ -71,6 +71,8 @@ public:
     void setSnappedSide(int);
     int getSnappedSide();
 
+    void encloseLinePaths();
+
 signals:
     void anchorMoved(QPointF newPos);   // signal the stateboxgraphic parent and target that the anchors need updating, newPos given in scene scope
 
@@ -93,7 +95,7 @@ private:
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
     void updateArrowHead();
-    void encloseLinePaths();
+
 
     QColor _outterborderColor; ///< the hover event handlers will toggle this between red and black
     QPen _outterborderPen; ///< the pen is used to paint the red/black border

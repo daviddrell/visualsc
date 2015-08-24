@@ -312,7 +312,15 @@ void TransitionGraphic::updateLineSegments(ElbowGrabber* elbow)
 }
 
 
+bool TransitionGraphic::horizontallyAligned(ElbowGrabber *one, ElbowGrabber *two)
+{
+    return (one->y() == two->y());
+}
 
+bool TransitionGraphic::verticallyAligned(ElbowGrabber *one, ElbowGrabber *two)
+{
+    return (one->x() == two->x());
+}
 
 
 /**
@@ -503,6 +511,11 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
             ElbowGrabber* right = line->getElbow(1);
             QPointF mouseInScene = mapToScene(mevent->pos());
 
+            qreal lx = left->pos().x();
+            qreal rx = right->pos().x();
+            qreal ly = left->y();
+            qreal ry = right->y();
+
             if(!line->isAnchored())
             {
                 // give the scene scope position of the mouse and update the elbow that triggered the scene event
@@ -511,6 +524,20 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 // update the position relative to the mouse event's position
                 left->setPos(mapFromScene(mouseInScene) - line->leftElbowOffset);
                 right->setPos(mapFromScene(mouseInScene) - line->rightElbowOffset);
+
+
+                // if this line is horizontally aligned, then only y is allowed to change
+                if(horizontallyAligned(left,right))
+                {
+                    left->setX(lx);
+                    right->setX(rx);
+                }
+                // if this line is vertically aligned, then only x is allowed to change
+                else if(verticallyAligned(left,right))
+                {
+                    left->setY(ly);
+                    right->setY(ry);
+                }
 
                 bool rightAngleMode = false;
                 if(rightAngleMode)
@@ -528,6 +555,8 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
 
                 // update the data model
                 this->update();
+
+
             }
             else     // an anchored line segment is being dragged
             {
@@ -543,9 +572,28 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                 {
 
 
+                    // left is an source anchor
+
+
+
                     // snap the source anchor to the state and set the other elbow's position
                     emit left->anchorMoved((mouseInScene) - line->leftElbowOffset);
                     right->setPos(mapFromScene(mouseInScene) - line->rightElbowOffset);
+
+                    // horizontal line = non anchor can only move up and down
+                    if(horizontallyAligned(left,right))
+                    {
+//                        left->setX(lx);
+                        right->setX(rx);
+                    }
+
+                    // vertical line = non anchor can only move left and right
+                    else if(verticallyAligned(left,right))
+                    {
+//                        left->setY(ly);
+                        right->setY(ry);
+                    }
+
 
                     // update the two line segments that are affected
                     line->enclosePathInElbows();
@@ -561,6 +609,22 @@ bool TransitionGraphic::sceneEventFilter ( QGraphicsItem * watched, QEvent * eve
                     // snap the sink anchor to the state and set the other elbow's position
                     left->setPos(mapFromScene(mouseInScene) - line->leftElbowOffset);
                     emit right->anchorMoved(mouseInScene - line->rightElbowOffset);
+
+                    // horizontal line = non anchor can only move up and down
+                    if(horizontallyAligned(left,right))
+                    {
+                        left->setX(lx);
+//                        right->setX(rx);
+                    }
+
+                    // vertical line = non anchor can only move left and right
+                    else if(verticallyAligned(left,right))
+                    {
+                        left->setY(ly);
+//                        right->setY(ry);
+                    }
+
+
 
                     // update the two line segments that are affected
                     line->enclosePathInElbows();

@@ -92,6 +92,10 @@ protected:
 
 private :
 
+    bool horizontallyAligned(ElbowGrabber* one, ElbowGrabber* two);
+    bool verticallyAligned(ElbowGrabber* one, ElbowGrabber* two);
+//    void bindLine(ElbowGrabber* one, ElbowGrabber* two);
+
         // private methods
 
     void bindNeighborElbows(ElbowGrabber* elbow);
