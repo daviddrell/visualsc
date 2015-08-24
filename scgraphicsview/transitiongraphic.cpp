@@ -1003,6 +1003,7 @@ void TransitionGraphic::handleParentStateGraphicMoved(QPointF offset)
  */
 void TransitionGraphic::handleParentStateGraphicReleased()
 {
+    qDebug() << "TransitionGraphic::handleParentStateGraphicReleased";
     for(int i = 0 ; i < _elbows.size()-1; i++)
     {
         _elbows.at(i)->straightenLines();

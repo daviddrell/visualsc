@@ -185,6 +185,9 @@ private:
     QPointF _diagLineStart;
     QPointF _diagLineEnd;
     bool    _diagLineDrawIt;
+
+
+
     QPointF _intersection;
 
     QColor  _finalStateColor;

@@ -1050,6 +1050,7 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
  */
 void StateBoxGraphic::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event )
 {
+    // if minimize is hovered, deny regular state box operation
     if(_minimize->isOn())
         return;
 
@@ -1098,13 +1099,9 @@ void StateBoxGraphic::getAllStates(QList<StateBoxGraphic *> &stateList)
 // for supporting moving the box across the scene
 void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
-
-//    if(mouseEventIgnore())
-//    {
-//        qDebug() << "mouse release ignored by sbg";
-//        event->setAccepted(false);
-//        return;
-//    }
+// if minimize is hovered, deny regular state box operation
+    if(_minimize->isHovered())
+        return;
 
     if(_keepInsideParent)
     {
@@ -1134,14 +1131,11 @@ void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 // for supporting moving the box across the scene
 void StateBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
-//    if(mouseEventIgnore())
-//    {
-//        qDebug() << "mouse press ignored by sbg";
-//        event->setAccepted(false);
-//    }
+    // if minimize is hovered, deny regular state box operation
+    if(_minimize->isHovered())
+        return;
 
-//    else
-    {
+
 
 //        event->setAccepted(true);
 
@@ -1152,7 +1146,8 @@ void StateBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
     _dragStart = event->pos();
 
     //QGraphicsItem::mousePressEvent(event);
-    }
+
+
 }
 
 
@@ -1175,14 +1170,10 @@ void StateBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 void StateBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
 
-//    if(mouseEventIgnore())
-//    {
-//        qDebug() << "mouse move ignore";
-//        event->setAccepted(false);
-//        return;
-//    }
+    // if minimize is hovered, deny regular state box operation
+    if(_minimize->isHovered())
+        return;
 
-//    event->setAccepted(true);
     //qDebug() << "mouse move event!";
     QPointF newPos = event->pos() ;
     QPointF location = this->pos();
@@ -1227,23 +1218,6 @@ void StateBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     else
     {
         emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their sink anchors
-
-        // disabled this because it was causing strange behavior for transition graphics, not sure why this is used in the first place
-
-//        // also emit statebox moved for all children STATE BOXES
-//        QList<SelectableBoxGraphic*> children;
-//        this->getAllChildren(children);
-//        for(int i = 0; i < children.size();i++)
-//        {
-//            SelectableBoxGraphic* st = dynamic_cast<SelectableBoxGraphic*>(children.at(i));
-//            SelectableTextBlock* tb = dynamic_cast<SelectableTextBlock*> (children.at(i));
-
-//            // enforce that this is a state and not a text block
-//            if(st && !tb)
-//            {
-//                emit children.at(i)->stateBoxMoved(diff);
-//            }
-//        }
 
 
         this->setPos(location);

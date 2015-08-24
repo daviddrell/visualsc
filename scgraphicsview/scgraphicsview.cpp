@@ -248,6 +248,7 @@ qreal SCGraphicsView::distance(QPointF a, QPointF b)
  */
 void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
 {
+    qDebug() << "handleAutoResize";
     QList<StateBoxGraphic*> sbgs;
 //    stateBoxGraphic->getAllStates(sbgs);
     stateBoxGraphic->getStates(sbgs);

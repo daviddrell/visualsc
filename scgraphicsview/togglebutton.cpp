@@ -174,12 +174,14 @@ void ToggleButton::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void ToggleButton::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
     qDebug () << "ToggleButton::mouseRelease";
+    QApplication::restoreOverrideCursor();
     this->parentAsStateBoxGraphic()->mouseReleaseEvent(event);
 
 }
 void ToggleButton::mousePressEvent ( QGraphicsSceneMouseEvent *  event)
 {
     qDebug () << "ToggleButton::mousePress";
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
     this->parentAsStateBoxGraphic()->mousePressEvent(event);
 }
 
@@ -234,15 +236,17 @@ void ToggleButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     // on means active, and in this case active means minimized <
     if(_on)
     {
+        // draw a <
         painter->drawEllipse(totalRect);
         painter->drawLine(north,west);
         painter->drawLine(west,south);
 
-//        painter->drawLine(br.x(), br.y() + br.height()/2.0, br.x() + br.width()/2.0, br.y()+br.height());
-//        painter->drawLine(br.x()+br.width()/2.0,  br.y() + br.height(), br.x() + br.width(), br.y() + br.height()/2.0);
-    } // V
+
+    }
     else
     {
+        // draw a V
+
         painter->drawEllipse(totalRect);
         painter->drawLine(east,south);
         painter->drawLine(south,west);
