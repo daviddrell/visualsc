@@ -5,15 +5,6 @@
 #include "transitiongraphic.h"
 #include "LineSegmentGraphic.h"
 
-#define ELBOW_DEFAULT_WIDTH 2
-#define ELBOW_HOVER_WIDTH 3
-#define ELBOW_DEFAULT_PAINT_STYLE kBox
-#define DEFAULT_OUTTER_BORDER_WIDTH 3
-#define DEFAULT_OUTTER_BORDER_HEIGHT 3
-#define HOVER_OUTTER_BORDER_WIDTH 6
-#define HOVER_OUTTER_BORDER_HEIGHT 6
-#define ELBOW_ARROWHEAD_DEFAULT_WIDTH 6;
-#define ELBOW_ARROWHEAD_HOVER_WIDTH 8;
 
 class ArrowHeadGraphic;
 class TransitionGraphic;
@@ -102,6 +93,7 @@ private:
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
     void updateArrowHead();
+    void encloseLinePaths();
 
     QColor _outterborderColor; ///< the hover event handlers will toggle this between red and black
     QPen _outterborderPen; ///< the pen is used to paint the red/black border

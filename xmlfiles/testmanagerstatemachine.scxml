@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scxml name="Test Manager State Machine" uid="{97b850af-b614-473e-8128-8158ca049fd3}" xmlns="http://www.w3.org/2005/07/scxml">
+<scxml comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="Test Manager State Machine" parallelState="false" position="0,0" size="160,100" type="machine" uid="{97b850af-b614-473e-8128-8158ca049fd3}" xmlns="http://www.w3.org/2005/07/scxml">
     <state comments="" entryAction="" exitAction="" finalState="false" initialState="true" name="Idle" parallelState="false" position="89,-244" size="162,91" type="default type" uid="{c9dcfd20-89e5-4214-b524-be411ea185d2}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="2,11" size="100,60"/>
         <transition comments="" connectToFinished="false" event="start" path="M 81 91 L 81 145 " target="Downloading AVC" uid="{fa1bce49-4d61-403f-83e0-f8ed95bdf10c}">
@@ -8,11 +8,11 @@
     </state>
     <state comments="incredibel sfajlsdfasdf" entryAction="start download" exitAction="" finalState="false" initialState="false" name="Downloading AVC" parallelState="false" position="88,-99" size="164,93" type="normal" uid="{fa1bce49-4d61-403f-83e0-f8ed95bdf10c}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,11" size="123,47"/>
-        <transition comments="" connectToFinished="false" event="download failed" path="M 0 39.5517 L -60 40 L -60 489 L 3 489 " target="Completed" uid="{850da190-f7df-4847-8e28-ad3d5223fe75}">
-            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-95,-46" size="100,60"/>
+        <transition comments="" connectToFinished="false" event="download failed" path="M 0 39.5517 L -60 39.5517 L -60 489 L 3 489 " target="Completed" uid="{850da190-f7df-4847-8e28-ad3d5223fe75}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-67,75" size="100,60"/>
         </transition>
         <transition comments="" connectToFinished="false" event="SHA1 is same" path="M 164 41.6897 L 269 42 L 271 471 L 174 471 " target="Completed" uid="{850da190-f7df-4847-8e28-ad3d5223fe75}">
-            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="45,-43" size="100,60"/>
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="45,-54" size="100,60"/>
         </transition>
         <transition comments="" connectToFinished="false" event="SHA1 is different" path="M 0 68 L -235 68 " target="Update Firmware All Units" uid="{53416b9a-83f8-46ea-b3dc-e1b1168b669e}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-216,-41" size="137,46"/>
@@ -26,7 +26,7 @@
     </state>
     <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="Completed" parallelState="false" position="91,327" size="171,98" type="default type" uid="{850da190-f7df-4847-8e28-ad3d5223fe75}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="6,3" size="95,60"/>
-        <transition comments="" connectToFinished="false" event="poll timer popped" path="M 90 98 L 90 142 L -143 142 L -143 -473 L -26 -473 L 5.96175 -426 " target="Downloading AVC" uid="{fa1bce49-4d61-403f-83e0-f8ed95bdf10c}">
+        <transition comments="" connectToFinished="false" event="poll timer popped" path="M 90 98 L 90 142 L -143 142 L -143 -400 L -3 -400 " target="Downloading AVC" uid="{fa1bce49-4d61-403f-83e0-f8ed95bdf10c}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-199,0" size="146,65"/>
         </transition>
     </state>
@@ -60,7 +60,7 @@
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-129,50" size="137,46"/>
         </transition>
         <transition comments="" connectToFinished="true" event="Update firmware all units finished" path="M 602 318 L 933 318 L 932 368 " target="Running Tests" uid="{c9e4b34a-653d-417b-b911-5e180e494dad}">
-            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="174,-48" size="193,42"/>
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="175,-43" size="221,42"/>
         </transition>
     </state>
 </scxml>

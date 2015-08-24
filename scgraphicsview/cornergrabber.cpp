@@ -23,14 +23,18 @@
 #include <QDebug>
 #include <QApplication>
 
+#define PEN_THICKNESS 1.61803398875
+#define WIDTH 5
+#define HEIGHT 5
+
 CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnASquare) :
     QGraphicsItem(parent),
     mouseDownX(0),
     mouseDownY(0),
     _outterborderColor(QColor(0,0,0,140)),
     _outterborderPen(),
-    _width(6),
-    _height(6),
+    _width(WIDTH),
+    _height(HEIGHT),
     _corner(corner),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(placedOnASquare),
@@ -40,7 +44,8 @@ CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnAS
     _isHovered(false)
 {
    this->setParentItem(parent);
-    _outterborderPen.setWidth(2);
+//    _outterborderPen.setWidth(2);
+    _outterborderPen.setWidthF(PEN_THICKNESS);
     _outterborderPen.setColor(_outterborderColor);
 
    this->setAcceptHoverEvents(true);
@@ -219,6 +224,8 @@ void CornerGrabber::setAngle(int angle)
 
 void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     if ( _paintStyle == kBox)
     {

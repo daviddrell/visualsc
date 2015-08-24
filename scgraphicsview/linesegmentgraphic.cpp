@@ -391,12 +391,15 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
 //TODO move terminal and arrow head paint to elbowgrabber
 void LineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+
+    painter->setRenderHint(QPainter::Antialiasing, true);
+     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
   //  enclosePathInElbows();
     //_pen.setWidth(20);
-//#define SHOW_HOVER_BOXES
+//    #define SHOW_HOVER_BOXES
     painter->setPen(_pen);
 
-    painter->setRenderHint(QPainter::Antialiasing);
+
 
 
 

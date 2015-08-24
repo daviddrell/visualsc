@@ -7,6 +7,17 @@
 #define SNAP_ANGLE          11
 #define SNAP_DISTANCE       30
 
+#define ELBOW_DEFAULT_WIDTH 2
+#define ELBOW_HOVER_WIDTH 3
+#define ELBOW_DEFAULT_PAINT_STYLE kBox
+#define DEFAULT_OUTTER_BORDER_WIDTH 2.61
+#define DEFAULT_OUTTER_BORDER_HEIGHT 2.61
+#define HOVER_OUTTER_BORDER_WIDTH 5.61
+#define HOVER_OUTTER_BORDER_HEIGHT 5.61
+#define ELBOW_ARROWHEAD_DEFAULT_WIDTH 6;
+#define ELBOW_ARROWHEAD_HOVER_WIDTH 8;
+
+
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys) :
     mouseDownX(0),
     mouseDownY(0),
@@ -27,7 +38,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys
     _segments[0] = NULL;
     _segments[1] = NULL;
     _defaultColor=QColor(0,0,125,255);
-    _hoverColor=QColor(255,0,0,180);
+    _hoverColor=QColor(216,0,0,255);
 
     this->setParentItem(parentGraphic);
    // qDebug() << "Elbow Parent: " << parentGraphic << " pos: "<< this->pos();
@@ -63,7 +74,7 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyC
     _segments[0] = NULL;
     _segments[1] = NULL;
     _defaultColor=QColor(0,0,125,255);
-    _hoverColor=QColor(255,0,0,180);
+    _hoverColor=QColor(216,0,0,255);
 
     this->setParentItem(parentGraphic);
 
@@ -541,10 +552,31 @@ void ElbowGrabber::straightenLines()
         }
     }
 
+
+
+
     // if this is an anchor, ensure that it is still attached to its parent state box graphic
     if(mid->isAnchor())
         emit mid->anchorMoved(this->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic()->mapToScene(this->pos()));
 
+    // make sure the line segment path is updated as well
+    this->encloseLinePaths();
+
+}
+
+/**
+ * @brief ElbowGrabber::encloseLinePaths
+ *
+ * redraws the paths of line segments attached to this elbow
+ *
+ */
+void ElbowGrabber::encloseLinePaths()
+{
+    if(this->getSegment(0))
+        this->getSegment(0)->enclosePathInElbows();
+
+    if(this->getSegment(1))
+        this->getSegment(1)->enclosePathInElbows();
 }
 
 void ElbowGrabber::updateArrowHead()
@@ -585,33 +617,37 @@ void ElbowGrabber::updateArrowHead()
     }
 }
 
-void ElbowGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void ElbowGrabber::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+
     if ( _paintStyle == kBox)
     {
         // fill the box with solid color, use sharp corners
 
-        _outterborderPen.setCapStyle(Qt::SquareCap);
+        _outterborderPen.setCapStyle(Qt::RoundCap);
         _outterborderPen.setStyle(Qt::SolidLine);
         painter->setPen(_outterborderPen);
 
-        QPointF topLeft (0-(_width/2), 0-(_height/2));
-        QPointF bottomRight ( _width/2 ,_height/2);
+        QPointF topLeft (0-(_width/2.0), 0-(_height/2.0));
+        QPointF bottomRight ( _width/2.0 ,_height/2.0);
 
         QRectF rect (topLeft, bottomRight);
 
         QBrush brush (Qt::SolidPattern);
         brush.setColor (_outterborderColor);
 
-        if ( _outterborderColor == Qt::red)
-        {
-            painter->fillRect(rect,brush);
-        }
-        else
-        {
-            painter->drawRect(rect);
-        }
+
+
+
+
+        painter->drawEllipse(rect);
+        painter->fillRect(rect, brush);
+
+//            painter->drawRect(rect);
+//            painter->fillRect(rect,brush);
+
     }
     else  if (_paintStyle == kCrossHair)
     {

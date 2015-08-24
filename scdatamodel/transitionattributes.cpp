@@ -71,8 +71,8 @@ void TransitionAttributes::addAttribute(const QString attrName)
     {
         IAttribute* newAttr=NULL;
 
-        TransitionStringAttribute *str;
-        TransitionStringAttribute * newStr = new TransitionStringAttribute (*str);
+//        TransitionStringAttribute *str;
+        TransitionStringAttribute * newStr = new TransitionStringAttribute();
         newStr->setValue(attrName);
         addItem(newStr);
         newAttr = newStr;
