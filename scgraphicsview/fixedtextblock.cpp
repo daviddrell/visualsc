@@ -81,23 +81,30 @@ bool FixedTextBlock::isHovered()
     return _hovered;
 }
 
+/**
+ * @brief FixedTextBlock::mouseMoveEvent
+ * @param event
+ *
+ * pass the event to a higher level for all mouse events
+ *
+ */
 void FixedTextBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    event->setAccepted(false);
-//    this->parentAsStateBoxGraphic()->mouseMoveEvent(event);
+//    event->setAccepted(false);
+    this->parentAsStateBoxGraphic()->mouseMoveEvent(event);
 }
 
 void FixedTextBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    event->setAccepted(false);
-    //    this->parentAsStateBoxGraphic()->mouseReleaseEvent(event);
+//    event->setAccepted(false);
+    this->parentAsStateBoxGraphic()->mouseReleaseEvent(event);
 }
 
 void FixedTextBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    event->setAccepted(false);
-//    qDebug() << "fte mouse press event";
-//    this->parentAsStateBoxGraphic()->mousePressEvent(event);
+//    event->setAccepted(false);
+    qDebug() << "fte mouse press event";
+    this->parentAsStateBoxGraphic()->mousePressEvent(event);
 }
 
 void FixedTextBlock::setFont(int font)

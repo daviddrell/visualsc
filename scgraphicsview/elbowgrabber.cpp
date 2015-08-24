@@ -562,6 +562,8 @@ void ElbowGrabber::straightenLines()
     // make sure the line segment path is updated as well
     this->encloseLinePaths();
 
+    this->update();
+
 }
 
 /**

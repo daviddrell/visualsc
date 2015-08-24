@@ -311,7 +311,7 @@ void SCTransition::deleteSafely()
     this->deleteLater();
 }
 
-void SCTransition::detachFromSource(QObject* o)
+void SCTransition::detachFromSource(QObject*)
 {
     SCState* source = this->parentSCState();
     if(source)
@@ -321,7 +321,7 @@ void SCTransition::detachFromSource(QObject* o)
     }
 }
 
-void SCTransition::detachFromSink(QObject* o)
+void SCTransition::detachFromSink(QObject*)
 {
     SCState* target = this->targetState();
     if(target)

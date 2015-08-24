@@ -122,6 +122,8 @@ public:
 signals:
     void resizeState(StateBoxGraphic*);
     void clicked(SCState*);
+    void minimized(SCState*);
+    void expanded(SCState*);
     void nameChanged(QString);
     void exitActionChanged(QString);
     void entryActionChanged(QString);
@@ -131,7 +133,7 @@ protected:
     void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
 public slots:
-    void updateTextBlocks();
+    void updateElements();
     void handleTransitionLineStartMoved(QPointF newPos);
     void handleTransitionLineEndMoved(QPointF newPos);
     void handleIsParallelStateChanged(StateString*);
@@ -145,11 +147,11 @@ public slots:
     void handleTextBlockAttributeChanged(SizeAttribute*);
     void handleTextBlockAttributeChanged(PositionAttribute*);
     void handleTextBlockMoved(QPointF);
-
+    void handleMinimize();
 
 private:
 
-    bool mouseEventIgnore();
+//    bool mouseEventIgnore();
 
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
@@ -193,6 +195,9 @@ private:
     FixedTextBlock* _exitActionTitle;
 
     ToggleButton* _minimize;
+
+    QPointF _restoreSize;
+    QPointF _minimizeSize;
 
 };
 

@@ -888,6 +888,18 @@ QObject* SCFormView::getNeighborState(QObject*s)
     return prev;
 }
 
+void SCFormView::handleItemExpand(SCState * st)
+{
+    FVItem* fv = _items.value(st);
+    fv->getTreeWidget()->setExpanded(true);
+}
+
+void SCFormView::handleItemMinimize(SCState * st)
+{
+    FVItem* fv = _items.value(st);
+    fv->getTreeWidget()->setExpanded(false);
+}
+
 void SCFormView::handleItemClicked(SCState* st)
 {
     this->highlightItem(st);
@@ -945,7 +957,8 @@ void SCFormView::connectState(SCState* st)
 
     // when a state emits the clicked signal, select it in form view
     connect(st, SIGNAL(clicked(SCState*)), this, SLOT(handleItemClicked(SCState*)));
-
+    connect(st, SIGNAL(minimized(SCState*)), this, SLOT(handleItemMinimize(SCState*)));
+    connect(st, SIGNAL(expanded(SCState*)), this, SLOT(handleItemExpand(SCState*)));
 }
 
 /**
@@ -970,6 +983,9 @@ void SCFormView::connectTransition(SCTransition* trans)
     connect(trans, SIGNAL(clicked(SCTransition*)), this,SLOT(handleItemClicked(SCTransition*)));
 
 }
+
+
+
 
 /**
  * @brief SCFormView::replantTree

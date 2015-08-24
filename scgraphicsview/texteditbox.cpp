@@ -48,12 +48,12 @@ TextEditBox::~TextEditBox()
     delete _textItem;
 }
 
-void TextEditBox::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void TextEditBox::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
     QApplication::setOverrideCursor(Qt::IBeamCursor);
 }
 
-void TextEditBox::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void TextEditBox::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
     QApplication::restoreOverrideCursor();
 }

@@ -94,6 +94,8 @@ public:
 
 public slots:
     void handleItemClicked(SCState*);
+    void handleItemMinimize(SCState*);
+    void handleItemExpand(SCState*);
     void handleItemClicked(SCTransition*);
 signals:
     void openClick();

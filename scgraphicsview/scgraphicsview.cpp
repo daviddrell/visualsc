@@ -163,7 +163,7 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
     connectTransition(trans);
 }
 
-bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
+bool SCGraphicsView::eventFilter(QObject*, QEvent * e)
 {
     // scene captures key presses in KeyController Object
     // the key controller object is passed to the transition graphic and its segmented lines
@@ -921,6 +921,10 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
     // when the graphic is clicked also emit clicked for the state
     connect(stateGraphic, SIGNAL(clicked(SCState*)), state, SIGNAL(clicked(SCState*)));
 
+    // when the graphic is minimized, also emit minimized/unminimized for the state
+    connect(stateGraphic, SIGNAL(minimized(SCState*)), state, SIGNAL(minimized(SCState*)));
+    connect(stateGraphic, SIGNAL(expanded(SCState*)), state, SIGNAL(expanded(SCState*)));
+
 
     // set up data model changes to update the state box graphic
     StateName* name = state->getStateNameAttr();
@@ -1239,6 +1243,6 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // load the text blocks
 
     // reposition the text items after loading their text
-    stateGraphic->updateTextBlocks();
+    stateGraphic->updateElements();
 
 }

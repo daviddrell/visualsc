@@ -10,5 +10,8 @@
         <file>red_x_depressed_16_16.png</file>
         <file>red_x_hovered_16_16.png</file>
         <file>picture.png</file>
+        <file>Circled Chevron Down-26.png</file>
+        <file>Circled Chevron Left -26.png</file>
+        <file>circledchevrondown.png</file>
     </qresource>
 </RCC>

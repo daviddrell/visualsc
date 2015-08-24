@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QGraphicsItem>
+#include <QPen>
 //#include "stateboxgraphic.h"
 
 
@@ -25,6 +26,9 @@ public:
 
     bool isHovered();
 
+    void toggle();
+    bool isOn();
+
 signals:
     void toggled();
 
@@ -33,12 +37,13 @@ public slots:
 
 
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event );
-    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event );
-//    virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
-//    virtual void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
-    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
+     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+     void hoverEnterEvent ( QGraphicsSceneHoverEvent * event );
+     void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event );
+     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+     void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
+     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
 
 
 private:
@@ -49,6 +54,7 @@ private:
     qreal _height;
 
     bool _hovered;
+    QPen _pen;
 
     bool _on;
     int _corner;
