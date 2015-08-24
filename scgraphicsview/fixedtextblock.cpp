@@ -25,6 +25,7 @@
  *  top = height
  *  bottom determines how far from the bottom the box will be
  *
+ * right will shrink the right side by a fixed amount
  *
  */
 
@@ -35,7 +36,7 @@
 // the text position will be pushed down to its position in edit mode
 #define TEXT_PUSH_DOWN      1
 
-FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal top, qreal bottom, bool attachedToTop):
+FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal top, qreal bottom, qreal right, bool attachedToTop):
     QGraphicsObject(parent),
     _pen(),
     _width(DEFAULT_WIDTH),
@@ -43,7 +44,9 @@ FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal top, qreal bottom,
     _top(top),
     _bottom(bottom),
     _attachedToTop(attachedToTop),
-    _textItem(this, QRect(0,0, DEFAULT_WIDTH-2*(TEXT_BUFFER), DEFAULT_HEIGHT-2*(TEXT_BUFFER)))      // doesn't matter what this is set to here because attributes get loaded anyways
+    _right(right),
+    _hovered(false),
+    _textItem(this, QRect(0,0, DEFAULT_WIDTH-2*(TEXT_BUFFER), DEFAULT_HEIGHT-2*(TEXT_BUFFER)))      // doesn't matter what this is set to here because state size attribute get loaded right after this is created and will change the size of the text item
 {
     switchPen(PenStyle::Default);
     setFont(Font::Normal);
@@ -52,6 +55,11 @@ FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal top, qreal bottom,
     reposition();
     resize();
     recenterText();
+
+
+    // control the hovered variable using the text item's hover events
+    connect(&_textItem,SIGNAL(hovered()), this, SLOT(handleHoverEnter()));
+    connect(&_textItem, SIGNAL(unhovered()), this, SLOT(handleHoverLeave()));
 }
 
 FixedTextBlock::~FixedTextBlock()
@@ -59,19 +67,37 @@ FixedTextBlock::~FixedTextBlock()
 
 }
 
+void FixedTextBlock::handleHoverEnter()
+{
+    _hovered = true;
+}
+void FixedTextBlock::handleHoverLeave()
+{
+    _hovered = false;
+}
+
+bool FixedTextBlock::isHovered()
+{
+    return _hovered;
+}
+
 void FixedTextBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    this->parentAsStateBoxGraphic()->mouseMoveEvent(event);
+    event->setAccepted(false);
+//    this->parentAsStateBoxGraphic()->mouseMoveEvent(event);
 }
 
 void FixedTextBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    this->parentAsStateBoxGraphic()->mouseReleaseEvent(event);
+    event->setAccepted(false);
+    //    this->parentAsStateBoxGraphic()->mouseReleaseEvent(event);
 }
 
 void FixedTextBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    this->parentAsStateBoxGraphic()->mousePressEvent(event);
+    event->setAccepted(false);
+//    qDebug() << "fte mouse press event";
+//    this->parentAsStateBoxGraphic()->mousePressEvent(event);
 }
 
 void FixedTextBlock::setFont(int font)
@@ -223,7 +249,7 @@ void FixedTextBlock::reposition()
 void FixedTextBlock::resize()
 {
     QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
-    _width = pRect.width();
+    _width = pRect.width() - _right;
 
     if(_attachedToTop)
         _height = _bottom;
@@ -269,11 +295,11 @@ void FixedTextBlock::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     if(_attachedToTop)
     {
-        painter->drawLine(r.bottomLeft(),r.bottomRight());
+        painter->drawLine(r.bottomLeft(),r.bottomRight() + QPointF(_right,0));
     }
     else
     {
-        painter->drawLine(r.topLeft()+QPointF(0,-2),r.topRight()+QPointF(0,-2));
+        painter->drawLine(r.topLeft()+QPointF(0,-2) ,r.topRight()+QPointF(0,-2)+ QPointF(_right,0));
     }
 }
 

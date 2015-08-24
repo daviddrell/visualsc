@@ -59,6 +59,8 @@
 #define MIN_WIDTH       105
 #define MIN_HEIGHT      65
 
+#define MINIMIZE_BUFFER_ON_TEXT 25
+
 
 // height of the state name fixed text block
 #define STATE_NAME_HEIGHT   26
@@ -76,9 +78,9 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _diagLineEnd(),
         _diagLineDrawIt(false),
         _intersection(),
-        _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, true)),
-        _entryActionTitle(new FixedTextBlock(this, ENTRY_TOP, ENTRY_HEIGHT, true)),
-        _exitActionTitle(new FixedTextBlock(this, ENTRY_HEIGHT,0 , false))
+        _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, MINIMIZE_BUFFER_ON_TEXT, true)),
+        _entryActionTitle(new FixedTextBlock(this, ENTRY_TOP, ENTRY_HEIGHT,0, true)),
+        _exitActionTitle(new FixedTextBlock(this, ENTRY_HEIGHT,0,0  , false))
 {
     // set the default text
     _stateTitle->setText(this->getStateName());
@@ -124,6 +126,14 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     _stateTitle->reposition();
     _entryActionTitle->reposition();
     _exitActionTitle->reposition();
+
+
+
+    // minimize toggle button
+    _minimize = new ToggleButton(this, WallCorners::NORTHEAST);
+    connect(sa, SIGNAL(changed(SizeAttribute*)), this->_minimize, SLOT(handleStateSizeChanged(SizeAttribute*)));
+    connect(_minimize, SIGNAL(toggled()), this, SLOT(handleMinimize()));
+
 }
 
 void StateBoxGraphic::handleExitActionChanged(StateString *ss )
@@ -333,6 +343,22 @@ int StateBoxGraphic::getSmallest(double* ar, int len)
         }
     }
     return index;
+}
+
+qreal StateBoxGraphic::getBufferX()
+{
+    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER;
+}
+
+qreal StateBoxGraphic::getBufferY()
+{
+    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER;
+}
+
+QRectF StateBoxGraphic::getBufferedRect()
+{
+    QRectF rect( this->getBufferX(), this->getBufferY(), getSize().x() - 2*getBufferX(), getSize().y() - 2* getBufferY());
+    return rect;
 }
 
 /**
@@ -944,7 +970,17 @@ void StateBoxGraphic::handleTransitionLineEndMoved(QPointF newPos)
  */
 void StateBoxGraphic::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event )
 {
+    if(mouseEventIgnore())
+    {
+        qDebug() << "mouse double click ignored by sbg";
+        event->setAccepted(false);
+        return;
+    }
+
+    event->setAccepted(true);
+    qDebug() << "sbg mouse double click";
     emit this->resizeState(this);
+    //QGraphicsItem::mouseDoubleClickEvent(event);
 }
 
 
@@ -979,6 +1015,14 @@ void StateBoxGraphic::getAllStates(QList<StateBoxGraphic *> &stateList)
 // for supporting moving the box across the scene
 void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
+
+    if(mouseEventIgnore())
+    {
+        qDebug() << "mouse release ignored by sbg";
+        event->setAccepted(false);
+        return;
+    }
+
     if(_keepInsideParent)
     {
 
@@ -1007,14 +1051,36 @@ void StateBoxGraphic::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 // for supporting moving the box across the scene
 void StateBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
+    if(mouseEventIgnore())
+    {
+        qDebug() << "mouse press ignored by sbg";
+        event->setAccepted(false);
+    }
+
+    else
+    {
+
+        event->setAccepted(true);
 
     qDebug() << "emitting clicked";
     emit clicked(this->getStateModel());
-    event->setAccepted(true);
+    //event->setAccepted(true);
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
     _dragStart = event->pos();
+
+    //QGraphicsItem::mousePressEvent(event);
+    }
 }
 
+
+bool StateBoxGraphic::mouseEventIgnore()
+{
+    if(_minimize->isHovered() || _stateTitle->isHovered() || _entryActionTitle->isHovered() || _exitActionTitle->isHovered())
+        return true;
+
+    return false;
+
+}
 
 // for supporting moving the box across the scene
 /**
@@ -1023,6 +1089,15 @@ void StateBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
  */
 void StateBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
+
+    if(mouseEventIgnore())
+    {
+        qDebug() << "mouse move ignore";
+        event->setAccepted(false);
+        return;
+    }
+
+    event->setAccepted(true);
     //qDebug() << "mouse move event!";
     QPointF newPos = event->pos() ;
     QPointF location = this->pos();
@@ -1098,12 +1173,13 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
 //        qDebug() << " QEvent == " + QString::number(event->type());
 
     CornerGrabber * corner = dynamic_cast<CornerGrabber *>(watched);
-    if ( corner == NULL) return false; // not expected to get here
+//    if ( corner == NULL) return false; // not expected to get here
 
     QGraphicsSceneMouseEvent * mevent = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
     if ( mevent == NULL)
     {
         // this is not one of the mouse events we are interrested in
+        qDebug() << "did not get a mouse event";
         return false;
     }
 
@@ -1113,6 +1189,7 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
         // if the mouse went down, record the x,y coords of the press, record it inside the corner object
     case QEvent::GraphicsSceneMousePress:
         {
+        qDebug() << "mouse press";
             corner->setMouseState(CornerGrabber::kMouseDown);
             corner->mouseDownX = mevent->pos().x();
             corner->mouseDownY = mevent->pos().y();
@@ -1124,6 +1201,7 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
 
     case QEvent::GraphicsSceneMouseRelease:
         {
+        qDebug() << "mouse release";
             corner->setMouseState(CornerGrabber::kMouseReleased);
             //corner->setHovered(false);
             emit cornerReleased();
@@ -1133,12 +1211,14 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
 
     case QEvent::GraphicsSceneMouseMove:
         {
+        qDebug() << "mouse move";
             corner->setMouseState(CornerGrabber::kMouseMoving );
         }
         break;
 
     default:
         // we dont care about the rest of the events
+        qDebug() << "default";
         return false;
         break;
     }

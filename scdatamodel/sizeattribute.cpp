@@ -67,7 +67,7 @@ void  SizeAttribute::setValue(const int w,const int h)
     if ( nSize != _size )
     {
         _size = nSize;
-        qDebug() << "SizeAttribute::emitting changed";
+//        qDebug() << "SizeAttribute::emitting changed";
         emit changed(this);
     }
 }
@@ -78,7 +78,7 @@ void SizeAttribute::setValue(const QPointF nSize)
     if ( nSize != _size )
     {
         _size = nSize;
-        qDebug() << "SizeAttribute::emitting changed";
+//        qDebug() << "SizeAttribute::emitting changed";
         emit changed(this);
     }
 }

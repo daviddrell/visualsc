@@ -911,7 +911,7 @@ void SelectableBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     for(int i = 0; i < 4; i++)
     {
         _corners[i]->setVisible(false);
-        _corners[i]->removeSceneEventFilter(this);
+//        _corners[i]->removeSceneEventFilter(this);
 
     }
 
@@ -951,7 +951,7 @@ void SelectableBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
     for(int i = 0; i < 4; i++)
     {
         _corners[i]->setVisible(true);
-        _corners[i]->installSceneEventFilter(this);
+//        _corners[i]->installSceneEventFilter(this);
     }
 
 

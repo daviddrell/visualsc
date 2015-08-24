@@ -27,7 +27,7 @@ class FixedTextBlock : public QGraphicsObject
 
 
 public:
-    FixedTextBlock(QGraphicsObject* parent,qreal topFraction, qreal bottomFraction, bool attachedToTop);
+    FixedTextBlock(QGraphicsObject* parent,qreal topFraction, qreal bottomFraction, qreal rightDistance, bool attachedToTop);
     ~FixedTextBlock();
     void switchPen(int);
     virtual QRectF boundingRect() const;
@@ -44,6 +44,8 @@ public:
     void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
     void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
+    bool isHovered();
+
 signals:
     void changed(QString);
 
@@ -51,6 +53,8 @@ public slots:
     void handleTextItemEdited();
     void handleStateBoxResized(QRectF, QRectF, int);
     void handleStateSizeChanged(SizeAttribute*);
+    void handleHoverLeave();
+    void handleHoverEnter();
 
 protected:
     qreal clampMin(qreal value, qreal min);
@@ -59,8 +63,12 @@ protected:
     qreal _height;
     qreal _top;
     qreal _bottom;
+    qreal _right;
     bool _attachedToTop;
     QPen _pen;
+
+    bool _hovered;
+
 
 private:
     MaskedTextEdit _textItem;

@@ -26,6 +26,7 @@
 #include "selectableboxgraphic.h"
 #include "selectabletextblock.h"
 #include "fixedtextblock.h"
+#include "togglebutton.h"
 
 
 
@@ -112,6 +113,11 @@ public:
     virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
+    qreal getBufferX();
+    qreal getBufferY();
+    QRectF getBufferedRect();
+
+
 
 signals:
     void resizeState(StateBoxGraphic*);
@@ -142,6 +148,8 @@ public slots:
 
 
 private:
+
+    bool mouseEventIgnore();
 
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
@@ -183,6 +191,8 @@ private:
     FixedTextBlock* _stateTitle;
     FixedTextBlock* _entryActionTitle;
     FixedTextBlock* _exitActionTitle;
+
+    ToggleButton* _minimize;
 
 };
 

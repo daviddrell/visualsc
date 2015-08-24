@@ -40,7 +40,8 @@ SOURCES += scgraphicsview.cpp \
     mousecontroller.cpp \
     linesegmentgraphic.cpp \
     fixedtextblock.cpp \
-    customgraphicsview.cpp
+    customgraphicsview.cpp \
+    togglebutton.cpp
 
 
 HEADERS += scgraphicsview.h\
@@ -61,7 +62,8 @@ HEADERS += scgraphicsview.h\
     mousecontroller.h \
     linesegmentgraphic.h \
     fixedtextblock.h \
-    customgraphicsview.h
+    customgraphicsview.h \
+    togglebutton.h
 
 
 OTHER_FILES += \

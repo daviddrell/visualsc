@@ -135,6 +135,9 @@ void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     this->setCursorToResize(false);
 
     this->update(0,0,_width,_height);
+
+    this->removeSceneEventFilter(this->parentItem());
+
 }
 
 void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
@@ -147,6 +150,7 @@ void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
     this->setCursorToResize(true);
 
     this->update(0,0,_width,_height);
+    this->installSceneEventFilter(this->parentItem());
 }
 
 void CornerGrabber::setCursorToResize(bool on)

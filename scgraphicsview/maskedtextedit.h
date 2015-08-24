@@ -45,6 +45,10 @@ public:
 
 signals:
     void focusOut();
+    void hovered();
+    void unhovered();
+
+public slots:
 
 
 private:

@@ -10,7 +10,7 @@
 #include <QKeyEvent>
 
 
-MaskedTextEdit::MaskedTextEdit(QGraphicsItem *parent ,QRectF rect ) :
+MaskedTextEdit::MaskedTextEdit(QGraphicsItem *parent ,QRectF rect) :
         QGraphicsTextItem(parent),
         _rect(rect)
 {
@@ -21,9 +21,11 @@ MaskedTextEdit::MaskedTextEdit(QGraphicsItem *parent ,QRectF rect ) :
     this->setAcceptHoverEvents(true);
 }
 
+
+
 void MaskedTextEdit::setBoundingRect(QRectF rect)
 {
-    _rect = rect;
+    _rect = rect; 
 }
 
 QRectF MaskedTextEdit::boundingRect()
@@ -33,13 +35,17 @@ QRectF MaskedTextEdit::boundingRect()
 
 void MaskedTextEdit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
+    qDebug() << "mte hover enter";
     QApplication::setOverrideCursor(Qt::IBeamCursor);
+    emit hovered();
     QGraphicsTextItem::hoverEnterEvent(event);
 }
 
 void MaskedTextEdit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
+    qDebug() << "mte hover leave";
     QApplication::restoreOverrideCursor();
+    emit unhovered();
     QGraphicsTextItem::hoverLeaveEvent(event);
 }
 
@@ -47,7 +53,7 @@ void MaskedTextEdit::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 {
     painter->setRenderHints(QPainter::TextAntialiasing);
     painter->setClipping(true);
-    painter->setClipRect(_rect);
+    painter->setClipRect(boundingRect());
     QGraphicsTextItem::paint(painter, option, widget);
 }
 
