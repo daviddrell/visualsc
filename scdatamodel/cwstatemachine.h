@@ -27,7 +27,8 @@ public:
     void createChildren();
     QList<CWState*> getStates();
 
-    QHash<SCState*, CWState*> _stateHash;
+    // this needs to be a pointer to a QHash
+    QHash<SCState*, CWState*> * _stateHash;
 
     void createTransition(CWState* state);
     void createTransitions();

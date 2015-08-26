@@ -7,7 +7,7 @@
 //}
 
 
-CWStateMachine::CWStateMachine(SCState *state,  QHash<SCState*, CWState*> &stateHash):
+CWStateMachine::CWStateMachine(SCState *state,  QHash<SCState*, CWState*> & stateHash):
     CWState(),
     _stateHash(stateHash)
 {
@@ -97,6 +97,8 @@ void CWStateMachine::createChildren()
         cwState = new CWState(state, stateName);
         _states.append(cwState);
         _stateHash.insert(state, cwState);
+
+        qDebug() << "state hash insert state: " << state->getObjectName();
 
         // set this state machine's initial state
         if(state->isInitial())

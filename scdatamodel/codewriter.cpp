@@ -23,29 +23,48 @@ void CodeWriter::createStateMachines()
     QList<CWState*> allStates;
     QList<CWStateMachine*> machs;
 
+    // go through each state machine and create a cw state machine object
+    // for each child state create a cwstate object
     for(int i = 0; i < _machines.size(); i++)
     {
         machine = _machines.at(i);
+
+        // pass a reference to the SCState object and the hash for all states
         cwsm = new CWStateMachine(machine, _stateHash); // creates a state machine
-//        cwsm->createSignalsAndSlots();      // creates the signals and slots for all states that belong to this state machine
+
+        // creates the cwstate object for each cwstatemachine
         cwsm->createChildren();
-        //allStates.append(cwsm);
+
+        // fill the local list of all states used for resolving collisions
         allStates.append(cwsm->getStates());
+
+        // add a reference to the state machine's SCState to the cwstatemachine
         _machineHash.insert(machine, cwsm);
+
+        // also add to the global list of all cwstatemachines
         machs.append(cwsm);
     }
+
     // add the root machine's cwstatemachine
     allStates.append(_machineHash.value(_rootMachine));
-    resolveCollisions(allStates);
 
-//    this->resolveCollisionsInsideStateMachines(machs);
-//    this->resolveCollisionsBetweenStateMachines(machs);
+    // resolve naming collisions for any state. this will change the stateName variable to be unique
+    resolveCollisions(allStates);
 
     for(int i = 0 ; i < machs.size(); i++)
     {
+        // using the state name, create all event, signal, and slot names
         machs.at(i)->createSignalsAndSlots();
+
+        // using the state names of the source state, create the event name for every transition
         machs.at(i)->createTransitions();
     }
+
+    /* for(int i = 0; i < machs.size(); i++)
+        {
+        machs.at(i)->createTransitions();
+            }
+    */
 
 }
 
