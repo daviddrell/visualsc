@@ -85,7 +85,7 @@ public:
 
    // SelectableTextBlock* TextItem;    ///<  text to go in the title area.
 
-
+    virtual void graphicHasChanged (); ///< implemented to receive updates from the SelectableBoxGraphic
     int getGridLocation(QPointF mts,QPointF point);
     void setGridSpace(int space);
     //void setTitle(QString t);
@@ -163,7 +163,6 @@ private:
     double distance(qreal,qreal,qreal,qreal);
     int getSmallest(double*, int);
     int findNearestWall(QRectF,QPointF);
-    virtual void graphicHasChanged (); ///< implemented to receive updates from the SelectableBoxGraphic
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
     bool isContained(QRectF);
 
