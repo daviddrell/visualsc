@@ -7,7 +7,7 @@
 //}
 
 
-CWStateMachine::CWStateMachine(SCState *state,  QHash<SCState*, CWState*> & stateHash):
+CWStateMachine::CWStateMachine(SCState *state,  QHash<SCState*, CWState*>* stateHash):
     CWState(),
     _stateHash(stateHash)
 {
@@ -69,7 +69,7 @@ void CWStateMachine::createTransition(CWState *state)
     for(int k = 0 ; k < transitions.size(); k++)
     {
         SCTransition* trans = transitions.at(k);
-        CWState* tar = _stateHash.value(trans->targetState());
+        CWState* tar = _stateHash->value(trans->targetState());
         CWTransition *cwTransition = new CWTransition(trans, state->_stateName, tar->_stateName);
         state->insertTransition(cwTransition);
     }
@@ -96,9 +96,9 @@ void CWStateMachine::createChildren()
         stateName = "_" + toCamel(state->getName());
         cwState = new CWState(state, stateName);
         _states.append(cwState);
-        _stateHash.insert(state, cwState);
+        _stateHash->insert(state, cwState);
 
-        qDebug() << "state hash insert state: " << state->getObjectName();
+        qDebug() << "state hash insert state: " << state->objectName();
 
         // set this state machine's initial state
         if(state->isInitial())

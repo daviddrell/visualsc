@@ -8,7 +8,7 @@ class CWStateMachine : public CWState
 {
 public:
 //    CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString comments);
-    CWStateMachine(SCState* state, QHash<SCState*, CWState*> &stateHash);
+    CWStateMachine(SCState* state, QHash<SCState*, CWState*> *stateHash);
     ~CWStateMachine();
     void createSignalsAndSlots();
 

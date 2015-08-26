@@ -30,7 +30,7 @@ void CodeWriter::createStateMachines()
         machine = _machines.at(i);
 
         // pass a reference to the SCState object and the hash for all states
-        cwsm = new CWStateMachine(machine, _stateHash); // creates a state machine
+        cwsm = new CWStateMachine(machine, &_stateHash); // creates a state machine
 
         // creates the cwstate object for each cwstatemachine
         cwsm->createChildren();
