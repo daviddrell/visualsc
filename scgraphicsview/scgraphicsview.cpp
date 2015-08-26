@@ -402,6 +402,8 @@ void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
                 {
                     StateBoxGraphic* sbg = sbgs.at(i);
                     sbg->setPosAndUpdateAnchors(sbg->pos()-QPointF(minX-25,minY-25));
+                    // update the datamodel for the position and size.
+                    sbg->graphicHasChanged();
                 }
 
                 // all children are inside of the state machine, so we can call this again
