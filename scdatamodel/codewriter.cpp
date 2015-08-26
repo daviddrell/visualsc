@@ -60,11 +60,11 @@ void CodeWriter::createStateMachines()
         machs.at(i)->createTransitions();
     }
 
-    /* for(int i = 0; i < machs.size(); i++)
-        {
-        machs.at(i)->createTransitions();
-            }
-    */
+
+
+
+
+
 
 }
 

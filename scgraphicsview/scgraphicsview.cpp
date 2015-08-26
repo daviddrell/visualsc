@@ -414,7 +414,13 @@ void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
                 newHeight+=minY;
                 QRectF newBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), newWidth, newHeight);
                 stateBoxGraphic->setSize(QPointF(newWidth,newHeight));
-                stateBoxGraphic->setCornerPositions();
+                stateBoxGraphicstateBoxGraphic->setCornerPositions();
+
+
+                // update the datamodel for the position and size.
+                stateBoxGraphic->graphicHasChanged();
+
+
                 emit stateBoxGraphic->stateBoxResized(oldBox, newBox, 2);
             }
         }
