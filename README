@@ -4,8 +4,8 @@ Developed by Matthew Zhan and David Drell.
 Install Micosoft Visual C++ 2013 (REQUIRED):
 https://drive.google.com/file/d/0B1lDetBy1i69TUVrWjZRd21qOWM/view?usp=sharing
 
-Install VisualSc Standalone: 
-https://drive.google.com/file/d/0B1lDetBy1i69akdqdDFtWkZYZ1k/view?usp=sharing
+Install Visual Statechart 1.0.7: 
+https://drive.google.com/file/d/0B1lDetBy1i69TEE1WWZ6VmxhSzQ/view?usp=sharing
 
 VisualSc is a graphical state chart editor built on Qt.
 It adds graphical attributes to state elements in a SCXML file.
