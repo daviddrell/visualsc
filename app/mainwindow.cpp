@@ -30,18 +30,12 @@
 #include <QTime>
 #include <QMessageBox>
 
-
 #define POP_UP_X    160
 #define POP_UP_Y    200
 
 #define SCALE_STEP 0.161803398875
 #define SCALE_MIN   0.1
 #define SCALE_MAX   3
-
-// adding comments to get the git repository
-
-
-
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),

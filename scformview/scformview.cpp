@@ -2926,7 +2926,8 @@ void SCFormView::about()
                                           "VisualSC is a Statechart Editor which reads/writes from/to SCXML\n"
                                           "\n"
                                           "This is an open source project by David Drell & Matt Zhan"
-                                          ""
+                                          "\n\n"
+                                          "Icons obtained from https://icons8.com/"
 
 
                                           "");
