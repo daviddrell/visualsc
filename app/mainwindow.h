@@ -47,6 +47,8 @@ public:
 signals:
     void reset();
     void open(QString);
+    void scaleChanged(qreal);
+    void gridToggled(bool);
 
 private:
     Ui::MainWindow *ui;
@@ -88,6 +90,7 @@ private slots:
     void on_actionZoomOut_triggered();
     void on_actionZoomIn_triggered();
     void on_actionSaveImage_triggered();
+    void on_actionGrid_toggled(bool arg1);
 };
 
 #endif // MAINWINDOW_H

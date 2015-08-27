@@ -24,7 +24,7 @@
 #include "scgraphicsview_global.h"
 #include "scdatamodel.h"
 #include "keycontroller.h"
-#include <QObject>
+
 //#include <QGraphicsView>
 #include "stateattributes.h"
 #include "stateboxgraphic.h"
@@ -32,7 +32,9 @@
 #include "textformattoolbar.h"
 #include "mousecontroller.h"
 #include "customgraphicsview.h"
+#include "customgraphicsscene.h"
 #include <QMap>
+#include <QObject>
 
 /**
   \defgroup GraphicsView
@@ -57,7 +59,9 @@ public:
     SCGraphicsView(QWidget *parent, SCDataModel * dm);
     ~SCGraphicsView();
 
+    CustomGraphicsScene* getCustomGraphicsScene();
     QGraphicsView * getQGraphicsView();
+    QGraphicsScene* getQGraphicsScene();
 
     void saveImage(QString fileName);
 
@@ -94,7 +98,7 @@ private:
     qreal distance(QPointF a, QPointF b);
     // private data
 
-    QGraphicsScene  *_scene;
+    CustomGraphicsScene  *_scene;
     CustomGraphicsView   _view;
     SCDataModel    *_dm;
     QMap<SCState*,StateBoxGraphic*> _mapStateToGraphic;

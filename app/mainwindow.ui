@@ -131,6 +131,7 @@
    </attribute>
    <addaction name="actionZoomOut"/>
    <addaction name="actionZoomIn"/>
+   <addaction name="actionGrid"/>
   </widget>
   <action name="actionNew">
    <property name="checkable">
@@ -276,6 +277,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionGrid">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../scgraphicsview/resources/scgraphicsview.qrc">
+     <normaloff>:/SCGraphicsView/Grid-50.png</normaloff>:/SCGraphicsView/Grid-50.png</iconset>
+   </property>
+   <property name="text">
+    <string>Grid</string>
    </property>
   </action>
  </widget>

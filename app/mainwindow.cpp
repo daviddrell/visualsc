@@ -131,6 +131,10 @@ MainWindow::MainWindow(QWidget *parent) :
 //    connect(this, SIGNAL(reset()), _formEditorWindow, SLOT(handleReset()));
     connect(this, SIGNAL(open(QString)), _project->getDM(), SLOT(handleOpen(QString)));
 
+//    connect(this, SIGNAL(scaleChanged(qreal)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleScaleChanged(qreal)));
+
+    connect(this, SIGNAL(gridToggled(bool)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
+
 #endif
 
 
@@ -498,6 +502,7 @@ void MainWindow::scale(qreal step)
     _project->getQGraphicsView()->scale(mult, mult);
     _scale *= mult;
     qDebug() << "setting scale to : " << _scale;
+    emit scaleChanged(_scale);  // alert the graphicsView that the scale changed
 }
 
 void MainWindow::on_actionSaveImage_triggered()
@@ -533,4 +538,10 @@ void MainWindow::on_actionSaveImage_triggered()
 //        this->setWindowTitle("Saved .png "+_currentImageFullPath);
 //        saveSettings();
 //    }
+}
+
+void MainWindow::on_actionGrid_toggled(bool arg1)
+{
+    qDebug() << "grid toggle: " << arg1;
+    emit gridToggled(arg1);
 }

@@ -25,6 +25,8 @@
 #include "keycontroller.h"
 #include "selectableboxgraphic.h"
 #include "mousecontroller.h"
+
+
 #include <QList>
 #include <QDebug>
 #include <QGLWidget>
@@ -43,14 +45,14 @@
 
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     QWidget (parentWidget),
-    _scene(new QGraphicsScene(this)),
+    _scene(new CustomGraphicsScene(this)),
     _view(parentWidget),
     _dm(dm),
     _mapStateToGraphic(),
     _hashStateToGraphic(),
     _keyController(new KeyController()), // initialize key controller
     _mouseController(new MouseController()),
-    _rightAngleMode(false)
+    _rightAngleMode(false)  // DEPRECATED
 {
     _dm->setScene(_scene);
 
@@ -78,6 +80,7 @@ SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
 
     _view.setScene(_scene);
     _view.show();
+//    _view.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
     createGraph();
 
@@ -222,6 +225,16 @@ void SCGraphicsView::createGraph()
             handleNewTransition(transitions[t]);
         }
     }
+}
+
+CustomGraphicsScene* SCGraphicsView::getCustomGraphicsScene()
+{
+    return _scene;
+}
+
+QGraphicsScene* SCGraphicsView::getQGraphicsScene()
+{
+    return dynamic_cast<QGraphicsScene*>(_scene);
 }
 
 QGraphicsView * SCGraphicsView::getQGraphicsView()
