@@ -8,7 +8,7 @@
 #include <QDebug>
 
 #define POP_UP_X    315
-#define POP_UP_Y    11
+#define POP_UP_Y    2
 
 StateSelectionWindow::StateSelectionWindow(QWidget *parent, SCDataModel * dm) :
         QMainWindow(parent, Qt::WindowStaysOnTopHint),

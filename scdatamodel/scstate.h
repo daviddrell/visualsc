@@ -49,8 +49,8 @@ class QPoint;
 
   */
 
-#define DEFAULT_STATE_WIDTH  160
-#define DEFAULT_STATE_HEIGHT 100
+#define DEFAULT_STATE_WIDTH  200
+#define DEFAULT_STATE_HEIGHT 124
 
 class SCDATAMODELSHARED_EXPORT  SCState : public SCItem
 {
