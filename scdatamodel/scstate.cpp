@@ -343,9 +343,14 @@ void SCState::setText(QString text)
  */
 void SCState::deleteAllSafely()
 {
+
+    qDebug() << "SCState::deleteAllSafely";
     QList<SCState*> directChildren = this->getStates();
 
     // base case, its ok to delete this child. this child has no children of its own, so we've gone down as far as the chain can go with this family tree.
+
+
+
     if(directChildren.size()==0)
     {
         qDebug() << "no children, deleting state";
@@ -387,6 +392,18 @@ void SCState::deleteSafely()
         SCTransition* trans = allTransitionChildren.at(i);
         trans->deleteSafely();
     }
+
+
+    // delete all in transitions as well
+    QList<SCTransition*> allInTransitions = this->getTransitionsIn();
+//    qDebug() << "allInTransitions Size: " << allInTransitions.size();
+    for(int i = 0; i < allInTransitions.size() ; i++)
+    {
+        SCTransition* trans = allInTransitions.at(i);
+//        qDebug() << "SCState::deleteSafely deleting State: " << this->objectName() << "\tdeleting in transition: " << trans->getEventName();
+        trans->deleteSafely();
+    }
+
 
     // next delete all states that belong to this state machine and itself
     this->deleteAllSafely();

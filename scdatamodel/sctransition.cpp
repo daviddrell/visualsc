@@ -213,13 +213,13 @@ void SCTransition::setTargetState(SCState* state)
     // emit changedTarget(this, state);
     if(_targetState)
     {
-        disconnect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
+//        disconnect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
     }
     _targetState = state;
 
     // set the transition to point to this new state
     //this->setUid(_targetState->getUid());
-    connect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
+//    connect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
 }
 
 SCTextBlock* SCTransition::getEventTextBlock()

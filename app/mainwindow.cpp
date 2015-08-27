@@ -128,7 +128,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     connect(this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
-    connect(this, SIGNAL(reset()), _formEditorWindow, SLOT(handleReset()));
+//    connect(this, SIGNAL(reset()), _formEditorWindow, SLOT(handleReset()));
     connect(this, SIGNAL(open(QString)), _project->getDM(), SLOT(handleOpen(QString)));
 
 #endif
