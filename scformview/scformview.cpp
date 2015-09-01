@@ -153,9 +153,12 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
 
-    // transitionsReadyToConnect is a special signal for the data model handling new transitions from when reading an scxml. The graphics view uses two different signals because when it is creating graphics, we can only connect transitions if their target is known
+    // transitionsReadyToConnect is a special signal for the data model handling new transitions from when reading an scxml. The graphics view relies on two different signals because when it is creating graphics, we can only connect transitions if their target is known. But this is not the case for the formview, where both signals result in the same function
     connect (_dm, SIGNAL(transitionsReadyToConnect(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));        // data model emits this signal for transitions when reading an scxml and all states and transitions have been loaded into the DM
     connect (_dm, SIGNAL(insertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));        // data model emits this signal for when a user inserts a new transition
+
+    // create an fv item for part of the forkedtransition
+    connect(_dm, SIGNAL(insertNewTransitionSignal(SCForkedTransition*)), this, SLOT(handleNewTransition(SCForkedTransition*)));
 
     connect(_dm, SIGNAL(newRootMachine(SCState*)), this, SLOT(handleNewRootMachine(SCState*)));
 
@@ -361,6 +364,36 @@ void SCFormView::handleNewTransition(SCTransition* tr)
     // hook up the transition to handlers
     connectTransition(tr);                              // deletesafely handler in formview
     connectTransition(tr, fvItem->getTreeWidget());     // connect the tree widget to the transition
+}
+
+void SCFormView::handleNewTransition(SCForkedTransition * ft)
+{
+    qDebug() << "SCFormView::handleNewTransition forked transitions";
+
+    QList<SCTransitionBranch*>* branches = ft->getSourceBranches();
+    foreach(SCTransitionBranch* br, *branches)
+    {
+        // the parent state's widget will be the parent of this transition branch's widget
+        SCState* parentState = br->parentAsSCState();
+        FVItem* parentFv = _items.value(parentState);
+
+        // create the tree widget and fvitem associated with this state
+        CustomTreeWidgetItem* item = new CustomTreeWidgetItem(parentFv->getTreeWidget());
+        FVItem* fvItem = new FVItem(br, FVItem::FORKEDTRANSITION, item);
+
+        // link the tree widget to the fv item, and set its text and icon
+        item->setData(fvItem);
+        item->setText(0, br->getEventName());
+        item->setIcon(0, QIcon(":/SCFormView/diagonalarrowhollow.png"));
+
+        // link the SCTransitionBranch and FVItem
+        _items.insert(br, fvItem);
+
+        // hook up the transition to handlers
+//        connectTransition(br);                              // deletesafely handler in formview
+//        connectTransition(br, fvItem->getTreeWidget());     // connect the tree widget to the transition
+    }
+
 }
 
 /**

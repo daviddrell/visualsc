@@ -1020,9 +1020,9 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
         if (sc)
             sc->writeSCVXML(sw);
 
-        SCTransition * st = dynamic_cast<SCTransition*>(children()[k]);
-        if (st)
-            st->writeSCVXML(sw);
+        SCTransition * tr = dynamic_cast<SCTransition*>(children()[k]);
+        if (tr)
+            tr->writeSCVXML(sw);
 
         SCTextBlock * tb = dynamic_cast<SCTextBlock*>(children()[k]);
         if (tb)

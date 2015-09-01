@@ -30,6 +30,7 @@
 #include <QTextStream>
 #include <codewriter.h>
 #include <QSettings>
+#include "scforkedtransition.h"
 
 class QGraphicsScene;
 
@@ -123,7 +124,7 @@ public:
     //SCTransition* insertNewTransition(SCState *source, QString event );
     SCTransition* insertNewTransition(SCState *source, SCState* target);
     SCTransition* insertNewTransition(SCState *source, SCState *target, QString eventName, QString pathString);
-    SCTransition* insertNewTransition(QList<SCState*> states, SCState* target);
+    SCForkedTransition* insertNewTransition(QList<SCState*> states, SCState* target);
 
     void logError(QString message);///< inform the user there was an error
     void logInfo(QString message);///< inform the user of anything that is not an error such as progress, etc
@@ -148,6 +149,7 @@ signals:
     void transitionsReadyToConnect(SCTransition*);
     void insertNewTransitionSignal(SCTransition*);
     void newRootMachine(SCState*);
+    void insertNewTransitionSignal(SCForkedTransition*);
 
 
 private slots:

@@ -1044,9 +1044,19 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     return transition;
 }
 
-SCTransition* SCDataModel::insertNewTransition(QList<SCState *> states, SCState *target)
+SCForkedTransition* SCDataModel::insertNewTransition(QList<SCState *> states, SCState *target)
 {
-    return NULL;
+    SCForkedTransition* ft = new SCForkedTransition();
+    ft->setTargetState(target);
+    qDebug() << "created ForkedTransition: " << ft->attributes.value("forkUid")->asString();
+    foreach(SCState* st, states)
+    {
+        qDebug() << "addedState: " << st->objectName();
+        ft->addSourceState(st);
+    }
+
+    emit this->insertNewTransitionSignal(ft);
+    return ft;
 }
 
 /**

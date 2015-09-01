@@ -34,7 +34,8 @@ SOURCES += scdatamodel.cpp \
     cwstate.cpp \
     cwtransition.cpp \
     cwstatemachine.cpp \
-    scmultitransition.cpp
+    sctransitionbranch.cpp \
+    scforkedtransition.cpp
 
 HEADERS += scdatamodel.h\
     SCDataModel_global.h \
@@ -54,7 +55,8 @@ HEADERS += scdatamodel.h\
     cwstate.h \
     cwtransition.h \
     cwstatemachine.h \
-    scmultitransition.h
+    sctransitionbranch.h \
+    scforkedtransition.h
 
 OTHER_FILES += \
     COPYING.txt

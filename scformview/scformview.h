@@ -147,6 +147,7 @@ private slots:
 
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
     void handleTreeViewItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
+    void handleNewTransition(SCForkedTransition*);
     void handleNewTransition(SCTransition*);
     void handleTransitionDeleted(QObject *);
     void handleStateDeleted(QObject*);
