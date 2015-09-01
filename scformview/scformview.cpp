@@ -96,6 +96,7 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
     stateChartTreeView->setColumnCount(1);
     //connect(stateChartTreeView, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(handleTreeViewItemClicked(QTreeWidgetItem*,int)));
     connect(stateChartTreeView, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(handleTreeViewItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
+    stateChartTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection); // enable multiple selection through ctrl+click and shift+click
 
     QVBoxLayout *treeLayout = new QVBoxLayout();
     //selectedChartItem = new QLabel();
@@ -1568,9 +1569,18 @@ void SCFormView::clearTextBlockPropertyTable()
     disconnect(textBlockPropertyTable, SIGNAL(cellChanged(int,int)),this, SLOT(handleTextBlockPropertyCellChanged(int,int)));
 }
 
+/**
+ * @brief SCFormView::handleTreeViewItemChanged
+ * @param current
+ * @param previous
+ *
+ * whenever a new item is selected in the tree view, this function is called
+ * to set up the tool bars and property tables
+ *
+ */
 void SCFormView::handleTreeViewItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous)
 {
-
+//    qDebug() << "SCFormView::handleTreeViewItemChanged";
     CustomTreeWidgetItem * item = dynamic_cast<CustomTreeWidgetItem*>(current);
 
     if(item)
@@ -2351,7 +2361,7 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
  */
 void SCFormView::insertTransition()
 {
-    updateCurrentlySelected();
+
     //SCState * st = dynamic_cast<SCState *> (_currentlySelected);
     SCState* st = _currentlySelected->getState();
     if ( st == NULL ) return;
@@ -2375,12 +2385,19 @@ void SCFormView::insertTransition()
     connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleStateSelectionWindowStateSelected(SCState*)));
 
     _targetStateSelectionWindow->show();
+
+
+
+
+
+
 }
 
 /**
  * @brief SCFormView::handleStateSelectionWindowStateSelected
  * @param targetName
  *
+ * SLOT
  * connect is in insertTransition
  *
  * connect(StateSelectionWindow, stateSelected, scformview, handleStateSelectionWindowStateSelected)
@@ -2391,18 +2408,37 @@ void SCFormView::insertTransition()
  */
 void SCFormView::handleStateSelectionWindowStateSelected(SCState* target)
 {
-    // user has clicked on a new state, create the transition with this target state
-    //SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
-    SCState* st= _currentlySelected->getState();
-    //SCTransition* trans = _dm->insertNewTransition(st, target);
-    _dm->insertNewTransition(st, target);
-    // SCTransition connects for newly created transition
-    //connectTransition(trans);
+    QList<QTreeWidgetItem*> selected = stateChartTreeView->selectedItems();
 
+    // check if one or multiple states are selected
+    if(selected.size()==1)
+    {
+        // user has clicked on a new state, create the transition with this target state
+        SCState* st= _currentlySelected->getState();
+        _dm->insertNewTransition(st, target);
+
+
+    }
+    else    // multiple source states
+    {
+        QList<SCState*> states;
+        // add all the scstates to a listn
+        for(int i = 0; i < selected.size(); i++)
+        {
+            FVItem* fvItem = dynamic_cast<FVItem*>(dynamic_cast<CustomTreeWidgetItem*>(selected.at(i))->data());
+            qDebug() << "i: " << i<<"\t" <<fvItem->getState()->objectName();
+            states.append(fvItem->getState());
+        }
+
+        // insert the transition
+        _dm->insertNewTransition(states,target);
+    }
+
+    // delete the selection window
     _targetStateSelectionWindow->close();
-
     delete _targetStateSelectionWindow;
     _targetStateSelectionWindow = NULL;
+
 }
 
 /**

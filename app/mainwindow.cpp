@@ -29,6 +29,8 @@
 #include "scformview.h"
 #include <QTime>
 #include <QMessageBox>
+//#include "scgraphicsview.h"
+//#include "customgraphicsscene.h"
 
 #define POP_UP_X    160
 #define POP_UP_Y    200
@@ -44,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
         //_settings(0),
         _formEditorWindow(0),
         _textFormatToolBar(NULL),
-        _scale(1)
+        _scale(1),
+        _gridEnable(false)
 {
 
 
@@ -159,6 +162,13 @@ void MainWindow::saveSettings()
 {
     QSettings settings(_settingsFileName, QSettings::IniFormat);
     settings.setValue("workingDirectory",_currentFolder);
+
+//    if(_gridEnable)
+//        settings.setValue("gridEnable", "true");
+//    else
+
+    settings.setValue("gridEnable",_gridEnable);
+
     settings.sync();
     qDebug ()<< "saveSettings " << settings.fileName();
 }
@@ -184,6 +194,17 @@ void MainWindow::loadSettings()
         qDebug() << "loading key: " <<key <<"\t with value: "<<settings.value(key);
         if(key=="workingDirectory")
             _currentFolder = settings.value(key).toString();
+        else if(key == "gridEnabled")
+        {
+            qDebug() << "gridEnabled found";
+            if(settings.value(key) == "true")
+            {
+                qDebug() << "gridEnabled is true";
+                _gridEnable = true;
+                ui->actionGrid->setEnabled(true);
+                emit gridToggled(true);
+            }
+        }
     }
 }
 
@@ -543,5 +564,6 @@ void MainWindow::on_actionSaveImage_triggered()
 void MainWindow::on_actionGrid_toggled(bool arg1)
 {
     qDebug() << "grid toggle: " << arg1;
+    _gridEnable = arg1;
     emit gridToggled(arg1);
 }

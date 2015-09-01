@@ -69,28 +69,6 @@ SCTransition::SCTransition(QObject * parent):
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
     connect(event, SIGNAL(changed(TransitionStringAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
 
-    // state handle transition deletion, unhook from source and sink before deleting the state
-    // i don't think this is need because the source state is getting deleted anyways
-//    SCState* parentState = dynamic_cast<SCState*>(parent);
-//    connect(parentState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSource(QObject*)));
-
-    // this is done elsewhere, since target states may not be known when loading a file
-
-    // SCState* targetState
-    // connect(targetState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
-    /*
-
-    TransitionStringAttribute * cond = new TransitizgonStringAttribute (this, "cond",QString());
-    attributes.addItem(cond);
-
-    TransitionStringAttribute * type = new TransitionStringAttribute (this, "type",QString("internal"));
-    attributes.addItem(type);
-
-
-    TransitionPositionAttribute * position = new TransitionPositionAttribute (this, "position",QPointF(0,0));
-    attributes.addItem(position);
-*/
-
     // set the event sctextblock's parent
     _eventTextBlock->setParent(this);
     //_eventTextBlock->setText("event");  // default event text

@@ -13,6 +13,9 @@ public:
     CustomGraphicsScene(QObject *parent);
     ~CustomGraphicsScene();
 
+    bool gridEnabled();
+    void setGridEnabled(bool enable);
+
 public slots:
 //    void handleScaleChanged(qreal);
     void handleGridToggled(bool);
@@ -21,7 +24,7 @@ protected:
 
     QPen _pen;
     void drawBackground(QPainter *painter, const QRectF &rect);
-    bool _enabled;
+    bool _gridEnable;
 
 };
 

@@ -27,7 +27,7 @@
 #include "textformattoolbar.h"
 
 class SCFormView;
-
+//class SCGraphicsView;
 class QSettings;
 
 namespace Ui {
@@ -74,6 +74,9 @@ private:
     qreal _scale;
     qreal clamp(qreal val, qreal min, qreal max);
     void scale(qreal scale);
+
+    bool _gridEnable;
+
 
 
 private slots:

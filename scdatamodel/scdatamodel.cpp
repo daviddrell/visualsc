@@ -1044,6 +1044,11 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     return transition;
 }
 
+SCTransition* SCDataModel::insertNewTransition(QList<SCState *> states, SCState *target)
+{
+    return NULL;
+}
+
 /**
  * @brief SCDataModel::insertNewTransition
  * @param source

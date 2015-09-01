@@ -31,8 +31,8 @@
 
 
 
-class SelectableLineSegmentGraphic;
 
+class SelectableLineSegmentGraphic;
 class StateAttributes;
 
 class SMProject : public QObject
