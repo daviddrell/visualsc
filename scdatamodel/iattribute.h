@@ -229,6 +229,7 @@ public:
       */
     bool addItem( IAttribute* attr);
 
+//    void removeItem(QString key, bool deleteItem);
 
     /**
       * \fn setAttributes

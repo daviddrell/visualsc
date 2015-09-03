@@ -19,6 +19,7 @@
 */
 
 #include "customtreewidgetitem.h"
+#include "fvitem.h"
 #include <QTreeWidgetItem>
 
 #include <QDebug>
@@ -59,6 +60,11 @@ void CustomTreeWidgetItem::treeAddTextBlock(SCTextBlock* textBlock)
 QObject * CustomTreeWidgetItem::data()
 {
     return  _stateOrTransitionItem ;
+}
+
+FVItem* CustomTreeWidgetItem::dataAsFvItem()
+{
+    return dynamic_cast<FVItem*>(_stateOrTransitionItem);
 }
 
 void CustomTreeWidgetItem::handleAttributeChanged(StateName* sn)

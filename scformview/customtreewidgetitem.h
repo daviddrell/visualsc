@@ -25,6 +25,9 @@
 #include <QObject>
 
 
+class FVItem;
+
+
 
 /** \class CustomTreeWidgetItem
   *
@@ -44,6 +47,7 @@ public:
     CustomTreeWidgetItem(CustomTreeWidgetItem * parent=NULL);
     void setData(QObject* d);
     QObject * data();
+    FVItem* dataAsFvItem();
 public slots:
     void treeAddTextBlock(SCTextBlock*);
     void handleAttributeChanged(StateName*);

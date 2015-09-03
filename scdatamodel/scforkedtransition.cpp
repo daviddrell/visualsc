@@ -37,6 +37,12 @@ void SCForkedTransition::initialize()
 
     TransitionStringAttribute* event = new TransitionStringAttribute(this, "event", "fork event");
     attributes.addItem(event);
+    this->setObjectName(event->asString());
+}
+
+QString SCForkedTransition::getEventName()
+{
+    return attributes.value("event")->asString();
 }
 
 QList<SCTransitionBranch*>* SCForkedTransition::getSourceBranches()

@@ -10,11 +10,12 @@ SCTransitionBranch::SCTransitionBranch(SCForkedTransition* group, SCState* sourc
 {
     _eventTextBlock = group->getEventTextBlock();
     initialize();
+    this->setObjectName(group->getEventName());
 }
 
 SCTransitionBranch::~SCTransitionBranch()
 {
-
+    this->removeParentAttributes();
 }
 
 void SCTransitionBranch::initialize()
@@ -38,6 +39,33 @@ QString SCTransitionBranch::getEventName()
 {
 //    return _group->attributes.value("event")->asString();
     return this->attributes.value("event")->asString();
+}
+
+/**
+ * @brief SCTransitionBranch::setEventName
+ * @param name
+ * @return
+ *
+ * called by scformview when the event name is changed in the table
+ *
+ */
+void SCTransitionBranch::setEventName(QString name)
+{
+    this->setObjectName(name);
+    attributes.value("event")->setValue(name);
+}
+
+void SCTransitionBranch::removeParentAttributes()
+{
+    qDebug() << "SCTransitionBranch::removeParentAttributes()";
+    QMapIterator<QString, IAttribute*> i(_group->attributes);
+    while(i.hasNext())
+    {
+        QString attr = i.next().key();
+        qDebug() << "removing key " << attr << " from branch attribute list";
+        this->attributes.remove(attr);
+    }
+
 }
 
 void SCTransitionBranch::addParentAttributes()

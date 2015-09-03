@@ -520,6 +520,7 @@ bool SCDataModel::deleteItem(QObject * item)
 {
     SCState* state      = dynamic_cast<SCState*>(item);
     SCTransition* trans = dynamic_cast<SCTransition*>(item);
+    SCTransitionBranch* br = dynamic_cast<SCTransitionBranch*>(item);
 
     if(state)
     {         
@@ -529,6 +530,11 @@ bool SCDataModel::deleteItem(QObject * item)
     else if(trans)
     {    
         trans->deleteSafely();
+        return true;
+    }
+    else if(br)
+    {
+        br->deleteSafely();
         return true;
     }
     else // unexpected item

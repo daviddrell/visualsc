@@ -128,6 +128,8 @@ IAttributeContainer::~IAttributeContainer()
 
 QString IAttributeContainer::key() {return _containerName; }
 
+
+
 bool IAttributeContainer::addItem( IAttribute* attr)
 {
     if (  this->contains( attr->key() ) )

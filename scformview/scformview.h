@@ -108,6 +108,7 @@ signals:
     void saveClick();
     void saveAsClick();
     void newClick();
+//    void treeItemSelected(int);
 
 private slots:
 
@@ -184,10 +185,14 @@ private slots:
 
     void handleItemNameChangedInDataModel(SCTransition*, QString);
 
+private slots:
+    void updateEditToolBar();
+
 private:
 
-
+    bool uniformSelection(int);
     void changeEditToolBar(int);
+
 
     void updateCurrentlySelected();
     void deleteTreeItem(SCItem*);

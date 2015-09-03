@@ -45,5 +45,6 @@
         <file>zoomout.png</file>
         <file>picture.png</file>
         <file>center.png</file>
+        <file>fork.png</file>
     </qresource>
 </RCC>

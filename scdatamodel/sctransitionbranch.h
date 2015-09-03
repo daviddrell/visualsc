@@ -38,6 +38,7 @@ public:
     TransitionAttributes attributes;
 
     void addParentAttributes();
+    void removeParentAttributes();
     void deleteSafely();
 
     SCState* parentAsSCState();
@@ -46,6 +47,7 @@ public:
     virtual IAttributeContainer * getAttributes(); //reimplemented from base SCItem
 
     QString getEventName();
+    void setEventName(QString name);
     SCTextBlock* getEventTextBlock();
     TransitionStringAttribute* getTransStringAttr(QString key);
 
