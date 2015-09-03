@@ -52,6 +52,7 @@ SCTransition::SCTransition(QObject * parent):
 
     TransitionStringAttribute * event = new TransitionStringAttribute (this, "event","event");
     attributes.addItem(event);
+    this->_eventTextBlock->setText(event->asString());
     this->setObjectName(event->asString());
 
     TransitionStringAttribute * comments = new TransitionStringAttribute (this, "comments",QString());
@@ -151,7 +152,6 @@ void SCTransition::handleTextBlockChanged()
 {
     //this->attributes.value("event")->setValue(_eventTextBlock->getText());
     this->setEventName(_eventTextBlock->getText());
-
 }
 
 /**

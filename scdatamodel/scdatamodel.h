@@ -150,6 +150,7 @@ signals:
     void insertNewTransitionSignal(SCTransition*);
     void newRootMachine(SCState*);
     void insertNewTransitionSignal(SCForkedTransition*);
+    void message(QString);
 
 
 private slots:
@@ -177,8 +178,12 @@ private slots:
     void handleStateMachineUidLoad(QString);
     void handleStateMachineAttributeLoad(QString key, QString value);
 
+    void handleCheckEventCollision(TransitionStringAttribute*);
+
 private:
 
+
+    void connectTransition(SCTransition*);
 
     QString toClassName(QString);
     QString toClassFileName(QString);

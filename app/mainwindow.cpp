@@ -129,6 +129,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _formEditorWindow->show();
 
 
+#endif
+
+    connect(_project->getDM(), SIGNAL(message(QString)), this, SLOT(handleMessage(QString)));
 
     connect(this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
 //    connect(this, SIGNAL(reset()), _formEditorWindow, SLOT(handleReset()));
@@ -138,7 +141,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(this, SIGNAL(gridToggled(bool)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
 
-#endif
 
 
 
@@ -152,6 +154,12 @@ MainWindow::~MainWindow()
     //delete _settings;
     delete _project;
     delete ui;
+}
+
+
+void MainWindow::handleMessage(QString msg)
+{
+    this->sendMessage("!", msg);
 }
 
 /**

@@ -80,6 +80,7 @@ private:
 
 
 private slots:
+    void handleMessage(QString);
     void handleFileOpenClick();
     void handleFileSaveClick();
     void handleExportCodeClick();

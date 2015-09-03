@@ -69,6 +69,39 @@ void SCDataModel::connectDataModel()
 
 }
 
+
+void SCDataModel::connectTransition(SCTransition * trans)
+{
+    qDebug() << "scdatamodel::connecttransition";
+    connect(trans->getTransStringAttr("event"), SIGNAL(changed(TransitionStringAttribute*)), this, SLOT(handleCheckEventCollision(TransitionStringAttribute*)));
+}
+
+/**
+ * @brief SCDataModel::handleCheckEventCollision
+ * @param tsa
+ *
+ * SLOT
+ *
+ * when a transition name changes, this will check if there are more than one transitions with the same name
+ * and message the user that the event slot will trigger the total number of transitions
+ *
+ *
+ */
+void SCDataModel::handleCheckEventCollision(TransitionStringAttribute * tsa)
+{
+    int count = 0;
+    foreach(SCTransition* trans, _transitions)
+    {
+        if(trans->getEventName() == tsa->asString())
+            count++;
+    }
+    qDebug() << "trans event name count: " << count;
+
+    if(count > 1)
+        emit message(("Event slot \"" + tsa->asString()+ "\" will trigger "+ QString::number(count)+" transitions"));
+
+}
+
 SCDataModel * SCDataModel::singleton()
 {
     static SCDataModel * instance=NULL;
@@ -1041,7 +1074,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     transition->setTargetState(target);
 
     _transitions.append(transition);        // add to the total list of transitions
-
+    connectTransition(transition);
     qDebug() << "@@@ adding transition out reference for state " << source->attributes.value("name")->asString();
 
     emit insertNewTransitionSignal(transition);
@@ -1101,6 +1134,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target,
     transition->setPathAttr(pathString);
 
     _transitions.append(transition);        // add to the total list of transitions
+    connectTransition(transition);
 
     emit insertNewTransitionSignal(transition);
     return transition;
@@ -1125,6 +1159,7 @@ SCTransition* SCDataModel::handleMakeANewTransition(SCState* source, TransitionA
     path->setValue( path->asString() );
     source->addTransistion(transition);
     _transitions.append(transition);
+    connectTransition(transition);
     _importedTransitions.append(transition);    // add to the list of transitions that stil need connect
 
 
@@ -1174,6 +1209,7 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
     _currentState->addTransistion(transition);
 
     _transitions.append(transition);
+    connectTransition(transition);
 
     delete ta;
 

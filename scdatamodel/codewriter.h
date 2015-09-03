@@ -8,8 +8,6 @@
 #include "cwstate.h"
 #include "cwtransition.h"
 #include "cwstatemachine.h"
-#include "cwevent.h"
-#include "cwaction.h"
 
 class CodeWriter : QObject
 {

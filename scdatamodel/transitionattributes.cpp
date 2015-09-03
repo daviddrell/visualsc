@@ -414,12 +414,14 @@ QString TransitionStringAttribute::asString()
     return _string;
 }
 
-
-
 void TransitionStringAttribute::setValue(QString str )
 {
-    _string = str;
-    emit changed(this);
+    if(_string!=str)
+    {
+        _string = str;
+        qDebug() << "TransitionStringAttributes::setValue emitting change!";
+        emit changed(this);
+    }
 
 }
 
