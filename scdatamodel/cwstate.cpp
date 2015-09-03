@@ -72,7 +72,7 @@ void CWState::createSignalsAndSlots()
         QStringList entries = entryAction.split(",");
         for(int i = 0; i < entries.size(); i++)
         {
-            QString entry = "EntryAction___"+toCamel(entries.at(i))+"()";
+            QString entry = "Action___"+toCamel(entries.at(i))+"()";
             this->addEntryAction(entry);
         }
     }
@@ -87,7 +87,7 @@ void CWState::createSignalsAndSlots()
         QStringList exits = exitAction.split(",");
         for(int i = 0; i < exits.size(); i++)
         {
-            QString exit = "ExitAction___"+toCamel(exits.at(i))+"()";
+            QString exit = "Action___"+toCamel(exits.at(i))+"()";
             this->addExitAction(exit);
         }
     }

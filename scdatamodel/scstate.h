@@ -24,6 +24,7 @@
 #include <QList>
 #include "stateattributes.h"
 #include "sctransition.h"
+#include "sctransitionbranch.h"
 class QString;
 class QXmlStreamWriter;
 class QPoint;
@@ -79,7 +80,7 @@ public:
     int doNotPrintSize();
     enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };
     void addTransitionReference(SCTransition*, TransitionTransitDirection );
-
+    void addTransitionReference(SCTransitionBranch*, TransitionTransitDirection);
 
     void addTransistion(SCTransition*);
     void addState(SCState *);
@@ -131,6 +132,9 @@ public:
 
     QList<SCTransition*> getTransitionsIn();
     QList<SCTransition*> getTransitionsTerminating();
+
+    QList<SCTransitionBranch*> getForkedTransitionsIn();
+    QList<SCTransitionBranch*> getForkedTransitionsTerminating();
 
     void removeTransitionReferenceIn(SCTransition* trans);
     void removeTransitionReferenceOut(SCTransition* trans);
@@ -268,6 +272,10 @@ private:
     QList<SCTransition*> _transitingTransitionsOut;
     QList<SCTransition*> _transitingTransitionsIn;
     QList<SCTransition*> _transitionsTerminatingHere;
+
+    QList<SCTransitionBranch*> _transitingForkedTransitionsOut;
+    QList<SCTransitionBranch*> _transitingForkedTransitionsIn;
+    QList<SCTransitionBranch*> _transitionsForkedTerminatingHere;
 
     QList<SCTextBlock*> _textBlocks;
 

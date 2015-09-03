@@ -1,5 +1,6 @@
 #include "scforkedtransition.h"
 #include "scstate.h"
+#include <QDebug>
 
 SCForkedTransition::SCForkedTransition():
     _eventTextBlock(new SCTextBlock()),
@@ -19,7 +20,6 @@ void SCForkedTransition::initialize()
     // strings are empty
     TransitionStringAttribute * target = new TransitionStringAttribute (this, "target",QString());
     attributes.addItem(target);
-
 
     TransitionStringAttribute * tuid = new TransitionStringAttribute (this, "targetUid",QString());
     attributes.addItem(tuid);
@@ -52,7 +52,7 @@ QList<SCTransitionBranch*>* SCForkedTransition::getSourceBranches()
 
 SCForkedTransition::~SCForkedTransition()
 {
-
+    qDebug() << "~SCForkedTransition deconstructor";
 }
 
 SCTextBlock* SCForkedTransition::getEventTextBlock()
@@ -83,5 +83,12 @@ SCTransitionBranch* SCForkedTransition::addSourceState(SCState *source)
 void SCForkedTransition::setTargetState(SCState *target)
 {
     _targetState = target;
+    setAttributeValue("target", target->objectName());
+    setAttributeValue("targetUid", target->getUid());
+}
+
+void SCForkedTransition::setAttributeValue(QString key, QString val)
+{
+    attributes.value(key)->setValue(val);
 }
 

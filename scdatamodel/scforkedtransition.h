@@ -41,6 +41,9 @@ public:
     QList<SCTransitionBranch*>* getSourceBranches();
 
     QString getEventName();
+
+    void setAttributeValue(QString key, QString val);
+
 private:
     QList<QString> DEFAULT_ATTRIBUTES;
     QHash<QString, int> DO_NOT_DISPLAY;

@@ -51,6 +51,9 @@ public:
     SCTextBlock* getEventTextBlock();
     TransitionStringAttribute* getTransStringAttr(QString key);
 
+    void    writeSCVXML(QXmlStreamWriter & sw);
+    void setAttributeValue(QString key, QString val);
+
 public slots:
     void handleTargetStateNameChanged(StateName*);
 

@@ -32,6 +32,9 @@ void CodeWriter::createStateMachines()
         // pass a reference to the SCState object and the hash for all states
         cwsm = new CWStateMachine(machine, &_stateHash); // creates a state machine
 
+        // connect the state machine
+        connectStateMachine(cwsm);
+
         // creates the cwstate object for each cwstatemachine
         cwsm->createChildren();
 
@@ -68,65 +71,46 @@ void CodeWriter::createStateMachines()
 
 }
 
-//void CodeWriter::resolveCollisionsInsideStateMachines(QList<CWStateMachine *> stateMachines)
-//{
-//    qDebug() << "CodeWriter::resolveCollisions INSIDE on states";
-//    for(int i = 0; i < stateMachines.size(); i++)
-//    {
-//        CWStateMachine* cwsm = stateMachines.at(i);
-//        for(int k = 0 ; k < cwsm->getStates().size()-1; k++)
-//        {
-//            CWState* one = cwsm->getStates().at(k);
-//            for(int q = k+1; q < cwsm->getStates().size(); q++)
-//            {
-//                CWState* two = cwsm->getStates().at(q);
-//                if(one->_stateName == two->_stateName)
-//                {
-//                    resolveCollision(one,two);
-//                }
-//            }
-//        }
-//    }
-//}
 
 
+void CodeWriter::handleNewRelayEvent(CWTransition* cwt)
+{
+    if(_eventRelaySignals.contains(cwt->_eventName))
+    {
 
-//void CodeWriter::resolveCollisionsBetweenStateMachines(QList<CWStateMachine *> stateMachines)
-//{
-//    qDebug() << "CodeWriter::resolveCollisions BETWEEN on states";
-//    bool collision = false;
-//    for(int i = 0; i < stateMachines.size() - 1 ; i++)
-//    {
-//        CWStateMachine* cwsm = stateMachines.at(i);
-//        for(int k = i + 1; k < stateMachines.size(); k++)
-//        {
-//            CWStateMachine *cwsmOther = stateMachines.at(k);
-//            for(int x = 0; x < cwsm->getStates().size(); x ++)
-//            {
-//                // compare the children states of these two state machines
-//                CWState* cws = cwsm->getStates().at(x);
-//                for(int y = 0; y < cwsmOther->getStates().size(); y++)
-//                {
-//                    CWState* cwsOther = cwsmOther->getStates().at(y);
+    }
+    else
+    {
+        _eventRelaySignals.insert(cwt->_eventName, new QList<QString>);
+    }
+    _eventRelaySignals.value(cwt->_eventName)->append(cwt->_relaySignal);
+}
 
-//                    // if there exists two children states that have the same stateName, then modify both of them
-//                    if(cws->_stateName == cwsOther->_stateName)
-//                    {
-//                        collision = true;
-//                        this->resolveCollision(cws, cwsOther);
-//                    }
-//                }
-//            }
-//        }
-//    }
+bool CodeWriter::isEventDeclared(QString eventName)
+{
+    if(_eventDeclare.contains(eventName))
+    {
+        return true;
+    }
+    else
+    {
+        _eventDeclare.insert(eventName,0);
+        return false;
+    }
+}
 
-//    // if there was a collision, run this method again to check for any further induced collisions
-//    if(collision)
-//    {
-//        resolveCollisionsBetweenStateMachines(stateMachines);
-//    }
-//}
-
+bool CodeWriter::isEventDefined(QString eventName)
+{
+    if(_eventDefine.contains(eventName))
+    {
+        return true;
+    }
+    else
+    {
+        _eventDefine.insert(eventName,0);
+        return false;
+    }
+}
 
 /**
  * @brief CodeWriter::resolveCollisions
@@ -294,49 +278,6 @@ void CodeWriter::cWriteConstructor()
                 }
 
             }
-
-
-
-//            // do not initialize again if this state is a state machine
-//            if(cws->getState()->isStateMachine())
-//            {
-
-//                //cPrintln("// child initialized elsewhere: QState* "+cws->_stateName+" ",1);
-//                //init.append(QString("// child state machine initialized elsewhere: QState* "+cws->_stateName+" "));
-//                //init.append(cwsm->_stateName+"(new QState()),");
-//            }
-//            else    // this is not a state machine
-//            {
-//                {
-//                    if(cwsm->isParallel())
-//                    {
-//                        if(cws->getState()->isFinal())
-//                        {
-//                           // cPrintln(cws->_stateName+"(new QFinalState(QState::ParallelStates)),",1);
-//                            init.append(QString(cws->_stateName+"(new QFinalState(QState::ParallelStates)),"));
-//                        }
-//                        else
-//                        {
-//                           // cPrintln(cws->_stateName+"(new QState(QState::ParallelStates)),",1);
-//                            init.append(QString(cws->_stateName+"(new QState(QState::ParallelStates)),"));
-//                        }
-//                    }
-//                    else
-//                    {
-//                        if(cws->getState()->isFinal())
-//                        {
-//                           // cPrintln(cws->_stateName+"(new QFinalState()),",1);
-//                            init.append(QString(cws->_stateName+"(new QFinalState()),"));
-//                        }
-//                        else
-//                        {
-//                           // cPrintln(cws->_stateName+"(new QState()),",1);
-//                            init.append(QString(cws->_stateName+"(new QState()),"));
-//                        }
-//                    }
-//                }
-//            }
-
         }
        // cPrintln("");
         init.append("");
@@ -490,7 +431,7 @@ void CodeWriter::cWriteConstructor()
  *
  * writes the event slot for every transition
  * a transition will perform whatever is in its event slot written here
- * additionally, each event slot will emit a relaysignal for that event
+ * additionally, an event slot will emit a relay event signal for every transition that share the event name
  *
  */
 void CodeWriter::cWriteEventSlots()
@@ -523,11 +464,22 @@ void CodeWriter::cWriteEventSlots()
             for(int x = 0; x < cws->getTransitions().size(); x++)
             {
                 CWTransition* cwt = cws->getTransitions().at(x);
-                cPrintln("void "+className+"::"+cwt->_eventName);
 
-                cPrintln("{");
-                cPrintln("emit "+cwt->_relaySignal+";",1);
-                cPrintln("}\n");
+                if(isEventDefined(cwt->_eventName))
+                {
+                      // if this has been defined, do nothing
+                }
+                else // define the slot and all of its emit signals
+                {
+                    QList<QString>* list = _eventRelaySignals.value(cwt->_eventName);
+                    cPrintln("void "+className+"::"+cwt->_eventName);
+                    cPrintln("{");
+                    for(int z = 0; z < list->size(); z++)
+                    {
+                        cPrintln("emit "+list->at(z)+";",1);
+                    }
+                    cPrintln("}\n");
+                }
             }
         }
         cPrintln("");
@@ -832,10 +784,36 @@ void CodeWriter::hWriteEventSlots()
             for(int x = 0; x < transitions.size(); x++)
             {
                 CWTransition* cwtrans = transitions.at(x);
-                hPrintln("void "+cwtrans->_eventName+";",1);
+
+                if(isEventDeclared(cwtrans->_eventName))
+                {
+
+                }
+                else
+                {
+                    hPrintln("void "+cwtrans->_eventName+";",1);
+                }
             }
         }
         hPrintln("");
+    }
+}
+
+/**
+ * @brief CodeWriter::isActionDeclared
+ * @param actionName
+ * @return true if defined already, false if not
+ *
+ * checks if the action exists in the qhash, otherwise it returns false and adds it to the qhash
+ */
+bool CodeWriter::isActionDeclared(QString actionName)
+{
+    if(_actionDeclare.contains(actionName))
+        return true;
+    else
+    {
+        _actionDeclare.insert(actionName, 0);
+        return false;
     }
 }
 
@@ -863,7 +841,13 @@ void CodeWriter::hWriteActionSignals()
             {
                 for(int i = 0; i < cws->_entryActions.size(); i++)
                 {
-                    hPrintln("void "+cws->_entryActions.at(i)+";",1);
+                    if(isActionDeclared(cws->_entryActions.at(i)))
+                    {
+//                        hPrintln("//void "+cws->_entryActions.at(i)+"; // entry action of \""+cws->_stateName+"\"",1);
+                    }
+                    else
+                        hPrintln("void "+cws->_entryActions.at(i)+";",1);
+
                 }
             }
 
@@ -871,12 +855,24 @@ void CodeWriter::hWriteActionSignals()
             {
                 for(int i = 0; i < cws->_exitActions.size(); i++)
                 {
-                    hPrintln("void "+cws->_exitActions.at(i)+";",1);
+                    if(isActionDeclared(cws->_exitActions.at(i)))
+                    {
+//                        hPrintln("//void "+cws->_exitActions.at(i)+"; // exit action of \""+cws->_stateName+"\"",1);
+                    }
+                    else
+                        hPrintln("void "+cws->_exitActions.at(i)+";",1);
                 }
             }
         }
         hPrintln("");
     }
+}
+
+void CodeWriter::connectStateMachine(CWStateMachine * cwsm)
+{
+//    connect(cwsm, SIGNAL(newEvent(QString)), this, SLOT(handleNewEvent(QString)));
+
+    connect(cwsm, SIGNAL(newTransition(CWTransition*)), this, SLOT(handleNewRelayEvent(CWTransition*)));
 }
 
 /**
@@ -1124,6 +1120,12 @@ void CodeWriter::cPrintln(QString text, int tabLevel)
 
 CodeWriter::~CodeWriter()
 {
+    QHash<QString, QList<QString>*>::iterator i;
+    for(i = _eventRelaySignals.begin(); i != _eventRelaySignals.end(); i++)
+    {
+        QList<QString> * list = i.value();
+        delete list;
+    }
 
 }
 

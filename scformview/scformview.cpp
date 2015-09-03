@@ -2579,7 +2579,7 @@ void SCFormView::insertTransition()
  *
  */
 
-#define FORKED_ENABLE
+//#define FORKED_ENABLE
 
 void SCFormView::handleStateSelectionWindowStateSelected(SCState* target)
 {
@@ -2607,14 +2607,11 @@ void SCFormView::handleStateSelectionWindowStateSelected(SCState* target)
         // insert the transition
         _dm->insertNewTransition(states,target);
 #endif
-
-
 #ifndef FORKED_ENABLE
         // user has clicked on a new state, create the transition with this target state
         SCState* st= _currentlySelected->getState();
         _dm->insertNewTransition(st, target);
 #endif
-
     }
 
     // delete the selection window
@@ -3417,13 +3414,14 @@ void SCFormView::createMenus()
  */
 void SCFormView::updateEditToolBar()
 {
-    int selectedSize = stateChartTreeView->selectedItems().size();
+
     int type = _currentlySelected->getTypeInt();
 
+#ifdef FORKED_ENABLE
+    int selectedSize = stateChartTreeView->selectedItems().size();
     // only switch to a fork if multiple states are selected
     if (selectedSize > 1 && this->uniformSelection(FVItem::STATE))
     {
-
         changeEditToolBar(type);
         insertTransitionAction->setIcon(QIcon(":/SCFormView/fork.png"));
     }
@@ -3433,6 +3431,10 @@ void SCFormView::updateEditToolBar()
         changeEditToolBar(type);
         insertTransitionAction->setIcon(QIcon(":/SCFormView/rightarrowhollownew.png"));
     }
+#endif
+#ifndef FORKED_ENABLE
+    changeEditToolBar(type);
+#endif
 }
 
 /**

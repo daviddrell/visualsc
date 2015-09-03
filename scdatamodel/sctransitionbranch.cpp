@@ -10,12 +10,23 @@ SCTransitionBranch::SCTransitionBranch(SCForkedTransition* group, SCState* sourc
 {
     _eventTextBlock = group->getEventTextBlock();
     initialize();
-    this->setObjectName(group->getEventName());
 }
 
 SCTransitionBranch::~SCTransitionBranch()
 {
     this->removeParentAttributes();
+
+    int index = _group->getSourceBranches()->indexOf(this);
+    qDebug() << "index of sctb in group: " << index;
+
+    _group->getSourceBranches()->removeAt(index);
+
+    // this was the last branch, so delete the group
+    if(_group->getSourceBranches()->size() == 0)
+    {
+        delete _group;
+    }
+
 }
 
 void SCTransitionBranch::initialize()
@@ -85,6 +96,11 @@ TransitionStringAttribute* SCTransitionBranch::getTransStringAttr(QString key)
     return dynamic_cast<TransitionStringAttribute*>(this->attributes.value(key));
 }
 
+void SCTransitionBranch::setAttributeValue(QString key, QString val)
+{
+    attributes.value(key)->setValue(val);
+}
+
 SCState* SCTransitionBranch::targetState()
 {
     return _group->targetState();
@@ -113,6 +129,29 @@ SCTextBlock* SCTransitionBranch::getEventTextBlock()
 IAttributeContainer* SCTransitionBranch::getAttributes()
 {
     return & attributes;
+}
+
+
+void SCTransitionBranch::writeSCVXML(QXmlStreamWriter &sw)
+{
+    sw.writeStartElement(QString("forkedtransition"));
+    QMapIterator<QString, IAttribute*> i(attributes);
+
+    while(i.hasNext())
+    {
+        QString key = i.next().key();
+        qDebug() << "writing " << key << "...";
+        sw.writeAttribute(key, attributes.value(key)->asString());
+    }
+
+    // additionally, write each of the attributes of this transition's children.
+    for(int k = 0; k < children().length(); k++)
+    {
+        SCTextBlock* tb = dynamic_cast<SCTextBlock*>(children()[k]);
+        if(tb)
+            tb->writeSCVXML(sw);
+    }
+    sw.writeEndElement();
 }
 
 void SCTransitionBranch::handleTargetStateNameChanged(StateName * sn)

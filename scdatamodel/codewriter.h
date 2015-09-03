@@ -8,9 +8,12 @@
 #include "cwstate.h"
 #include "cwtransition.h"
 #include "cwstatemachine.h"
+#include "cwevent.h"
+#include "cwaction.h"
 
-class CodeWriter
+class CodeWriter : QObject
 {
+    Q_OBJECT
 public:
     CodeWriter(SCState*,QString,QString, QString);
     ~CodeWriter();
@@ -25,9 +28,12 @@ public:
     //void setChildren(QList<SCState*>);
   //  void createSignalsAndSlots();
     void createStateMachines();
+    void connectStateMachine(CWStateMachine*);
+
+public slots:
+    void handleNewRelayEvent(CWTransition*);
 
 private:
-
 
 
     void cWriteConstructor();
@@ -74,7 +80,16 @@ private:
 
     //QHash<SCTransition*, CWTransition*> _transitions;
 
+//    QList<CWEvent*> _events;
+    QHash<QString, QList<QString>*> _eventRelaySignals;
 
+    QHash<QString, int> _actionDeclare;
+    QHash<QString, int> _eventDeclare;
+    QHash<QString, int> _eventDefine;
+
+    bool isActionDeclared(QString);
+    bool isEventDeclared(QString);
+    bool isEventDefined(QString);
 
 };
 

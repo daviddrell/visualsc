@@ -41,6 +41,7 @@ SCTransition::SCTransition(QObject * parent):
      path
      */
 
+    // items in this list cannot be deleted by the user
     DEFAULT_ATTRIBUTES_LIST << "target" << "event" << "comments" << "path" << "uid";
 
     //DO_NOT_DISPLAY_HASH.insert("uid",0);
@@ -49,8 +50,9 @@ SCTransition::SCTransition(QObject * parent):
     TransitionStringAttribute * target = new TransitionStringAttribute (this, "target",QString());
     attributes.addItem(target);
 
-    TransitionStringAttribute * event = new TransitionStringAttribute (this, "event",QString());
+    TransitionStringAttribute * event = new TransitionStringAttribute (this, "event","event");
     attributes.addItem(event);
+    this->setObjectName(event->asString());
 
     TransitionStringAttribute * comments = new TransitionStringAttribute (this, "comments",QString());
     attributes.addItem(comments);
@@ -336,21 +338,9 @@ void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
     while(i.hasNext())              // for every attribute, write into the scxml
     {
         QString key = i.next().key();
-
-        //if(key != "path")           // do a special write for the path
-        {
-            qDebug() << "writing " << key <<"...";
-            sw.writeAttribute(key, attributes.value(key)->asString());
-        }
+        qDebug() << "writing " << key <<"...";
+        sw.writeAttribute(key, attributes.value(key)->asString());
     }
-
-//    if (  attributes.contains("path"))  // write all the path values in a separate element
-//    {
-//         sw.writeStartElement(QString("path"));
-//         QString path = attributes.value("path")->asString();
-//         sw.writeAttribute(QString("d"),path);
-//         sw.writeEndElement();
-//    }
 
     // additionally, write each of the attributes of this transitions's children.
     for(int k = 0 ; k < children().length(); k++)

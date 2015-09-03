@@ -34,6 +34,10 @@ CWStateMachine::CWStateMachine(SCState *state,  QHash<SCState*, CWState*>* state
         }
     }
 }
+
+
+
+
 CWStateMachine::~CWStateMachine()
 {
 
@@ -72,6 +76,8 @@ void CWStateMachine::createTransition(CWState *state)
         CWState* tar = _stateHash->value(trans->targetState());
         CWTransition *cwTransition = new CWTransition(trans, state->_stateName, tar->_stateName);
         state->insertTransition(cwTransition);
+
+        emit this->newTransition(cwTransition);
     }
 }
 
@@ -105,6 +111,9 @@ void CWStateMachine::createChildren()
         {
             _initialState = state;
         }
+
+        // connect the states
+//        connectState(cwState);
     }
 }
 

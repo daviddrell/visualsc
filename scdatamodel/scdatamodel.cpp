@@ -1035,9 +1035,7 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target 
     SCTransition * transition = new SCTransition(source);
 
     transition->setAttributeValue("target", target->attributes.value("name")->asString());
-    transition->setAttributeValue("event", "event");
-    transition->setAttributeValue("uid",target->getUid());
-    transition->setObjectName("event");
+    transition->setAttributeValue("uid", target->getUid());
     target->addTransitionReference(transition, SCState::kTransitIn);
     source->addTransitionReference(transition, SCState::kTransitOut);
     transition->setTargetState(target);
@@ -1055,11 +1053,21 @@ SCForkedTransition* SCDataModel::insertNewTransition(QList<SCState *> states, SC
     SCForkedTransition* ft = new SCForkedTransition();
     ft->setTargetState(target);
     qDebug() << "created ForkedTransition: " << ft->attributes.value("forkUid")->asString();
+
+    ft->setTargetState(target);
+
     foreach(SCState* st, states)
     {
         qDebug() << "addedState: " << st->objectName();
-        ft->addSourceState(st);
+        SCTransitionBranch* tb = ft->addSourceState(st);
+
+        tb->setAttributeValue("sourceUid",st->getUid());
+
+        target->addTransitionReference(tb, SCState::kTransitIn);
+        st->addTransitionReference(tb, SCState::kTransitOut);
     }
+
+    //_transitions.append();
 
     emit this->insertNewTransitionSignal(ft);
     return ft;
@@ -1083,8 +1091,8 @@ SCTransition* SCDataModel::insertNewTransition(SCState *source, SCState* target,
     SCTransition * transition = new SCTransition(source);
 
     transition->setAttributeValue("target", target->attributes.value("name")->asString());
-    transition->setAttributeValue("event", eventName);
     transition->setAttributeValue("uid",target->getUid());
+    transition->setAttributeValue("event", eventName);
     transition->setObjectName(eventName);
     target->addTransitionReference(transition, SCState::kTransitIn);
     source->addTransitionReference(transition, SCState::kTransitOut);

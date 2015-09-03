@@ -613,6 +613,16 @@ QList<SCTransition*> SCState::getTransitionsTerminating()
     return _transitionsTerminatingHere;
 }
 
+
+QList<SCTransitionBranch*> SCState::getForkedTransitionsIn()
+{
+    return  _transitingForkedTransitionsIn;
+}
+QList<SCTransitionBranch*> SCState::getForkedTransitionsTerminating()
+{
+    return _transitionsForkedTerminatingHere;
+}
+
 /**
  * @brief SCState::removeTargetsTransitionIn
  *
@@ -704,6 +714,25 @@ void SCState::addTransitionReference(SCTransition* t, TransitionTransitDirection
         _transitionsTerminatingHere.append(t);
     }
 }
+
+void SCState::addTransitionReference(SCTransitionBranch* t, TransitionTransitDirection d)
+{
+    if ( d == kTransitOut)
+    {
+        _transitingForkedTransitionsOut.append(t);
+    }
+    if ( d == kTransitIn)
+    {
+        _transitingForkedTransitionsIn.append(t);
+    }
+    if ( d == kDestination)
+    {
+        _transitionsForkedTerminatingHere.append(t);
+    }
+}
+
+
+
 
 /**
  * @brief SCState::deleteAllInTransitions
@@ -1023,6 +1052,10 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
         SCTransition * tr = dynamic_cast<SCTransition*>(children()[k]);
         if (tr)
             tr->writeSCVXML(sw);
+
+        SCTransitionBranch* br = dynamic_cast<SCTransitionBranch*>(children()[k]);
+        if(br)
+            br->writeSCVXML(sw);
 
         SCTextBlock * tb = dynamic_cast<SCTextBlock*>(children()[k]);
         if (tb)

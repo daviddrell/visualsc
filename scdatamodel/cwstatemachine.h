@@ -4,8 +4,9 @@
 #include "cwstate.h"
 #include "cwtransition.h"
 
-class CWStateMachine : public CWState
+class CWStateMachine :  public QObject, public CWState
 {
+    Q_OBJECT
 public:
 //    CWStateMachine(QString theStateName,QString theEntryRelaySlot, QString theExitRelaySlot, QString theEntryRelaySignal,QString theExitRelaySignal,QString comments);
     CWStateMachine(SCState* state, QHash<SCState*, CWState*> *stateHash);
@@ -35,8 +36,8 @@ public:
 
 
     QString _startEventName;
-private:
-
+signals:
+    void newTransition(CWTransition*);
 
 };
 

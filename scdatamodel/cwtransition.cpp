@@ -6,9 +6,10 @@
 CWTransition::CWTransition(SCTransition *trans, QString sourceName, QString targetName):
     _transModel(trans),
     _targetName(targetName),
-    _eventName("Event___"+toCamel(trans->getEventName())+""+sourceName+"()"),
+//    _eventName("Event___"+toCamel(trans->getEventName())+""+sourceName+"()"),
+    _eventName("Event___"+toCamel(trans->getEventName())+"()"),
     _comments(trans->getTransStringAttr("comments")->asString()),
-    _relaySignal("Relay_"+_eventName)
+    _relaySignal("Relay_Event___"+toCamel(trans->getEventName())+""+sourceName+"()")
 {
 
 }

@@ -28,70 +28,50 @@ StateMachine::StateMachine(QObject* parent):
     QObject(parent),
     //////// State Machine: _stateMachine ////////
     _stateMachine(new QStateMachine(this)),
-    _waitingForSystemReady(new QState()),
-    _running(new QState()),
-    _success(new QFinalState()),
-    _failed(new QFinalState()),
-
-    //////// State Machine: _running ////////
-    _connecting(new QState(_running)),
-    _connected(new QState(_running))
+    _stateMachine_1(new QState()),
+    _stateMachine_2(new QState()),
+    _stateMachine_3(new QState()),
+    _stateMachine_4(new QState()),
+    _stateMachine_5(new QState())
 
 {
     //////// State Machine: _stateMachine ////////
-    _stateMachine->addState(_waitingForSystemReady);
-    _stateMachine->setInitialState(_waitingForSystemReady);
-    _stateMachine->addState(_running);
-    _stateMachine->addState(_success);
-    _stateMachine->addState(_failed);
+    _stateMachine->addState(_stateMachine_1);
+    _stateMachine->addState(_stateMachine_2);
+    _stateMachine->addState(_stateMachine_3);
+    _stateMachine->addState(_stateMachine_4);
+    _stateMachine->addState(_stateMachine_5);
 
     //    Add transitions for the QStates using the transitions' private relay signals
-    _waitingForSystemReady->addTransition(this, SIGNAL(Relay_Event___systemReady_waitingForSystemReady()), _running);
-    _running->addTransition(this, SIGNAL(Relay_Event___loopCountExceeded_running()), _success);
-    _running->addTransition(this, SIGNAL(Relay_Event___equipmentFailed_running()), _failed);
+    _stateMachine_1->addTransition(this, SIGNAL(Relay_Event___asdf_stateMachine_1()), _stateMachine_2);
+    _stateMachine_2->addTransition(this, SIGNAL(Relay_Event___asdf_stateMachine_2()), _stateMachine_3);
+    _stateMachine_3->addTransition(this, SIGNAL(Relay_Event___asdf_stateMachine_3()), _stateMachine_4);
+    _stateMachine_4->addTransition(this, SIGNAL(Relay_Event___asdf_stateMachine_4()), _stateMachine_5);
 
     //    Propogate the private QState signals to public signals
     connect(_stateMachine, SIGNAL(started()), this, SIGNAL(Signal_StateReady___stateMachine()));
-    connect(_waitingForSystemReady, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___waitingForSystemReady()));
-    connect(_waitingForSystemReady, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___waitingForSystemReady()));
-    connect(_running, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___running()));
-    connect(_running, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___running()));
-    connect(_success, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___success()));
-    connect(_success, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___success()));
-    connect(_failed, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___failed()));
-    connect(_failed, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___failed()));
+    connect(_stateMachine_1, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___stateMachine_1()));
+    connect(_stateMachine_1, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___stateMachine_1()));
+    connect(_stateMachine_2, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___stateMachine_2()));
+    connect(_stateMachine_2, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___stateMachine_2()));
+    connect(_stateMachine_3, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___stateMachine_3()));
+    connect(_stateMachine_3, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___stateMachine_3()));
+    connect(_stateMachine_4, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___stateMachine_4()));
+    connect(_stateMachine_4, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___stateMachine_4()));
+    connect(_stateMachine_5, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___stateMachine_5()));
+    connect(_stateMachine_5, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___stateMachine_5()));
 
     //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_waitingForSystemReady, SIGNAL(entered()), this, SLOT(Slot_StateEntry___waitingForSystemReady()));
-    connect(_waitingForSystemReady, SIGNAL(exited()), this, SLOT(Slot_StateExit___waitingForSystemReady()));
-    connect(_running, SIGNAL(entered()), this, SLOT(Slot_StateEntry___running()));
-    connect(_running, SIGNAL(exited()), this, SLOT(Slot_StateExit___running()));
-    connect(_success, SIGNAL(entered()), this, SLOT(Slot_StateEntry___success()));
-    connect(_success, SIGNAL(exited()), this, SLOT(Slot_StateExit___success()));
-    connect(_failed, SIGNAL(entered()), this, SLOT(Slot_StateEntry___failed()));
-    connect(_failed, SIGNAL(exited()), this, SLOT(Slot_StateExit___failed()));
-
-
-    //////// State Machine: _running ////////
-    _running->setInitialState(_connecting);
-
-    //    Add transitions for the QStates using the transitions' private relay signals
-    _connecting->addTransition(this, SIGNAL(Relay_Event___connected_connecting()), _connected);
-    _connecting->addTransition(this, SIGNAL(Relay_Event___dialFailed_connecting()), _failed);
-    _connected->addTransition(this, SIGNAL(Relay_Event___disconnected_connected()), _connecting);
-    _connected->addTransition(this, SIGNAL(Relay_Event___disconnectFailed_connected()), _failed);
-
-    //    Propogate the private QState signals to public signals
-    connect(_connecting, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___connecting()));
-    connect(_connecting, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___connecting()));
-    connect(_connected, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___connected()));
-    connect(_connected, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___connected()));
-
-    //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_connecting, SIGNAL(entered()), this, SLOT(Slot_StateEntry___connecting()));
-    connect(_connecting, SIGNAL(exited()), this, SLOT(Slot_StateExit___connecting()));
-    connect(_connected, SIGNAL(entered()), this, SLOT(Slot_StateEntry___connected()));
-    connect(_connected, SIGNAL(exited()), this, SLOT(Slot_StateExit___connected()));
+    connect(_stateMachine_1, SIGNAL(entered()), this, SLOT(Slot_StateEntry___stateMachine_1()));
+    connect(_stateMachine_1, SIGNAL(exited()), this, SLOT(Slot_StateExit___stateMachine_1()));
+    connect(_stateMachine_2, SIGNAL(entered()), this, SLOT(Slot_StateEntry___stateMachine_2()));
+    connect(_stateMachine_2, SIGNAL(exited()), this, SLOT(Slot_StateExit___stateMachine_2()));
+    connect(_stateMachine_3, SIGNAL(entered()), this, SLOT(Slot_StateEntry___stateMachine_3()));
+    connect(_stateMachine_3, SIGNAL(exited()), this, SLOT(Slot_StateExit___stateMachine_3()));
+    connect(_stateMachine_4, SIGNAL(entered()), this, SLOT(Slot_StateEntry___stateMachine_4()));
+    connect(_stateMachine_4, SIGNAL(exited()), this, SLOT(Slot_StateExit___stateMachine_4()));
+    connect(_stateMachine_5, SIGNAL(entered()), this, SLOT(Slot_StateEntry___stateMachine_5()));
+    connect(_stateMachine_5, SIGNAL(exited()), this, SLOT(Slot_StateExit___stateMachine_5()));
 
 
 }
@@ -109,41 +89,12 @@ void StateMachine::Event_startMachine___stateMachine()
     _stateMachine->start();
 }
 
-void StateMachine::Event___systemReady_waitingForSystemReady()
+void StateMachine::Event___asdf()
 {
-    emit Relay_Event___systemReady_waitingForSystemReady();
-}
-
-void StateMachine::Event___loopCountExceeded_running()
-{
-    emit Relay_Event___loopCountExceeded_running();
-}
-
-void StateMachine::Event___equipmentFailed_running()
-{
-    emit Relay_Event___equipmentFailed_running();
-}
-
-
-    //////// State Machine: _running ////////
-void StateMachine::Event___connected_connecting()
-{
-    emit Relay_Event___connected_connecting();
-}
-
-void StateMachine::Event___dialFailed_connecting()
-{
-    emit Relay_Event___dialFailed_connecting();
-}
-
-void StateMachine::Event___disconnected_connected()
-{
-    emit Relay_Event___disconnected_connected();
-}
-
-void StateMachine::Event___disconnectFailed_connected()
-{
-    emit Relay_Event___disconnectFailed_connected();
+    emit Relay_Event___asdf_stateMachine_1();
+    emit Relay_Event___asdf_stateMachine_2();
+    emit Relay_Event___asdf_stateMachine_3();
+    emit Relay_Event___asdf_stateMachine_4();
 }
 
 
@@ -151,64 +102,52 @@ void StateMachine::Event___disconnectFailed_connected()
 //    these slots register the state entry/exits to generate event signals for any given entry or exit events
 //
     //////// State Machine: _stateMachine ////////
-void StateMachine::Slot_StateEntry___waitingForSystemReady()
+void StateMachine::Slot_StateEntry___stateMachine_1()
+{
+    emit Action___ab();
+}
+
+void StateMachine::Slot_StateExit___stateMachine_1()
 {
 
 }
 
-void StateMachine::Slot_StateExit___waitingForSystemReady()
+void StateMachine::Slot_StateEntry___stateMachine_2()
+{
+    emit Action___ab();
+}
+
+void StateMachine::Slot_StateExit___stateMachine_2()
 {
 
 }
 
-void StateMachine::Slot_StateEntry___running()
+void StateMachine::Slot_StateEntry___stateMachine_3()
+{
+    emit Action___ab();
+}
+
+void StateMachine::Slot_StateExit___stateMachine_3()
 {
 
 }
 
-void StateMachine::Slot_StateExit___running()
+void StateMachine::Slot_StateEntry___stateMachine_4()
+{
+    emit Action___ab();
+}
+
+void StateMachine::Slot_StateExit___stateMachine_4()
 {
 
 }
 
-void StateMachine::Slot_StateEntry___success()
+void StateMachine::Slot_StateEntry___stateMachine_5()
 {
-
+    emit Action___ab();
 }
 
-void StateMachine::Slot_StateExit___success()
-{
-
-}
-
-void StateMachine::Slot_StateEntry___failed()
-{
-
-}
-
-void StateMachine::Slot_StateExit___failed()
-{
-
-}
-
-
-    //////// State Machine: _running ////////
-void StateMachine::Slot_StateEntry___connecting()
-{
-    emit EntryAction___dial();
-}
-
-void StateMachine::Slot_StateExit___connecting()
-{
-    emit ExitAction___incrementloopcounter();
-}
-
-void StateMachine::Slot_StateEntry___connected()
-{
-    emit EntryAction___hangup();
-}
-
-void StateMachine::Slot_StateExit___connected()
+void StateMachine::Slot_StateExit___stateMachine_5()
 {
 
 }
