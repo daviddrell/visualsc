@@ -1,6 +1,7 @@
 #include "sctransitionbranch.h"
 #include "scforkedtransition.h"
 #include "scstate.h"
+#include <QDebug>
 
 SCTransitionBranch::SCTransitionBranch(SCForkedTransition* group, SCState* source):
     SCItem(source),
@@ -18,6 +19,7 @@ SCTransitionBranch::~SCTransitionBranch()
 
 void SCTransitionBranch::initialize()
 {
+    qDebug () << "SCTransitionBranch::initialize()";
     // initialize the attributes
     TransitionStringAttribute * sourceUid = new TransitionStringAttribute (this, QString("sourceUid"),QString());
     attributes.addItem(sourceUid);
@@ -29,22 +31,35 @@ void SCTransitionBranch::initialize()
     TransitionStringAttribute* connectToFinished = new TransitionStringAttribute(this, "connectToFinished", "false");
     attributes.addItem(connectToFinished);
 
-//    this->addParentAttributes();
+    this->addParentAttributes();
 }
 
 QString SCTransitionBranch::getEventName()
 {
-    return _group->attributes.value("event")->asString();
-//    return attributes.value("event")->asString();
+//    return _group->attributes.value("event")->asString();
+    return this->attributes.value("event")->asString();
 }
 
 void SCTransitionBranch::addParentAttributes()
 {
+    qDebug() << "SCTransitionBranch::addParentAttributes()";
     QMapIterator<QString, IAttribute*> i(_group->attributes);
     while(i.hasNext())
     {
-        attributes.addItem(i.value());
+        IAttribute* attr = i.next().value();
+        qDebug() << "attempting to add attribute: " << attr->key();
+        this->attributes.addItem(attr);
     }
+}
+
+TransitionStringAttribute* SCTransitionBranch::getTransStringAttr(QString key)
+{
+    return dynamic_cast<TransitionStringAttribute*>(this->attributes.value(key));
+}
+
+SCState* SCTransitionBranch::targetState()
+{
+    return _group->targetState();
 }
 
 SCState* SCTransitionBranch::parentAsSCState()
@@ -62,7 +77,28 @@ void SCTransitionBranch::deleteSafely()
     this->deleteLater();
 }
 
+SCTextBlock* SCTransitionBranch::getEventTextBlock()
+{
+    return _eventTextBlock;
+}
+
 IAttributeContainer* SCTransitionBranch::getAttributes()
 {
     return & attributes;
+}
+
+void SCTransitionBranch::handleTargetStateNameChanged(StateName * sn)
+{
+//    if(_group->attributes.value("target")->asString() != sn->asString())
+//    {
+//        qDebug() << "changing group target! " << sn->asString();
+//        _group->attributes.value("target")->setValue(sn->asString());
+//    }
+
+
+    if(this->attributes.value("event")->asString() != sn->asString())
+    {
+        qDebug() << "changing target name for trans branch to " << sn->asString();
+        this->attributes.value("event")->setValue(sn->asString());
+    }
 }

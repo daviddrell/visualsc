@@ -57,6 +57,11 @@ SCTransition* FVItem::getTransition()
     return dynamic_cast<SCTransition*>(_item);
 }
 
+SCTransitionBranch* FVItem::getTransitionBranch()
+{
+    return dynamic_cast<SCTransitionBranch*>(_item);
+}
+
 SCItem* FVItem::getItem()
 {
     return _item;
@@ -71,6 +76,10 @@ IAttributeContainer* FVItem::getAttributes()
     else if(isTransition())
     {
         return &getTransition()->attributes;
+    }
+    else if(isTransitionBranch())
+    {
+        return &getTransitionBranch()->attributes;
     }
     else
     {
@@ -89,6 +98,10 @@ IAttributeContainer* FVItem::getTextBlockAttributes()
     {
         return &getTransition()->getEventTextBlock()->attributes;
     }
+    else if(isTransitionBranch())
+    {
+        return &getTransitionBranch()->getEventTextBlock()->attributes;
+    }
     else
     {
         qDebug() << "FVItem::getTextBlockAttributes ERROR unexpected type";
@@ -106,6 +119,10 @@ QString FVItem::getType()
     else if(isTransition())
     {
         return "transition";
+    }
+    else if(isTransitionBranch())
+    {
+        return "transitionbranch";
     }
 
     else
@@ -130,6 +147,10 @@ QString FVItem::getTitle()
     {
         return getTransition()->getTransStringAttr("event")->asString();
     }
+    else if(isTransitionBranch())
+    {
+        return getTransitionBranch()->getTransStringAttr("event")->asString();
+    }
     else
     {
         qDebug() << "FVItem::getTitle() ERROR unknown type";
@@ -147,6 +168,11 @@ bool FVItem::isState()
 bool FVItem::isTransition()
 {
     return (_type==FVItem::TRANSITION);
+}
+
+bool FVItem::isTransitionBranch()
+{
+    return (_type == FVItem::TRANSITIONBRANCH);
 }
 
 void FVItem::setItem(SCItem* item)

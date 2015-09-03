@@ -17,8 +17,12 @@ void SCForkedTransition::initialize()
 {
     // initialize the attributes
     // strings are empty
-    TransitionStringAttribute * target = new TransitionStringAttribute (this, "targetUid",QString());
+    TransitionStringAttribute * target = new TransitionStringAttribute (this, "target",QString());
     attributes.addItem(target);
+
+
+    TransitionStringAttribute * tuid = new TransitionStringAttribute (this, "targetUid",QString());
+    attributes.addItem(tuid);
 
     QUuid u=QUuid::createUuid();
     TransitionStringAttribute* uid = new TransitionStringAttribute(this, "forkUid", u.toString());
@@ -31,7 +35,7 @@ void SCForkedTransition::initialize()
     TransitionPathAttribute * path = new TransitionPathAttribute (this, QString("targetPath"),emptyPath);
     attributes.addItem(path);
 
-    TransitionStringAttribute* event = new TransitionStringAttribute(this, "event", "event");
+    TransitionStringAttribute* event = new TransitionStringAttribute(this, "event", "fork event");
     attributes.addItem(event);
 }
 
@@ -50,7 +54,10 @@ SCTextBlock* SCForkedTransition::getEventTextBlock()
     return _eventTextBlock;
 }
 
-
+SCState* SCForkedTransition::targetState()
+{
+    return _targetState;
+}
 
 /**
  * @brief SCForkedTransition::addSourceState

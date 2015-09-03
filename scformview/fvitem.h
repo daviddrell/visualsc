@@ -7,12 +7,13 @@
 #include "sctransition.h"
 #include "customtreewidgetitem.h"
 #include "scitem.h"
+#include "sctransitionbranch.h"
 
 
 class FVItem : public QObject
 {
 public:
-    enum FVItemType {STATE,TRANSITION,FORKEDTRANSITION };
+    enum FVItemType {STATE,TRANSITION,TRANSITIONBRANCH };
 
     FVItem(SCItem*,int, CustomTreeWidgetItem*);
     FVItem(CustomTreeWidgetItem*);
@@ -29,11 +30,13 @@ public:
 
     bool isState();
     bool isTransition();
+    bool isTransitionBranch();
 
     int getTypeInt();
 
     SCState* getState();
     SCTransition* getTransition();
+    SCTransitionBranch* getTransitionBranch();
     SCItem* getItem();
 
     QString getType();

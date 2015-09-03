@@ -41,12 +41,20 @@ public:
     void deleteSafely();
 
     SCState* parentAsSCState();
+    SCState* targetState();
+
     virtual IAttributeContainer * getAttributes(); //reimplemented from base SCItem
 
     QString getEventName();
+    SCTextBlock* getEventTextBlock();
+    TransitionStringAttribute* getTransStringAttr(QString key);
+
+public slots:
+    void handleTargetStateNameChanged(StateName*);
+
 
 signals:
-    void markedForDeletion(QObject*);
+    void clicked(SCTransitionBranch*);
 
 private:
     SCForkedTransition* _group;

@@ -35,6 +35,8 @@
 #include "scitem.h"
 #include "fvitem.h"
 #include "customtablewidgetitem.h"
+#include "scforkedtransition.h"
+#include "sctransitionbranch.h"
 
 
 class StateSelectionWindow;
@@ -93,6 +95,7 @@ public:
     SCState* getCurrentlySelectedState();
 
 public slots:
+    void handleItemClicked(SCTransitionBranch*);
     void handleItemClicked(SCState*);
     void handleItemMinimize(SCState*);
     void handleItemExpand(SCState*);
@@ -149,6 +152,7 @@ private slots:
     void handleTreeViewItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
     void handleNewTransition(SCForkedTransition*);
     void handleNewTransition(SCTransition*);
+    void handleTransitionBranchDeleted(QObject*);
     void handleTransitionDeleted(QObject *);
     void handleStateDeleted(QObject*);
     void handleNewState(SCState*);
@@ -205,6 +209,11 @@ private:
 
     void connectTextBlock(SCTextBlock*, CustomTableWidgetItem*, QString);
 
+
+    void connectTransition(SCTransitionBranch*);
+    void connectTransition(SCTransitionBranch* br, CustomTableWidgetItem*, QString);
+    void connectTransition(SCTransitionBranch* br, CustomTreeWidgetItem* treeItem);
+
     void connectTransition(SCTransition*);
     void connectTransition(SCTransition *, CustomTableWidgetItem*, QString);
     void connectTransition(SCTransition*,CustomTreeWidgetItem*);
@@ -239,6 +248,7 @@ private:
     void loadPropertyTable(FVItem*);
     void loadPropertyTable(SCState*);
     void loadPropertyTable(SCTransition*);
+    void loadPropertyTable(SCTransitionBranch *);
 
     void setTextBlockAttributeConnections(IAttributeContainer* atts, bool connect);
     void clearPropertyTable();

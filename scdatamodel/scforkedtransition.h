@@ -32,6 +32,7 @@ public:
     TransitionAttributes attributes;
 
     void setTargetState(SCState* target);
+    SCState* targetState();
     SCTransitionBranch* addSourceState(SCState* source);
     void writeSCXML(QXmlStreamWriter&sw);
     void initialize();

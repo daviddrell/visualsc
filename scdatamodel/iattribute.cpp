@@ -145,6 +145,7 @@ bool IAttributeContainer::addItem( IAttribute* attr)
     }
 }
 
+
 /**
       * \fn operator=
       * \abstract sets the values of the abtribute list to the same values as the passed-in list, equivalent to setAttributes
