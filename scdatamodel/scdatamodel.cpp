@@ -69,7 +69,14 @@ void SCDataModel::connectDataModel()
 
 }
 
-
+/**
+ * @brief SCDataModel::connectTransition
+ * @param trans
+ *
+ * SCDataModel level connects for SCTransitions.
+ * called when a transition is created.
+ *
+ */
 void SCDataModel::connectTransition(SCTransition * trans)
 {
     qDebug() << "scdatamodel::connecttransition";
