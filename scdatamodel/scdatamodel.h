@@ -155,10 +155,9 @@ signals:
 
 private slots:
 
-
     void handleMakeANewState(StateAttributes*);
-
     void handleMakeANewTransition(TransitionAttributes*);
+    void handleTransitionBeingDeleted(QObject*);
     void handleLeaveTransitionElement();
     void handleMakeANewTransitionPath(QString path);
     void handleTransitUp();

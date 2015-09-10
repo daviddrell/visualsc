@@ -81,6 +81,7 @@ void SCDataModel::connectTransition(SCTransition * trans)
 {
     qDebug() << "scdatamodel::connecttransition";
     connect(trans->getTransStringAttr("event"), SIGNAL(changed(TransitionStringAttribute*)), this, SLOT(handleCheckEventCollision(TransitionStringAttribute*)));
+    connect(trans,SIGNAL(markedForDeletion(QObject*)),this,SLOT(handleTransitionBeingDeleted(QObject*)));
 }
 
 /**
@@ -1180,10 +1181,15 @@ SCTransition* SCDataModel::handleMakeANewTransition(SCState* source, TransitionA
     qDebug() << "leave handleMakeANewTransition, : "  ;
 }
 
+void SCDataModel::handleTransitionBeingDeleted(QObject*o)
+{
+    SCTransition* t = dynamic_cast<SCTransition*>(o);
+    if ( _transitions.contains(t)) _transitions.removeAll(t);
+}
+
 /**
  * @brief SCDataModel::handleMakeANewTransition
  * @param ta
- *
  *
  * called by the scxmlreader
  * this function is used when adding transitions read from an scxml file
@@ -1210,7 +1216,6 @@ void SCDataModel::handleMakeANewTransition(TransitionAttributes * ta)
             dynamic_cast<TransitionPathAttribute *>( transition->attributes.value("path"));
 
     path->setValue( path->asString() );
-
 
     _currentTransition = transition;
     _currentState->addTransistion(transition);
