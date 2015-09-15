@@ -274,5 +274,8 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
 
         _arrowHead->update();
     }
+    else if(_paintStyle == kNone)
+    {
 
+    }
 }

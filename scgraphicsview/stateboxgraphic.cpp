@@ -32,7 +32,7 @@
 #include <QApplication>
 
 
-
+#define HIDE_CORNER_GRABBERS
 
 #define PEN_DEFAULT_WIDTH       2.472135954999419
 #define PEN_HOVER_WIDTH         4
@@ -103,12 +103,20 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     setPenWidth(PEN_DEFAULT_WIDTH, PEN_HOVER_WIDTH);
     //TextItem.setPos(25,10);
 
+#ifdef HIDE_CORNER_GRABBERS
+    _corners[0]->setPaintStyle( CornerGrabber::kNone);
+    _corners[1]->setPaintStyle( CornerGrabber::kNone);
+    _corners[2]->setPaintStyle( CornerGrabber::kNone);
+    _corners[3]->setPaintStyle( CornerGrabber::kNone);
+#endif
+
     //TextItem.setParentItem(this);
     //PositionAttribute* position = dynamic_cast<PositionAttribute*> (_stateModel->attributes.value("position"));
     //qDebug() << "setting position: " << mapFromScene(position->asPointF());
     //qDebug() << "setting position: " << mapToScene(position->asPointF());
     //qDebug() << "setting position: " << mapToParent(position->asPointF());
 
+    // set the inner border colors of initial and final states
     _initialStateColor = QColor(104,237,153,255);
     _finalStateColor = QColor(242,119,119,255);
 
@@ -1227,12 +1235,66 @@ void StateBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 }
 
+// remove the corner grabbers
+void StateBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
+{
+    _isHovered = false;
+
+    QApplication::restoreOverrideCursor();
+
+    for(int i = 0; i < 4; i++)
+    {
+        _corners[i]->setVisible(false);
+//        _corners[i]->removeSceneEventFilter(this);
+
+    }
+
+//    _corners[0]->setParentItem(NULL);
+//    _corners[1]->setParentItem(NULL);
+//    _corners[2]->setParentItem(NULL);
+//    _corners[3]->setParentItem(NULL);
+
+//    delete _corners[0];
+//    _corners[0] = NULL;
+
+//    delete _corners[1];
+//    _corners[1] = NULL;
+
+//    delete _corners[2];
+//    _corners[2] = NULL;
+
+//    delete _corners[3];
+//    _corners[3] = NULL;
+
+   // _pen.setWidthF(_penWidth);
+
+
+}
+
+
+// create the corner grabbers
+
+void StateBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
+{
+    //qDebug() << "SelectableBoxGraphic HoverEnterEvent";
+    _isHovered = true;
+
+    //QApplication::setOverrideCursor(Qt::OpenHandCursor);
+
+
+    for(int i = 0; i < 4; i++)
+    {
+        _corners[i]->setVisible(true);
+//        _corners[i]->installSceneEventFilter(this);
+    }
+
+
+    setCornerPositions();
+}
+
 bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event )
 {
     //        qDebug() << " QEvent == " + QString::number(event->type());
-
-
-
     QGraphicsSceneMouseEvent * mevent = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
     if ( mevent == NULL)
     {
@@ -1256,8 +1318,6 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
             corner->mouseDownX = mevent->pos().x();
             corner->mouseDownY = mevent->pos().y();
             //corner->setHovered(true);
-
-
         }
             break;
 

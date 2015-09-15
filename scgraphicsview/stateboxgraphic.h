@@ -156,6 +156,9 @@ private:
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
 
+    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+
     QRectF* getBufferedBoxRect(qreal buffer,qreal offset);
     double xDistance(QPointF, QPointF);
     double yDistance(QPointF, QPointF);
@@ -165,6 +168,8 @@ private:
     int findNearestWall(QRectF,QPointF);
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
     bool isContained(QRectF);
+
+
 
     // private slots
 
