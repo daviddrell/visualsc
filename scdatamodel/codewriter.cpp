@@ -3,6 +3,24 @@
 
 #define UNDER_SCORES    "_"
 
+/**
+ * @brief CodeWriter::CodeWriter
+ * @param rootMachine
+ * @param classNameString
+ * @param cFileName
+ * @param hFileName
+ *
+ * creates a .cpp and .h file for the current state machine
+ *
+ * structure of use:
+ *      initialize codewriter object
+ *      call addStateMachine for every state machine (any state with at least one child state)
+ *      call createStateMachines to initialize all cwstatemachine, cwstate, and cwtransition objects
+ *      call writeHFile
+ *      call writeCFile
+ *
+ *
+ */
 CodeWriter::CodeWriter(SCState* rootMachine, QString classNameString,QString cFileName, QString hFileName):
     cFile(cFileName),
     hFile(hFileName),
@@ -15,7 +33,15 @@ CodeWriter::CodeWriter(SCState* rootMachine, QString classNameString,QString cFi
 }
 
 
-
+/**
+ * @brief CodeWriter::createStateMachines
+ *
+ * after addStateMachine() has been called for all state machine, this function will create cwstatemachine objects for every state machine
+ * each cwstatemachine will create a cwstate object for every top level child
+ * each state machine has a separate cwstatemachine and cwstate object (except for root machine)
+ * naming collisions are resolved here
+ *
+ */
 void CodeWriter::createStateMachines()
 {
     SCState* machine;
@@ -72,7 +98,15 @@ void CodeWriter::createStateMachines()
 }
 
 
-
+/**
+ * @brief CodeWriter::handleNewRelayEvent
+ * @param cwt
+ *
+ * SLOT
+ *
+ * when a cwtransition is first created, the codewriter will keep track of it, grouping all events with the same name
+ *
+ */
 void CodeWriter::handleNewRelayEvent(CWTransition* cwt)
 {
     if(_eventRelaySignals.contains(cwt->_eventName))
@@ -86,6 +120,17 @@ void CodeWriter::handleNewRelayEvent(CWTransition* cwt)
     _eventRelaySignals.value(cwt->_eventName)->append(cwt->_relaySignal);
 }
 
+/**
+ * @brief CodeWriter::isEventDeclared
+ * @param eventName
+ * @return true if param has been passed before
+ *
+ * called during .h declaration of the public event slots
+ * used to ensure no duplicate event slots are created
+ *
+ *
+ *
+ */
 bool CodeWriter::isEventDeclared(QString eventName)
 {
     if(_eventDeclare.contains(eventName))
@@ -99,6 +144,15 @@ bool CodeWriter::isEventDeclared(QString eventName)
     }
 }
 
+/**
+ * @brief CodeWriter::isEventDefined
+ * @param eventName
+ * @return true if param has been passed before
+ *
+ * called during .cpp definition of the public event slots
+ * used to ensure no duplicate event slot is defined
+ *
+ */
 bool CodeWriter::isEventDefined(QString eventName)
 {
     if(_eventDefine.contains(eventName))
@@ -185,16 +239,37 @@ void CodeWriter::resolveCollision(CWState* one, CWState* two)
         resolveCollision(one, two);
 }
 
+/**
+ * @brief CodeWriter::addStateMachine
+ * @param state
+ *
+ * before any code is generated, this is called for the initialization of the codewriter to add all state machines
+ *
+ */
 void CodeWriter::addStateMachine(SCState* state)
 {
     _machines.append(state);
 }
 
+/**
+ * @brief CodeWriter::setRootMachine
+ * @param state
+ *
+ * sets the reference for the root machine
+ *
+ */
 void CodeWriter::setRootMachine(SCState* state)
 {
     _rootMachine = state;
 }
 
+/**
+ * @brief CodeWriter::cWriteDeconstructor
+ *
+ * .cpp deconstructor
+ *
+ * empty by default
+ */
 void CodeWriter::cWriteDeconstructor()
 {
     cPrintln(className+"::~"+className+"()");
@@ -202,6 +277,18 @@ void CodeWriter::cWriteDeconstructor()
     cPrintln("}");
 }
 
+/**
+ * @brief CodeWriter::cWriteConstructor
+ *
+ * .cpp constructor
+ *
+ * initializes all states according to type (root machine = state machine, parallel states, final states)
+ * calls addTransition for every transition
+ * sets up all connects for all private entry/exit signals to public, custom entry/exit signals
+ * (optionally connects final signals to some transitions)
+ *
+ *
+ */
 void CodeWriter::cWriteConstructor()
 {
     // print the constructor
@@ -429,9 +516,11 @@ void CodeWriter::cWriteConstructor()
 /**
  * @brief CodeWriter::cWriteEventSlots
  *
- * writes the event slot for every transition
+ * writes the public event slot for every transition
  * a transition will perform whatever is in its event slot written here
- * additionally, an event slot will emit a relay event signal for every transition that share the event name
+ * additionally, an event slot will emit a relay event signal for every transition that shares the event name
+ *
+ * Event___eventName();
  *
  */
 void CodeWriter::cWriteEventSlots()
@@ -486,6 +575,13 @@ void CodeWriter::cWriteEventSlots()
     }
 }
 
+/**
+ * @brief CodeWriter::cWriteEntryExitSlots
+ *
+ * .cpp write of the private entry/exit slots that belong to QStates
+ * Slot_StateEntry___stateMachineName();
+ * Slot_StateExit___stateMachineName();
+ */
 void CodeWriter::cWriteEntryExitSlots()
 {
     cPrintln("//");
@@ -552,7 +648,15 @@ void CodeWriter::cWriteEntryExitSlots()
     }
 }
 
-
+/**
+ * @brief CodeWriter::writeCppFile
+ * @return
+ *
+ * highest level function that writes the .cpp file
+ * calls other cWrite functions
+ *
+ *
+ */
 bool CodeWriter::writeCppFile()
 {
     if(!cFile.open(QIODevice::WriteOnly|QIODevice::Text))
@@ -570,15 +674,15 @@ bool CodeWriter::writeCppFile()
     cPrintln("exit events visible to outside classes). These slots are empty by default. any text in entryAction or exitAction will have the");
     cPrintln("corresponding function emit a signal with the value found in these attributes.\n");
     cPrintln(" every state will");
-    cPrintln("connect its private entered()/exited() signals to the public pair of                                        StateEntry_stateName()          StateExit_stateName()",1);
-    cPrintln("connect its private entered()/exited() signals to private entry and exit slots                              Slot_StateEntry_stateName()     Slot_StateExit_stateName()",1);
-    cPrintln("*for any entryActions and exitActions attributes: have the private entry and exit slots emit a signal       EntryAction_entryActionValue()  ExitAction_exitActionValue()",1);
-    cPrintln("addTransition for each outgoing transition using private signals specific to each transition                Relay_Event_eventName()\n",1);
-    cPrintln("every transition has its own public slot that emits a private (RELAY)signal named after the slot/transition (this signal is also what is ");
+    cPrintln("connect its private entered()/exited() signals to the public pair of                                        Signal_StateEntry___stateName()     Signal_StateExit___stateName()",1);
+    cPrintln("connect its private entered()/exited() signals to private entry and exit slots                              Slot_StateEntry___stateName()       Slot_StateExit___stateName()",1);
+    cPrintln("*for any entryActions and exitActions attributes: have the private entry and exit slots emit a signal       Action_entryAction()",1);
+    cPrintln("addTransition for each outgoing transition using private signals specific to each transition                Relay_Event___eventName()\n",1);
+    cPrintln("every transition has its own public slot that emits a private (RELAY) signal named after the slot/transition (this signal is also what is ");
     cPrintln("registered when using addTransition to trigger transitions between the QStates), and represents an external event triggering a transition between states.");
     cPrintln(" every transition will");
-    cPrintln("have its own public slot    Event_eventName()",1);
-    cPrintln("emit a private signal       Relay_Event_eventName()\n",1);
+    cPrintln("have a public slot    Event_eventName()",1);
+    cPrintln("that will emit private signal(s) for all events sharing the same event name      Relay_Event___eventName()\n",1);
     cPrintln("*/");
 
     // include statements
@@ -602,6 +706,12 @@ bool CodeWriter::writeCppFile()
 
 }
 
+/**
+ * @brief CodeWriter::writeHFile
+ * @return
+ * highest level function to write the .h file
+ * calls other hWrite functions
+ */
 bool CodeWriter::writeHFile()
 {
     if(!hFile.open(QIODevice::WriteOnly|QIODevice::Text))
@@ -966,6 +1076,12 @@ void CodeWriter::hWriteActionRelaySlots()
     }
 }
 
+/**
+ * @brief CodeWriter::hWriteStates
+ *
+ * .h write of QState and QStateMachine members
+ *
+ */
 void CodeWriter::hWriteStates()
 {
 /*
@@ -1023,6 +1139,14 @@ void CodeWriter::hWriteStates()
     }
 }
 
+/**
+ * @brief CodeWriter::hPrint
+ * @param text
+ *
+ * writes to hFile
+ *
+ */
+
 void CodeWriter::hPrint(QString text)
 {
     if(text.isEmpty())
@@ -1070,6 +1194,12 @@ void CodeWriter::hPrintln(QString text, int tabLevel)
     }
 }
 
+/**
+ * @brief CodeWriter::cPrint
+ * @param text
+ *
+ * writes to .cpp file
+ */
 void CodeWriter::cPrint(QString text)
 {
     if(text.isEmpty())

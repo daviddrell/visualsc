@@ -15,7 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_04D7F07D7A8E46FC886EA642AE329430"
+        "MsmKey" = "8:_0BD679C61DFE4C2691E156F682945BE6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -34,6 +34,12 @@
         "Entry"
         {
         "MsmKey" = "8:_15C4A56EB40F43899C0FE11CD14C55F4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_191089F12C0E457AA2D0FEF61A44E9A4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -75,12 +81,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4AEA3DBAB3A44EA3817D9A92EDB4519D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_5DFFBD2C5CCD4FAD903E2ADC31EAE5D9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -111,12 +111,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_74DBE435C66E4D159BFA3B9D0D2601FF"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_77EE9D8B50174DE8A15C2EF742029A76"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -130,6 +124,12 @@
         "Entry"
         {
         "MsmKey" = "8:_7B4A1174038249F38B9DE7EFEB7F99C5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9B2931934E6B45A198CC93EC32D31581"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -183,7 +183,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E217194094CD4190BB2A6CC11E4C5546"
+        "MsmKey" = "8:_DC0B4A5A859740AFBF20FCA844F64C3B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -296,7 +296,7 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_04D7F07D7A8E46FC886EA642AE329430"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0BD679C61DFE4C2691E156F682945BE6"
             {
             "SourcePath" = "8:..\\..\\bin\\release\\scgraphicsview.dll"
             "TargetName" = "8:scgraphicsview.dll"
@@ -362,6 +362,26 @@
             "TargetName" = "8:qicns.dll"
             "Tag" = "8:"
             "Folder" = "8:_D5AD908A0EDF4A2F8562FA9119E5F2F3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_191089F12C0E457AA2D0FEF61A44E9A4"
+            {
+            "SourcePath" = "8:..\\..\\bin\\release\\scformview.dll"
+            "TargetName" = "8:scformview.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -496,26 +516,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4AEA3DBAB3A44EA3817D9A92EDB4519D"
-            {
-            "SourcePath" = "8:..\\..\\bin\\release\\scdatamodel.dll"
-            "TargetName" = "8:scdatamodel.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5DFFBD2C5CCD4FAD903E2ADC31EAE5D9"
             {
             "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\imageformats\\qjp2.dll"
@@ -616,26 +616,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_74DBE435C66E4D159BFA3B9D0D2601FF"
-            {
-            "SourcePath" = "8:..\\..\\bin\\release\\scformview.dll"
-            "TargetName" = "8:scformview.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_77EE9D8B50174DE8A15C2EF742029A76"
             {
             "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\iconengines\\qsvgicon.dll"
@@ -680,6 +660,26 @@
             {
             "SourcePath" = "8:C:\\Users\\mazhan\\Desktop\\vsc\\icuin53.dll"
             "TargetName" = "8:icuin53.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9B2931934E6B45A198CC93EC32D31581"
+            {
+            "SourcePath" = "8:..\\..\\bin\\release\\scdatamodel.dll"
+            "TargetName" = "8:scdatamodel.dll"
             "Tag" = "8:"
             "Folder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Condition" = "8:"
@@ -856,7 +856,7 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E217194094CD4190BB2A6CC11E4C5546"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DC0B4A5A859740AFBF20FCA844F64C3B"
             {
             "SourcePath" = "8:..\\..\\bin\\release\\visualsc.exe"
             "TargetName" = "8:visualsc.exe"
@@ -1016,15 +1016,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Visual Statechart"
-        "ProductCode" = "8:{02F4989B-46E0-4051-8911-4A259BAAE110}"
-        "PackageCode" = "8:{87CF0BAF-D475-4494-85F6-FA7E54490B91}"
+        "ProductCode" = "8:{F36EF4D7-7D76-4CDD-AD96-15285ADDD8FF}"
+        "PackageCode" = "8:{15D8F4D4-F248-4FBE-B100-459E79164C5C}"
         "UpgradeCode" = "8:{D709AE66-BF74-4E55-876B-8F4B9F9CBF2E}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.9"
+        "ProductVersion" = "8:1.0.10"
         "Manufacturer" = "8:Visual Statechart"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1145,7 +1145,7 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_E217194094CD4190BB2A6CC11E4C5546"
+            "Target" = "8:_DC0B4A5A859740AFBF20FCA844F64C3B"
             "Folder" = "8:_97647CB0098E49F9BA0E2ECA3FD75D32"
             "WorkingFolder" = "8:_39E0CA0221A64D3EA3A2404DC3A9BF28"
             "Icon" = "8:_FC3A5A9CB6594315B2F2AF7CE17B6915"

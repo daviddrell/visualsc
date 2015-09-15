@@ -38,7 +38,7 @@ public:
 public slots:
     //////// State Machine: _stateMachine ////////
     void Event_startMachine___stateMachine();
-    void Event___asdf();
+    void Event___testevent();
 
 
 signals:
@@ -48,7 +48,6 @@ signals:
     //    Connect to these signals to a slot corresponding to a entryAction or exitAction
     //
     //////// State Machine: _stateMachine ////////
-    void Action___ab();
 
 
     //
@@ -66,8 +65,6 @@ signals:
     void Signal_StateExit___stateMachine_3();
     void Signal_StateEntry___stateMachine_4();
     void Signal_StateExit___stateMachine_4();
-    void Signal_StateEntry___stateMachine_5();
-    void Signal_StateExit___stateMachine_5();
 
 
     //////////////////
@@ -105,17 +102,13 @@ private slots:
     void Slot_StateExit___stateMachine_3();
     void Slot_StateEntry___stateMachine_4();
     void Slot_StateExit___stateMachine_4();
-    void Slot_StateEntry___stateMachine_5();
-    void Slot_StateExit___stateMachine_5();
 
 
 signals:
     // A Transition/Event slot's corresponding signal emitted in the slot
     //////// State Machine: _stateMachine ////////
-    void Relay_Event___asdf_stateMachine_1();
-    void Relay_Event___asdf_stateMachine_2();
-    void Relay_Event___asdf_stateMachine_3();
-    void Relay_Event___asdf_stateMachine_4();
+    void Relay_Event___testevent_stateMachine_1();
+    void Relay_Event___testevent_stateMachine_3();
 
 
 private:
@@ -125,7 +118,6 @@ private:
     QState*    _stateMachine_2;
     QState*    _stateMachine_3;
     QState*    _stateMachine_4;
-    QState*    _stateMachine_5;
 
 
 };
