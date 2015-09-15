@@ -8,4 +8,4 @@ Install Visual Statechart 1.0.10
 https://drive.google.com/file/d/0B1lDetBy1i69Rm5LenlLUmJHYnc/view?usp=sharing
 
 
-VisualSc is an editor for hierarchical statecharts developed in C++ with Qt and based on the statechart model by David Harel. One can save and load statecharts using .SCXML and export statecharts to C++ code. The purpose of this program is to provide the user a platform to quickly create and easily manage statechart states and transitions with an editable graphics view and an organized form view. Additionally, VisualSc can port a statechart directly to code, modeling the statechart using the Qt framework with QStates.
+VisualSc is an editor for hierarchical statecharts developed in C++ with Qt and is based on the statechart model by David Harel. One can save and load statecharts using .SCXML and export statecharts to C++ code. The purpose of this program is to provide the user a platform to quickly create and easily manage statechart states and transitions with an editable graphics view and an organized form view. Additionally, VisualSc can port a statechart directly to code, modeling the statechart using the Qt framework with QStates.

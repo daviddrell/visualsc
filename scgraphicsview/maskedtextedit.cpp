@@ -86,9 +86,13 @@ bool MaskedTextEdit::eventFilter(QObject* o, QEvent * e)
         //qDebug() << "eventFiler in ftb " << key->key();
         if(key->key() == Qt::Key_Return)
         {
-
             qDebug() << "Masked Text Edit enter pressed";
             this->setTextInteraction(false, false);
+        }
+        else if (key->key() == Qt::Key_Tab)
+        {
+            qDebug() << "Masked Text Edit Tab Key Pressed";
+            this->setTextInteraction(false,false);
         }
     }
     return false; // propogate the event further

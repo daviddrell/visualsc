@@ -25,7 +25,7 @@
  *  top = height
  *  bottom determines how far from the bottom the box will be
  *
- * right will shrink the right side by a fixed amount
+ * right will shrink the width from the right wall. visually it will appear the same as the original width, but the hover box will be smaller
  *
  */
 
@@ -208,10 +208,6 @@ void FixedTextBlock::recenterText()
     }
 
     //_textItem.document()->setPageSize(QSizeF(_width,_height));
-
-
-
-
 }
 
 qreal FixedTextBlock::clampMin(qreal value, qreal min)
