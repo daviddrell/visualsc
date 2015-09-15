@@ -90,6 +90,8 @@ private slots:
     void handleAttributeDeleted(IAttribute *attr);
     void handleEditBoxSavedText(QString text);
     void handleParentStateGraphicResized(QRectF, QRectF, int);
+    void handleFontFamilyChanged(FontFamilyAttribute*);
+    void handleFontSizeChanged(FontSizeAttribute*);
 
 private:
 

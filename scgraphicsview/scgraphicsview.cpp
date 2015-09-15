@@ -998,7 +998,8 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
  * @param trans
  *
  * calls all graphics related connects for transition graphics, their elbows, and the transition deconstructors
- *
+ * calls all data model/attribute connects for sctransition to transitiongraphics
+ * calls all data model/attribute connects for sctextblock of the transition to the selectable text block of the transition
  * additionally, repositions the anchors to their target states
  *
  */
@@ -1081,6 +1082,12 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
 
     // when the transition graphic emits clicked, also emit it for the sctransition
     connect(transGraphic, SIGNAL(clicked(SCTransition*)), trans, SIGNAL(clicked(SCTransition*)));
+
+    // connect the text block graphic of this transition to the data model
+    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontFamilyChanged(FontFamilyAttribute*)));
+    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontSizeChanged(FontSizeAttribute*)));
+
+
 }
 
 

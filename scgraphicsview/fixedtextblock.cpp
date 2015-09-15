@@ -59,7 +59,7 @@ FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal top, qreal bottom,
 
     // control the hovered variable using the text item's hover events
     connect(&_textItem,SIGNAL(hovered()), this, SLOT(handleHoverEnter()));
-    connect(&_textItem, SIGNAL(unhovered()), this, SLOT(handleHoverLeave()));
+    connect(&_textItem, SIGNAL(unhovered()), this, SLOT(handleHoverLeave()));  
 }
 
 FixedTextBlock::~FixedTextBlock()

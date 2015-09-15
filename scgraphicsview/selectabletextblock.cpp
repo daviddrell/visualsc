@@ -30,6 +30,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QTextDocument>
 #include "transitiongraphic.h"
+#include <QFontDatabase>
 
 #define DEFAULT_PEN_WIDTH       1
 #define HOVER_PEN_WIDTH         1
@@ -69,10 +70,11 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
 //    _textItem.setPos( viewArea.x() , viewArea.y() );
     _textItem.setPos(TEXT_ITEM_X_BUFFER, TEXT_ITEM_Y_BUFFER);
     qDebug()<<"text item is :" << _textItem.pos();
-    QFont serifFont("Arial", 10, QFont::Bold);
-    _textItem.setFont(serifFont);
+//    QFont serifFont("Arial", 10, QFont::Bold);
+//    _textItem.setFont(serifFont);
 
-
+    QFont f(textBlockModel->getFontFamilyAttr()->asString(), textBlockModel->getFontSizeAttr()->asInt(), QFont::Bold);
+    _textItem.setFont(f);
 
     // set the initial text to what the datamodel loaded
     //_textItem.setPlainText( _textBlockModel->getText());
@@ -160,6 +162,43 @@ void SelectableTextBlock::resizeToFitParent()
     }
 
 
+}
+
+void SelectableTextBlock::handleFontSizeChanged(FontSizeAttribute * fa)
+{
+    qDebug() << "stb::handleFOntSizeChanged ";
+    QFont f = _textItem.font();
+    f.setPointSize(fa->asInt());
+    _textItem.setFont(f);
+    recenterText();
+}
+
+void SelectableTextBlock::handleFontFamilyChanged(FontFamilyAttribute *ga)
+{
+    qDebug() << "stb::handleFontFamilyChanged()";
+    QFont f = _textItem.font();
+    f.setFamily(ga->asString());
+    _textItem.setFont(f);
+    this->recenterText();
+    /*
+    QFontDatabase qfd;
+    foreach(const QString &family, qfd.families())
+    {
+//        qDebug() << "================================="<< family <<"====================================";
+        qDebug() << family;
+        foreach(const QString &style, qfd.styles(family))
+        {
+
+            QString sizes;
+            foreach (int points, qfd.smoothSizes(family,style))
+            {
+                sizes += QString::number(points) + " ";
+            }
+            //qDebug() << "\t"<<style <<"\t" << sizes;
+        }
+//        qDebug() << "==============================================================================\n";
+    }
+    */
 }
 
 void SelectableTextBlock::textItemEventHandler(MaskedTextEdit *text, QGraphicsSceneMouseEvent *mevent)
@@ -465,7 +504,6 @@ void SelectableTextBlock::cornerEventHandler(CornerGrabber *corner, QGraphicsSce
 
         emit stateBoxResized(oldBox, newBox, corner->getCorner());
         this->recenterText();
-        this->update();
     }
 }
 
@@ -925,7 +963,7 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 
         QFont font = _textItem.font();
 
-        _textItem.setFont(font);
+//        _textItem.setFont(font);
 
         if ( fb->asBool() )
         {
@@ -1033,6 +1071,7 @@ void SelectableTextBlock::recenterText()
         qreal newY = this->getSize().y()/2.0 - _textItem.document()->size().height()/2.0;
         _textItem.setPos(this->clampMin(newX,getTotalTextItemBufferX()), this->clampMin(newY,getTotalTextItemBufferY()));
     }
+    update();
 }
 
 

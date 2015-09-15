@@ -38,6 +38,22 @@ void CustomTableWidgetItem::handleAttributeChanged(StateString* ss)
     setText(ss->asString());
 }
 
+void CustomTableWidgetItem::handleAttributeChanged(GenericAttribute* ga)
+{
+//    qDebug() << "customtablewidgetitem::handleattribtuechagned ga";
+    setText(ga->asString());
+}
+
+void CustomTableWidgetItem::handleAttributeChanged(FontFamilyAttribute * fa)
+{
+    setText(fa->asString());
+}
+
+void CustomTableWidgetItem::handleAttributeChanged(FontSizeAttribute * fs)
+{
+    setText(fs->asString());
+}
+
 /*
 void CustomTableWidgetItem::setText(const QString &text)
 {

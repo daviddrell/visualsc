@@ -39,6 +39,9 @@ public:
 
     SizeAttribute* getSizeAttr();
     PositionAttribute* getPosAttr();
+    GenericAttribute* getAttr(QString key);
+    FontFamilyAttribute* getFontFamilyAttr();
+    FontSizeAttribute* getFontSizeAttr();
 
 
 public slots:

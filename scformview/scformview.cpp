@@ -583,6 +583,16 @@ void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
             sendMessage("Invalid Position","Please enter coordinates: \"x,y\"");
         }
     }
+    else if (key == "font-family")
+    {
+        qDebug() << "font changed to: " << value;
+        tb->getFontFamilyAttr()->setValue(value);
+    }
+    else if(key == "font-size")
+    {
+        qDebug() << "font size changed to " << value;
+        tb->getFontSizeAttr()->setValue(value);
+    }
 }
 
 /**
@@ -928,6 +938,14 @@ void SCFormView::handleItemClicked(SCTransitionBranch* br)
     this->highlightItem(br);
 }
 
+/**
+ * @brief SCFormView::connectTextBlock
+ * @param textBlock
+ * @param tableItem
+ * @param key
+ *
+ * when the attribute changes, update the corresponding table widget text
+ */
 void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem *tableItem, QString key)
 {
     if(key=="size")
@@ -937,6 +955,14 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
     else if(key == "position")
     {
         connect(textBlock->getPosAttr(), SIGNAL(changed(PositionAttribute*)), tableItem, SLOT(handleAttributeChanged(PositionAttribute*)));
+    }
+    else if (key == "font-family")
+    {
+        connect(textBlock->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), tableItem, SLOT(handleAttributeChanged(FontFamilyAttribute*)));
+    }
+    else if (key == "size")
+    {
+        connect(textBlock->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), tableItem, SLOT(handleAttributeChanged(FontSizeAttribute*)));
     }
 }
 
@@ -1629,7 +1655,7 @@ void SCFormView::setAttributeConnections(IAttributeContainer * atts, bool should
  *
  *
  * loads the textblock properties given in the attributes list into the secondary property table
- *
+ * and connects them to the data model
  *
  */
 void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, bool connect)

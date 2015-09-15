@@ -163,7 +163,7 @@ void SCTransition::handleTextBlockChanged()
 void SCTransition::setEventName(QString text)
 {
     this->setObjectName(text);
-    attributes.value("event")->setValue(text);;
+    attributes.value("event")->setValue(text);
 }
 
 QString SCTransition::getEventName()

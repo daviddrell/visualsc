@@ -1,7 +1,9 @@
 #ifndef ELBOWGRABBER_H
 #define ELBOWGRABBER_H
 
+//#include "elbowgrabber.h"
 #include <QGraphicsItem>
+//#include <QObject>
 #include "transitiongraphic.h"
 #include "LineSegmentGraphic.h"
 
@@ -10,7 +12,7 @@ class ArrowHeadGraphic;
 class TransitionGraphic;
 class LineSegmentGraphic;
 
-class ElbowGrabber : public QObject ,  public QGraphicsItem
+class ElbowGrabber : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 
@@ -80,8 +82,8 @@ private:
 
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
-   // virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
-   // virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+//    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+//    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
     // once the hover event handlers are implemented in this class,
     // the mouse events must also be implemented because of

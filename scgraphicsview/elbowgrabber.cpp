@@ -292,30 +292,30 @@ void ElbowGrabber::forceHoverLeaveEvent()
 
 
 // Hover Events now received in Transition Graphic Scene Event filter
-/*
-void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
-{
-    qDebug() << "ElbowGrabber HoverLeaveEvent";
-    _outterborderColor = _defaultColor;
-    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
-    _outterborderPen.setColor(_defaultColor);
-    _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
-    _height = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
-    //this->update(0,0,_width,_height);
-}
 
-void ElbowGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
-{
-   qDebug() << "ElbowGrabber HoverEnterEvent";
-    _outterborderColor = _hoverColor;
-    _outterborderPen.setWidth(ELBOW_HOVER_WIDTH);
-    _outterborderPen.setColor(_hoverColor);
-    _width = ELBOW_ARROWHEAD_HOVER_WIDTH;
-    _height = ELBOW_ARROWHEAD_HOVER_WIDTH;
-    //_outterborderPen.setStyle();
-    //this->update(0,0,_width,_height);
-}
-*/
+//void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
+//{
+//    qDebug() << "ElbowGrabber HoverLeaveEvent";
+////    _outterborderColor = _defaultColor;
+////    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
+////    _outterborderPen.setColor(_defaultColor);
+////    _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+////    _height = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+////    //this->update(0,0,_width,_height);
+//}
+
+//void ElbowGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
+//{
+//   qDebug() << "ElbowGrabber HoverEnterEvent";
+////    _outterborderColor = _hoverColor;
+////    _outterborderPen.setWidth(ELBOW_HOVER_WIDTH);
+////    _outterborderPen.setColor(_hoverColor);
+////    _width = ELBOW_ARROWHEAD_HOVER_WIDTH;
+////    _height = ELBOW_ARROWHEAD_HOVER_WIDTH;
+////    //_outterborderPen.setStyle();
+////    //this->update(0,0,_width,_height);
+//}
+
 QRectF ElbowGrabber::boundingRect() const
 {
     int captureMargin = 12;

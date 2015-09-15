@@ -58,6 +58,9 @@ public:
 
     virtual void    setValue(const QString value)  ;
 
+signals:
+    void changed(FontFamilyAttribute*);
+
 private:
 
     QString _family;
@@ -82,6 +85,9 @@ public:
     virtual int asInt();
     virtual void    setValue(const QString size)  ;
     void            setValue(const int v);
+
+signals:
+    void changed(FontSizeAttribute*);
 
 private:
 

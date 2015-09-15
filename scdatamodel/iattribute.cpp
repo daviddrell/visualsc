@@ -19,6 +19,7 @@
 */
 
 #include "iattribute.h"
+#include <QDebug>
 #include <QMetaType>
 
 // IAttribute - a base class for attributes
@@ -84,7 +85,12 @@ QString GenericAttribute::asString()
 
 void GenericAttribute::setValue(const QString value)
 {
-    _value = value;
+    if(_value!=value)
+    {
+//        qDebug() << "GenericAttribute::setValue " << this->_key<<":" << this->_value;
+        _value = value;
+        emit changed(this);
+    }
 }
 
 

@@ -25,6 +25,7 @@
 #include <QVariant>
 #include <QMap>
 #include <QMapIterator>
+#include "scdatamodel_global.h"
 
 //#include "sizeattribute.h"
 //#include "stateattributes.h"
@@ -128,6 +129,7 @@ class PositionAttribute;
 class StateName;
 class StateString;
 class TransitionStringAttribute;
+class GenericAttribute;
 
 class IAttribute: public QObject
 {
@@ -158,13 +160,14 @@ signals:
     void changed(StateString*);
     void error(QString err);
 
-private:
+protected:
     QString _key;
 
 };
 
-class GenericAttribute: public IAttribute
+class SCDATAMODELSHARED_EXPORT GenericAttribute: public IAttribute
 {
+    Q_OBJECT
 public:
 
     GenericAttribute();
@@ -177,6 +180,9 @@ public:
 
     virtual QString asString();
     virtual void setValue(const QString value);
+
+signals:
+    void changed(GenericAttribute*);
 
 private:
     QString _value;

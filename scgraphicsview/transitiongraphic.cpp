@@ -1398,6 +1398,11 @@ void TransitionGraphic::handleAttributeChanged(TransitionStringAttribute *tsa)
     _eventText->setText(tsa->asString());
 }
 
+SelectableTextBlock* TransitionGraphic::getEventTextGraphic()
+{
+    return _eventText;
+}
+
 void TransitionGraphic::getClosestSides(int* sourceSide, int* targetSide)
 {
 

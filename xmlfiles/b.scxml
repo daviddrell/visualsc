@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scxml comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine" parallelState="false" position="0,0" size="200,124" type="machine" uid="{2e9c9681-bfd9-4ee5-b725-dc6e08d597c4}" xmlns="http://www.w3.org/2005/07/scxml">
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_1" parallelState="false" position="-440,-153" size="200,124" type="" uid="{ba2a25fd-14d6-4fb7-babd-0e916219430f}">
-        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
-        <transition comments="" connectToFinished="false" event="testevent" path="M 200 62 L 316 68 " target="State Machine_2" uid="{9977af2a-98f2-4bf7-b4fe-57f8ef5c2571}">
-            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-14,29" size="122,42"/>
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_1" parallelState="false" position="-480,-159" size="200,124" type="" uid="{ba2a25fd-14d6-4fb7-babd-0e916219430f}">
+        <textblock font="Arial" font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        <transition comments="" connectToFinished="false" event="testevent" path="M 200 74 L 354 74 " target="State Machine_2" uid="{9977af2a-98f2-4bf7-b4fe-57f8ef5c2571}">
+            <textblock font="Arial" font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="-14,29" size="122,42"/>
         </transition>
     </state>
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_2" parallelState="false" position="-131,-147" size="200,124" type="" uid="{9977af2a-98f2-4bf7-b4fe-57f8ef5c2571}">
-        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_2" parallelState="false" position="-126,-125" size="200,124" type="" uid="{9977af2a-98f2-4bf7-b4fe-57f8ef5c2571}">
+        <textblock font="Arial" font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
     </state>
     <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_3" parallelState="false" position="-332,82" size="200,124" type="" uid="{26859436-348b-4fd0-b265-b7dd0687bef7}">
-        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        <textblock font="Arial" font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
         <transition comments="" connectToFinished="false" event="testevent" path="M 200 62 L 414 60 " target="State Machine_4" uid="{314ac786-ea27-4036-a8ee-e83ea674f235}">
-            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="37,2" size="122,42"/>
+            <textblock font="Arial" font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="37,2" size="122,42"/>
         </transition>
     </state>
     <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_4" parallelState="false" position="75,80" size="200,124" type="" uid="{314ac786-ea27-4036-a8ee-e83ea674f235}">
-        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
+        <textblock font="Arial" font-bold="false" font-color="rgb(0,0,0)" font-family="courier" font-size="8" font-underline="false" position="10,10" size="122,42"/>
     </state>
 </scxml>
