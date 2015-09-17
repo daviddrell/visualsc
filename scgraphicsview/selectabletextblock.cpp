@@ -180,25 +180,25 @@ void SelectableTextBlock::handleFontFamilyChanged(FontFamilyAttribute *ga)
     f.setFamily(ga->asString());
     _textItem.setFont(f);
     this->recenterText();
-    /*
-    QFontDatabase qfd;
-    foreach(const QString &family, qfd.families())
-    {
-//        qDebug() << "================================="<< family <<"====================================";
-        qDebug() << family;
-        foreach(const QString &style, qfd.styles(family))
-        {
 
-            QString sizes;
-            foreach (int points, qfd.smoothSizes(family,style))
-            {
-                sizes += QString::number(points) + " ";
-            }
-            //qDebug() << "\t"<<style <<"\t" << sizes;
-        }
+//    QFontDatabase qfd;
+//    foreach(const QString &family, qfd.families())
+//    {
+//        qDebug() << "================================="<< family <<"====================================";
+//        qDebug() << family;
+//        foreach(const QString &style, qfd.styles(family))
+//        {
+
+//            QString sizes;
+//            foreach (int points, qfd.smoothSizes(family,style))
+//            {
+//                sizes += QString::number(points) + " ";
+//            }
+//            //qDebug() << "\t"<<style <<"\t" << sizes;
+//        }
 //        qDebug() << "==============================================================================\n";
-    }
-    */
+//    }
+
 }
 
 void SelectableTextBlock::textItemEventHandler(MaskedTextEdit *text, QGraphicsSceneMouseEvent *mevent)

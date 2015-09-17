@@ -1331,4 +1331,56 @@ void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 
 }
 
+/**
+ * @brief SCDataModel::handleFontFamilyChanged
+ * @param fontName
+ *
+ * SLOT
+ *
+ *
+ * connected to the mainwindow combo box for the Font
+ * will change the font attribute for every item
+ *
+ */
+void SCDataModel::handleFontFamilyChanged(QString fontName)
+{
+    qDebug() << "SCDatamodel::handleFontFamilyChanged";
+
+    QList<SCTransition*> transitions;
+    _topState->getAllTransitions(transitions);
+
+    foreach(SCTransition* trans, transitions)
+    {
+        trans->setFont(fontName);
+    }
+}
+
+/**
+ * @brief SCDataModel::handleFontSizeChanged
+ * @param fontSize
+ *
+ * SLOT
+ *
+ * connected to mainwindow combo box for font size
+ * will change the font size attribute for all items
+ */
+void SCDataModel::handleFontSizeChanged(QString fontSize)
+{
+    bool ok;
+    int size = fontSize.toInt(&ok);
+
+    if(!ok)
+    {
+        this->message("Could not change font size to "+fontSize);
+        return;
+    }
+
+    QList<SCTransition*> transitions;
+    _topState->getAllTransitions(transitions);
+
+    foreach(SCTransition* trans, transitions)
+    {
+        trans->setFontSize(size);
+    }
+}
 

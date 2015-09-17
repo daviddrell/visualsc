@@ -1088,6 +1088,8 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontSizeChanged(FontSizeAttribute*)));
 
 
+
+
 }
 
 

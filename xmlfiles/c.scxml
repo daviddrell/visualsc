@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scxml comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine" parallelState="false" position="0,0" size="200,124" type="machine" uid="{84960c4e-438f-40b3-b08c-173beaf7db5c}" xmlns="http://www.w3.org/2005/07/scxml">
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_1" parallelState="false" position="0,0" size="200,124" type="" uid="{ee39133a-8da5-40db-9d67-9d9c545987fe}">
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_1" parallelState="false" position="-94,-39" size="200,124" type="" uid="{ee39133a-8da5-40db-9d67-9d9c545987fe}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="arial" font-size="123" font-underline="false" position="10,10" size="122,42"/>
-        <transition comments="" connectToFinished="false" event="twtietn" path="M 100 124 L 100 7 " target="State Machine_2" uid="{6d90ad4d-d3a6-49c8-9eb6-e349eee8ba9e}">
+        <transition comments="" connectToFinished="false" event="twtietn" path="M 124 124 L 124 280 " target="State Machine_2" uid="{6d90ad4d-d3a6-49c8-9eb6-e349eee8ba9e}">
             <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="arial" font-size="50" font-underline="false" position="-345,-383" size="245,133"/>
         </transition>
     </state>
-    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_2" parallelState="false" position="0,0" size="200,124" type="" uid="{6d90ad4d-d3a6-49c8-9eb6-e349eee8ba9e}">
+    <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="State Machine_2" parallelState="false" position="-70,241" size="200,124" type="" uid="{6d90ad4d-d3a6-49c8-9eb6-e349eee8ba9e}">
         <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="10,10" size="122,42"/>
     </state>
 </scxml>

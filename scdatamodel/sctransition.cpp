@@ -243,6 +243,17 @@ SCTextBlock* SCTransition::getTextBlock(QString textBlockName)
     return NULL;
 }
 */
+
+void SCTransition::setFont(QString fontName)
+{
+    this->getEventTextBlock()->getFontFamilyAttr()->setValue(fontName);
+}
+
+void SCTransition::setFontSize(int fontSize)
+{
+    this->getEventTextBlock()->getFontSizeAttr()->setValue(fontSize);
+}
+
 IAttributeContainer * SCTransition::getAttributes()
 {
     return & attributes;

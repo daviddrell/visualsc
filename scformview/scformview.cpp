@@ -960,7 +960,7 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
     {
         connect(textBlock->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), tableItem, SLOT(handleAttributeChanged(FontFamilyAttribute*)));
     }
-    else if (key == "size")
+    else if (key == "font-size")
     {
         connect(textBlock->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), tableItem, SLOT(handleAttributeChanged(FontSizeAttribute*)));
     }

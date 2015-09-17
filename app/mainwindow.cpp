@@ -61,9 +61,55 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-
+    // Designer code
     ui->setupUi(this);
 
+    // Create the Fonts List
+//    QList<QString> fontList;
+    QStringList fontList;
+    QStringList fontSizeList;
+    QFontDatabase qfd;
+    foreach(const QString &family, qfd.families())
+    {
+        //   qDebug() << family;
+        fontList.append(family);
+    }
+
+    // create a list of font sizes based on the first font
+    if(fontList.size() > 0)
+    {
+        foreach(int point, qfd.smoothSizes(fontList.at(0), qfd.styles(fontList.at(0)).at(0)))
+        {
+            fontSizeList.append(QString::number(point));
+        }
+    }
+
+    // add combobox
+    ui->mainToolBar->addSeparator();
+
+    fontBox = new QComboBox();
+    fontBox->setEditable(true);
+    fontBox->addItems(fontList);
+    ui->mainToolBar->addWidget(fontBox);
+
+    // set default to arial, if it exists
+    if(fontBox->findText("arial", 0))
+    {
+        fontBox->setCurrentText("Arial");
+    }
+
+    // add font size combox box
+    fontSizeBox = new QComboBox();
+    fontSizeBox->setEditable(true);
+    fontSizeBox->addItems(fontSizeList);
+    ui->mainToolBar->addWidget(fontSizeBox);
+
+    if(fontSizeBox->findText(QString::number(8),0))
+    {
+        fontSizeBox->setCurrentText(QString::number(8));
+    }
+
+    // custom action connects
     connect ( ui->actionOpen, SIGNAL(triggered()), this, SLOT(handleFileOpenClick()));
     connect ( ui->actionSave, SIGNAL(triggered()), this, SLOT(handleFileSaveClick()));
     connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
@@ -131,19 +177,31 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #endif
 
+    // connects for the mainwindow to other modules
+
+
+    // if the data model sends an error message, the main window will display it with a pop up
     connect(_project->getDM(), SIGNAL(message(QString)), this, SLOT(handleMessage(QString)));
 
+    // data model has special needs when doing a full reset
     connect(this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
+
+    // no special protocol needed for formview. regular item deletion and creation is good enough
 //    connect(this, SIGNAL(reset()), _formEditorWindow, SLOT(handleReset()));
     connect(this, SIGNAL(open(QString)), _project->getDM(), SLOT(handleOpen(QString)));
 
-//    connect(this, SIGNAL(scaleChanged(qreal)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleScaleChanged(qreal)));
-
+    // when the grid action is toggled, the graphics view's scene will change its background
     connect(this, SIGNAL(gridToggled(bool)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
 
 
+    // mainwindow component connects
 
+    // when the font combo box is activated, the data model will change the font family attribute for all items
+    connect(fontBox, SIGNAL(activated(QString)), _project->getDM(), SLOT(handleFontFamilyChanged(QString)));
 
+    connect(fontSizeBox, SIGNAL(activated(QString)), _project->getDM(), SLOT(handleFontSizeChanged(QString)));
+
+    // load settings from settings.ini if it exists, otherwise create a settings.ini file
     _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
     qDebug () << "settings file " << _settingsFileName;
     loadSettings();

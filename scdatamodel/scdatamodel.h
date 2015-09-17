@@ -179,6 +179,10 @@ private slots:
 
     void handleCheckEventCollision(TransitionStringAttribute*);
 
+    void handleFontFamilyChanged(QString);
+    void handleFontSizeChanged(QString);
+
+
 private:
 
 

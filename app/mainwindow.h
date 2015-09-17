@@ -77,7 +77,8 @@ private:
 
     bool _gridEnable;
 
-
+    QComboBox* fontBox;
+    QComboBox* fontSizeBox;
 
 private slots:
     void handleMessage(QString);
