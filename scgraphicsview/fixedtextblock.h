@@ -49,6 +49,8 @@ public:
 
     bool isHovered();
 
+    void adjustHeight();
+
 signals:
     void changed(QString);
 
@@ -58,6 +60,8 @@ public slots:
     void handleStateSizeChanged(SizeAttribute*);
     void handleHoverLeave();
     void handleHoverEnter();
+    void handleFontFamilyChanged(FontFamilyAttribute*);
+    void handleFontSizeChanged(FontSizeAttribute*);
 
 protected:
     qreal clampMin(qreal value, qreal min);

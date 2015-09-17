@@ -250,9 +250,6 @@ void SelectableBoxGraphic::adjustDrawingSize(int x, int y)
 
     _drawingWidth =  _width - _XcornerGrabBuffer;
     _drawingHeight=  _height - _YcornerGrabBuffer;
-
-
-
 }
 
 /**
@@ -754,6 +751,11 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 void SelectableBoxGraphic::setMinSize(QPoint size)
 {
     _minSize = size;
+}
+
+void SelectableBoxGraphic::setMinHeight(qreal h)
+{
+    _minSize.setY(h);
 }
 
 bool SelectableBoxGraphic::isBetween(qreal start, qreal end, qreal point)

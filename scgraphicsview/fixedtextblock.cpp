@@ -31,7 +31,7 @@
 
 #define DEFAULT_WIDTH       50
 #define DEFAULT_HEIGHT      50
-#define TEXT_BUFFER         5
+#define TEXT_BUFFER         1
 
 // the text position will be pushed down to its position in edit mode
 #define TEXT_PUSH_DOWN      1
@@ -81,6 +81,28 @@ bool FixedTextBlock::isHovered()
     return _hovered;
 }
 
+void FixedTextBlock::handleFontSizeChanged(FontSizeAttribute * fa)
+{
+    qDebug() << "stb::handleFOntSizeChanged ";
+    QFont f = _textItem.font();
+    f.setPointSize(fa->asInt());
+    _textItem.setFont(f);
+//    _bottom = _textItem.document()->size().height();
+    recenterText();
+    this->adjustHeight();
+
+}
+
+void FixedTextBlock::handleFontFamilyChanged(FontFamilyAttribute *ga)
+{
+    qDebug() << "stb::handleFontFamilyChanged()";
+    QFont f = _textItem.font();
+    f.setFamily(ga->asString());
+    _textItem.setFont(f);
+    this->recenterText();
+    this->adjustHeight();
+}
+
 /**
  * @brief FixedTextBlock::mouseMoveEvent
  * @param event
@@ -118,6 +140,8 @@ void FixedTextBlock::setFont(int font)
         break;
     }
 }
+
+
 
 void FixedTextBlock::setText(QString text)
 {
@@ -169,6 +193,14 @@ StateBoxGraphic* FixedTextBlock::parentAsStateBoxGraphic()
     return dynamic_cast<StateBoxGraphic*>(this->parentItem());
 }
 
+/**
+ * @brief FixedTextBlock::recenterText
+ *
+ * updates the dimensions of the masked text edit object based on the text graphic dimensions and useable area dimensions
+ * will attempt to center the text block within the total allowable area
+ * otherwise it will move it to the top left corner of the allowable area
+ *
+ */
 void FixedTextBlock::recenterText()
 {
     // sets the width and height of the textItem based on the plainText
@@ -210,6 +242,31 @@ void FixedTextBlock::recenterText()
     //_textItem.document()->setPageSize(QSizeF(_width,_height));
 }
 
+/**
+ * @brief FixedTextBlock::adjustHeight
+ *
+ * When the text size is changed, automatically adjust the maximum rectangle height
+ *
+ *
+ *
+ */
+void FixedTextBlock::adjustHeight()
+{
+    if(_attachedToTop)
+    {
+        qreal docH = _textItem.document()->size().height();
+//        _textItem.setHeight(docH+2);
+        _bottom = docH+2*TEXT_BUFFER;
+        this->parentAsStateBoxGraphic()->setMinHeight(_bottom);
+        this->resize();
+        qDebug () << "_textItem document dimensions: " <<_textItem.document()->size() <<"\tchanged bottom: " << this->_bottom << "\tnew dimensions: " << this->getSize();
+    }
+    else // bottom anchored
+    {
+
+    }
+}
+
 qreal FixedTextBlock::clampMin(qreal value, qreal min)
 {
     if(value < min)
@@ -221,7 +278,7 @@ qreal FixedTextBlock::clampMin(qreal value, qreal min)
  * @brief FixedTextBlock::reposition
  *
  * moves the fixed text block to hug the left wall of the usable area of its parent
- * and down to the percentage level of _top
+ * and down to the level of _top
  */
 void FixedTextBlock::reposition()
 {

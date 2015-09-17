@@ -139,6 +139,11 @@ public slots:
     SCTransition* handleMakeANewTransition(SCState* source, TransitionAttributes*);
     void handleReset();
     void handleOpen(QString);
+    void handleTransitionFontFamilyChanged(QString);
+    void handleStateFontFamilyChanged(QString);
+
+    void handleTransitionFontSizeChanged(QString);
+    void handleStateFontSizeChanged(QString);
 
 signals:
     void importedMachine(SCState*);
@@ -181,6 +186,7 @@ private slots:
 
     void handleFontFamilyChanged(QString);
     void handleFontSizeChanged(QString);
+
 
 
 private:

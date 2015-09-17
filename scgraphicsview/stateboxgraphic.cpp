@@ -32,7 +32,7 @@
 #include "cornergrabber.h"
 
 
-#define HIDE_CORNER_GRABBERS
+//#define HIDE_CORNER_GRABBERS
 
 #define PEN_DEFAULT_WIDTH       2.472135954999419
 #define PEN_HOVER_WIDTH         4
@@ -148,6 +148,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
 }
 
+
 /**
  * @brief StateBoxGraphic::handleMinimize
  *
@@ -219,7 +220,12 @@ void StateBoxGraphic::handleMinimize()
     }
 }
 
-
+void StateBoxGraphic::setMinHeight(qreal h)
+{
+//    SelectableBoxGraphic::setMinHeight(h);
+    _minSize.setY(h);
+    _minimizeSize.setY(h);
+}
 
 void StateBoxGraphic::handleExitActionChanged(StateString *ss )
 {

@@ -25,6 +25,8 @@
 #include "smproject.h"
 #include <QString>
 #include "textformattoolbar.h"
+#include <QButtonGroup>
+#include <QRadioButton>
 
 class SCFormView;
 //class SCGraphicsView;
@@ -77,8 +79,15 @@ private:
 
     bool _gridEnable;
 
-    QComboBox* fontBox;
-    QComboBox* fontSizeBox;
+    QComboBox* _fontBox;
+    QComboBox* _fontSizeBox;
+
+//    QButtonGroup _fontSelection;
+    QRadioButton* _stateFontRadioButton;
+    QRadioButton* _transitionFontRadioButton;
+
+    void addToolbarSpacer(QToolBar *toolbar);
+
 
 private slots:
     void handleMessage(QString);
@@ -96,6 +105,10 @@ private slots:
     void on_actionZoomIn_triggered();
     void on_actionSaveImage_triggered();
     void on_actionGrid_toggled(bool arg1);
+
+
+    void handleChangeFont(QString);
+    void handleChangeFontSize(QString);
 };
 
 #endif // MAINWINDOW_H

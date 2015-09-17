@@ -107,6 +107,8 @@ public:
     virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
+    void setMinHeight(qreal h);
+
 
 signals:
     void resizeState(StateBoxGraphic*);
@@ -137,6 +139,7 @@ public slots:
     void handleTextBlockAttributeChanged(PositionAttribute*);
     void handleTextBlockMoved(QPointF);
     void handleMinimize();
+
 
 private:
 

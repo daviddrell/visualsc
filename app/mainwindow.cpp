@@ -87,27 +87,44 @@ MainWindow::MainWindow(QWidget *parent) :
     // add combobox
     ui->mainToolBar->addSeparator();
 
-    fontBox = new QComboBox();
-    fontBox->setEditable(true);
-    fontBox->addItems(fontList);
-    ui->mainToolBar->addWidget(fontBox);
+    _fontBox = new QComboBox();
+    _fontBox->setEditable(true);
+    _fontBox->addItems(fontList);
+    ui->mainToolBar->addWidget(_fontBox);
 
     // set default to arial, if it exists
-    if(fontBox->findText("arial", 0))
+    if(_fontBox->findText("arial", 0))
     {
-        fontBox->setCurrentText("Arial");
+        _fontBox->setCurrentText("Arial");
     }
+
+//    this->addToolbarSpacer(ui->mainToolBar);
+//    ui->mainToolBar->setStyleSheet("spacing: 20px");
 
     // add font size combox box
-    fontSizeBox = new QComboBox();
-    fontSizeBox->setEditable(true);
-    fontSizeBox->addItems(fontSizeList);
-    ui->mainToolBar->addWidget(fontSizeBox);
+    _fontSizeBox = new QComboBox();
+    _fontSizeBox->setEditable(true);
+    _fontSizeBox->addItems(fontSizeList);
+    ui->mainToolBar->addWidget(_fontSizeBox);
 
-    if(fontSizeBox->findText(QString::number(8),0))
+    if(_fontSizeBox->findText(QString::number(10),0))
     {
-        fontSizeBox->setCurrentText(QString::number(8));
+        _fontSizeBox->setCurrentText(QString::number(10));
     }
+
+
+
+    // radio buttons
+
+//    _fontSelection.setParent(this);
+    _stateFontRadioButton = new QRadioButton("States",this);
+    _transitionFontRadioButton = new QRadioButton("Transitions", this);
+
+    ui->mainToolBar->addWidget(_stateFontRadioButton);
+    ui->mainToolBar->addWidget(_transitionFontRadioButton);
+
+    _stateFontRadioButton->toggle();
+
 
     // custom action connects
     connect ( ui->actionOpen, SIGNAL(triggered()), this, SLOT(handleFileOpenClick()));
@@ -197,9 +214,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // mainwindow component connects
 
     // when the font combo box is activated, the data model will change the font family attribute for all items
-    connect(fontBox, SIGNAL(activated(QString)), _project->getDM(), SLOT(handleFontFamilyChanged(QString)));
+//    connect(_fontBox, SIGNAL(activated(QString)), _project->getDM(), SLOT(handleFontFamilyChanged(QString)));
+    connect(_fontBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
 
-    connect(fontSizeBox, SIGNAL(activated(QString)), _project->getDM(), SLOT(handleFontSizeChanged(QString)));
+    connect(_fontSizeBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFontSize(QString)));
+
+//    connect(_fontSizeBox, SIGNAL(activated(QString)), _project->getDM(), SLOT(handleFontSizeChanged(QString)));
 
     // load settings from settings.ini if it exists, otherwise create a settings.ini file
     _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
@@ -213,6 +233,45 @@ MainWindow::~MainWindow()
     delete _project;
     delete ui;
 }
+
+void MainWindow::addToolbarSpacer(QToolBar *toolbar)
+{
+QWidget *widget = new QWidget;
+QHBoxLayout *spacerLayout = new QHBoxLayout;
+QSpacerItem *spacer =
+   new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Minimum);
+spacerLayout->addSpacerItem(spacer);
+widget->setLayout(spacerLayout);
+toolbar->addWidget(widget);
+}
+
+
+void MainWindow::handleChangeFont(QString fontName)
+{
+    if(_stateFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleStateFontFamilyChanged(fontName);
+    }
+    else
+    {
+        _project->getDM()->handleTransitionFontFamilyChanged(fontName);
+    }
+
+}
+
+void MainWindow::handleChangeFontSize(QString fontSize)
+{
+
+    if(_stateFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleStateFontSizeChanged(fontSize);
+    }
+    else
+    {
+        _project->getDM()->handleTransitionFontSizeChanged(fontSize);
+    }
+}
+
 
 
 void MainWindow::handleMessage(QString msg)

@@ -990,6 +990,14 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
     // handle state exit action change to update the data model
     connect(stateGraphic, SIGNAL(exitActionChanged(QString)), state, SLOT(handleExitActionChanged(QString)));
+
+
+
+    // font connects
+    connect(state->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontFamilyChanged(FontFamilyAttribute*)));
+
+
+    connect(state->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontSizeChanged(FontSizeAttribute*)));
 }
 
 

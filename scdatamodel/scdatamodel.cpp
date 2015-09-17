@@ -1353,6 +1353,14 @@ void SCDataModel::handleFontFamilyChanged(QString fontName)
     {
         trans->setFont(fontName);
     }
+
+    QList<SCState*> states;
+    _topState->getAllStates(states);
+
+    foreach(SCState* st, states)
+    {
+        st->setFont(fontName);
+    }
 }
 
 /**
@@ -1382,5 +1390,76 @@ void SCDataModel::handleFontSizeChanged(QString fontSize)
     {
         trans->setFontSize(size);
     }
+
+    QList<SCState*> states;
+    _topState->getAllStates(states);
+
+    foreach(SCState* st, states)
+    {
+        st->setFontSize(size);
+    }
 }
 
+
+void SCDataModel::handleTransitionFontFamilyChanged(QString fontName)
+{
+    QList<SCTransition*> transitions;
+    _topState->getAllTransitions(transitions);
+
+    foreach(SCTransition* trans, transitions)
+    {
+        trans->setFont(fontName);
+    }
+}
+
+void SCDataModel::handleTransitionFontSizeChanged(QString fontSize)
+{
+    bool ok;
+    int size = fontSize.toInt(&ok);
+
+    if(!ok)
+    {
+        this->message("Could not change font size to "+fontSize);
+        return;
+    }
+
+    QList<SCTransition*> transitions;
+    _topState->getAllTransitions(transitions);
+
+    foreach(SCTransition* trans, transitions)
+    {
+        trans->setFontSize(size);
+    }
+}
+
+
+void SCDataModel::handleStateFontFamilyChanged(QString fontName)
+{
+    QList<SCState*> states;
+    _topState->getAllStates(states);
+
+    foreach(SCState* st, states)
+    {
+        st->setFont(fontName);
+    }
+}
+
+void SCDataModel::handleStateFontSizeChanged(QString fontSize)
+{
+    bool ok;
+    int size = fontSize.toInt(&ok);
+
+    if(!ok)
+    {
+        this->message("Could not change font size to "+fontSize);
+        return;
+    }
+
+    QList<SCState*> states;
+    _topState->getAllStates(states);
+
+    foreach(SCState* st, states)
+    {
+        st->setFontSize(size);
+    }
+}

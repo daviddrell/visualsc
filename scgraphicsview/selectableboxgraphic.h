@@ -135,6 +135,7 @@ public:
 
     void setPenWidth(qreal, qreal);
     void setMinSize(QPoint);
+    void setMinHeight(qreal);
     //bool eventFilter(QObject *, QEvent *);
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
     virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );

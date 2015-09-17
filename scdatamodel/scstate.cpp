@@ -500,6 +500,23 @@ void SCState::handleTextBlockChanged()
     this->setStateName(_IdTextBlock->getText());
 }
 
+
+/**
+ * @brief SCState::setFont
+ * @param fontName
+ *
+ * changes the font family attribute
+ */
+void SCState::setFont(QString fontName)
+{
+    this->getIDTextBlock()->getFontFamilyAttr()->setValue(fontName);
+}
+
+void SCState::setFontSize(int fontSize)
+{
+    this->getIDTextBlock()->getFontSizeAttr()->setValue(fontSize);
+}
+
 /**
  * @brief SCState::setStateName
  * @param n
