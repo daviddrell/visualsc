@@ -19,7 +19,6 @@
 */
 
 #include "stateboxgraphic.h"
-
 #include <QBrush>
 #include <QLinearGradient>
 #include <QDebug>
@@ -30,6 +29,7 @@
 #include "textblock.h"
 #include "selectablelinesegmentgraphic.h"
 #include <QApplication>
+#include "cornergrabber.h"
 
 
 #define HIDE_CORNER_GRABBERS
@@ -56,10 +56,6 @@
 #define BOX_GREEN_OFFSET        0
 #define BOX_BLUE_OFFSET         1
 
-#define MIN_WIDTH       105
-#define MIN_HEIGHT      42
-
-#define MINIMIZE_BUFFER_ON_TEXT 25
 
 
 // height of the state name fixed text block
@@ -67,6 +63,9 @@
 
 #define ENTRY_TOP           STATE_NAME_HEIGHT+2
 #define ENTRY_HEIGHT        24
+
+
+
 
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
@@ -78,10 +77,13 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _diagLineEnd(),
         _diagLineDrawIt(false),
         _intersection(),
-        _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, MINIMIZE_BUFFER_ON_TEXT, true)),
+        _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, MINIMIZE_BUTTON_MARGIN, true)),
         _entryActionTitle(new FixedTextBlock(this, ENTRY_TOP, ENTRY_HEIGHT,0, true)),
         _exitActionTitle(new FixedTextBlock(this, ENTRY_HEIGHT,0,0  , false))
 {
+
+
+
     // set the default text
     _stateTitle->setText(this->getStateName());
 
@@ -431,41 +433,6 @@ int StateBoxGraphic::getSmallest(double* ar, int len)
         }
     }
     return index;
-}
-
-qreal StateBoxGraphic::getBufferX()
-{
-    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER;
-}
-
-qreal StateBoxGraphic::getBufferY()
-{
-    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER;
-}
-
-QRectF StateBoxGraphic::getBufferedRect()
-{
-    QRectF rect( this->getBufferX(), this->getBufferY(), getSize().x() - 2*getBufferX(), getSize().y() - 2* getBufferY());
-    return rect;
-}
-
-/**
- * @brief StateBoxGraphic::getBufferedBoxRect
- * @param bufferLength
- * @return
- *
- * Returns a modified QRectF of the statebox that has a reduced width and height to match the box shown and ignore the stylistic shadow of the state box
- *
- */
-QRectF* StateBoxGraphic::getBufferedBoxRect(qreal bufferLength, qreal offset)
-{
-    QRectF box = getUsableArea();
-    QRectF* ret = new QRectF(box);
-    ret->setWidth(ret->width()-bufferLength);
-    ret->setHeight(ret->height()-bufferLength);
-    ret->setX(ret->x()-offset);
-    ret->setY(ret->y()-offset);
-    return ret;
 }
 
 /**

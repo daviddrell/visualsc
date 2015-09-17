@@ -239,6 +239,7 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
         _outterborderPen.setStyle(Qt::SolidLine);
         painter->setPen(_outterborderPen);
 
+        qDebug() << "corner pos: " << this->pos();
         QPointF topLeft (0-(_width/2), 0-(_height/2));
         QPointF bottomRight ( _width/2 ,_height/2);
 
@@ -276,6 +277,6 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
     }
     else if(_paintStyle == kNone)
     {
-
+qDebug() << "corner pos: " << this->pos();
     }
 }

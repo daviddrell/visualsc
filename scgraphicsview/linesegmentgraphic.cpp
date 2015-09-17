@@ -1,6 +1,13 @@
 #include "linesegmentgraphic.h"
 #include <QDebug>
 
+
+
+#define LSG_CORNER_GRAB_BUFFER 5
+#define ELBOW_GUARD_BUFFER 15.0
+#define LINE_HOVER_WIDTH  10.0
+
+
 LineSegmentGraphic::LineSegmentGraphic()
 {
 
@@ -314,15 +321,15 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
     QList<QPointF> pointsStart;
     QList<QPointF> pointsEnd;
 
-    pointsStart.append(  QPointF(lineStartX  - CORNER_GRAB_BUFFER, lineStartY - CORNER_GRAB_BUFFER));
-    pointsStart.append(  QPointF(lineStartX + CORNER_GRAB_BUFFER, lineStartY - CORNER_GRAB_BUFFER));
-    pointsStart.append(  QPointF(lineStartX + CORNER_GRAB_BUFFER, lineStartY + CORNER_GRAB_BUFFER));
-    pointsStart.append(  QPointF(lineStartX - CORNER_GRAB_BUFFER, lineStartY + CORNER_GRAB_BUFFER));
+    pointsStart.append(  QPointF(lineStartX  - LSG_CORNER_GRAB_BUFFER, lineStartY - LSG_CORNER_GRAB_BUFFER));
+    pointsStart.append(  QPointF(lineStartX + LSG_CORNER_GRAB_BUFFER, lineStartY - LSG_CORNER_GRAB_BUFFER));
+    pointsStart.append(  QPointF(lineStartX + LSG_CORNER_GRAB_BUFFER, lineStartY + LSG_CORNER_GRAB_BUFFER));
+    pointsStart.append(  QPointF(lineStartX - LSG_CORNER_GRAB_BUFFER, lineStartY + LSG_CORNER_GRAB_BUFFER));
 
-    pointsEnd.append(  QPointF(lineEndX - CORNER_GRAB_BUFFER, lineEndY - CORNER_GRAB_BUFFER));
-    pointsEnd.append(  QPointF(lineEndX + CORNER_GRAB_BUFFER, lineEndY - CORNER_GRAB_BUFFER));
-    pointsEnd.append(  QPointF(lineEndX + CORNER_GRAB_BUFFER, lineEndY + CORNER_GRAB_BUFFER));
-    pointsEnd.append(  QPointF(lineEndX - CORNER_GRAB_BUFFER, lineEndY + CORNER_GRAB_BUFFER));
+    pointsEnd.append(  QPointF(lineEndX - LSG_CORNER_GRAB_BUFFER, lineEndY - LSG_CORNER_GRAB_BUFFER));
+    pointsEnd.append(  QPointF(lineEndX + LSG_CORNER_GRAB_BUFFER, lineEndY - LSG_CORNER_GRAB_BUFFER));
+    pointsEnd.append(  QPointF(lineEndX + LSG_CORNER_GRAB_BUFFER, lineEndY + LSG_CORNER_GRAB_BUFFER));
+    pointsEnd.append(  QPointF(lineEndX - LSG_CORNER_GRAB_BUFFER, lineEndY + LSG_CORNER_GRAB_BUFFER));
 
     qreal minDistance = 0 ;
     qreal secondMinDistance = 0;

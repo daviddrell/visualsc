@@ -10,6 +10,9 @@
 #include "textblock.h"
 
 class StateBoxGraphic;
+//class SelectableBoxGraphic;
+
+
 enum Font{
         Normal,
         Small

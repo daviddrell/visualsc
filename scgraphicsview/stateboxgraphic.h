@@ -19,8 +19,8 @@
 */
 
 
-#ifndef STATEBOX_H
-#define STATEBOX_H
+#ifndef STATEBOXGRAPHIC_H
+#define STATEBOXGRAPHIC_H
 
 
 #include "selectableboxgraphic.h"
@@ -53,12 +53,6 @@ class IAttribute;
 
 
 
-enum WallFace{
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST
-};
 
 enum WallCorners{
     NORTHWEST,
@@ -113,11 +107,6 @@ public:
     virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
-    qreal getBufferX();
-    qreal getBufferY();
-    QRectF getBufferedRect();
-
-
 
 signals:
     void resizeState(StateBoxGraphic*);
@@ -159,7 +148,6 @@ private:
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
     virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
-    QRectF* getBufferedBoxRect(qreal buffer,qreal offset);
     double xDistance(QPointF, QPointF);
     double yDistance(QPointF, QPointF);
     double distance(QPointF,QPointF);
@@ -206,6 +194,8 @@ private:
     QPointF _restoreSize;
     QPointF _minimizeSize;
 
+
+
 };
 
-#endif // STATEBOX_H
+#endif // STATEBOXGRAPHIC_H

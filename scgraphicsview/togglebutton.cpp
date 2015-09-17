@@ -81,7 +81,7 @@ void ToggleButton::reposition()
     StateBoxGraphic* parent = this->parentAsStateBoxGraphic();
 //    QRectF rect(parent->getBufferX(), parent->getBufferY(), parent->getSize().x()- 2*parent->getBufferX(), parent->getSize.y()-2*parent->getBufferY());
 
-    QRectF rect = parent->getBufferedRect();
+    QRectF rect = parent->getContentAreaRect();
 
     switch(_corner)
     {
@@ -109,7 +109,7 @@ void ToggleButton::handleStateSizeChanged(SizeAttribute * sa)
         StateBoxGraphic* parent = this->parentAsStateBoxGraphic();
     //    QRectF rect(parent->getBufferX(), parent->getBufferY(), parent->getSize().x()- 2*parent->getBufferX(), parent->getSize.y()-2*parent->getBufferY());
 
-        QRectF rect = parent->getBufferedRect();
+        QRectF rect = parent->getContentAreaRect();
 
         switch(_corner)
         {

@@ -20,32 +20,37 @@
 */
 
 #include "selectabletextblock.h"
-#include "positionattribute.h"
-#include "sizeattribute.h"
 #include <QDebug>
 #include <QKeyEvent>
-#include "texteditbox.h"
-#include "scdatamodel.h"
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QTextDocument>
-#include "transitiongraphic.h"
 #include <QFontDatabase>
+#include "positionattribute.h"
+#include "sizeattribute.h"
+#include "texteditbox.h"
+#include "scdatamodel.h"
+#include "transitiongraphic.h"
+#include "cornergrabber.h"
+
 
 #define DEFAULT_PEN_WIDTH       1
 #define HOVER_PEN_WIDTH         1
 
-#define MIN_WIDTH               50
-#define MIN_HEIGHT              24 + 2*(CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_Y_BUFFER)
+//#define MIN_WIDTH               50
+//#define MIN_HEIGHT              24 + 2*(CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_Y_BUFFER)
 
 //#define POP_UP_EDIT_MODE
+
+#define TB_MIN_WIDTH    50
+#define TB_MIN_HEIGHT   24 + 2*(VISIBLE_MARGIN+CONTENT_MARGIN)
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent,true),
        // _minSize(QPoint(MIN_WIDTH,MIN_HEIGHT)),
         _verticalTextMargin(10),
         _horizontalTextMargin(5),
-        _textItem(this, QRect(0,0, TEXTBLOCK_DEFAULT_WIDTH-2*(TEXT_ITEM_X_BUFFER), TEXTBLOCK_DEFAULT_HEIGHT-2*(TEXT_ITEM_Y_BUFFER))),
+        _textItem(this, QRect(0,0, TEXTBLOCK_DEFAULT_WIDTH, TEXTBLOCK_DEFAULT_HEIGHT)),
         _textBlockModel(textBlockModel),
         _centerText(true)
 {
@@ -68,7 +73,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     // set the text into the viewable area of the rectangle
 //    QRectF viewArea = this->getUsableArea();
 //    _textItem.setPos( viewArea.x() , viewArea.y() );
-    _textItem.setPos(TEXT_ITEM_X_BUFFER, TEXT_ITEM_Y_BUFFER);
+    _textItem.setPos(0,0);
     qDebug()<<"text item is :" << _textItem.pos();
 //    QFont serifFont("Arial", 10, QFont::Bold);
 //    _textItem.setFont(serifFont);
@@ -87,7 +92,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     setBoxStyle(SelectableBoxGraphic::kTransparent );
     setFlags(QGraphicsItem::ItemClipsChildrenToShape);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
-    setMinSize(QPoint(MIN_WIDTH,MIN_HEIGHT));
+    setMinSize(QPoint(TB_MIN_WIDTH,TB_MIN_HEIGHT));
     setPenWidth(DEFAULT_PEN_WIDTH,HOVER_PEN_WIDTH);
 
 #ifdef POP_UP_EDIT_MODE
@@ -1084,12 +1089,12 @@ void SelectableTextBlock::recenterText()
 
 qreal SelectableTextBlock::getTotalTextItemBufferX()
 {
-    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_X_BUFFER;
+    return 2*(VISIBLE_MARGIN+CONTENT_MARGIN);
 }
 
 qreal SelectableTextBlock::getTotalTextItemBufferY()
 {
-    return CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_Y_BUFFER;
+    return 2*(VISIBLE_MARGIN+CONTENT_MARGIN);
 }
 
 /**

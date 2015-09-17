@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QTextDocument>
 #include "stateboxgraphic.h"
-
+//#include "selectableboxgraphic.h"
 
 
 /**
@@ -227,14 +227,14 @@ void FixedTextBlock::reposition()
 {
     if(_attachedToTop)
     {
-        QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
+        QRectF pRect = this->parentAsSelectableBoxGraphic()->getContentAreaRect();
         qreal x = pRect.x();
         qreal y = _top + pRect.y();
         this->setPos(x,y);
     }
     else
     {
-        QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
+        QRectF pRect = this->parentAsSelectableBoxGraphic()->getContentAreaRect();
         qreal x = pRect.x();
         qreal y = pRect.y()+pRect.height() - _bottom - (_top) + 2;
         this->setPos(x,y);
@@ -251,7 +251,7 @@ void FixedTextBlock::reposition()
  */
 void FixedTextBlock::resize()
 {
-    QRectF pRect = this->parentAsSelectableBoxGraphic()->getUsableArea();
+    QRectF pRect = this->parentAsSelectableBoxGraphic()->getContentAreaRect();
     _width = pRect.width() - _right;
 
     if(_attachedToTop)

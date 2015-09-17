@@ -1,15 +1,16 @@
 #ifndef SELECTABLETEXTBLOCK_H
 #define SELECTABLETEXTBLOCK_H
 
-#include "maskedtextedit.h"
 #include "selectableboxgraphic.h"
+#include "maskedtextedit.h"
 #include "textblock.h"
 #include "iattribute.h"
 
+
+
+
 class QKeyEvent;
 class QGraphicsSceneMouseEvent;
-
-
 
 
 /**
