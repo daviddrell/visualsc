@@ -184,9 +184,6 @@ private slots:
 
     void handleCheckEventCollision(TransitionStringAttribute*);
 
-    void handleFontFamilyChanged(QString);
-    void handleFontSizeChanged(QString);
-
     void handleItemClicked(SCState*);
     void handleItemClicked(SCTransition*);
 
@@ -215,6 +212,8 @@ private:
     //QList<SCState*> _states;
     QList<SCTransition*> _transitions;
     QList<SCTransition*> _importedTransitions;
+
+    SCItem* _lastClickedItem;
 
 
 

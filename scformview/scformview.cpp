@@ -615,7 +615,7 @@ void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
  */
 void SCFormView::handlePropertyCellChanged(int r, int c)
 {
-    qDebug() << "SCFormView::handle PropertyCellChanged type is " << _currentlySelected->getType();
+//    qDebug() << "SCFormView::handle PropertyCellChanged type is " << _currentlySelected->getType();
 
     // only process the second column
     if ( c != 1 ) return;

@@ -35,7 +35,7 @@ QRectF MaskedTextEdit::boundingRect()
 
 void MaskedTextEdit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    qDebug() << "mte hover enter";
+//    qDebug() << "mte hover enter";
     QApplication::setOverrideCursor(Qt::IBeamCursor);
     emit hovered();
     QGraphicsTextItem::hoverEnterEvent(event);
@@ -43,7 +43,7 @@ void MaskedTextEdit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 void MaskedTextEdit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-    qDebug() << "mte hover leave";
+//    qDebug() << "mte hover leave";
     QApplication::restoreOverrideCursor();
     emit unhovered();
     QGraphicsTextItem::hoverLeaveEvent(event);
@@ -292,9 +292,14 @@ void MaskedTextEdit::setTextInteraction(bool on, bool selectAll)
 //    return QGraphicsTextItem::itemChange(change, value);
 //}
 
-
+/**
+ * @brief MaskedTextEdit::resizeRectToFixedTextBlock
+ *
+ * sets the textitem to be fixed at the top left of the content area
+ */
 void MaskedTextEdit::resizeRectToFixedTextBlock()
 {
+    qDebug() << "mte::resizeRectoFixedTextBlock";
     FixedTextBlock* ftb = this->parentAsFixedTextBlock();
 
 
@@ -309,6 +314,7 @@ void MaskedTextEdit::resizeRectToFixedTextBlock()
 
 void MaskedTextEdit::resizeRectToTextBlock()
 {
+
     SelectableTextBlock* stb = this->parentAsSelectableTextBlock();
 
     // rect should always be at 0,0

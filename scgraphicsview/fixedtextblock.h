@@ -38,7 +38,7 @@ public:
     StateBoxGraphic* parentAsStateBoxGraphic();
     void reposition();
     void resize();
-    void recenterText();
+    void cropDocument();
     QPointF getSize();
     void setText(QString);
     void setFont(int);

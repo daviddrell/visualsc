@@ -37,7 +37,8 @@ SCDataModel::SCDataModel(QObject * parent) :
     _currentState(NULL),
     _currentTransition(NULL),
     _topState(NULL),
-    _scene(0)
+    _scene(0),
+    _lastClickedItem(NULL)
 {
     _reader.setDataModel(this);
     _settings = new QSettings(this);
@@ -83,8 +84,10 @@ void SCDataModel::connectTransition(SCTransition * trans)
     connect(trans->getTransStringAttr("event"), SIGNAL(changed(TransitionStringAttribute*)), this, SLOT(handleCheckEventCollision(TransitionStringAttribute*)));
     connect(trans,SIGNAL(markedForDeletion(QObject*)),this,SLOT(handleTransitionBeingDeleted(QObject*)));
 
+    // when the transition is clicked, scdatamodel will do something
     connect(trans, SIGNAL(clicked(SCTransition*)), this, SLOT(handleItemClicked(SCTransition*)));
 
+    // propogate font attribute changes to the mainwindow combo boxes
     connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
 
     connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
@@ -100,16 +103,29 @@ void SCDataModel::connectTransition(SCTransition * trans)
 void SCDataModel::connectState(SCState * st)
 {
     qDebug() << "scdm::connectState";
+     // when the state is clicked, scdatamodel will do something
     connect(st, SIGNAL(clicked(SCState*)), this, SLOT(handleItemClicked(SCState*)));
 
+
+    // propogate font attribute changes to the mainwindow combo boxes
     connect(st->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
 
     connect(st->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
 }
 
+/**
+ * @brief SCDataModel::handleChangeProgramFont
+ * @param ffa
+ *
+ * SLOT
+ *
+ * connected to the sctextblock attributes of items
+ * propogates attribute changes to change the program font in mainwindow
+ *
+ */
 void SCDataModel::handleChangeProgramFont(FontFamilyAttribute * ffa)
 {
-    QFont font(ffa->asString(),0);
+    QFont font(ffa->asString(), 1);
     emit setProgramFont(&font);
 }
 void SCDataModel::handleChangeProgramFont(FontSizeAttribute * fsa)
@@ -128,8 +144,12 @@ void SCDataModel::handleChangeProgramFont(FontSizeAttribute * fsa)
  */
 void SCDataModel::handleItemClicked(SCState * st)
 {
-//    emit setFont(st->getIDTextBlock()->getFontFamilyAttr()->asString());
-//    emit setFontSize(st->getIDTextBlock()->getFontSizeAttr()->asInt());
+//    SCState* lastClickedSt = dynamic_cast<SCState*>(_lastClickedItem);
+
+    if(_lastClickedItem==st)
+        return;
+
+    _lastClickedItem = st;
 
     QFont font(st->getIDTextBlock()->getFontFamilyAttr()->asString(), st->getIDTextBlock()->getFontSizeAttr()->asInt());
     emit setProgramFont(&font);
@@ -137,6 +157,14 @@ void SCDataModel::handleItemClicked(SCState * st)
 
 void SCDataModel::handleItemClicked(SCTransition * trans)
 {
+//    SCTransition* lastClickedTr = dynamic_cast<SCTransition*>(_lastClickedItem);
+
+    if(_lastClickedItem==trans)
+        return;
+
+    _lastClickedItem = trans;
+
+
     QFont font(trans->getEventTextBlock()->getFontFamilyAttr()->asString(), trans->getEventTextBlock()->getFontSizeAttr()->asInt());
     emit setProgramFont(&font);
 }
@@ -1332,80 +1360,13 @@ void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 
 }
 
-/**
- * @brief SCDataModel::handleFontFamilyChanged
- * @param fontName
- *
- * SLOT
- *
- *
- * connected to the mainwindow combo box for the Font
- * will change the font attribute for every item
- *
- */
-void SCDataModel::handleFontFamilyChanged(QString fontName)
-{
-    qDebug() << "SCDatamodel::handleFontFamilyChanged";
-
-    QList<SCTransition*> transitions;
-    _topState->getAllTransitions(transitions);
-
-    foreach(SCTransition* trans, transitions)
-    {
-        trans->setFont(fontName);
-    }
-
-    QList<SCState*> states;
-    _topState->getAllStates(states);
-
-    foreach(SCState* st, states)
-    {
-        st->setFont(fontName);
-    }
-}
 
 /**
- * @brief SCDataModel::handleFontSizeChanged
- * @param fontSize
+ * @brief SCDataModel::handleStateFontChanged
+ * @param font
  *
- * SLOT
- *
- * connected to mainwindow combo box for font size
- * will change the font size attribute for all items
+ * change all states fonts to given Qfont
  */
-void SCDataModel::handleFontSizeChanged(QString fontSize)
-{
-    bool ok;
-    int size = fontSize.toInt(&ok);
-
-    if(!ok)
-    {
-        this->message("Could not change font size to "+fontSize);
-        return;
-    }
-
-    QList<SCTransition*> transitions;
-    _topState->getAllTransitions(transitions);
-
-    foreach(SCTransition* trans, transitions)
-    {
-        trans->setFontSize(size);
-    }
-
-    QList<SCState*> states;
-    _topState->getAllStates(states);
-
-    foreach(SCState* st, states)
-    {
-        st->setFontSize(size);
-    }
-}
-
-
-
-
-
-
 void SCDataModel::handleStateFontChanged(QFont * font)
 {
     QList<SCState*> states;
@@ -1419,6 +1380,12 @@ void SCDataModel::handleStateFontChanged(QFont * font)
 
 }
 
+/**
+ * @brief SCDataModel::handleTransitionFontChanged
+ * @param font
+ *
+ * change all transition fonts to given qfont
+ */
 void SCDataModel::handleTransitionFontChanged(QFont * font)
 {
     QList<SCTransition*> transitions;

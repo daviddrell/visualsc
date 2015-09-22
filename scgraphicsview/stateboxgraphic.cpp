@@ -86,6 +86,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     // set the default text
     _stateTitle->setText(this->getStateName());
+//    _stateTitle->setFont(Font::Small);
 
     _entryActionTitle->setText(this->getStateModel()->getStringAttr("entryAction")->asString());
     _entryActionTitle->setFont(Font::Small);
@@ -241,15 +242,15 @@ void StateBoxGraphic::updateElements()
 {
     _stateTitle->resize();
     _stateTitle->reposition();
-    _stateTitle->recenterText();
+    _stateTitle->cropDocument();
 
     _entryActionTitle->resize();
     _entryActionTitle->reposition();
-    _entryActionTitle->recenterText();
+    _entryActionTitle->cropDocument();
 
     _exitActionTitle->resize();
     _exitActionTitle->reposition();
-    _exitActionTitle->recenterText();
+    _exitActionTitle->cropDocument();
 
     _minimize->reposition();
 
@@ -783,7 +784,7 @@ void StateBoxGraphic::handleAttributeChanged(SizeAttribute* size)
     QPoint sz = size->asPointF().toPoint();
     setSizeAndUpdateAnchors(sz);
     this->_stateTitle->resize();
-    this->_stateTitle->recenterText();
+    this->_stateTitle->cropDocument();
 
 }
 
@@ -1120,7 +1121,7 @@ void StateBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 
 //        event->setAccepted(true);
 
-    qDebug() << "emitting clicked";
+//    qDebug() << "emitting clicked";
     emit clicked(this->getStateModel());
     //event->setAccepted(true);
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -1286,7 +1287,7 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
         // if the mouse went down, record the x,y coords of the press, record it inside the corner object
         case QEvent::GraphicsSceneMousePress:
         {
-            qDebug() << "mouse press";
+//            qDebug() << "mouse press";
             corner->setMouseState(CornerGrabber::kMouseDown);
             corner->mouseDownX = mevent->pos().x();
             corner->mouseDownY = mevent->pos().y();
@@ -1296,7 +1297,7 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
 
         case QEvent::GraphicsSceneMouseRelease:
         {
-            qDebug() << "mouse release";
+//            qDebug() << "mouse release";
             corner->setMouseState(CornerGrabber::kMouseReleased);
             //corner->setHovered(false);
             emit cornerReleased();
@@ -1306,7 +1307,7 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
 
         case QEvent::GraphicsSceneMouseMove:
         {
-            qDebug() << "mouse move";
+//            qDebug() << "mouse move";
             corner->setMouseState(CornerGrabber::kMouseMoving );
         }
             break;

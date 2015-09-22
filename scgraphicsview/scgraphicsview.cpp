@@ -1278,8 +1278,6 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // and since its bigger, make its parent bigger.....
    // increaseSizeOfAllAncestors (newState);
 
-//    stateGraphic->getStateTitle()->resize();
-//    stateGraphic->getStateTitle()->recenterText();
 
     // load the text blocks
 

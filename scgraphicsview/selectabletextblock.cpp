@@ -1051,6 +1051,8 @@ qreal SelectableTextBlock::clampMin(qreal value, qreal min)
  */
 void SelectableTextBlock::recenterText()
 {
+    qDebug() << "STB::recenterText()";
+
     // sets the width and height of the textItem based on the plainText
     _textItem.adjustSize();
 

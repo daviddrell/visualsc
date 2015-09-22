@@ -224,8 +224,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_fontSizeBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
 
     // when a datamodel item is clicked, change the font box to match its attributes
-//    connect(_project->getDM(), SIGNAL(setFont(QString)), this, SLOT(handleSetProgramFont(QString)));
-//    connect(_project->getDM(), SIGNAL(setFontSize(int)), this, SLOT(handleSetProgramFontSize(int)));
+
+    // when the data model signals set program font, set the program font
     connect(_project->getDM(), SIGNAL(setProgramFont(QFont*)), this, SLOT(handleSetProgramFont(QFont*)));
 
 
@@ -242,46 +242,59 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+/**
+ * @brief MainWindow::handleSetProgramFont
+ * @param font
+ *
+ * SLOT
+ *
+ * this is triggered by SCDataModel when the mainwindow font boxes should update
+ * for each valid font attribute given, update the corresponding combo box
+ *
+ */
 void MainWindow::handleSetProgramFont(QFont* font)
 {
     qDebug() << "mainwindow::handlesetprogramfont";
     // set font, if it exists
     int fontIndex = _fontBox->findText(font->family(), Qt::MatchFixedString);
-    int fontSizeIndex = _fontSizeBox->findText(QString::number(font->pointSize()),0);
-
     if(fontIndex>-1)
     {
         _fontBox->setCurrentIndex(fontIndex);
     }
+
+    int fontSizeIndex = _fontSizeBox->findText(QString::number(font->pointSize()),0);
     if(fontSizeIndex>-1)
     {
         _fontSizeBox->setCurrentIndex(fontSizeIndex);
     }
 }
 
-//void MainWindow::handleSetProgramFont(QString fontName)
-//{
-
-//}
-
-//void MainWindow::handleSetProgramFontSize(int size)
-//{
-
-//}
-
-
+/**
+ * @brief MainWindow::addToolbarSpacer
+ * @param toolbar
+ *
+ * Test code found online to implement a custom spacer in the toolbar
+ */
 void MainWindow::addToolbarSpacer(QToolBar *toolbar)
 {
-QWidget *widget = new QWidget;
-QHBoxLayout *spacerLayout = new QHBoxLayout;
-QSpacerItem *spacer =
-   new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Minimum);
-spacerLayout->addSpacerItem(spacer);
-widget->setLayout(spacerLayout);
-toolbar->addWidget(widget);
+    QWidget *widget = new QWidget;
+    QHBoxLayout *spacerLayout = new QHBoxLayout;
+    QSpacerItem *spacer =
+            new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Minimum);
+    spacerLayout->addSpacerItem(spacer);
+    widget->setLayout(spacerLayout);
+    toolbar->addWidget(widget);
 }
 
-
+/**
+ * @brief MainWindow::handleChangeFont
+ *
+ * SLOT
+ * connected to both font family and size combo boxes.
+ * whenever a combo box is activated, create a font from the current values
+ * based on the radio toggle, update the corresponding item(s) font
+ *
+ */
 void MainWindow::handleChangeFont(QString)
 {
     qDebug() << "mainwindow::handlechangefont";
@@ -330,11 +343,6 @@ void MainWindow::handleChangeFont(QString)
     {
         qDebug() << "ERROR NEITHER state or transition radio button selected for font";
     }
-
-
-//    handleSetProgramFont(&font);
-
-
 }
 
 
@@ -352,11 +360,6 @@ void MainWindow::saveSettings()
 {
     QSettings settings(_settingsFileName, QSettings::IniFormat);
     settings.setValue("workingDirectory",_currentFolder);
-
-//    if(_gridEnable)
-//        settings.setValue("gridEnable", "true");
-//    else
-
     settings.setValue("gridEnable",_gridEnable);
 
     settings.sync();
@@ -433,8 +436,6 @@ void MainWindow::handleNewClick()
     _currentExportFullPath = "";
 
     this->setWindowTitle("Visual Statechart Editor");
-
-    //
 }
 
 void MainWindow::handleFileOpenClick()
