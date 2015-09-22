@@ -303,9 +303,6 @@ void SCState::reselectParent(SCState* newParent)
 
     // set the parent
     setParent(newParent);
-
-
-
 }
 
 /**

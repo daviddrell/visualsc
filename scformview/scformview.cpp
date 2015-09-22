@@ -997,6 +997,8 @@ void SCFormView::connectState(SCState* st)
 {
     // SCState connects
     connect(st, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
+
+    // when a state changes parent
     connect(st, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*,SCState*)));
 
     // when a state emits the clicked signal, select it in form view
@@ -2505,6 +2507,9 @@ void SCFormView::handleReselectParent(SCState * target)
  * @param state
  * @param newParent
  *
+ *
+ * SLOT
+ *
  * state changed parent to newParent
  *
  * deletes all out transitions and recreates them using their old properties
@@ -2519,26 +2524,42 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
     QTreeWidgetItem* currentParentWidget    = _items.value(state->getParentState())->getTreeWidget();
     QTreeWidgetItem* newParentWidget        = _items.value(newParent)->getTreeWidget();
 
-    //stateWidget->setParent();
 
-    //_items.value(state)->getTreeWidget()->setParent(_items.value(newParent)->getTreeWidget());
-    //_items.value(newParent)->getTreeWidget()->addChild(_items.value(state)->getTreeWidget());
+    // retain expansion bool for each child (Qt will automatically set to false when widget is parameter in addChild)
+    bool stateExp = stateWidget->isExpanded();
+    QList<bool> childExpansion;
+    for(int i = 0; i < stateWidget->childCount(); i++)
+    {
+        childExpansion.append(stateWidget->child(i)->isExpanded());
+    }
+
+    // change the parent of the state in the tree view
     currentParentWidget->removeChild(stateWidget);
     newParentWidget->addChild(stateWidget);
-    stateWidget->setExpanded(true);
 
 
+    // re-apply expansion bool
+    stateWidget->setExpanded(stateExp);
+    for(int i = 0; i < stateWidget->childCount(); i++)
+    {
+        stateWidget->child(i)->setExpanded(childExpansion.at(i));
+    }
+
+    // for every transition that is a child of this state machine, delete it, then create a new one
+    // this is done to circumvent calling all proper disconnects for grand parent states
     QList<SCTransition*> transitions;
     state->getAllTransitions(transitions);
     // these are the sink anchors that belong to out transitions of the state
     for(int i = 0; i < transitions.size(); i++)
     {
         SCTransition* trans = transitions.at(i);
+        SCState* source = trans->parentSCState();
+
         QString eventName = trans->getEventName();
         QString pathStr = trans->getPathAttr()->asString();
         qDebug() << "pathStr: " << pathStr;
         _dm->deleteItem(trans);
-        _dm->insertNewTransition(state, trans->targetState(), eventName, pathStr);
+        _dm->insertNewTransition(source, trans->targetState(), eventName, pathStr);
     }
 
 
