@@ -142,6 +142,7 @@ public:
 
 
     void setFont(QString fontName);
+    void setFont(QFont * font);
     void setFontSize(int fontSize);
 
     /**

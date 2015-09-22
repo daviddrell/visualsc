@@ -1667,6 +1667,7 @@ void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, boo
 
     if(connect)
     {
+        textBlockPropertyTable->setHorizontalHeaderLabels(QString("Attribute;Value").split(";"));
         int row = 0;
 
         // insert the name at the top
@@ -3209,13 +3210,12 @@ void SCFormView::handleNewRootMachine(SCState*)
 
 SCState* SCFormView::getCurrentlySelectedState()
 {
-    if(!_currentlySelected->isState())
-    {
-        sendMessage("Error", "Please select a state");
-        return NULL;
-    }
-
     return _currentlySelected->getState();
+}
+
+SCTransition* SCFormView::getCurrentlySelectedTransition()
+{
+    return _currentlySelected->getTransition();
 }
 
 /**

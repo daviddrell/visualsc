@@ -22,6 +22,7 @@
 #include "QXmlStreamWriter"
 #include "transitionattributes.h"
 #include <QDebug>
+#include <QFont>
 
 
 
@@ -247,6 +248,12 @@ SCTextBlock* SCTransition::getTextBlock(QString textBlockName)
 void SCTransition::setFont(QString fontName)
 {
     this->getEventTextBlock()->getFontFamilyAttr()->setValue(fontName);
+}
+
+void SCTransition::setFont(QFont *font)
+{
+    this->getEventTextBlock()->getFontFamilyAttr()->setValue(font->family());
+    this->getEventTextBlock()->getFontSizeAttr()->setValue(font->pointSize());
 }
 
 void SCTransition::setFontSize(int fontSize)

@@ -82,6 +82,63 @@ void SCDataModel::connectTransition(SCTransition * trans)
     qDebug() << "scdatamodel::connecttransition";
     connect(trans->getTransStringAttr("event"), SIGNAL(changed(TransitionStringAttribute*)), this, SLOT(handleCheckEventCollision(TransitionStringAttribute*)));
     connect(trans,SIGNAL(markedForDeletion(QObject*)),this,SLOT(handleTransitionBeingDeleted(QObject*)));
+
+    connect(trans, SIGNAL(clicked(SCTransition*)), this, SLOT(handleItemClicked(SCTransition*)));
+
+    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
+
+    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
+}
+
+/**
+ * @brief SCDataModel::connectState
+ * @param st
+ *
+ * called when a state is created.
+ * calls scdatamodel scope connects.
+ */
+void SCDataModel::connectState(SCState * st)
+{
+    qDebug() << "scdm::connectState";
+    connect(st, SIGNAL(clicked(SCState*)), this, SLOT(handleItemClicked(SCState*)));
+
+    connect(st->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
+
+    connect(st->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
+}
+
+void SCDataModel::handleChangeProgramFont(FontFamilyAttribute * ffa)
+{
+    QFont font(ffa->asString(),0);
+    emit setProgramFont(&font);
+}
+void SCDataModel::handleChangeProgramFont(FontSizeAttribute * fsa)
+{
+    QFont font("", fsa->asInt());
+    emit setProgramFont(&font);
+}
+
+
+/**
+ * @brief SCDataModel::handleItemClicked
+ * @param st
+ *
+ * when the state is clicked, do stuff
+ *
+ */
+void SCDataModel::handleItemClicked(SCState * st)
+{
+//    emit setFont(st->getIDTextBlock()->getFontFamilyAttr()->asString());
+//    emit setFontSize(st->getIDTextBlock()->getFontSizeAttr()->asInt());
+
+    QFont font(st->getIDTextBlock()->getFontFamilyAttr()->asString(), st->getIDTextBlock()->getFontSizeAttr()->asInt());
+    emit setProgramFont(&font);
+}
+
+void SCDataModel::handleItemClicked(SCTransition * trans)
+{
+    QFont font(trans->getEventTextBlock()->getFontFamilyAttr()->asString(), trans->getEventTextBlock()->getFontSizeAttr()->asInt());
+    emit setProgramFont(&font);
 }
 
 /**
@@ -609,6 +666,7 @@ bool SCDataModel::deleteItem(QObject * item)
 SCState* SCDataModel::insertNewState(SCState *parent)
 {
     SCState * state = new SCState (parent);
+    connectState(state);
     emit newStateSignal(state);
     return state;
 }
@@ -815,7 +873,7 @@ SCState* SCDataModel::handleMakeANewState(SCState* parent,StateAttributes*  sa)
 
     //_currentState  = state;
 
-
+    connectState(state);
     // connected to scformview slot handleNewState
     // connected to scgraphicsview slot handleNewState
     emit newStateSignal(state);
@@ -892,7 +950,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
     _currentState  = state;
 
-
+    connectState(state);
     // connected to scformview slot handleNewState
     // connected to scgraphicsview slot handleNewState
     emit newStateSignal(state);
@@ -995,72 +1053,6 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
     return false;    // should not reach this
 
 }
-
-
-
-void SCDataModel::handleEventNameChangedInFormView(SCTransition * trans, QString eventName)
-{
-    qDebug() << "SCDataModel::handleEventNameChangedInFormView";
-    trans->setText(eventName);
-}
-
-void SCDataModel::handleEventSizeChangedInFormView(SCTransition *, QString)
-{
-
-}
-
-void SCDataModel::handleEventPositionChangedInFormView(SCTransition *, QString)
-{
-
-}
-
-void SCDataModel::handleStateSizeChangedInFormView(SCState *state, QPointF size)
-{
-    qDebug() << "SCDataModel::handleStateSizeChangeInFormView";
-    state->setSize(size);
-}
-
-/**
- * @brief SCDataModel::handleStateNameChangedInFormView
- *
- * SLOT
- *
- * connect in SCDataModel
- * connect(SCState,SIGNAL(nameChangedInFormView(SCState*,QString)), SCDataModel,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
- *
- *
- * called when the user types in the name in the property table
- * will update the data model's textbox with the new name
- * by calling SCState::setText, which will then emit a signal to change the graphics view text
- *
- *
- */
-void SCDataModel::handleStateNameChangedInFormView(SCState* state, QString name)
-{
-    qDebug() << "SCDataModel::handleStateNameChangedInFormView";
-    state->setText(name);
-}
-
-/**
- * @brief SCDataModel::handleStatePositionChangedInFormView
- * @param state
- * @param point
- *
- * SLOT
- * connect in SCDataModel
- * connect(SCState,SIGNAL(positionChangedInFormView(SCState*,QPointF)),SCDataModel,SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
- *
- *
- * change the SCState's position
- *
- * this also will emit signal position changed in datamodel
- */
-void SCDataModel::handleStatePositionChangedInFormView(SCState* state, QPointF point)
-{
-    qDebug() << "SCDataModel::handleStatePositionChangeInFormView";
-    state->setPosition(point);
-}
-
 
 /**
  * @brief SCDataModel::insertNewTransition
@@ -1410,68 +1402,37 @@ void SCDataModel::handleFontSizeChanged(QString fontSize)
 }
 
 
-void SCDataModel::handleTransitionFontFamilyChanged(QString fontName)
-{
-    QList<SCTransition*> transitions;
-    _topState->getAllTransitions(transitions);
-
-    foreach(SCTransition* trans, transitions)
-    {
-        trans->setFont(fontName);
-    }
-}
-
-void SCDataModel::handleTransitionFontSizeChanged(QString fontSize)
-{
-    bool ok;
-    int size = fontSize.toInt(&ok);
-
-    if(!ok)
-    {
-        this->message("Could not change font size to "+fontSize);
-        return;
-    }
-
-    QList<SCTransition*> transitions;
-    _topState->getAllTransitions(transitions);
-
-    foreach(SCTransition* trans, transitions)
-    {
-        trans->setFontSize(size);
-    }
-}
 
 
-void SCDataModel::handleStateFontFamilyChanged(QString fontName)
+
+
+void SCDataModel::handleStateFontChanged(QFont * font)
 {
     QList<SCState*> states;
     _topState->getAllStates(states);
 
     foreach(SCState* st, states)
     {
-        st->setFont(fontName);
+        st->setFont(font->family());
+        st->setFontSize(font->pointSize());
     }
+
 }
 
-void SCDataModel::handleStateFontSizeChanged(QString fontSize)
+void SCDataModel::handleTransitionFontChanged(QFont * font)
 {
-    bool ok;
-    int size = fontSize.toInt(&ok);
+    QList<SCTransition*> transitions;
+    _topState->getAllTransitions(transitions);
 
-    if(!ok)
+    foreach(SCTransition* trans, transitions)
     {
-        this->message("Could not change font size to "+fontSize);
-        return;
+        trans->setFont(font->family());
+        trans->setFontSize(font->pointSize());
     }
 
-    QList<SCState*> states;
-    _topState->getAllStates(states);
-
-    foreach(SCState* st, states)
-    {
-        st->setFontSize(size);
-    }
 }
+
+
 
 /**
  * @brief SCDataModel::checkDataModel

@@ -23,6 +23,7 @@
 #include "scstate.h"
 #include <QVariant>
 #include <QDebug>
+#include <QFont>
 
 
 SCState::SCState(QObject *parent) :
@@ -507,6 +508,12 @@ void SCState::handleTextBlockChanged()
 void SCState::setFont(QString fontName)
 {
     this->getIDTextBlock()->getFontFamilyAttr()->setValue(fontName);
+}
+
+void SCState::setFont(QFont *font)
+{
+    this->getIDTextBlock()->getFontFamilyAttr()->setValue(font->family());
+    this->getIDTextBlock()->getFontSizeAttr()->setValue(font->pointSize());
 }
 
 void SCState::setFontSize(int fontSize)

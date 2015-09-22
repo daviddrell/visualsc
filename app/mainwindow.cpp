@@ -39,6 +39,8 @@
 #define SCALE_MIN   0.1
 #define SCALE_MAX   3
 
+#define DEFAULT_FONT_SIZE 10
+
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
         ui(new Ui::MainWindow),
@@ -92,10 +94,12 @@ MainWindow::MainWindow(QWidget *parent) :
     _fontBox->addItems(fontList);
     ui->mainToolBar->addWidget(_fontBox);
 
+    int fontIndex = _fontBox->findText("arial", Qt::MatchFixedString);
+
     // set default to arial, if it exists
-    if(_fontBox->findText("arial", 0))
+    if(fontIndex>-1)
     {
-        _fontBox->setCurrentText("Arial");
+        _fontBox->setCurrentIndex(fontIndex);
     }
 
 //    this->addToolbarSpacer(ui->mainToolBar);
@@ -107,9 +111,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _fontSizeBox->addItems(fontSizeList);
     ui->mainToolBar->addWidget(_fontSizeBox);
 
-    if(_fontSizeBox->findText(QString::number(10),0))
+    int fontSizeIndex = _fontSizeBox->findText(QString::number(DEFAULT_FONT_SIZE),0);
+    if(fontSizeIndex>-1)
     {
-        _fontSizeBox->setCurrentText(QString::number(10));
+        _fontSizeBox->setCurrentIndex(fontSizeIndex);
     }
 
 
@@ -117,14 +122,15 @@ MainWindow::MainWindow(QWidget *parent) :
     // radio buttons
 
 //    _fontSelection.setParent(this);
-    _stateFontRadioButton = new QRadioButton("States",this);
+    _selectedRadioButton = new QRadioButton("Selected", this);
+    _stateFontRadioButton = new QRadioButton("States", this);
     _transitionFontRadioButton = new QRadioButton("Transitions", this);
 
+    ui->mainToolBar->addWidget(_selectedRadioButton);
     ui->mainToolBar->addWidget(_stateFontRadioButton);
     ui->mainToolBar->addWidget(_transitionFontRadioButton);
 
-    _stateFontRadioButton->toggle();
-
+    _selectedRadioButton->toggle();
 
     // custom action connects
     connect ( ui->actionOpen, SIGNAL(triggered()), this, SLOT(handleFileOpenClick()));
@@ -214,12 +220,14 @@ MainWindow::MainWindow(QWidget *parent) :
     // mainwindow component connects
 
     // when the font combo box is activated, the data model will change the font family attribute for all items
-//    connect(_fontBox, SIGNAL(activated(QString)), _project->getDM(), SLOT(handleFontFamilyChanged(QString)));
     connect(_fontBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
+    connect(_fontSizeBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
 
-    connect(_fontSizeBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFontSize(QString)));
+    // when a datamodel item is clicked, change the font box to match its attributes
+//    connect(_project->getDM(), SIGNAL(setFont(QString)), this, SLOT(handleSetProgramFont(QString)));
+//    connect(_project->getDM(), SIGNAL(setFontSize(int)), this, SLOT(handleSetProgramFontSize(int)));
+    connect(_project->getDM(), SIGNAL(setProgramFont(QFont*)), this, SLOT(handleSetProgramFont(QFont*)));
 
-//    connect(_fontSizeBox, SIGNAL(activated(QString)), _project->getDM(), SLOT(handleFontSizeChanged(QString)));
 
     // load settings from settings.ini if it exists, otherwise create a settings.ini file
     _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
@@ -234,6 +242,34 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::handleSetProgramFont(QFont* font)
+{
+    qDebug() << "mainwindow::handlesetprogramfont";
+    // set font, if it exists
+    int fontIndex = _fontBox->findText(font->family(), Qt::MatchFixedString);
+    int fontSizeIndex = _fontSizeBox->findText(QString::number(font->pointSize()),0);
+
+    if(fontIndex>-1)
+    {
+        _fontBox->setCurrentIndex(fontIndex);
+    }
+    if(fontSizeIndex>-1)
+    {
+        _fontSizeBox->setCurrentIndex(fontSizeIndex);
+    }
+}
+
+//void MainWindow::handleSetProgramFont(QString fontName)
+//{
+
+//}
+
+//void MainWindow::handleSetProgramFontSize(int size)
+//{
+
+//}
+
+
 void MainWindow::addToolbarSpacer(QToolBar *toolbar)
 {
 QWidget *widget = new QWidget;
@@ -246,30 +282,59 @@ toolbar->addWidget(widget);
 }
 
 
-void MainWindow::handleChangeFont(QString fontName)
+void MainWindow::handleChangeFont(QString)
 {
-    if(_stateFontRadioButton->isChecked())
+    qDebug() << "mainwindow::handlechangefont";
+    QString fontFam = _fontBox->currentText();
+    QString fontSizeStr = _fontSizeBox->currentText();
+
+    bool ok;
+
+    int size = fontSizeStr.toInt(&ok);
+    if(!ok)
     {
-        _project->getDM()->handleStateFontFamilyChanged(fontName);
+        sendMessage("Error","Cannot change font size to "+ fontSizeStr);
+        return;
+    }
+
+    QFont font(fontFam,size);
+
+    if(_selectedRadioButton->isChecked())
+    {
+        SCState* st = _formEditorWindow->getCurrentlySelectedState();
+        SCTransition* trans = _formEditorWindow->getCurrentlySelectedTransition();
+
+        if(st)
+        {
+            st->setFont(&font);
+        }
+        else if(trans)
+        {
+            trans->setFont(&font);
+        }
+        else
+        {
+
+        }
+
+    }
+    else if(_stateFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleStateFontChanged(&font);
+    }
+    else if(_transitionFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleTransitionFontChanged(&font);
     }
     else
     {
-        _project->getDM()->handleTransitionFontFamilyChanged(fontName);
+        qDebug() << "ERROR NEITHER state or transition radio button selected for font";
     }
 
-}
 
-void MainWindow::handleChangeFontSize(QString fontSize)
-{
+//    handleSetProgramFont(&font);
 
-    if(_stateFontRadioButton->isChecked())
-    {
-        _project->getDM()->handleStateFontSizeChanged(fontSize);
-    }
-    else
-    {
-        _project->getDM()->handleTransitionFontSizeChanged(fontSize);
-    }
+
 }
 
 
@@ -297,6 +362,7 @@ void MainWindow::saveSettings()
     settings.sync();
     qDebug ()<< "saveSettings " << settings.fileName();
 }
+
 
 /**
  * @brief MainWindow::loadSettings

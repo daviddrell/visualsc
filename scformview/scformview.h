@@ -93,6 +93,7 @@ public:
     void setProject(SMProject*);
 
     SCState* getCurrentlySelectedState();
+    SCTransition* getCurrentlySelectedTransition();
 
 public slots:
     void handleItemClicked(SCTransitionBranch*);

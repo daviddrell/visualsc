@@ -85,6 +85,7 @@ private:
 //    QButtonGroup _fontSelection;
     QRadioButton* _stateFontRadioButton;
     QRadioButton* _transitionFontRadioButton;
+    QRadioButton* _selectedRadioButton;
 
     void addToolbarSpacer(QToolBar *toolbar);
 
@@ -108,7 +109,12 @@ private slots:
 
 
     void handleChangeFont(QString);
-    void handleChangeFontSize(QString);
+//    void handleChangeFontSize(QString);
+
+
+    void handleSetProgramFont(QFont*);
+//    void handleSetProgramFont(QString);
+//    void handleSetProgramFontSize(int);
 };
 
 #endif // MAINWINDOW_H

@@ -143,11 +143,10 @@ public slots:
     SCTransition* handleMakeANewTransition(SCState* source, TransitionAttributes*);
     void handleReset();
     void handleOpen(QString);
-    void handleTransitionFontFamilyChanged(QString);
-    void handleStateFontFamilyChanged(QString);
 
-    void handleTransitionFontSizeChanged(QString);
-    void handleStateFontSizeChanged(QString);
+
+    void handleStateFontChanged(QFont*);
+    void handleTransitionFontChanged(QFont*);
 
 signals:
     void importedMachine(SCState*);
@@ -160,6 +159,10 @@ signals:
     void newRootMachine(SCState*);
     void insertNewTransitionSignal(SCForkedTransition*);
     void message(QString);
+
+    void setProgramFont(QFont*);
+//    void setFont(QString);
+//    void setFontSize(int);
 
 
 private slots:
@@ -174,13 +177,6 @@ private slots:
     void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
     void handleMakeANewEventTextBlock(TextBlockAttributes* attributes);
     void handleMakeANewTransitionProperty(const QString name);
-    void handleStateNameChangedInFormView(SCState*, QString);
-    void handleStatePositionChangedInFormView(SCState*, QPointF);
-    void handleStateSizeChangedInFormView(SCState*, QPointF);
-
-    void handleEventNameChangedInFormView(SCTransition*, QString);
-    void handleEventPositionChangedInFormView(SCTransition*, QString);
-    void handleEventSizeChangedInFormView(SCTransition*, QString);
 
     void handleStateMachineNameLoad(QString);
     void handleStateMachineUidLoad(QString);
@@ -191,12 +187,17 @@ private slots:
     void handleFontFamilyChanged(QString);
     void handleFontSizeChanged(QString);
 
+    void handleItemClicked(SCState*);
+    void handleItemClicked(SCTransition*);
 
+    void handleChangeProgramFont(FontFamilyAttribute*);
+    void handleChangeProgramFont(FontSizeAttribute*);
 
 private:
 
 
     void connectTransition(SCTransition*);
+    void connectState(SCState*);
 
     QString toClassName(QString);
     QString toClassFileName(QString);

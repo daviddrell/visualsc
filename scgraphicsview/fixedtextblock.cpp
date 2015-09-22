@@ -89,7 +89,7 @@ void FixedTextBlock::handleFontSizeChanged(FontSizeAttribute * fa)
     _textItem.setFont(f);
 //    _bottom = _textItem.document()->size().height();
     recenterText();
-    this->adjustHeight();
+//    this->adjustHeight();
 
 }
 
@@ -100,7 +100,7 @@ void FixedTextBlock::handleFontFamilyChanged(FontFamilyAttribute *ga)
     f.setFamily(ga->asString());
     _textItem.setFont(f);
     this->recenterText();
-    this->adjustHeight();
+//    this->adjustHeight();
 }
 
 /**
