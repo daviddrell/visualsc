@@ -45,6 +45,7 @@ FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal top, qreal bottom,
     _bottom(bottom),
     _attachedToTop(attachedToTop),
     _right(right),
+    _base(NULL),
     _hovered(false),
     _textItem(this, QRect(0,0, DEFAULT_WIDTH-2*(TEXT_BUFFER), DEFAULT_HEIGHT-2*(TEXT_BUFFER)))      // doesn't matter what this is set to here because state size attribute get loaded right after this is created and will change the size of the text item
 {
@@ -60,6 +61,7 @@ FixedTextBlock::FixedTextBlock(QGraphicsObject* parent, qreal top, qreal bottom,
     // control the hovered variable using the text item's hover events
     connect(&_textItem,SIGNAL(hovered()), this, SLOT(handleHoverEnter()));
     connect(&_textItem, SIGNAL(unhovered()), this, SLOT(handleHoverLeave()));  
+
 }
 
 FixedTextBlock::~FixedTextBlock()
@@ -76,6 +78,25 @@ void FixedTextBlock::handleHoverLeave()
     _hovered = false;
 }
 
+void FixedTextBlock::setBase(FixedTextBlock *ftb)
+{
+    _base = ftb;
+    connect(ftb, SIGNAL(heightChanged(qreal)), this, SLOT(handleBaseHeightChanged(qreal)));
+}
+
+void FixedTextBlock::handleBaseHeightChanged(qreal delta)
+{
+    if(_attachedToTop)
+    {
+        _top += delta;
+        this->reposition();
+    }
+    else
+    {
+
+    }
+}
+
 bool FixedTextBlock::isHovered()
 {
     return _hovered;
@@ -83,25 +104,20 @@ bool FixedTextBlock::isHovered()
 
 void FixedTextBlock::handleFontSizeChanged(FontSizeAttribute * fa)
 {
-    qDebug() << "stb::handleFOntSizeChanged ";
+    qDebug() << "ftb::handleFOntSizeChanged ";
     QFont f = _textItem.font();
     f.setPointSize(fa->asInt());
     _textItem.setFont(f);
-//    this->adjustHeight();
-    this->reposition();
-
-
-
+    this->adjustHeight();
 }
 
 void FixedTextBlock::handleFontFamilyChanged(FontFamilyAttribute *ga)
 {
-    qDebug() << "stb::handleFontFamilyChanged()";
+    qDebug() << "ftb::handleFontFamilyChanged()";
     QFont f = _textItem.font();
     f.setFamily(ga->asString());
     _textItem.setFont(f);
-//    this->adjustHeight();
-    this->reposition();
+    this->adjustHeight();
 }
 
 /**
@@ -197,14 +213,13 @@ StateBoxGraphic* FixedTextBlock::parentAsStateBoxGraphic()
 /**
  * @brief FixedTextBlock::recenterText
  *
- * updates the dimensions of the masked text edit object based on the text graphic dimensions and useable area dimensions
- *
+ * updates the dimensions of the text item to fit within the area of the fixed text block
+ * crops text if it goes beyond the allowed dimensions
  *
  */
 void FixedTextBlock::cropDocument()
 {
-    qDebug () << "FTB::cropDocument()";
-
+//    qDebug () << "FTB::cropDocument()";
     _textItem.setWidth(_width);
     _textItem.setHeight(_height);
 
@@ -268,12 +283,30 @@ void FixedTextBlock::adjustHeight()
 {
     if(_attachedToTop)
     {
+        qreal deltaH = _height;
+        // set the height to match one line of the masked text edit.
+        // hacky method:
+        // in order to find the appropriate height for one line of text with this new font, max out the width of the text item
+        _textItem.setTextWidth(std::numeric_limits<double>::max());
+
+        // get the height of the text document
         qreal docH = _textItem.document()->size().height();
-//        _textItem.setHeight(docH+2);
+
+        // set the height to be this + some buffer
         _bottom = docH+2*TEXT_BUFFER;
-        this->parentAsStateBoxGraphic()->setMinHeight(_bottom);
-        this->resize();
+        _height = _bottom;
+        deltaH = _height - deltaH;
+
+
+        // adjust the text item to fit within the new height and current ftb width
+        this->cropDocument();
+
         qDebug () << "_textItem document dimensions: " <<_textItem.document()->size() <<"\tchanged bottom: " << this->_bottom << "\tnew dimensions: " << this->getSize();
+
+
+
+//        this->reposition();
+          emit heightChanged(deltaH);
     }
     else // bottom anchored
     {

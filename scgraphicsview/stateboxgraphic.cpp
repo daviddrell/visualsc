@@ -88,6 +88,8 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     _stateTitle->setText(this->getStateName());
 //    _stateTitle->setFont(Font::Small);
 
+    // attach entry action title to the state title
+    _entryActionTitle->setBase(_stateTitle);
     _entryActionTitle->setText(this->getStateModel()->getStringAttr("entryAction")->asString());
     _entryActionTitle->setFont(Font::Small);
     _entryActionTitle->switchPen(PenStyle::Experimental);

@@ -46,13 +46,14 @@ public:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
     void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
-
     bool isHovered();
-
     void adjustHeight();
+
+    void setBase(FixedTextBlock* ftb);
 
 signals:
     void changed(QString);
+    void heightChanged(qreal);
 
 public slots:
     void handleTextItemEdited();
@@ -62,6 +63,7 @@ public slots:
     void handleHoverEnter();
     void handleFontFamilyChanged(FontFamilyAttribute*);
     void handleFontSizeChanged(FontSizeAttribute*);
+    void handleBaseHeightChanged(qreal delta);
 
 protected:
     qreal clampMin(qreal value, qreal min);
@@ -79,6 +81,7 @@ protected:
 
 private:
     MaskedTextEdit _textItem;
+    FixedTextBlock* _base;
 };
 
 #endif // FIXEDTEXTBLOCK_H

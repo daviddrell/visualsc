@@ -373,6 +373,7 @@ void MainWindow::saveSettings()
  */
 void MainWindow::loadSettings()
 {
+
     QSettings settings(_settingsFileName, QSettings::IniFormat);
 
     if(settings.childKeys().size()==0)
@@ -382,10 +383,12 @@ void MainWindow::loadSettings()
         return;
     }
 
+    qDebug() << "====================" <<"\tloading settings\t" << "====================";
+
     const QStringList keys = settings.childKeys();
     foreach(const QString &key, keys)
     {
-        qDebug() << "loading setting: " <<key <<"\t with value: "<<settings.value(key);
+        qDebug() << "" <<key <<"\t:\t"<<settings.value(key);
         if(key=="workingDirectory")
             _currentFolder = settings.value(key).toString();
         else if(key == "gridEnable")
@@ -398,6 +401,8 @@ void MainWindow::loadSettings()
             }
         }
     }
+
+    qDebug() << "====================" <<"\tdone loading settings\t" << "====================";
 }
 
 /**
