@@ -1089,12 +1089,12 @@ void SelectableTextBlock::recenterText()
 
 qreal SelectableTextBlock::getTotalTextItemBufferX()
 {
-    return 2*(VISIBLE_MARGIN+CONTENT_MARGIN);
+    return (VISIBLE_MARGIN+CONTENT_MARGIN);
 }
 
 qreal SelectableTextBlock::getTotalTextItemBufferY()
 {
-    return 2*(VISIBLE_MARGIN+CONTENT_MARGIN);
+    return (VISIBLE_MARGIN+CONTENT_MARGIN);
 }
 
 /**
