@@ -2524,26 +2524,21 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
     QTreeWidgetItem* currentParentWidget    = _items.value(state->getParentState())->getTreeWidget();
     QTreeWidgetItem* newParentWidget        = _items.value(newParent)->getTreeWidget();
 
-
-    // retain expansion bool for each child (Qt will automatically set to false when widget is parameter in addChild)
+    // retain expansion bool for the state machine and its children
+    // Qt will automatically set "expanded" for all children and itself to false when using addChild
     bool stateExp = stateWidget->isExpanded();
     QList<bool> childExpansion;
     for(int i = 0; i < stateWidget->childCount(); i++)
-    {
         childExpansion.append(stateWidget->child(i)->isExpanded());
-    }
 
     // change the parent of the state in the tree view
     currentParentWidget->removeChild(stateWidget);
     newParentWidget->addChild(stateWidget);
 
-
     // re-apply expansion bool
     stateWidget->setExpanded(stateExp);
     for(int i = 0; i < stateWidget->childCount(); i++)
-    {
         stateWidget->child(i)->setExpanded(childExpansion.at(i));
-    }
 
     // for every transition that is a child of this state machine, delete it, then create a new one
     // this is done to circumvent calling all proper disconnects for grand parent states
@@ -2562,7 +2557,7 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
         _dm->insertNewTransition(source, trans->targetState(), eventName, pathStr);
     }
 
-
+    // select the root item because the current state gets unselected
     highlightRootItem();
 }
 
@@ -2580,17 +2575,12 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
  */
 void SCFormView::insertTransition()
 {
-
-    //SCState * st = dynamic_cast<SCState *> (_currentlySelected);
     SCState* st = _currentlySelected->getState();
-    if ( st == NULL ) return;
+    if ( st == NULL )
+        return;
 
     if ( st->parent() == NULL)
     {
-        /*
-        QMessageBox msgBox;
-        msgBox.setText("cannot add state from root machine");
-        msgBox.exec();*/
         sendMessage("Error", "Cannot add transition from root machine");
         return;
     }
@@ -2604,12 +2594,6 @@ void SCFormView::insertTransition()
     connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleStateSelectionWindowStateSelected(SCState*)));
 
     _targetStateSelectionWindow->show();
-
-
-
-
-
-
 }
 
 /**

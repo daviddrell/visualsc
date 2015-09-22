@@ -9,16 +9,16 @@ exit events visible to outside classes). These slots are empty by default. any t
 corresponding function emit a signal with the value found in these attributes.
 
  every state will
-    connect its private entered()/exited() signals to the public pair of                                        StateEntry_stateName()          StateExit_stateName()
-    connect its private entered()/exited() signals to private entry and exit slots                              Slot_StateEntry_stateName()     Slot_StateExit_stateName()
-    *for any entryActions and exitActions attributes: have the private entry and exit slots emit a signal       EntryAction_entryActionValue()  ExitAction_exitActionValue()
-    addTransition for each outgoing transition using private signals specific to each transition                Relay_Event_eventName()
+    connect its private entered()/exited() signals to the public pair of                                        Signal_StateEntry___stateName()     Signal_StateExit___stateName()
+    connect its private entered()/exited() signals to private entry and exit slots                              Slot_StateEntry___stateName()       Slot_StateExit___stateName()
+    *for any entryActions and exitActions attributes: have the private entry and exit slots emit a signal       Action_entryAction()
+    addTransition for each outgoing transition using private signals specific to each transition                Relay_Event___eventName()
 
-every transition has its own public slot that emits a private (RELAY)signal named after the slot/transition (this signal is also what is 
+every transition has its own public slot that emits a private (RELAY) signal named after the slot/transition (this signal is also what is 
 registered when using addTransition to trigger transitions between the QStates), and represents an external event triggering a transition between states.
  every transition will
-    have its own public slot    Event_eventName()
-    emit a private signal       Relay_Event_eventName()
+    have a public slot    Event_eventName()
+    that will emit private signal(s) for all events sharing the same event name      Relay_Event___eventName()
 
 */
 #include "statesequencemachine.h"
@@ -174,22 +174,22 @@ void StateSequenceMachine::Event_startMachine___stateSequenceMachine()
     _stateSequenceMachine->start();
 }
 
-void StateSequenceMachine::Event___checkingAllStatesCompleted_checkingAllStateSequences()
+void StateSequenceMachine::Event___checkingAllStatesCompleted()
 {
     emit Relay_Event___checkingAllStatesCompleted_checkingAllStateSequences();
 }
 
-void StateSequenceMachine::Event___checkingCallSequenceFailed_checkingAllStateSequences()
+void StateSequenceMachine::Event___checkingCallSequenceFailed()
 {
     emit Relay_Event___checkingCallSequenceFailed_checkingAllStateSequences();
 }
 
-void StateSequenceMachine::Event___checkingConnSequenceFailed_checkingAllStateSequences()
+void StateSequenceMachine::Event___checkingConnSequenceFailed()
 {
     emit Relay_Event___checkingConnSequenceFailed_checkingAllStateSequences();
 }
 
-void StateSequenceMachine::Event___checkingSessionSeqFailed_checkingAllStateSequences()
+void StateSequenceMachine::Event___checkingSessionSeqFailed()
 {
     emit Relay_Event___checkingSessionSeqFailed_checkingAllStateSequences();
 }
@@ -198,21 +198,21 @@ void StateSequenceMachine::Event___checkingSessionSeqFailed_checkingAllStateSequ
     //////// State Machine: _checkingAllStateSequences ////////
 
     //////// State Machine: _checkingCallSequence ////////
-void StateSequenceMachine::Event___callSeqComplete_waiting_checkingCallSequence()
+void StateSequenceMachine::Event___callSeqComplete()
 {
     emit Relay_Event___callSeqComplete_waiting_checkingCallSequence();
 }
 
 
     //////// State Machine: _checkingConnSequence ////////
-void StateSequenceMachine::Event___connSeqComplete_waiting_checkingConnSequence()
+void StateSequenceMachine::Event___connSeqComplete()
 {
     emit Relay_Event___connSeqComplete_waiting_checkingConnSequence();
 }
 
 
     //////// State Machine: _checkingSessionSeq ////////
-void StateSequenceMachine::Event___sessionSeqComplete_waiting()
+void StateSequenceMachine::Event___sessionSeqComplete()
 {
     emit Relay_Event___sessionSeqComplete_waiting();
 }

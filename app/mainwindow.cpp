@@ -480,8 +480,18 @@ void MainWindow::on_actionSave_As_triggered()
 
 void MainWindow::handleExportCodeClick()
 {
+
     if(_project==NULL)
         return;
+
+    // return if the the check on the datamodel came out wrong
+    if(!_project->getDM()->checkDataModel())
+    {
+        this->setWindowTitle("Exported failed: please correct errors");
+        return;
+    }
+
+    bool exportStatus;
 
     // check if we have exported the file before
     if(_currentExportFullPath.isEmpty())
@@ -504,14 +514,16 @@ void MainWindow::handleExportCodeClick()
         {
             _currentExportFullPath = exportName;
             _currentFolder = QFileInfo(_currentExportFullPath).path();
-            _project->exportToCode(_currentExportFullPath);
-            this->setWindowTitle("Exported to "+_currentExportFullPath);
-            saveSettings();
+            exportStatus = _project->exportToCode(_currentExportFullPath);
         }
     }
     else
     {
-        _project->exportToCode(_currentExportFullPath);
+        exportStatus = _project->exportToCode(_currentExportFullPath);
+    }
+
+    if(exportStatus)
+    {
         this->setWindowTitle("Exported to "+_currentExportFullPath);
         saveSettings();
     }

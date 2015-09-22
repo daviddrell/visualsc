@@ -313,12 +313,13 @@ qDebug() << "time to save files " << fileName;
 QString hFileName;
 QString cppFileName;
 QString className = toClassName(_topState->attributes.value("name")->asString());
+
+
 //#define FORCE_STATE_MACHINE_NAME
 #ifndef FORCE_STATE_MACHINE_NAME
     // get the file name minus cpp and add h
     cppFileName = fileName;
     hFileName = fileName.mid(0,fileName.size()-3) + "h";
-
 #endif
 
 #ifdef FORCE_STATE_MACHINE_NAME
@@ -344,21 +345,29 @@ QString className = toClassName(_topState->attributes.value("name")->asString())
    // _topState->getStates(list);
 
 
-    QList<SCState* > all;
-    all.append(_topState);
-    _topState->getAllStates(all);
+//    QList<SCState* > all;
+//    all.append(_topState);
+//    _topState->getAllStates(all);
 
 
-    for(int i = 0; i < all.size();i++)
-    {
-        SCState* state = all.at(i);
-        if(state->isStateMachine())
-        {
-            cw.addStateMachine(state);
-        }
-    }
-    //cw.createSignalsAndSlots();
+//    for(int i = 0; i < all.size();i++)
+//    {
+//        SCState* state = all.at(i);
+//        if(state->isStateMachine())
+//        {
+//            cw.addStateMachine(state);
+//        }
+//    }
+
+    // add the state machines to the codewriter
+    QList<SCState*> stateMachines = this->getStateMachines();
+    foreach(SCState* sm, stateMachines)
+        cw.addStateMachine(sm);
+
+    // define the signal and slot names
     cw.createStateMachines();
+
+    // create the files
     cw.writeHFile();
     cw.writeCppFile();
 
@@ -1462,4 +1471,88 @@ void SCDataModel::handleStateFontSizeChanged(QString fontSize)
     {
         st->setFontSize(size);
     }
+}
+
+/**
+ * @brief SCDataModel::checkDataModel
+ *
+ * checks data model for exporting correctness
+ * called before export procedure (in mainwindow.cpp) to alert user if any errors will be produced in the generated code
+ */
+bool SCDataModel::checkDataModel()
+{
+    QString errorLog;
+
+    // initial states check
+    // ensures that user has an initial state for all non-parallel state machines
+    QList<SCState*> stateMachines = this->getStateMachines();
+    foreach(SCState* sm, stateMachines)
+    {
+        if(sm->isParallel())
+        {
+            QList<SCState*> initialStates;
+            QList<SCState*> directChildren;
+            sm->getStates(directChildren);
+            foreach(SCState* child, directChildren)
+            {
+                if(child->isInitial())
+                    initialStates.append(child);
+            }
+
+            if(initialStates.size()!=0)
+            {
+                //            errorLog.append("State");
+                errorLog.append("State machine \""+sm->objectName()+"\" is parallel and should not have an initial state\n");
+            }
+        }
+        else
+        {
+            // check number of initial states
+            QList<SCState*> initialStates;
+            QList<SCState*> directChildren;
+            sm->getStates(directChildren);
+            foreach(SCState* child, directChildren)
+            {
+                if(child->isInitial())
+                    initialStates.append(child);
+            }
+
+            if(initialStates.size()==0)
+            {
+                //            errorLog.append("State");
+                errorLog.append("State machine \""+sm->objectName()+"\" is missing an initial state\n");
+            }
+            else if(initialStates.size()>1)
+            {
+                errorLog.append("State machine \""+sm->objectName()+"\" has too many initial states ("+QString::number(initialStates.size())+")\n");
+            }
+        }
+    }
+
+    // if there were errors, then emit a message and return false
+    if(!errorLog.isEmpty())
+    {
+        emit message(errorLog);
+        return false;
+    }
+
+    // return true if there were no errors
+    return true;
+}
+
+QList<SCState*> SCDataModel::getStateMachines()
+{
+    QList<SCState*> sm;
+    QList<SCState*> allStates;
+
+    // add the top state and add all of its children
+    allStates.append(_topState);
+    _topState->getAllStates(allStates);
+
+    // add every statemachine to sm
+    foreach(SCState* st, allStates)
+        if(st->isStateMachine())
+            sm.append(st);
+
+    return sm;
 }

@@ -38,21 +38,21 @@ public:
 public slots:
     //////// State Machine: _stateSequenceMachine ////////
     void Event_startMachine___stateSequenceMachine();
-    void Event___checkingAllStatesCompleted_checkingAllStateSequences();
-    void Event___checkingCallSequenceFailed_checkingAllStateSequences();
-    void Event___checkingConnSequenceFailed_checkingAllStateSequences();
-    void Event___checkingSessionSeqFailed_checkingAllStateSequences();
+    void Event___checkingAllStatesCompleted();
+    void Event___checkingCallSequenceFailed();
+    void Event___checkingConnSequenceFailed();
+    void Event___checkingSessionSeqFailed();
 
     //////// State Machine: _checkingAllStateSequences ////////
 
     //////// State Machine: _checkingCallSequence ////////
-    void Event___callSeqComplete_waiting_checkingCallSequence();
+    void Event___callSeqComplete();
 
     //////// State Machine: _checkingConnSequence ////////
-    void Event___connSeqComplete_waiting_checkingConnSequence();
+    void Event___connSeqComplete();
 
     //////// State Machine: _checkingSessionSeq ////////
-    void Event___sessionSeqComplete_waiting();
+    void Event___sessionSeqComplete();
 
 
 signals:

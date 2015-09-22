@@ -38,7 +38,20 @@ public:
 public slots:
     //////// State Machine: _stateMachine ////////
     void Event_startMachine___stateMachine();
-    void Event___testevent();
+    void Event___systemReady();
+    void Event___equipmentFailed();
+
+    //////// State Machine: _running ////////
+
+    //////// State Machine: _looping ////////
+    void Event___disconnected();
+    void Event___disconnectFailed();
+    void Event___connected();
+    void Event___dialFailed();
+    void Event___unregistered();
+    void Event___registered();
+    void Event___loopCountExceeded();
+    void Event___loopCountNotExceeded();
 
 
 signals:
@@ -49,6 +62,15 @@ signals:
     //
     //////// State Machine: _stateMachine ////////
 
+    //////// State Machine: _running ////////
+
+    //////// State Machine: _looping ////////
+    void Action___hangup();
+    void Action___dial();
+    void Action___deregister();
+    void Action___register();
+    void Action___incrementloopcount();
+
 
     //
     //    STATE CHANGE MONITOR SIGNALS
@@ -57,14 +79,30 @@ signals:
     //
     //////// State Machine: _stateMachine ////////
     void Signal_StateReady___stateMachine();
-    void Signal_StateEntry___stateMachine_1();
-    void Signal_StateExit___stateMachine_1();
-    void Signal_StateEntry___stateMachine_2();
-    void Signal_StateExit___stateMachine_2();
-    void Signal_StateEntry___stateMachine_3();
-    void Signal_StateExit___stateMachine_3();
-    void Signal_StateEntry___stateMachine_4();
-    void Signal_StateExit___stateMachine_4();
+    void Signal_StateEntry___waitingForSystemReady();
+    void Signal_StateExit___waitingForSystemReady();
+    void Signal_StateEntry___running();
+    void Signal_StateExit___running();
+    void Signal_StateEntry___success();
+    void Signal_StateExit___success();
+    void Signal_StateEntry___failed();
+    void Signal_StateExit___failed();
+
+    //////// State Machine: _running ////////
+    void Signal_StateEntry___looping();
+    void Signal_StateExit___looping();
+
+    //////// State Machine: _looping ////////
+    void Signal_StateEntry___connected();
+    void Signal_StateExit___connected();
+    void Signal_StateEntry___connecting();
+    void Signal_StateExit___connecting();
+    void Signal_StateEntry___disconnected();
+    void Signal_StateExit___disconnected();
+    void Signal_StateEntry___registering();
+    void Signal_StateExit___registering();
+    void Signal_StateEntry___unregistered();
+    void Signal_StateExit___unregistered();
 
 
     //////////////////
@@ -94,30 +132,70 @@ private:
 private slots:
     // The Entry/Exit Slots that belong to QStates
     //////// State Machine: _stateMachine ////////
-    void Slot_StateEntry___stateMachine_1();
-    void Slot_StateExit___stateMachine_1();
-    void Slot_StateEntry___stateMachine_2();
-    void Slot_StateExit___stateMachine_2();
-    void Slot_StateEntry___stateMachine_3();
-    void Slot_StateExit___stateMachine_3();
-    void Slot_StateEntry___stateMachine_4();
-    void Slot_StateExit___stateMachine_4();
+    void Slot_StateEntry___waitingForSystemReady();
+    void Slot_StateExit___waitingForSystemReady();
+    void Slot_StateEntry___running();
+    void Slot_StateExit___running();
+    void Slot_StateEntry___success();
+    void Slot_StateExit___success();
+    void Slot_StateEntry___failed();
+    void Slot_StateExit___failed();
+
+    //////// State Machine: _running ////////
+    void Slot_StateEntry___looping();
+    void Slot_StateExit___looping();
+
+    //////// State Machine: _looping ////////
+    void Slot_StateEntry___connected();
+    void Slot_StateExit___connected();
+    void Slot_StateEntry___connecting();
+    void Slot_StateExit___connecting();
+    void Slot_StateEntry___disconnected();
+    void Slot_StateExit___disconnected();
+    void Slot_StateEntry___registering();
+    void Slot_StateExit___registering();
+    void Slot_StateEntry___unregistered();
+    void Slot_StateExit___unregistered();
 
 
 signals:
     // A Transition/Event slot's corresponding signal emitted in the slot
     //////// State Machine: _stateMachine ////////
-    void Relay_Event___testevent_stateMachine_1();
-    void Relay_Event___testevent_stateMachine_3();
+    void Relay_Event___systemReady_waitingForSystemReady();
+    void Relay_Event___equipmentFailed_running();
+
+    //////// State Machine: _running ////////
+
+    //////// State Machine: _looping ////////
+    void Relay_Event___disconnected_connected();
+    void Relay_Event___disconnectFailed_connected();
+    void Relay_Event___connected_connecting();
+    void Relay_Event___dialFailed_connecting();
+    void Relay_Event___unregistered_disconnected();
+    void Relay_Event___registered_registering();
+    void Relay_Event___loopCountExceeded_unregistered();
+    void Relay_Event___loopCountNotExceeded_unregistered();
 
 
 private:
     //////// State Machine: _stateMachine ////////
     QStateMachine*    _stateMachine;
-    QState*    _stateMachine_1;
-    QState*    _stateMachine_2;
-    QState*    _stateMachine_3;
-    QState*    _stateMachine_4;
+    QState*    _waitingForSystemReady;
+    QState*    _running;
+    QFinalState*    _success;
+    QFinalState*    _failed;
+
+    //////// State Machine: _running ////////
+    // child QState declared elsewhere _running
+    QState*    _looping;
+
+    //////// State Machine: _looping ////////
+    // child QState declared elsewhere _looping
+    QState*    _connected;
+    QState*    _connecting;
+    QState*    _disconnected;
+    QState*    _registering;
+    QState*    _unregistered;
 
 
 };

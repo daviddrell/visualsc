@@ -1125,6 +1125,8 @@ void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
 #endif
 
 #ifndef REMAKE_TRANSITIONS
+
+    // adjusts the path string to match the new parent scheme
     StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
     StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
 

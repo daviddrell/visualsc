@@ -96,10 +96,10 @@ void SMProject::save(QString fileName)
     _dm->save(fileName, errorMsg);
 }
 
-void SMProject::exportToCode(QString fileName)
+bool SMProject::exportToCode(QString fileName)
 {
     QString errorMessage;
-    _dm->exportToCode(fileName, errorMessage);
+    return _dm->exportToCode(fileName, errorMessage);
 }
 
 void SMProject::close()

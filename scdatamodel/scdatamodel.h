@@ -134,6 +134,10 @@ public:
 
     bool insertNewTextBlock(SCItem* item, QString name);
 
+    QList<SCState*> getStateMachines();
+
+    bool checkDataModel();
+
 public slots:
     SCState* handleMakeANewState(SCState*, StateAttributes*);
     SCTransition* handleMakeANewTransition(SCState* source, TransitionAttributes*);
