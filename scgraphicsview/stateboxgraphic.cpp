@@ -32,7 +32,7 @@
 #include "cornergrabber.h"
 
 
-//#define HIDE_CORNER_GRABBERS
+#define HIDE_CORNER_GRABBERS
 
 #define PEN_DEFAULT_WIDTH       2.472135954999419
 #define PEN_HOVER_WIDTH         4
