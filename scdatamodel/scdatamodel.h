@@ -190,6 +190,7 @@ private slots:
 
     void handleChangeProgramFont(FontFamilyAttribute*);
     void handleChangeProgramFont(FontSizeAttribute*);
+    void handleChangeProgramFont(FontBoldAttribute*);
 
 private:
 

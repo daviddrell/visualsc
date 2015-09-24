@@ -836,26 +836,41 @@ bool CodeWriter::writeHFile()
  */
 QString CodeWriter::toCamel(QString text)
 {
-    QStringList qls = text.split(" ");
-    //if(qls.size()==1)
-      //  return text;
+    // get all words separted by 1+n spaces, n = 0, 1, 2, 3, ...
+    QRegExp sep("\\s+");
+    QStringList qls = text.split(sep);
 
     QString ret;
     QString part;
     QChar firstLetter;
 
-    part = qls.at(0);
+    // find the starting word, where the word is not an empty string
+    int start = 0;
+    for(int i = 0 ; i < qls.size(); i++)
+    {
+        if(!qls.at(i).isEmpty())
+        {
+            start = i;
+            break;
+        }
+    }
+
+    // the first letter of the first word will be lowercase
+    part = qls.at(start);
     firstLetter = part.at(0);
 
-#ifdef FORCE_CAMEL_FIRST_WORD_LOWERCASE
-    ret+=part.toLower();
-#endif
-#ifndef FORCE_CAMEL_FIRST_WORD_LOWERCASE
+
     ret+= firstLetter.toLower();
     ret+= part.mid(1,part.size());
-#endif
-    for(int i = 1 ; i < qls.size(); i++)
+
+
+    // now, for every word, capitialize the first letter
+    for(int i = start+1 ; i < qls.size(); i++)
     {
+        // check if there was trailing spaces
+        if(qls.at(i).isEmpty())
+            continue;
+
         part = qls.at(i);
         firstLetter = part.at(0);
 

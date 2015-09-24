@@ -72,6 +72,8 @@ private:
     void saveSettings();
     void createSettings();
 
+    void createActions();
+
 
     qreal _scale;
     qreal clamp(qreal val, qreal min, qreal max);
@@ -81,6 +83,9 @@ private:
 
     QComboBox* _fontBox;
     QComboBox* _fontSizeBox;
+
+
+    QAction* _boldAction;
 
 //    QButtonGroup _fontSelection;
     QRadioButton* _stateFontRadioButton;
@@ -110,12 +115,7 @@ private slots:
 
 
     void handleChangeFont(QString);
-//    void handleChangeFontSize(QString);
-
-
     void handleSetProgramFont(QFont*);
-//    void handleSetProgramFont(QString);
-//    void handleSetProgramFontSize(int);
 };
 
 #endif // MAINWINDOW_H

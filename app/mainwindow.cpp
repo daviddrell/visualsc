@@ -139,6 +139,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
 
+    // custom action create/connects
+    createActions();
 
 #ifdef ENABLE_TEXT_TOOL_BAR
     _textFormatToolBar = new TextFormatToolBar();
@@ -244,6 +246,16 @@ MainWindow::~MainWindow()
     //delete _settings;
     delete _project;
     delete ui;
+}
+
+void MainWindow::createActions()
+{
+    _boldAction = new QAction(tr("Bold"), this);
+    _boldAction->setCheckable(true);
+    QPixmap pixmap(":/SCFormView/bold.png");
+    _boldAction->setIcon(QIcon(pixmap));
+    _boldAction->setShortcut(tr("Ctrl+B"));
+    connect(_boldAction, SIGNAL(triggered()), this, SLOT(handleBoldChanged()));
 }
 
 /**

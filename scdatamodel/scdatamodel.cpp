@@ -93,8 +93,8 @@ void SCDataModel::connectTransition(SCTransition * trans)
 
     // propogate font attribute changes to the mainwindow combo boxes
     connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
-
     connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
+    connect(trans->getEventTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), this, SLOT( handleChangeProgramFont(FontBoldAttribute*)));
 }
 
 /**
@@ -136,6 +136,21 @@ void SCDataModel::handleChangeProgramFont(FontFamilyAttribute * ffa)
 void SCDataModel::handleChangeProgramFont(FontSizeAttribute * fsa)
 {
     QFont font("", fsa->asInt());
+    emit setProgramFont(&font);
+}
+
+void SCDataModel::handleChangeProgramFont(FontBoldAttribute * fba)
+{
+    QFont font;
+
+    if(fba->asBool())
+    {
+        font=QFont("", 1, QFont::Bold);
+    }
+    else
+    {
+        font=QFont("",1);
+    }
     emit setProgramFont(&font);
 }
 

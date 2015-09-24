@@ -38,7 +38,6 @@ public:
 public slots:
     //////// State Machine: _stateMachine ////////
     void Event_startMachine___stateMachine();
-    void Event___event();
 
 
 signals:
@@ -48,9 +47,12 @@ signals:
     //    Connect to these signals to a slot corresponding to a entryAction or exitAction
     //
     //////// State Machine: _stateMachine ////////
-    void Action___jump();
-    void Action___shoot();
-    void Action___dive();
+    void Action___wowDoCoolStuff();
+    void Action___increidblePeformance();
+    void Action___and();
+    void Action___handling();
+    void Action___wrastleMania();
+    void Action___awwowow();
 
 
     //
@@ -60,12 +62,12 @@ signals:
     //
     //////// State Machine: _stateMachine ////////
     void Signal_StateReady___stateMachine();
-
-
-    void Signal_StateEntry___stateA();
-    void Signal_StateExit___stateA();
+    void Signal_StateEntry___stateMachine_1();
+    void Signal_StateExit___stateMachine_1();
     void Signal_StateEntry___stateMachine_2();
     void Signal_StateExit___stateMachine_2();
+    void Signal_StateEntry___stateMachine_3();
+    void Signal_StateExit___stateMachine_3();
 
 
     //////////////////
@@ -95,23 +97,25 @@ private:
 private slots:
     // The Entry/Exit Slots that belong to QStates
     //////// State Machine: _stateMachine ////////
-    void Slot_StateEntry___stateA();
-    void Slot_StateExit___stateA();
+    void Slot_StateEntry___stateMachine_1();
+    void Slot_StateExit___stateMachine_1();
     void Slot_StateEntry___stateMachine_2();
     void Slot_StateExit___stateMachine_2();
+    void Slot_StateEntry___stateMachine_3();
+    void Slot_StateExit___stateMachine_3();
 
 
 signals:
     // A Transition/Event slot's corresponding signal emitted in the slot
     //////// State Machine: _stateMachine ////////
-    void Relay_Event___event_stateA();
 
 
 private:
     //////// State Machine: _stateMachine ////////
     QStateMachine*    _stateMachine;
-    QState*    _stateA;
+    QState*    _stateMachine_1;
     QState*    _stateMachine_2;
+    QState*    _stateMachine_3;
 
 
 };

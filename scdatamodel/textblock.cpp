@@ -68,6 +68,11 @@ FontSizeAttribute* SCTextBlock::getFontSizeAttr()
     return dynamic_cast<FontSizeAttribute*>(attributes.value("font-size"));
 }
 
+FontBoldAttribute* SCTextBlock::getFontBoldAttr()
+{
+    return dynamic_cast<FontBoldAttribute*>(attributes.value("font-bold"));
+}
+
 IAttributeContainer * SCTextBlock::getAttributes()
 {
     return & attributes;

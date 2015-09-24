@@ -41,6 +41,7 @@ public:
     GenericAttribute* getAttr(QString key);
     FontFamilyAttribute* getFontFamilyAttr();
     FontSizeAttribute* getFontSizeAttr();
+    FontBoldAttribute* getFontBoldAttr();
 
 
 public slots:

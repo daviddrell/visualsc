@@ -38,40 +38,22 @@ public:
 public slots:
     //////// State Machine: _testManagerStateMachine ////////
     void Event_startMachine___testManagerStateMachine();
-    void Event___start_idle();
-    void Event___downloadFailed_downloadingAVC();
-    void Event___sHA1IsDifferent_downloadingAVC();
-    void Event___sHA1IsSame_downloadingAVC();
-    void Event___testsCompleted_runningTests();
-    void Event___pollTimerPopped_completed_testManagerStateMachine();
-    void Event___updateFailure_updateFirmwareAllUnits();
-    void Event___updateFirmwareAllUnitsFinished_updateFirmwareAllUnits();
-    void Event___event_stateSequenceMachine();
+    void Event___start();
+    void Event___downloadFailed();
+    void Event___sHA1IsSame();
+    void Event___sHA1IsDifferent();
+    void Event___testsCompleted();
+    void Event___pollTimerPopped();
+    void Event___updateFailure();
+    void Event___updateFirmwareAllUnitsFinished();
 
     //////// State Machine: _updateFirmwareAllUnits ////////
 
     //////// State Machine: _updatingGSUnits ////////
-    void Event___gSUpdateSuccess_updateInProgress();
+    void Event___gSUpdateSuccess();
 
     //////// State Machine: _updatingWincomm ////////
-    void Event___upzipSuccess_unzipInProgress();
-
-    //////// State Machine: _stateSequenceMachine ////////
-    void Event___checkingAllStatesCompleted_checkingAllStateSequences();
-    void Event___checkingCallSequenceFailed_checkingAllStateSequences();
-    void Event___checkingConnSequenceFailed_checkingAllStateSequences();
-    void Event___checkingSessionSeqFailed_checkingAllStateSequences();
-
-    //////// State Machine: _checkingAllStateSequences ////////
-
-    //////// State Machine: _checkingCallSequence ////////
-    void Event___callSeqComplete_waiting_checkingCallSequence();
-
-    //////// State Machine: _checkingConnSequence ////////
-    void Event___connSeqComplete_waiting_checkingConnSequence();
-
-    //////// State Machine: _checkingSessionSeq ////////
-    void Event___sessionSeqComplete_waiting();
+    void Event___upzipSuccess();
 
 
 signals:
@@ -81,26 +63,16 @@ signals:
     //    Connect to these signals to a slot corresponding to a entryAction or exitAction
     //
     //////// State Machine: _testManagerStateMachine ////////
-    void EntryAction___startdownload();
-    void EntryAction___starttests();
+    void Action___startDownload();
+    void Action___startTests();
 
     //////// State Machine: _updateFirmwareAllUnits ////////
 
     //////// State Machine: _updatingGSUnits ////////
-    void EntryAction___startGSupdate();
+    void Action___startGSUpdate();
 
     //////// State Machine: _updatingWincomm ////////
-    void EntryAction___startunzip();
-
-    //////// State Machine: _stateSequenceMachine ////////
-
-    //////// State Machine: _checkingAllStateSequences ////////
-
-    //////// State Machine: _checkingCallSequence ////////
-
-    //////// State Machine: _checkingConnSequence ////////
-
-    //////// State Machine: _checkingSessionSeq ////////
+    void Action___startUnzip();
 
 
     //
@@ -116,12 +88,10 @@ signals:
     void Signal_StateExit___downloadingAVC();
     void Signal_StateEntry___runningTests();
     void Signal_StateExit___runningTests();
-    void Signal_StateEntry___completed_testManagerStateMachine();
-    void Signal_StateExit___completed_testManagerStateMachine();
+    void Signal_StateEntry___completed();
+    void Signal_StateExit___completed();
     void Signal_StateEntry___updateFirmwareAllUnits();
     void Signal_StateExit___updateFirmwareAllUnits();
-    void Signal_StateEntry___stateSequenceMachine();
-    void Signal_StateExit___stateSequenceMachine();
 
     //////// State Machine: _updateFirmwareAllUnits ////////
     void Signal_StateEntry___updatingGSUnits();
@@ -140,40 +110,6 @@ signals:
     void Signal_StateExit___unzipInProgress();
     void Signal_StateEntry___done_updatingWincomm();
     void Signal_StateExit___done_updatingWincomm();
-
-    //////// State Machine: _stateSequenceMachine ////////
-    void Signal_StateEntry___checkingAllStateSequences();
-    void Signal_StateExit___checkingAllStateSequences();
-    void Signal_StateEntry___failed();
-    void Signal_StateExit___failed();
-    void Signal_StateEntry___success();
-    void Signal_StateExit___success();
-
-    //////// State Machine: _checkingAllStateSequences ////////
-    void Signal_StateEntry___checkingCallSequence();
-    void Signal_StateExit___checkingCallSequence();
-    void Signal_StateEntry___checkingConnSequence();
-    void Signal_StateExit___checkingConnSequence();
-    void Signal_StateEntry___checkingSessionSeq();
-    void Signal_StateExit___checkingSessionSeq();
-
-    //////// State Machine: _checkingCallSequence ////////
-    void Signal_StateEntry___waiting_checkingCallSequence();
-    void Signal_StateExit___waiting_checkingCallSequence();
-    void Signal_StateEntry___completed_checkingCallSequence();
-    void Signal_StateExit___completed_checkingCallSequence();
-
-    //////// State Machine: _checkingConnSequence ////////
-    void Signal_StateEntry___waiting_checkingConnSequence();
-    void Signal_StateExit___waiting_checkingConnSequence();
-    void Signal_StateEntry___completed_checkingConnSequence();
-    void Signal_StateExit___completed_checkingConnSequence();
-
-    //////// State Machine: _checkingSessionSeq ////////
-    void Signal_StateEntry___waiting();
-    void Signal_StateExit___waiting();
-    void Signal_StateEntry___completed_checkingSessionSeq();
-    void Signal_StateExit___completed_checkingSessionSeq();
 
 
     //////////////////
@@ -209,12 +145,10 @@ private slots:
     void Slot_StateExit___downloadingAVC();
     void Slot_StateEntry___runningTests();
     void Slot_StateExit___runningTests();
-    void Slot_StateEntry___completed_testManagerStateMachine();
-    void Slot_StateExit___completed_testManagerStateMachine();
+    void Slot_StateEntry___completed();
+    void Slot_StateExit___completed();
     void Slot_StateEntry___updateFirmwareAllUnits();
     void Slot_StateExit___updateFirmwareAllUnits();
-    void Slot_StateEntry___stateSequenceMachine();
-    void Slot_StateExit___stateSequenceMachine();
 
     //////// State Machine: _updateFirmwareAllUnits ////////
     void Slot_StateEntry___updatingGSUnits();
@@ -234,53 +168,18 @@ private slots:
     void Slot_StateEntry___done_updatingWincomm();
     void Slot_StateExit___done_updatingWincomm();
 
-    //////// State Machine: _stateSequenceMachine ////////
-    void Slot_StateEntry___checkingAllStateSequences();
-    void Slot_StateExit___checkingAllStateSequences();
-    void Slot_StateEntry___failed();
-    void Slot_StateExit___failed();
-    void Slot_StateEntry___success();
-    void Slot_StateExit___success();
-
-    //////// State Machine: _checkingAllStateSequences ////////
-    void Slot_StateEntry___checkingCallSequence();
-    void Slot_StateExit___checkingCallSequence();
-    void Slot_StateEntry___checkingConnSequence();
-    void Slot_StateExit___checkingConnSequence();
-    void Slot_StateEntry___checkingSessionSeq();
-    void Slot_StateExit___checkingSessionSeq();
-
-    //////// State Machine: _checkingCallSequence ////////
-    void Slot_StateEntry___waiting_checkingCallSequence();
-    void Slot_StateExit___waiting_checkingCallSequence();
-    void Slot_StateEntry___completed_checkingCallSequence();
-    void Slot_StateExit___completed_checkingCallSequence();
-
-    //////// State Machine: _checkingConnSequence ////////
-    void Slot_StateEntry___waiting_checkingConnSequence();
-    void Slot_StateExit___waiting_checkingConnSequence();
-    void Slot_StateEntry___completed_checkingConnSequence();
-    void Slot_StateExit___completed_checkingConnSequence();
-
-    //////// State Machine: _checkingSessionSeq ////////
-    void Slot_StateEntry___waiting();
-    void Slot_StateExit___waiting();
-    void Slot_StateEntry___completed_checkingSessionSeq();
-    void Slot_StateExit___completed_checkingSessionSeq();
-
 
 signals:
     // A Transition/Event slot's corresponding signal emitted in the slot
     //////// State Machine: _testManagerStateMachine ////////
     void Relay_Event___start_idle();
     void Relay_Event___downloadFailed_downloadingAVC();
-    void Relay_Event___sHA1IsDifferent_downloadingAVC();
     void Relay_Event___sHA1IsSame_downloadingAVC();
+    void Relay_Event___sHA1IsDifferent_downloadingAVC();
     void Relay_Event___testsCompleted_runningTests();
-    void Relay_Event___pollTimerPopped_completed_testManagerStateMachine();
+    void Relay_Event___pollTimerPopped_completed();
     void Relay_Event___updateFailure_updateFirmwareAllUnits();
     void Relay_Event___updateFirmwareAllUnitsFinished_updateFirmwareAllUnits();
-    void Relay_Event___event_stateSequenceMachine();
 
     //////// State Machine: _updateFirmwareAllUnits ////////
 
@@ -290,23 +189,6 @@ signals:
     //////// State Machine: _updatingWincomm ////////
     void Relay_Event___upzipSuccess_unzipInProgress();
 
-    //////// State Machine: _stateSequenceMachine ////////
-    void Relay_Event___checkingAllStatesCompleted_checkingAllStateSequences();
-    void Relay_Event___checkingCallSequenceFailed_checkingAllStateSequences();
-    void Relay_Event___checkingConnSequenceFailed_checkingAllStateSequences();
-    void Relay_Event___checkingSessionSeqFailed_checkingAllStateSequences();
-
-    //////// State Machine: _checkingAllStateSequences ////////
-
-    //////// State Machine: _checkingCallSequence ////////
-    void Relay_Event___callSeqComplete_waiting_checkingCallSequence();
-
-    //////// State Machine: _checkingConnSequence ////////
-    void Relay_Event___connSeqComplete_waiting_checkingConnSequence();
-
-    //////// State Machine: _checkingSessionSeq ////////
-    void Relay_Event___sessionSeqComplete_waiting();
-
 
 private:
     //////// State Machine: _testManagerStateMachine ////////
@@ -314,9 +196,8 @@ private:
     QState*    _idle;
     QState*    _downloadingAVC;    // incredibel sfajlsdfasdf
     QState*    _runningTests;
-    QState*    _completed_testManagerStateMachine;
+    QState*    _completed;
     QState*    _updateFirmwareAllUnits;
-    QState*    _stateSequenceMachine;
 
     //////// State Machine: _updateFirmwareAllUnits ////////
     // child QState declared elsewhere _updateFirmwareAllUnits
@@ -332,33 +213,6 @@ private:
     // child QState declared elsewhere _updatingWincomm
     QState*    _unzipInProgress;
     QFinalState*    _done_updatingWincomm;
-
-    //////// State Machine: _stateSequenceMachine ////////
-    // child QState declared elsewhere _stateSequenceMachine
-    QState*    _checkingAllStateSequences;
-    QFinalState*    _failed;
-    QFinalState*    _success;
-
-    //////// State Machine: _checkingAllStateSequences ////////
-    // child QState declared elsewhere _checkingAllStateSequences
-    QState*    _checkingCallSequence;
-    QState*    _checkingConnSequence;
-    QState*    _checkingSessionSeq;
-
-    //////// State Machine: _checkingCallSequence ////////
-    // child QState declared elsewhere _checkingCallSequence
-    QState*    _waiting_checkingCallSequence;
-    QFinalState*    _completed_checkingCallSequence;
-
-    //////// State Machine: _checkingConnSequence ////////
-    // child QState declared elsewhere _checkingConnSequence
-    QState*    _waiting_checkingConnSequence;
-    QFinalState*    _completed_checkingConnSequence;
-
-    //////// State Machine: _checkingSessionSeq ////////
-    // child QState declared elsewhere _checkingSessionSeq
-    QState*    _waiting;
-    QFinalState*    _completed_checkingSessionSeq;
 
 
 };
