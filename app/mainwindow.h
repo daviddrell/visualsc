@@ -119,7 +119,10 @@ private slots:
 
 
     void handleChangeFont(QString);
-    void handleSetProgramFont(QFont*);
+//    void handleSetProgramFont(QFont*);
+    void handleSetProgramFontFamily(FontFamilyAttribute*);
+    void handleSetProgramFontSize(FontSizeAttribute*);
+    void handleSetProgramFontBold(FontBoldAttribute*);
 };
 
 #endif // MAINWINDOW_H

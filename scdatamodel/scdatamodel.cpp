@@ -114,9 +114,17 @@ void SCDataModel::connectState(SCState * st)
     connect(st,SIGNAL(clicked(SCState*)), this, SIGNAL(itemClicked()));
 
     // propogate font attribute changes to the mainwindow combo boxes
-    connect(st->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
-    connect(st->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
-    connect(st->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), this, SLOT(handleChangeProgramFont(FontBoldAttribute*)));
+//    connect(st->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
+//    connect(st->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
+//    connect(st->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), this, SLOT(handleChangeProgramFont(FontBoldAttribute*)));
+
+
+    connect(st->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SIGNAL(setProgramFontFamily(FontFamilyAttribute*)));
+
+    connect(st->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), this, SIGNAL(setProgramFontBold(FontBoldAttribute*)));
+
+    connect(st->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SIGNAL(setProgramFontSize(FontSizeAttribute*)));
+
 }
 
 /**
@@ -142,16 +150,9 @@ void SCDataModel::handleChangeProgramFont(FontSizeAttribute * fsa)
 
 void SCDataModel::handleChangeProgramFont(FontBoldAttribute * fba)
 {
-    QFont font;
+    QFont font("",1);
+    font.setBold(fba);
 
-    if(fba->asBool())
-    {
-        font=QFont("", 1, QFont::Bold);
-    }
-    else
-    {
-        font=QFont("",1);
-    }
     emit setProgramFont(&font);
 }
 
@@ -172,9 +173,13 @@ void SCDataModel::handleItemClicked(SCState * st)
 
     _lastClickedItem = st;
 
-    QFont font(st->getIDTextBlock()->getFontFamilyAttr()->asString(), st->getIDTextBlock()->getFontSizeAttr()->asInt());
-    font.setBold(st->getIDTextBlock()->getFontBoldAttr()->asBool());
-    emit setProgramFont(&font);
+//    QFont font(st->getIDTextBlock()->getFontFamilyAttr()->asString(), st->getIDTextBlock()->getFontSizeAttr()->asInt());
+//    font.setBold(st->getIDTextBlock()->getFontBoldAttr()->asBool());
+//    emit setProgramFont(&font);
+    SCTextBlock* tb = st->getIDTextBlock();
+    emit setProgramFontFamily(tb->getFontFamilyAttr());
+    emit setProgramFontSize(tb->getFontSizeAttr());
+    emit setProgramFontBold(tb->getFontBoldAttr());
 }
 
 void SCDataModel::handleItemClicked(SCTransition * trans)
@@ -187,10 +192,15 @@ void SCDataModel::handleItemClicked(SCTransition * trans)
     _lastClickedItem = trans;
 
 
-    QFont font(trans->getEventTextBlock()->getFontFamilyAttr()->asString(), trans->getEventTextBlock()->getFontSizeAttr()->asInt());
+//    QFont font(trans->getEventTextBlock()->getFontFamilyAttr()->asString(), trans->getEventTextBlock()->getFontSizeAttr()->asInt());
 
-    font.setBold(trans->getEventTextBlock()->getFontBoldAttr()->asBool());
-    emit setProgramFont(&font);
+//    font.setBold(trans->getEventTextBlock()->getFontBoldAttr()->asBool());
+//    emit setProgramFont(&font);
+
+    SCTextBlock* tb = trans->getEventTextBlock();
+    emit setProgramFontFamily(tb->getFontFamilyAttr());
+    emit setProgramFontSize(tb->getFontSizeAttr());
+    emit setProgramFontBold(tb->getFontBoldAttr());
 }
 
 /**

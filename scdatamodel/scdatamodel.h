@@ -162,6 +162,10 @@ signals:
     void itemClicked();
 
     void setProgramFont(QFont*);
+
+    void setProgramFontFamily(FontFamilyAttribute*);
+    void setProgramFontSize(FontSizeAttribute*);
+    void setProgramFontBold(FontBoldAttribute*);
 //    void setFont(QString);
 //    void setFontSize(int);
 

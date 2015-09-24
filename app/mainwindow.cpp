@@ -168,7 +168,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // when a datamodel item is clicked, change the font box to match its attributes
 
     // when the data model signals set program font, set the program font
-    connect(_project->getDM(), SIGNAL(setProgramFont(QFont*)), this, SLOT(handleSetProgramFont(QFont*)));
+//    connect(_project->getDM(), SIGNAL(setProgramFont(QFont*)), this, SLOT(handleSetProgramFont(QFont*)));
+    connect(_project->getDM(), SIGNAL(setProgramFontFamily(FontFamilyAttribute*)), this, SLOT(handleSetProgramFontFamily(FontFamilyAttribute*)));
+
+    connect(_project->getDM(),SIGNAL(setProgramFontSize(FontSizeAttribute*)), this, SLOT(handleSetProgramFontSize(FontSizeAttribute*)));
+
+    connect(_project->getDM(), SIGNAL(setProgramFontBold(FontBoldAttribute*)), this, SLOT(handleSetProgramFontBold(FontBoldAttribute*)));
 
     // when the data model emits a clicked signal, change the radio button selection
     connect(_project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
@@ -184,6 +189,29 @@ MainWindow::~MainWindow()
     //delete _settings;
     delete _project;
     delete ui;
+}
+
+void MainWindow::handleSetProgramFontFamily(FontFamilyAttribute * ffa)
+{
+    int fontIndex = _fontBox->findText(ffa->asString(), Qt::MatchFixedString);
+    if(fontIndex>-1)
+    {
+        _fontBox->setCurrentIndex(fontIndex);
+    }
+}
+
+void MainWindow::handleSetProgramFontSize(FontSizeAttribute * fsa)
+{
+    int sizeIndex = _fontSizeBox->findText(QString::number(fsa->asInt()),0);
+    if(sizeIndex > -1)
+    {
+        _fontSizeBox->setCurrentIndex(sizeIndex);
+    }
+}
+
+void MainWindow::handleSetProgramFontBold(FontBoldAttribute * fba)
+{
+    _boldAction->setChecked(fba->asBool());
 }
 
 void MainWindow::createFontBar()
@@ -340,37 +368,40 @@ void MainWindow::handleItemClicked()
     else
     {
         _selectedRadioButton->toggle();
+
     }
 }
 
-/**
- * @brief MainWindow::handleSetProgramFont
- * @param font
- *
- * SLOT
- *
- * this is triggered by SCDataModel when the mainwindow font boxes should update
- * for each valid font attribute given, update the corresponding combo box
- *
- */
-void MainWindow::handleSetProgramFont(QFont* font)
-{
-    qDebug() << "mainwindow::handlesetprogramfont";
-    // set font, if it exists
-    int fontIndex = _fontBox->findText(font->family(), Qt::MatchFixedString);
-    if(fontIndex>-1)
-    {
-        _fontBox->setCurrentIndex(fontIndex);
-    }
+///**
+// * @brief MainWindow::handleSetProgramFont
+// * @param font
+// *
+// * SLOT
+// *
+// * this is triggered by SCDataModel when the mainwindow font boxes should update
+// * for each valid font attribute given, update the corresponding combo box
+// *
+// */
+//void MainWindow::handleSetProgramFont(QFont* font)
+//{
+//    qDebug() << "mainwindow::handlesetprogramfont";
+//    // set font, if it exists
+//    int fontIndex = _fontBox->findText(font->family(), Qt::MatchFixedString);
+//    if(fontIndex>-1)
+//    {
+//        _fontBox->setCurrentIndex(fontIndex);
+//    }
 
-    int fontSizeIndex = _fontSizeBox->findText(QString::number(font->pointSize()),0);
-    if(fontSizeIndex>-1)
-    {
-        _fontSizeBox->setCurrentIndex(fontSizeIndex);
-    }
+//    int fontSizeIndex = _fontSizeBox->findText(QString::number(font->pointSize()),0);
+//    if(fontSizeIndex>-1)
+//    {
+//        _fontSizeBox->setCurrentIndex(fontSizeIndex);
+//    }
 
-    _boldAction->setChecked(font->bold());
-}
+
+////    if(_boldAction->isChecked()!=font->bold()) //        _boldAction->toggle();
+
+//}
 
 /**
  * @brief MainWindow::addToolbarSpacer
@@ -414,6 +445,7 @@ void MainWindow::handleChangeFont(QString)
     }
 
     QFont font(fontFam,size);
+    font.setBold(_boldAction->isChecked());
 
     if(_selectedRadioButton->isChecked())
     {
@@ -457,7 +489,7 @@ void MainWindow::handleChangeFont(QString)
  */
 void MainWindow::handleFontRadioChanged()
 {
-    _boldAction->setChecked(false);
+//    _boldAction->setChecked(false);
 }
 
 void MainWindow::handleMessage(QString msg)
