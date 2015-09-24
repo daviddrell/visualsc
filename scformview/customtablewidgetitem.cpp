@@ -54,6 +54,11 @@ void CustomTableWidgetItem::handleAttributeChanged(FontSizeAttribute * fs)
     setText(fs->asString());
 }
 
+void CustomTableWidgetItem::handleAttributeChanged(FontBoldAttribute * fba)
+{
+    setText(fba->asString());
+}
+
 /*
 void CustomTableWidgetItem::setText(const QString &text)
 {

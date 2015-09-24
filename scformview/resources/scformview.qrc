@@ -46,5 +46,7 @@
         <file>picture.png</file>
         <file>center.png</file>
         <file>fork.png</file>
+        <file>Bold-50.png</file>
+        <file>Bold-32.png</file>
     </qresource>
 </RCC>

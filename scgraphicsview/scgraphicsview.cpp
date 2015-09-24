@@ -994,10 +994,11 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
 
     // font connects
-    connect(state->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontFamilyChanged(FontFamilyAttribute*)));
+    connect(state->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontFamilyAttribute*)));
 
+    connect(state->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontSizeAttribute*)));
 
-    connect(state->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontSizeChanged(FontSizeAttribute*)));
+    connect(state->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontBoldAttribute*)));
 }
 
 
@@ -1092,10 +1093,10 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     connect(transGraphic, SIGNAL(clicked(SCTransition*)), trans, SIGNAL(clicked(SCTransition*)));
 
     // connect the text block graphic of this transition to the data model
-    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontFamilyChanged(FontFamilyAttribute*)));
-    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontSizeChanged(FontSizeAttribute*)));
+    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontFamilyAttribute*)));
+    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontSizeAttribute*)));
 
-
+    connect(trans->getEventTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontBoldAttribute*)));
 
 
 }

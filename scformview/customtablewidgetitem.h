@@ -32,6 +32,7 @@ public slots:
     void handleAttributeChanged(GenericAttribute*);
     void handleAttributeChanged(FontFamilyAttribute*);
     void handleAttributeChanged(FontSizeAttribute*);
+    void handleAttributeChanged(FontBoldAttribute*);
 
 };
 

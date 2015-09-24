@@ -141,9 +141,9 @@ public:
     void removeAllTransitionsIn();
 
 
-    void setFont(QString fontName);
     void setFont(QFont * font);
-    void setFontSize(int fontSize);
+//    void setFont(QString fontName);
+//    void setFontSize(int fontSize);
 
     /**
       * \fn getAllTransitions

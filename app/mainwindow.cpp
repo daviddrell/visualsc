@@ -67,71 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Designer code
     ui->setupUi(this);
 
-    // Create the Fonts List
-//    QList<QString> fontList;
-    QStringList fontList;
-    QStringList fontSizeList;
-    QFontDatabase qfd;
-    foreach(const QString &family, qfd.families())
-    {
-        //   qDebug() << family;
-        fontList.append(family);
-    }
-
-    // create a list of font sizes based on the first font
-    if(fontList.size() > 0)
-    {
-        foreach(int point, qfd.smoothSizes(fontList.at(0), qfd.styles(fontList.at(0)).at(0)))
-        {
-            fontSizeList.append(QString::number(point));
-        }
-    }
-
-    // add combobox
-    ui->mainToolBar->addSeparator();
-
-    _fontBox = new QComboBox();
-    _fontBox->setEditable(true);
-    _fontBox->addItems(fontList);
-    ui->mainToolBar->addWidget(_fontBox);
-
-    int fontIndex = _fontBox->findText("arial", Qt::MatchFixedString);
-
-    // set default to arial, if it exists
-    if(fontIndex>-1)
-    {
-        _fontBox->setCurrentIndex(fontIndex);
-    }
-
-//    this->addToolbarSpacer(ui->mainToolBar);
-//    ui->mainToolBar->setStyleSheet("spacing: 20px");
-
-    // add font size combox box
-    _fontSizeBox = new QComboBox();
-    _fontSizeBox->setEditable(true);
-    _fontSizeBox->addItems(fontSizeList);
-    ui->mainToolBar->addWidget(_fontSizeBox);
-
-    int fontSizeIndex = _fontSizeBox->findText(QString::number(DEFAULT_FONT_SIZE),0);
-    if(fontSizeIndex>-1)
-    {
-        _fontSizeBox->setCurrentIndex(fontSizeIndex);
-    }
 
 
-
-    // radio buttons
-
-//    _fontSelection.setParent(this);
-    _selectedRadioButton = new QRadioButton("Selected", this);
-    _stateFontRadioButton = new QRadioButton("States", this);
-    _transitionFontRadioButton = new QRadioButton("Transitions", this);
-
-    ui->mainToolBar->addWidget(_selectedRadioButton);
-    ui->mainToolBar->addWidget(_stateFontRadioButton);
-    ui->mainToolBar->addWidget(_transitionFontRadioButton);
-
-    _selectedRadioButton->toggle();
 
     // custom action connects
     connect ( ui->actionOpen, SIGNAL(triggered()), this, SLOT(handleFileOpenClick()));
@@ -139,8 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
 
-    // custom action create/connects
-    createActions();
+
 
 #ifdef ENABLE_TEXT_TOOL_BAR
     _textFormatToolBar = new TextFormatToolBar();
@@ -154,6 +90,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->move(633,0);
 
 
+    // add font widgets
+    createFontBar();
 
 // uncomment this macro to autoload a file
 // WARNING: outdated, may not work
@@ -248,14 +186,140 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::createActions()
+void MainWindow::createFontBar()
 {
+    // Create the Fonts List
+    QStringList fontList;
+    QStringList fontSizeList;
+    QFontDatabase qfd;
+    foreach(const QString &family, qfd.families())
+    {
+        //   qDebug() << family;
+        fontList.append(family);
+    }
+
+    // create a list of font sizes based on the first font
+    if(fontList.size() > 0)
+    {
+        foreach(int point, qfd.smoothSizes(fontList.at(0), qfd.styles(fontList.at(0)).at(0)))
+        {
+            fontSizeList.append(QString::number(point));
+        }
+    }
+
+    // add combobox
+    ui->mainToolBar->addSeparator();
+
+    _fontBox = new QComboBox();
+    _fontBox->setEditable(true);
+    _fontBox->addItems(fontList);
+    ui->mainToolBar->addWidget(_fontBox);
+
+    int fontIndex = _fontBox->findText("arial", Qt::MatchFixedString);
+
+    // set default to arial, if it exists
+    if(fontIndex>-1)
+    {
+        _fontBox->setCurrentIndex(fontIndex);
+    }
+
+//    this->addToolbarSpacer(ui->mainToolBar);
+//    ui->mainToolBar->setStyleSheet("spacing: 20px");
+
+    // add font size combox box
+    _fontSizeBox = new QComboBox();
+    _fontSizeBox->setEditable(true);
+    _fontSizeBox->addItems(fontSizeList);
+    ui->mainToolBar->addWidget(_fontSizeBox);
+
+    int fontSizeIndex = _fontSizeBox->findText(QString::number(DEFAULT_FONT_SIZE),0);
+    if(fontSizeIndex>-1)
+    {
+        _fontSizeBox->setCurrentIndex(fontSizeIndex);
+    }
+
+
+
+
+    // bold button
     _boldAction = new QAction(tr("Bold"), this);
     _boldAction->setCheckable(true);
-    QPixmap pixmap(":/SCFormView/bold.png");
+    QPixmap pixmap(":/SCFormView/Bold-32.png");
     _boldAction->setIcon(QIcon(pixmap));
     _boldAction->setShortcut(tr("Ctrl+B"));
-    connect(_boldAction, SIGNAL(triggered()), this, SLOT(handleBoldChanged()));
+    connect(_boldAction, SIGNAL(triggered(bool)), this, SLOT(handleBoldToggled(bool)));
+
+    ui->mainToolBar->addAction(_boldAction);
+
+    ui->mainToolBar->addSeparator();
+
+    // radio buttons
+    _selectedRadioButton = new QRadioButton("Selected", this);
+    _stateFontRadioButton = new QRadioButton("States", this);
+    _transitionFontRadioButton = new QRadioButton("Transitions", this);
+
+    // when a group radio button is selected, uncheck bold (this is to make it easier to trigger making all bold simultaneously)
+    connect(_stateFontRadioButton, SIGNAL(clicked()), this, SLOT(handleFontRadioChanged()));
+    connect(_transitionFontRadioButton, SIGNAL(clicked()), this, SLOT(handleFontRadioChanged()));
+
+    ui->mainToolBar->addWidget(_selectedRadioButton);
+    ui->mainToolBar->addWidget(_stateFontRadioButton);
+    ui->mainToolBar->addWidget(_transitionFontRadioButton);
+
+    _selectedRadioButton->toggle();
+
+
+
+    ui->mainToolBar->addSeparator();
+
+}
+
+void MainWindow::handleBoldToggled(bool toggle)
+{
+    qDebug() << "bold: " << toggle;
+
+    QFont font;
+
+    if(toggle)
+    {
+       font = QFont("",1,QFont::Bold);
+    }
+    else
+    {
+       font = QFont("",1);
+    }
+
+    if(_selectedRadioButton->isChecked())
+    {
+        SCState* st = _formEditorWindow->getCurrentlySelectedState();
+        SCTransition* trans = _formEditorWindow->getCurrentlySelectedTransition();
+
+        if(st)
+        {
+            st->setFont(&font);
+        }
+        else if(trans)
+        {
+            trans->setFont(&font);
+        }
+        else
+        {
+
+        }
+    }
+    else if(_stateFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleStateFontChanged(&font);
+    }
+    else if(_transitionFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleTransitionFontChanged(&font);
+    }
+    else
+    {
+
+    }
+
 }
 
 /**
@@ -304,6 +368,8 @@ void MainWindow::handleSetProgramFont(QFont* font)
     {
         _fontSizeBox->setCurrentIndex(fontSizeIndex);
     }
+
+    _boldAction->setChecked(font->bold());
 }
 
 /**
@@ -382,7 +448,17 @@ void MainWindow::handleChangeFont(QString)
     }
 }
 
-
+/**
+ * @brief MainWindow::handleFontRadioChanged
+ *
+ * SLOT
+ *
+ * when a radio is triggered that represents a group of items, change the bold button to not checked
+ */
+void MainWindow::handleFontRadioChanged()
+{
+    _boldAction->setChecked(false);
+}
 
 void MainWindow::handleMessage(QString msg)
 {

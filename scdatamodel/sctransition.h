@@ -102,9 +102,9 @@ public:
 
     void setTargetState(SCState*);
 
-    void setFont(QString);
+//    void setFont(QString);
+//    void setFontSize(int);
     void setFont(QFont* font);
-    void setFontSize(int);
 
 
 signals:

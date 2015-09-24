@@ -48,11 +48,11 @@ signals:
     //
     //////// State Machine: _stateMachine ////////
     void Action___wowDoCoolStuff();
-    void Action___increidblePeformance();
+    void Action___goodPeformance();
     void Action___and();
     void Action___handling();
-    void Action___wrastleMania();
-    void Action___awwowow();
+    void Action___testingLeadingSpaces();
+    void Action___testingTrailingSpaces();
 
 
     //
@@ -66,8 +66,8 @@ signals:
     void Signal_StateExit___stateMachine_1();
     void Signal_StateEntry___stateMachine_2();
     void Signal_StateExit___stateMachine_2();
-    void Signal_StateEntry___stateMachine_3();
-    void Signal_StateExit___stateMachine_3();
+    void Signal_StateEntry___leadingTrailing();
+    void Signal_StateExit___leadingTrailing();
 
 
     //////////////////
@@ -101,8 +101,8 @@ private slots:
     void Slot_StateExit___stateMachine_1();
     void Slot_StateEntry___stateMachine_2();
     void Slot_StateExit___stateMachine_2();
-    void Slot_StateEntry___stateMachine_3();
-    void Slot_StateExit___stateMachine_3();
+    void Slot_StateEntry___leadingTrailing();
+    void Slot_StateExit___leadingTrailing();
 
 
 signals:
@@ -115,7 +115,7 @@ private:
     QStateMachine*    _stateMachine;
     QState*    _stateMachine_1;
     QState*    _stateMachine_2;
-    QState*    _stateMachine_3;
+    QState*    _leadingTrailing;
 
 
 };

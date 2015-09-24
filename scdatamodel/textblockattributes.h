@@ -143,6 +143,9 @@ public:
     virtual void setValue(const QString bold)  ;
             void setValue(const bool bold)  ;
 
+signals:
+            void changed(FontBoldAttribute*);
+
 private:
 
     bool _bold;

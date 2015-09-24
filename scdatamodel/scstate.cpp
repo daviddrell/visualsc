@@ -85,6 +85,9 @@ SCState* SCState::parentAsSCState()
  */
 void SCState::initCommon()
 {
+    // set the SCTextblock's bold attribute to true by default for the state title
+    this->getIDTextBlock()->getFontBoldAttr()->setValue(true);
+
    // _stateBoxGraphic = NULL;
     QString defaultName = QString();
 
@@ -503,23 +506,26 @@ void SCState::handleTextBlockChanged()
  * @brief SCState::setFont
  * @param fontName
  *
- * changes the font family attribute
+ * changes the font family attributes
  */
-void SCState::setFont(QString fontName)
-{
-    this->getIDTextBlock()->getFontFamilyAttr()->setValue(fontName);
-}
-
 void SCState::setFont(QFont *font)
 {
-    this->getIDTextBlock()->getFontFamilyAttr()->setValue(font->family());
-    this->getIDTextBlock()->getFontSizeAttr()->setValue(font->pointSize());
+    SCTextBlock* idtb = this->getIDTextBlock();
+
+    if(!font->family().isEmpty())
+    {
+        idtb->getFontFamilyAttr()->setValue(font->family());
+    }
+
+    if(font->pointSize()!=1)
+    {
+        idtb->getFontSizeAttr()->setValue(font->pointSize());
+    }
+
+    idtb->getFontBoldAttr()->setValue(font->bold());
 }
 
-void SCState::setFontSize(int fontSize)
-{
-    this->getIDTextBlock()->getFontSizeAttr()->setValue(fontSize);
-}
+
 
 /**
  * @brief SCState::setStateName

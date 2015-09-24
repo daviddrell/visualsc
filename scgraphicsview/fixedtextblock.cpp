@@ -102,20 +102,28 @@ bool FixedTextBlock::isHovered()
     return _hovered;
 }
 
-void FixedTextBlock::handleFontSizeChanged(FontSizeAttribute * fa)
+void FixedTextBlock::handleFontChanged(FontSizeAttribute * fa)
 {
-    qDebug() << "ftb::handleFOntSizeChanged ";
+    qDebug() << "ftb::handleFontChanged ";
     QFont f = _textItem.font();
     f.setPointSize(fa->asInt());
     _textItem.setFont(f);
     this->adjustHeight();
 }
 
-void FixedTextBlock::handleFontFamilyChanged(FontFamilyAttribute *ga)
+void FixedTextBlock::handleFontChanged(FontFamilyAttribute *ga)
 {
-    qDebug() << "ftb::handleFontFamilyChanged()";
+    qDebug() << "ftb::handleFontChanged()";
     QFont f = _textItem.font();
     f.setFamily(ga->asString());
+    _textItem.setFont(f);
+    this->adjustHeight();
+}
+
+void FixedTextBlock::handleFontChanged(FontBoldAttribute* fba)
+{
+    QFont f = _textItem.font();
+    f.setBold(fba->asBool());
     _textItem.setFont(f);
     this->adjustHeight();
 }

@@ -169,18 +169,18 @@ void SelectableTextBlock::resizeToFitParent()
 
 }
 
-void SelectableTextBlock::handleFontSizeChanged(FontSizeAttribute * fa)
+void SelectableTextBlock::handleFontChanged(FontSizeAttribute * fa)
 {
-    qDebug() << "stb::handleFOntSizeChanged ";
+    qDebug() << "stb::handleFontChanged ";
     QFont f = _textItem.font();
     f.setPointSize(fa->asInt());
     _textItem.setFont(f);
     recenterText();
 }
 
-void SelectableTextBlock::handleFontFamilyChanged(FontFamilyAttribute *ga)
+void SelectableTextBlock::handleFontChanged(FontFamilyAttribute *ga)
 {
-    qDebug() << "stb::handleFontFamilyChanged()";
+    qDebug() << "stb::handleFontChanged()";
     QFont f = _textItem.font();
     f.setFamily(ga->asString());
     _textItem.setFont(f);
@@ -204,6 +204,14 @@ void SelectableTextBlock::handleFontFamilyChanged(FontFamilyAttribute *ga)
 //        qDebug() << "==============================================================================\n";
 //    }
 
+}
+
+void SelectableTextBlock::handleFontChanged(FontBoldAttribute * fba)
+{
+    QFont f = _textItem.font();
+    f.setBold(fba->asBool());
+    _textItem.setFont(f);
+    this->recenterText();
 }
 
 void SelectableTextBlock::textItemEventHandler(MaskedTextEdit *text, QGraphicsSceneMouseEvent *mevent)

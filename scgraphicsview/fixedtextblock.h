@@ -61,8 +61,11 @@ public slots:
     void handleStateSizeChanged(SizeAttribute*);
     void handleHoverLeave();
     void handleHoverEnter();
-    void handleFontFamilyChanged(FontFamilyAttribute*);
-    void handleFontSizeChanged(FontSizeAttribute*);
+
+    void handleFontChanged(FontFamilyAttribute*);
+    void handleFontChanged(FontSizeAttribute*);
+    void handleFontChanged(FontBoldAttribute*);
+
     void handleBaseHeightChanged(qreal delta);
 
 protected:

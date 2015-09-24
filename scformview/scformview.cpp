@@ -964,6 +964,10 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
     {
         connect(textBlock->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), tableItem, SLOT(handleAttributeChanged(FontSizeAttribute*)));
     }
+    else if( key == "font-bold")
+    {
+        connect(textBlock->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), tableItem, SLOT(handleAttributeChanged(FontBoldAttribute*)));
+    }
 }
 
 /**

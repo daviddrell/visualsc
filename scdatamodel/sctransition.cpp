@@ -245,21 +245,24 @@ SCTextBlock* SCTransition::getTextBlock(QString textBlockName)
 }
 */
 
-void SCTransition::setFont(QString fontName)
-{
-    this->getEventTextBlock()->getFontFamilyAttr()->setValue(fontName);
-}
 
 void SCTransition::setFont(QFont *font)
 {
-    this->getEventTextBlock()->getFontFamilyAttr()->setValue(font->family());
-    this->getEventTextBlock()->getFontSizeAttr()->setValue(font->pointSize());
+    SCTextBlock* idtb = this->getEventTextBlock();
+
+    if(!font->family().isEmpty())
+    {
+        idtb->getFontFamilyAttr()->setValue(font->family());
+    }
+
+    if(font->pointSize()!=1)
+    {
+        idtb->getFontSizeAttr()->setValue(font->pointSize());
+    }
+
+    idtb->getFontBoldAttr()->setValue(font->bold());
 }
 
-void SCTransition::setFontSize(int fontSize)
-{
-    this->getEventTextBlock()->getFontSizeAttr()->setValue(fontSize);
-}
 
 IAttributeContainer * SCTransition::getAttributes()
 {

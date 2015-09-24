@@ -72,7 +72,7 @@ private:
     void saveSettings();
     void createSettings();
 
-    void createActions();
+    void createFontBar();
 
 
     qreal _scale;
@@ -103,6 +103,10 @@ private slots:
     void handleNewClick();
     void handleReadInputFileDone(bool,QStringList);
     void handleItemClicked();
+    void handleBoldToggled(bool toggle);
+
+    void handleFontRadioChanged();
+
     void on_actionImport_triggered();
 
     void on_actionShortcuts_triggered();
