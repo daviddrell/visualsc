@@ -303,9 +303,6 @@ void FixedTextBlock::adjustHeight()
 
         qDebug () << "_textItem document dimensions: " <<_textItem.document()->size() <<"\tchanged bottom: " << this->_bottom << "\tnew dimensions: " << this->getSize();
 
-
-
-//        this->reposition();
           emit heightChanged(deltaH);
     }
     else // bottom anchored

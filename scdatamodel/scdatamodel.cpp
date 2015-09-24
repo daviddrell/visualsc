@@ -68,6 +68,7 @@ void SCDataModel::connectDataModel()
     connect(&_reader, SIGNAL(changeStateMachineAttribute(QString, QString)), this, SLOT(handleStateMachineAttributeLoad(QString,QString)));
 
 
+
 }
 
 /**
@@ -86,6 +87,9 @@ void SCDataModel::connectTransition(SCTransition * trans)
 
     // when the transition is clicked, scdatamodel will do something
     connect(trans, SIGNAL(clicked(SCTransition*)), this, SLOT(handleItemClicked(SCTransition*)));
+
+    // propogate clicked signal outside the datamodel
+    connect(trans, SIGNAL(clicked(SCTransition*)), this, SIGNAL(itemClicked()));
 
     // propogate font attribute changes to the mainwindow combo boxes
     connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
@@ -106,10 +110,11 @@ void SCDataModel::connectState(SCState * st)
      // when the state is clicked, scdatamodel will do something
     connect(st, SIGNAL(clicked(SCState*)), this, SLOT(handleItemClicked(SCState*)));
 
+    // propogate clicked signal outside the datamodel
+    connect(st,SIGNAL(clicked(SCState*)), this, SIGNAL(itemClicked()));
 
     // propogate font attribute changes to the mainwindow combo boxes
     connect(st->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
-
     connect(st->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
 }
 

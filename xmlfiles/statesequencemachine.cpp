@@ -21,331 +21,320 @@ registered when using addTransition to trigger transitions between the QStates),
     that will emit private signal(s) for all events sharing the same event name      Relay_Event___eventName()
 
 */
-#include "statesequencemachine.h"
+#include "testmanagerstatemachine.h"
 #include <QDebug>
 
-StateSequenceMachine::StateSequenceMachine(QObject* parent):
+TestManagerStateMachine::TestManagerStateMachine(QObject* parent):
     QObject(parent),
-    //////// State Machine: _stateSequenceMachine ////////
-    _stateSequenceMachine(new QStateMachine(this)),
-    _checkingAllStateSequences(new QState(QState::ParallelStates)),
-    _failed(new QFinalState()),
-    _success(new QFinalState()),
+    //////// State Machine: _testManagerStateMachine ////////
+    _testManagerStateMachine(new QStateMachine(this)),
+    _idle(new QState()),
+    _downloadingAVC(new QState()),
+    _runningTests(new QState()),
+    _completed(new QState()),
+    _updateFirmwareAllUnits(new QState(QState::ParallelStates)),
 
-    //////// State Machine: _checkingAllStateSequences ////////
-    _checkingCallSequence(new QState(_checkingAllStateSequences)),
-    _checkingConnSequence(new QState(_checkingAllStateSequences)),
-    _checkingSessionSeq(new QState(_checkingAllStateSequences)),
+    //////// State Machine: _updateFirmwareAllUnits ////////
+    _updatingGSUnits(new QState(_updateFirmwareAllUnits)),
+    _updatingWincomm(new QState(_updateFirmwareAllUnits)),
 
-    //////// State Machine: _checkingCallSequence ////////
-    _waiting_checkingCallSequence(new QState(_checkingCallSequence)),
-    _completed_checkingCallSequence(new QFinalState(_checkingCallSequence)),
+    //////// State Machine: _updatingGSUnits ////////
+    _updateInProgress(new QState(_updatingGSUnits)),
+    _done_updatingGSUnits(new QFinalState(_updatingGSUnits)),
 
-    //////// State Machine: _checkingConnSequence ////////
-    _waiting_checkingConnSequence(new QState(_checkingConnSequence)),
-    _completed_checkingConnSequence(new QFinalState(_checkingConnSequence)),
-
-    //////// State Machine: _checkingSessionSeq ////////
-    _waiting(new QState(_checkingSessionSeq)),
-    _completed(new QFinalState(_checkingSessionSeq))
+    //////// State Machine: _updatingWincomm ////////
+    _unzipInProgress(new QState(_updatingWincomm)),
+    _done_updatingWincomm(new QFinalState(_updatingWincomm))
 
 {
-    //////// State Machine: _stateSequenceMachine ////////
-    _stateSequenceMachine->addState(_checkingAllStateSequences);
-    _stateSequenceMachine->setInitialState(_checkingAllStateSequences);
-    _stateSequenceMachine->addState(_failed);
-    _stateSequenceMachine->addState(_success);
+    //////// State Machine: _testManagerStateMachine ////////
+    _testManagerStateMachine->addState(_idle);
+    _testManagerStateMachine->setInitialState(_idle);
+    _testManagerStateMachine->addState(_downloadingAVC);
+    _testManagerStateMachine->addState(_runningTests);
+    _testManagerStateMachine->addState(_completed);
+    _testManagerStateMachine->addState(_updateFirmwareAllUnits);
 
     //    Add transitions for the QStates using the transitions' private relay signals
-    _checkingAllStateSequences->addTransition(this, SIGNAL(Relay_Event___checkingAllStatesCompleted_checkingAllStateSequences()), _success);
-    _checkingAllStateSequences->addTransition(_checkingAllStateSequences, SIGNAL(finished()), _success);
-    _checkingAllStateSequences->addTransition(this, SIGNAL(Relay_Event___checkingCallSequenceFailed_checkingAllStateSequences()), _failed);
-    _checkingAllStateSequences->addTransition(this, SIGNAL(Relay_Event___checkingConnSequenceFailed_checkingAllStateSequences()), _failed);
-    _checkingAllStateSequences->addTransition(this, SIGNAL(Relay_Event___checkingSessionSeqFailed_checkingAllStateSequences()), _failed);
+    _idle->addTransition(this, SIGNAL(Relay_Event___start_idle()), _downloadingAVC);
+    _downloadingAVC->addTransition(this, SIGNAL(Relay_Event___downloadFailed_downloadingAVC()), _completed);
+    _downloadingAVC->addTransition(this, SIGNAL(Relay_Event___sHA1IsSame_downloadingAVC()), _completed);
+    _downloadingAVC->addTransition(this, SIGNAL(Relay_Event___sHA1IsDifferent_downloadingAVC()), _updateFirmwareAllUnits);
+    _runningTests->addTransition(this, SIGNAL(Relay_Event___testsCompleted_runningTests()), _completed);
+    _completed->addTransition(this, SIGNAL(Relay_Event___pollTimerPopped_completed()), _downloadingAVC);
+    _updateFirmwareAllUnits->addTransition(this, SIGNAL(Relay_Event___updateFailure_updateFirmwareAllUnits()), _completed);
+    _updateFirmwareAllUnits->addTransition(this, SIGNAL(Relay_Event___updateFirmwareAllUnitsFinished_updateFirmwareAllUnits()), _runningTests);
+    _updateFirmwareAllUnits->addTransition(_updateFirmwareAllUnits, SIGNAL(finished()), _runningTests);
 
     //    Propogate the private QState signals to public signals
-    connect(_stateSequenceMachine, SIGNAL(started()), this, SIGNAL(Signal_StateReady___stateSequenceMachine()));
-    connect(_checkingAllStateSequences, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___checkingAllStateSequences()));
-    connect(_checkingAllStateSequences, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___checkingAllStateSequences()));
-    connect(_failed, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___failed()));
-    connect(_failed, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___failed()));
-    connect(_success, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___success()));
-    connect(_success, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___success()));
-
-    //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_checkingAllStateSequences, SIGNAL(entered()), this, SLOT(Slot_StateEntry___checkingAllStateSequences()));
-    connect(_checkingAllStateSequences, SIGNAL(exited()), this, SLOT(Slot_StateExit___checkingAllStateSequences()));
-    connect(_failed, SIGNAL(entered()), this, SLOT(Slot_StateEntry___failed()));
-    connect(_failed, SIGNAL(exited()), this, SLOT(Slot_StateExit___failed()));
-    connect(_success, SIGNAL(entered()), this, SLOT(Slot_StateEntry___success()));
-    connect(_success, SIGNAL(exited()), this, SLOT(Slot_StateExit___success()));
-
-
-    //////// State Machine: _checkingAllStateSequences ////////
-
-    //    Add transitions for the QStates using the transitions' private relay signals
-
-    //    Propogate the private QState signals to public signals
-    connect(_checkingCallSequence, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___checkingCallSequence()));
-    connect(_checkingCallSequence, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___checkingCallSequence()));
-    connect(_checkingConnSequence, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___checkingConnSequence()));
-    connect(_checkingConnSequence, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___checkingConnSequence()));
-    connect(_checkingSessionSeq, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___checkingSessionSeq()));
-    connect(_checkingSessionSeq, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___checkingSessionSeq()));
-
-    //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_checkingCallSequence, SIGNAL(entered()), this, SLOT(Slot_StateEntry___checkingCallSequence()));
-    connect(_checkingCallSequence, SIGNAL(exited()), this, SLOT(Slot_StateExit___checkingCallSequence()));
-    connect(_checkingConnSequence, SIGNAL(entered()), this, SLOT(Slot_StateEntry___checkingConnSequence()));
-    connect(_checkingConnSequence, SIGNAL(exited()), this, SLOT(Slot_StateExit___checkingConnSequence()));
-    connect(_checkingSessionSeq, SIGNAL(entered()), this, SLOT(Slot_StateEntry___checkingSessionSeq()));
-    connect(_checkingSessionSeq, SIGNAL(exited()), this, SLOT(Slot_StateExit___checkingSessionSeq()));
-
-
-    //////// State Machine: _checkingCallSequence ////////
-    _checkingCallSequence->setInitialState(_waiting_checkingCallSequence);
-
-    //    Add transitions for the QStates using the transitions' private relay signals
-    _waiting_checkingCallSequence->addTransition(this, SIGNAL(Relay_Event___callSeqComplete_waiting_checkingCallSequence()), _completed_checkingCallSequence);
-
-    //    Propogate the private QState signals to public signals
-    connect(_waiting_checkingCallSequence, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___waiting_checkingCallSequence()));
-    connect(_waiting_checkingCallSequence, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___waiting_checkingCallSequence()));
-    connect(_completed_checkingCallSequence, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___completed_checkingCallSequence()));
-    connect(_completed_checkingCallSequence, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___completed_checkingCallSequence()));
-
-    //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_waiting_checkingCallSequence, SIGNAL(entered()), this, SLOT(Slot_StateEntry___waiting_checkingCallSequence()));
-    connect(_waiting_checkingCallSequence, SIGNAL(exited()), this, SLOT(Slot_StateExit___waiting_checkingCallSequence()));
-    connect(_completed_checkingCallSequence, SIGNAL(entered()), this, SLOT(Slot_StateEntry___completed_checkingCallSequence()));
-    connect(_completed_checkingCallSequence, SIGNAL(exited()), this, SLOT(Slot_StateExit___completed_checkingCallSequence()));
-
-
-    //////// State Machine: _checkingConnSequence ////////
-    _checkingConnSequence->setInitialState(_waiting_checkingConnSequence);
-
-    //    Add transitions for the QStates using the transitions' private relay signals
-    _waiting_checkingConnSequence->addTransition(this, SIGNAL(Relay_Event___connSeqComplete_waiting_checkingConnSequence()), _completed_checkingConnSequence);
-
-    //    Propogate the private QState signals to public signals
-    connect(_waiting_checkingConnSequence, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___waiting_checkingConnSequence()));
-    connect(_waiting_checkingConnSequence, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___waiting_checkingConnSequence()));
-    connect(_completed_checkingConnSequence, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___completed_checkingConnSequence()));
-    connect(_completed_checkingConnSequence, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___completed_checkingConnSequence()));
-
-    //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_waiting_checkingConnSequence, SIGNAL(entered()), this, SLOT(Slot_StateEntry___waiting_checkingConnSequence()));
-    connect(_waiting_checkingConnSequence, SIGNAL(exited()), this, SLOT(Slot_StateExit___waiting_checkingConnSequence()));
-    connect(_completed_checkingConnSequence, SIGNAL(entered()), this, SLOT(Slot_StateEntry___completed_checkingConnSequence()));
-    connect(_completed_checkingConnSequence, SIGNAL(exited()), this, SLOT(Slot_StateExit___completed_checkingConnSequence()));
-
-
-    //////// State Machine: _checkingSessionSeq ////////
-    _checkingSessionSeq->setInitialState(_waiting);
-
-    //    Add transitions for the QStates using the transitions' private relay signals
-    _waiting->addTransition(this, SIGNAL(Relay_Event___sessionSeqComplete_waiting()), _completed);
-
-    //    Propogate the private QState signals to public signals
-    connect(_waiting, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___waiting()));
-    connect(_waiting, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___waiting()));
+    connect(_testManagerStateMachine, SIGNAL(started()), this, SIGNAL(Signal_StateReady___testManagerStateMachine()));
+    connect(_idle, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___idle()));
+    connect(_idle, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___idle()));
+    connect(_downloadingAVC, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___downloadingAVC()));
+    connect(_downloadingAVC, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___downloadingAVC()));
+    connect(_runningTests, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___runningTests()));
+    connect(_runningTests, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___runningTests()));
     connect(_completed, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___completed()));
     connect(_completed, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___completed()));
+    connect(_updateFirmwareAllUnits, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___updateFirmwareAllUnits()));
+    connect(_updateFirmwareAllUnits, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___updateFirmwareAllUnits()));
 
     //    Connect the private QState signals to private slots for entry/exit handlers
-    connect(_waiting, SIGNAL(entered()), this, SLOT(Slot_StateEntry___waiting()));
-    connect(_waiting, SIGNAL(exited()), this, SLOT(Slot_StateExit___waiting()));
+    connect(_idle, SIGNAL(entered()), this, SLOT(Slot_StateEntry___idle()));
+    connect(_idle, SIGNAL(exited()), this, SLOT(Slot_StateExit___idle()));
+    connect(_downloadingAVC, SIGNAL(entered()), this, SLOT(Slot_StateEntry___downloadingAVC()));
+    connect(_downloadingAVC, SIGNAL(exited()), this, SLOT(Slot_StateExit___downloadingAVC()));
+    connect(_runningTests, SIGNAL(entered()), this, SLOT(Slot_StateEntry___runningTests()));
+    connect(_runningTests, SIGNAL(exited()), this, SLOT(Slot_StateExit___runningTests()));
     connect(_completed, SIGNAL(entered()), this, SLOT(Slot_StateEntry___completed()));
     connect(_completed, SIGNAL(exited()), this, SLOT(Slot_StateExit___completed()));
+    connect(_updateFirmwareAllUnits, SIGNAL(entered()), this, SLOT(Slot_StateEntry___updateFirmwareAllUnits()));
+    connect(_updateFirmwareAllUnits, SIGNAL(exited()), this, SLOT(Slot_StateExit___updateFirmwareAllUnits()));
+
+
+    //////// State Machine: _updateFirmwareAllUnits ////////
+
+    //    Add transitions for the QStates using the transitions' private relay signals
+
+    //    Propogate the private QState signals to public signals
+    connect(_updatingGSUnits, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___updatingGSUnits()));
+    connect(_updatingGSUnits, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___updatingGSUnits()));
+    connect(_updatingWincomm, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___updatingWincomm()));
+    connect(_updatingWincomm, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___updatingWincomm()));
+
+    //    Connect the private QState signals to private slots for entry/exit handlers
+    connect(_updatingGSUnits, SIGNAL(entered()), this, SLOT(Slot_StateEntry___updatingGSUnits()));
+    connect(_updatingGSUnits, SIGNAL(exited()), this, SLOT(Slot_StateExit___updatingGSUnits()));
+    connect(_updatingWincomm, SIGNAL(entered()), this, SLOT(Slot_StateEntry___updatingWincomm()));
+    connect(_updatingWincomm, SIGNAL(exited()), this, SLOT(Slot_StateExit___updatingWincomm()));
+
+
+    //////// State Machine: _updatingGSUnits ////////
+    _updatingGSUnits->setInitialState(_updateInProgress);
+
+    //    Add transitions for the QStates using the transitions' private relay signals
+    _updateInProgress->addTransition(this, SIGNAL(Relay_Event___gSUpdateSuccess_updateInProgress()), _done_updatingGSUnits);
+
+    //    Propogate the private QState signals to public signals
+    connect(_updateInProgress, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___updateInProgress()));
+    connect(_updateInProgress, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___updateInProgress()));
+    connect(_done_updatingGSUnits, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___done_updatingGSUnits()));
+    connect(_done_updatingGSUnits, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___done_updatingGSUnits()));
+
+    //    Connect the private QState signals to private slots for entry/exit handlers
+    connect(_updateInProgress, SIGNAL(entered()), this, SLOT(Slot_StateEntry___updateInProgress()));
+    connect(_updateInProgress, SIGNAL(exited()), this, SLOT(Slot_StateExit___updateInProgress()));
+    connect(_done_updatingGSUnits, SIGNAL(entered()), this, SLOT(Slot_StateEntry___done_updatingGSUnits()));
+    connect(_done_updatingGSUnits, SIGNAL(exited()), this, SLOT(Slot_StateExit___done_updatingGSUnits()));
+
+
+    //////// State Machine: _updatingWincomm ////////
+    _updatingWincomm->setInitialState(_unzipInProgress);
+
+    //    Add transitions for the QStates using the transitions' private relay signals
+    _unzipInProgress->addTransition(this, SIGNAL(Relay_Event___upzipSuccess_unzipInProgress()), _done_updatingWincomm);
+
+    //    Propogate the private QState signals to public signals
+    connect(_unzipInProgress, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___unzipInProgress()));
+    connect(_unzipInProgress, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___unzipInProgress()));
+    connect(_done_updatingWincomm, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___done_updatingWincomm()));
+    connect(_done_updatingWincomm, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___done_updatingWincomm()));
+
+    //    Connect the private QState signals to private slots for entry/exit handlers
+    connect(_unzipInProgress, SIGNAL(entered()), this, SLOT(Slot_StateEntry___unzipInProgress()));
+    connect(_unzipInProgress, SIGNAL(exited()), this, SLOT(Slot_StateExit___unzipInProgress()));
+    connect(_done_updatingWincomm, SIGNAL(entered()), this, SLOT(Slot_StateEntry___done_updatingWincomm()));
+    connect(_done_updatingWincomm, SIGNAL(exited()), this, SLOT(Slot_StateExit___done_updatingWincomm()));
 
 
 }
 
-StateSequenceMachine::~StateSequenceMachine()
+TestManagerStateMachine::~TestManagerStateMachine()
 {
 
 }
 //    PUBLIC
 //    these functions connect external Event slots to internal signals to drive the inputs to the state machine
 //    Each State Machine Section shows all transitions between its direct children
-    //////// State Machine: _stateSequenceMachine ////////
-void StateSequenceMachine::Event_startMachine___stateSequenceMachine()
+    //////// State Machine: _testManagerStateMachine ////////
+void TestManagerStateMachine::Event_startMachine___testManagerStateMachine()
 {
-    _stateSequenceMachine->start();
+    _testManagerStateMachine->start();
 }
 
-void StateSequenceMachine::Event___checkingAllStatesCompleted()
+void TestManagerStateMachine::Event___start()
 {
-    emit Relay_Event___checkingAllStatesCompleted_checkingAllStateSequences();
+    emit Relay_Event___start_idle();
 }
 
-void StateSequenceMachine::Event___checkingCallSequenceFailed()
+void TestManagerStateMachine::Event___downloadFailed()
 {
-    emit Relay_Event___checkingCallSequenceFailed_checkingAllStateSequences();
+    emit Relay_Event___downloadFailed_downloadingAVC();
 }
 
-void StateSequenceMachine::Event___checkingConnSequenceFailed()
+void TestManagerStateMachine::Event___sHA1IsSame()
 {
-    emit Relay_Event___checkingConnSequenceFailed_checkingAllStateSequences();
+    emit Relay_Event___sHA1IsSame_downloadingAVC();
 }
 
-void StateSequenceMachine::Event___checkingSessionSeqFailed()
+void TestManagerStateMachine::Event___sHA1IsDifferent()
 {
-    emit Relay_Event___checkingSessionSeqFailed_checkingAllStateSequences();
+    emit Relay_Event___sHA1IsDifferent_downloadingAVC();
+}
+
+void TestManagerStateMachine::Event___testsCompleted()
+{
+    emit Relay_Event___testsCompleted_runningTests();
+}
+
+void TestManagerStateMachine::Event___pollTimerPopped()
+{
+    emit Relay_Event___pollTimerPopped_completed();
+}
+
+void TestManagerStateMachine::Event___updateFailure()
+{
+    emit Relay_Event___updateFailure_updateFirmwareAllUnits();
+}
+
+void TestManagerStateMachine::Event___updateFirmwareAllUnitsFinished()
+{
+    emit Relay_Event___updateFirmwareAllUnitsFinished_updateFirmwareAllUnits();
 }
 
 
-    //////// State Machine: _checkingAllStateSequences ////////
+    //////// State Machine: _updateFirmwareAllUnits ////////
 
-    //////// State Machine: _checkingCallSequence ////////
-void StateSequenceMachine::Event___callSeqComplete()
+    //////// State Machine: _updatingGSUnits ////////
+void TestManagerStateMachine::Event___gSUpdateSuccess()
 {
-    emit Relay_Event___callSeqComplete_waiting_checkingCallSequence();
+    emit Relay_Event___gSUpdateSuccess_updateInProgress();
 }
 
 
-    //////// State Machine: _checkingConnSequence ////////
-void StateSequenceMachine::Event___connSeqComplete()
+    //////// State Machine: _updatingWincomm ////////
+void TestManagerStateMachine::Event___upzipSuccess()
 {
-    emit Relay_Event___connSeqComplete_waiting_checkingConnSequence();
-}
-
-
-    //////// State Machine: _checkingSessionSeq ////////
-void StateSequenceMachine::Event___sessionSeqComplete()
-{
-    emit Relay_Event___sessionSeqComplete_waiting();
+    emit Relay_Event___upzipSuccess_unzipInProgress();
 }
 
 
 //
 //    these slots register the state entry/exits to generate event signals for any given entry or exit events
 //
-    //////// State Machine: _stateSequenceMachine ////////
-void StateSequenceMachine::Slot_StateEntry___checkingAllStateSequences()
+    //////// State Machine: _testManagerStateMachine ////////
+void TestManagerStateMachine::Slot_StateEntry___idle()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateExit___checkingAllStateSequences()
+void TestManagerStateMachine::Slot_StateExit___idle()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateEntry___failed()
+void TestManagerStateMachine::Slot_StateEntry___downloadingAVC()
+{
+    emit Action___startdownload();
+}
+
+void TestManagerStateMachine::Slot_StateExit___downloadingAVC()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateExit___failed()
+void TestManagerStateMachine::Slot_StateEntry___runningTests()
+{
+    emit Action___starttests();
+}
+
+void TestManagerStateMachine::Slot_StateExit___runningTests()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateEntry___success()
+void TestManagerStateMachine::Slot_StateEntry___completed()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateExit___success()
+void TestManagerStateMachine::Slot_StateExit___completed()
 {
 
 }
 
-
-    //////// State Machine: _checkingAllStateSequences ////////
-void StateSequenceMachine::Slot_StateEntry___checkingCallSequence()
+void TestManagerStateMachine::Slot_StateEntry___updateFirmwareAllUnits()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateExit___checkingCallSequence()
-{
-
-}
-
-void StateSequenceMachine::Slot_StateEntry___checkingConnSequence()
-{
-
-}
-
-void StateSequenceMachine::Slot_StateExit___checkingConnSequence()
-{
-
-}
-
-void StateSequenceMachine::Slot_StateEntry___checkingSessionSeq()
-{
-
-}
-
-void StateSequenceMachine::Slot_StateExit___checkingSessionSeq()
+void TestManagerStateMachine::Slot_StateExit___updateFirmwareAllUnits()
 {
 
 }
 
 
-    //////// State Machine: _checkingCallSequence ////////
-void StateSequenceMachine::Slot_StateEntry___waiting_checkingCallSequence()
+    //////// State Machine: _updateFirmwareAllUnits ////////
+void TestManagerStateMachine::Slot_StateEntry___updatingGSUnits()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateExit___waiting_checkingCallSequence()
+void TestManagerStateMachine::Slot_StateExit___updatingGSUnits()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateEntry___completed_checkingCallSequence()
+void TestManagerStateMachine::Slot_StateEntry___updatingWincomm()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateExit___completed_checkingCallSequence()
-{
-
-}
-
-
-    //////// State Machine: _checkingConnSequence ////////
-void StateSequenceMachine::Slot_StateEntry___waiting_checkingConnSequence()
-{
-
-}
-
-void StateSequenceMachine::Slot_StateExit___waiting_checkingConnSequence()
-{
-
-}
-
-void StateSequenceMachine::Slot_StateEntry___completed_checkingConnSequence()
-{
-
-}
-
-void StateSequenceMachine::Slot_StateExit___completed_checkingConnSequence()
+void TestManagerStateMachine::Slot_StateExit___updatingWincomm()
 {
 
 }
 
 
-    //////// State Machine: _checkingSessionSeq ////////
-void StateSequenceMachine::Slot_StateEntry___waiting()
+    //////// State Machine: _updatingGSUnits ////////
+void TestManagerStateMachine::Slot_StateEntry___updateInProgress()
+{
+    emit Action___startGSupdate();
+}
+
+void TestManagerStateMachine::Slot_StateExit___updateInProgress()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateExit___waiting()
+void TestManagerStateMachine::Slot_StateEntry___done_updatingGSUnits()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateEntry___completed()
+void TestManagerStateMachine::Slot_StateExit___done_updatingGSUnits()
 {
 
 }
 
-void StateSequenceMachine::Slot_StateExit___completed()
+
+    //////// State Machine: _updatingWincomm ////////
+void TestManagerStateMachine::Slot_StateEntry___unzipInProgress()
+{
+    emit Action___startunzip();
+}
+
+void TestManagerStateMachine::Slot_StateExit___unzipInProgress()
+{
+
+}
+
+void TestManagerStateMachine::Slot_StateEntry___done_updatingWincomm()
+{
+
+}
+
+void TestManagerStateMachine::Slot_StateExit___done_updatingWincomm()
 {
 
 }

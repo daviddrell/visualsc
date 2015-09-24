@@ -97,6 +97,7 @@ private slots:
     void handleExportCodeClick();
     void handleNewClick();
     void handleReadInputFileDone(bool,QStringList);
+    void handleItemClicked();
     void on_actionImport_triggered();
 
     void on_actionShortcuts_triggered();

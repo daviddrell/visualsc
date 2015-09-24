@@ -159,6 +159,7 @@ signals:
     void newRootMachine(SCState*);
     void insertNewTransitionSignal(SCForkedTransition*);
     void message(QString);
+    void itemClicked();
 
     void setProgramFont(QFont*);
 //    void setFont(QString);

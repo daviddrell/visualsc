@@ -29,6 +29,7 @@
 #include "scformview.h"
 #include <QTime>
 #include <QMessageBox>
+#include "scitem.h"
 //#include "scgraphicsview.h"
 //#include "customgraphicsscene.h"
 
@@ -153,6 +154,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 // uncomment this macro to autoload a file
+// WARNING: outdated, may not work
 //#define AUTO_LOAD_FILE
 
 #ifdef AUTO_LOAD_FILE
@@ -228,6 +230,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // when the data model signals set program font, set the program font
     connect(_project->getDM(), SIGNAL(setProgramFont(QFont*)), this, SLOT(handleSetProgramFont(QFont*)));
 
+    // when the data model emits a clicked signal, change the radio button selection
+    connect(_project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
 
     // load settings from settings.ini if it exists, otherwise create a settings.ini file
     _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
@@ -240,6 +244,27 @@ MainWindow::~MainWindow()
     //delete _settings;
     delete _project;
     delete ui;
+}
+
+/**
+ * @brief MainWindow::handleItemClicked
+ * @param item
+ *
+ * SLOT
+ *
+ * when the datamodel emits the itemclicked signal, the mainwindow handles it here
+ *
+ */
+void MainWindow::handleItemClicked()
+{
+    if(_selectedRadioButton->isChecked())
+    {
+
+    }
+    else
+    {
+        _selectedRadioButton->toggle();
+    }
 }
 
 /**
@@ -610,6 +635,7 @@ void MainWindow::on_actionImport_triggered()
 
     if(!current)
     {
+        sendMessage("!","Please select a state to import into");
         return;
     }
 
