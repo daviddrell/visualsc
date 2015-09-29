@@ -414,7 +414,17 @@ void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
                 for(int i = 0; i < sbgs.size(); i++)
                 {
                     StateBoxGraphic* sbg = sbgs.at(i);
-                    sbg->setPosAndUpdateAnchors(sbg->pos()-QPointF(minX-25,minY-25));
+
+                    QPointF newPos;
+                    if(minX < 0)
+                        newPos = QPointF(sbg->pos().x() - (minX -25) , sbg->pos().y());
+                    else
+                        newPos = QPointF(sbg->pos().x(), sbg->pos().y() - (minY -25));
+
+
+//                     newPos = QPointF(sbg->pos().x() - (minX -25) , sbg->pos().y() - (minY -25));
+
+                    sbg->setPosAndUpdateAnchors(newPos);
                     // update the datamodel for the position and size.
                     sbg->graphicHasChanged();
                 }
