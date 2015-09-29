@@ -30,14 +30,14 @@ StateMachine::StateMachine(QObject* parent):
     _stateMachine(new QStateMachine(this)),
     _stateMachine_1(new QState()),
     _stateMachine_2(new QState()),
-    _leadingTrailing(new QState())
+    _lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine(new QState())
 
 {
     //////// State Machine: _stateMachine ////////
     _stateMachine->addState(_stateMachine_1);
     _stateMachine->addState(_stateMachine_2);
-    _stateMachine->addState(_leadingTrailing);
-    _stateMachine->setInitialState(_leadingTrailing);
+    _stateMachine->addState(_lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine);
+    _stateMachine->setInitialState(_lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine);
 
     //    Add transitions for the QStates using the transitions' private relay signals
 
@@ -47,16 +47,16 @@ StateMachine::StateMachine(QObject* parent):
     connect(_stateMachine_1, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___stateMachine_1()));
     connect(_stateMachine_2, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___stateMachine_2()));
     connect(_stateMachine_2, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___stateMachine_2()));
-    connect(_leadingTrailing, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___leadingTrailing()));
-    connect(_leadingTrailing, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___leadingTrailing()));
+    connect(_lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine, SIGNAL(entered()), this, SIGNAL(Signal_StateEntry___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine()));
+    connect(_lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine, SIGNAL(exited()), this, SIGNAL(Signal_StateExit___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine()));
 
     //    Connect the private QState signals to private slots for entry/exit handlers
     connect(_stateMachine_1, SIGNAL(entered()), this, SLOT(Slot_StateEntry___stateMachine_1()));
     connect(_stateMachine_1, SIGNAL(exited()), this, SLOT(Slot_StateExit___stateMachine_1()));
     connect(_stateMachine_2, SIGNAL(entered()), this, SLOT(Slot_StateEntry___stateMachine_2()));
     connect(_stateMachine_2, SIGNAL(exited()), this, SLOT(Slot_StateExit___stateMachine_2()));
-    connect(_leadingTrailing, SIGNAL(entered()), this, SLOT(Slot_StateEntry___leadingTrailing()));
-    connect(_leadingTrailing, SIGNAL(exited()), this, SLOT(Slot_StateExit___leadingTrailing()));
+    connect(_lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine, SIGNAL(entered()), this, SLOT(Slot_StateEntry___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine()));
+    connect(_lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine, SIGNAL(exited()), this, SLOT(Slot_StateExit___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine()));
 
 
 }
@@ -99,7 +99,7 @@ void StateMachine::Slot_StateExit___stateMachine_2()
 
 }
 
-void StateMachine::Slot_StateEntry___leadingTrailing()
+void StateMachine::Slot_StateEntry___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine()
 {
     emit Action___wowDoCoolStuff();
     emit Action___goodPeformance();
@@ -107,7 +107,7 @@ void StateMachine::Slot_StateEntry___leadingTrailing()
     emit Action___handling();
 }
 
-void StateMachine::Slot_StateExit___leadingTrailing()
+void StateMachine::Slot_StateExit___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine()
 {
     emit Action___testingLeadingSpaces();
     emit Action___testingTrailingSpaces();

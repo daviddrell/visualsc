@@ -29,6 +29,7 @@
 #include "scformview.h"
 #include <QTime>
 #include <QMessageBox>
+#include <QDesktopWidget>
 #include "scitem.h"
 //#include "scgraphicsview.h"
 //#include "customgraphicsscene.h"
@@ -36,7 +37,8 @@
 #define POP_UP_X    160
 #define POP_UP_Y    200
 
-#define SCALE_STEP 0.161803398875
+//#define SCALE_STEP 0.161803398875
+#define SCALE_STEP 0.15
 #define SCALE_MIN   0.1
 #define SCALE_MAX   3
 
@@ -86,49 +88,18 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
     this->setWindowTitle("Visual Statechart Editor");
 
-    this->resize(1272,1000);
-    this->move(633,0);
-
 
     // add font widgets
     createFontBar();
 
-// uncomment this macro to autoload a file
-// WARNING: outdated, may not work
-//#define AUTO_LOAD_FILE
 
-#ifdef AUTO_LOAD_FILE
-
-#define DEFAULT_FILE "C:/visualsc/xmlfiles/statesequencemachine.scxml"
-    QString fileName =DEFAULT_FILE;
-    _settings->setValue(_keyLastFilePath, fileName);
-    /*
-    _project = new SMProject(  ui->centralWidget );
-    connect (_project, SIGNAL(readInputFileCompleted(bool,QStringList)), this, SLOT(handleReadInputFileDone(bool,QStringList)) );
-    _project->readInputFile(fileName);
-    */
-
-    _project = new SMProject(  ui->centralWidget );
-    connect( this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
-   // _project->initNewSM(); moved to constructor
-    ui->gridLayout->addWidget( _project->getQGraphicsView() );
-    _formEditorWindow = new SCFormView(0, _project->getDM());
-    _formEditorWindow->show();
-
-
-    // open the file
-    _project->getDM()->openFile(fileName);
-
-    // reselect the new root machine tree widget in the tree view
-    _formEditorWindow->highlightRootItem();
-
-#endif
-
-#ifndef AUTO_LOAD_FILE
+    // create the project
     _project = new SMProject(  ui->centralWidget );
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
     _formEditorWindow = new SCFormView(0, _project->getDM());
 
+
+    // main window actions
     connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
     connect(_formEditorWindow, SIGNAL(openClick()), this, SLOT(handleFileOpenClick()));
     connect(_formEditorWindow, SIGNAL(saveImageClick()), this, SLOT(on_actionSaveImage_triggered()));
@@ -140,7 +111,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _formEditorWindow->show();
 
 
-#endif
+
+
+
 
     // connects for the mainwindow to other modules
 
@@ -152,7 +125,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
 
     // no special protocol needed for formview. regular item deletion and creation is good enough
-//    connect(this, SIGNAL(reset()), _formEditorWindow, SLOT(handleReset()));
     connect(this, SIGNAL(open(QString)), _project->getDM(), SLOT(handleOpen(QString)));
 
     // when the grid action is toggled, the graphics view's scene will change its background
@@ -165,14 +137,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_fontBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
     connect(_fontSizeBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
 
-    // when a datamodel item is clicked, change the font box to match its attributes
-
     // when the data model signals set program font, set the program font
-//    connect(_project->getDM(), SIGNAL(setProgramFont(QFont*)), this, SLOT(handleSetProgramFont(QFont*)));
     connect(_project->getDM(), SIGNAL(setProgramFontFamily(FontFamilyAttribute*)), this, SLOT(handleSetProgramFontFamily(FontFamilyAttribute*)));
-
     connect(_project->getDM(),SIGNAL(setProgramFontSize(FontSizeAttribute*)), this, SLOT(handleSetProgramFontSize(FontSizeAttribute*)));
-
     connect(_project->getDM(), SIGNAL(setProgramFontBold(FontBoldAttribute*)), this, SLOT(handleSetProgramFontBold(FontBoldAttribute*)));
 
     // when the data model emits a clicked signal, change the radio button selection
@@ -180,8 +147,38 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // load settings from settings.ini if it exists, otherwise create a settings.ini file
     _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
-    qDebug () << "settings file " << _settingsFileName;
+//    qDebug () << "settings file " << _settingsFileName;
     loadSettings();
+
+
+    // resize the window
+    // based on the current resolution, set the formview and graphicsview sizes
+    // the height will be the same between the two
+    // the width of the formview will take up 1/3 of the screen
+    // the width of the graphicsview will take up 2/3 of the screen
+
+#define W7_BORDER   7.5                 // each of the windows 7 window borders are 7.5 pixels.
+
+    QRect desktop = QApplication::desktop()->availableGeometry();
+    qreal sysW = desktop.width();
+    qreal sysH = desktop.height();
+
+    sysW -= 2*(W7_BORDER);              // account for window border
+    qreal gW = sysW*2/3;
+    qreal fW = sysW*1/3;
+    fW -= W7_BORDER;                    // space between windows
+    gW -= W7_BORDER;
+    qreal gH = sysH - 37.5;             // 30 pixels + 7.5 pixels
+
+
+    qDebug() << "fw: " <<fW << " gw: "<< gW <<" gH: "<<gH;
+
+    this->resize(gW,gH);
+    this->move( fW + W7_BORDER+ W7_BORDER,0);
+
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -515,6 +512,9 @@ void MainWindow::saveSettings()
 /**
  * @brief MainWindow::loadSettings
  * load settings from settings.ini
+ * if no settings are found, create a settings.ini file
+ *
+ * .exe must have write privilege
  */
 void MainWindow::loadSettings()
 {
@@ -565,6 +565,10 @@ void MainWindow::createSettings()
     qDebug() << "creating settings in " << _settingsFileName;
 }
 
+/**
+ * @brief MainWindow::delay
+ * deprecated function
+ */
 void MainWindow::delay()
 {
     QTime dieTime= QTime::currentTime().addSecs(1);
@@ -576,9 +580,16 @@ void MainWindow::delay()
     qDebug()<<"delay num states: "  <<states.size();
 }
 
+/**
+ * @brief MainWindow::handleNewClick
+ *
+ * SLOT
+ *
+ * when a new project is clicked, reset the program
+ */
 void MainWindow::handleNewClick()
 {
-    // alert the graphics view and form view to reset
+    // alert the data model, graphics view, and form view to reset
     emit reset();
 
     // reset the current save and export files.
@@ -755,7 +766,7 @@ void MainWindow::on_actionImport_triggered()
 
     if(!current)
     {
-        sendMessage("!","Please select a state to import into");
+        sendMessage("!","Please select the state to be imported into");
         return;
     }
 
@@ -875,8 +886,13 @@ void MainWindow::scale(qreal step)
     qreal mult = (_scale+step)/(_scale);
     _project->getQGraphicsView()->scale(mult, mult);
     _scale *= mult;
-    qDebug() << "setting scale to : " << _scale;
-    emit scaleChanged(_scale);  // alert the graphicsView that the scale changed
+
+    QString output = QString::number(_scale*100) +"%";
+    this->setWindowTitle(output);
+//    qDebug() << "setting scale to : " << _scale;
+//    emit scaleChanged(_scale);  // alert the graphicsView that the scale changed
+
+
 }
 
 void MainWindow::on_actionSaveImage_triggered()

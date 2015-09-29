@@ -61,6 +61,7 @@ void CWState::createSignalsAndSlots()
     _entryRelaySlot =    "Slot_StateEntry__" + _stateName+"()";
     _exitRelaySlot =     "Slot_StateExit__"+ _stateName+"()";
 
+    // get all things separated by n spaces "," then k spaces where n and k are 0, 1, 2, 3, ... spaces
     QRegExp sep("\\s*,\\s*");
 
     // add all entry actions
@@ -68,7 +69,6 @@ void CWState::createSignalsAndSlots()
     if(!entryAction.isEmpty())
     {
         // delete any spaces, otherwise there will be an error
-//        entryAction.replace("\s+,\s+",",");
         QStringList entries = entryAction.split(sep);
         for(int i = 0; i < entries.size(); i++)
         {
@@ -86,7 +86,6 @@ void CWState::createSignalsAndSlots()
     if(!exitAction.isEmpty())
     {
         // delete any spaces, otherwise an assertion error is thrown
-//        exitAction.replace(", ",",");
         QStringList exits = exitAction.split(sep);
         for(int i = 0; i < exits.size(); i++)
         {

@@ -45,13 +45,14 @@
 #include <QApplication>
 #include <QHeaderView>
 #include <QFileDialog>
+#include <QDesktopWidget>
 
 
 #define PROPERTY_TABLE_WIDTH_1  108     // smallest value while still having clearance for the longest attribute name connectToFinished
 #define PROPERTY_TABLE_WIDTH_2  170
 
 #define WINDOW_WIDTH    618
-#define WINDOW_HEIGHT   1000
+#define WINDOW_HEIGHT   1002
 
 
 //#define TREEVIEW_COLOR_ENABLE
@@ -72,7 +73,9 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         _currentlySelected(NULL)//,
         //_previouslySelected(NULL)
 {
-this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+
+
     createActions();
     createMenus();
     createToolbars();
@@ -169,6 +172,27 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 
     initTree();
+
+
+    // resize the window
+    // based on the current resolution, set the formview and graphicsview sizes
+    // the height will be the same between the two
+    // the width of the formview will take up 1/3 of the screen
+    // the width of the graphicsview will take up 2/3 of the screen
+
+#define W7_BORDER   7.5                 // each of the windows 7 window borders are 7.5 pixels.
+
+    QRect desktop = QApplication::desktop()->availableGeometry();
+    qreal sysW = desktop.width();
+    qreal sysH = desktop.height();
+
+    sysW -= 2*(W7_BORDER);              // account for window border
+    qreal fW = sysW*1/3;
+    fW -= W7_BORDER;                    // space between windows
+    qreal gH = sysH - 37.5;             // 30 pixels + 7.5 pixels
+
+
+    this->resize(fW,gH);
 }
 
 

@@ -66,8 +66,8 @@ signals:
     void Signal_StateExit___stateMachine_1();
     void Signal_StateEntry___stateMachine_2();
     void Signal_StateExit___stateMachine_2();
-    void Signal_StateEntry___leadingTrailing();
-    void Signal_StateExit___leadingTrailing();
+    void Signal_StateEntry___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine();
+    void Signal_StateExit___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine();
 
 
     //////////////////
@@ -101,8 +101,8 @@ private slots:
     void Slot_StateExit___stateMachine_1();
     void Slot_StateEntry___stateMachine_2();
     void Slot_StateExit___stateMachine_2();
-    void Slot_StateEntry___leadingTrailing();
-    void Slot_StateExit___leadingTrailing();
+    void Slot_StateEntry___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine();
+    void Slot_StateExit___lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine();
 
 
 signals:
@@ -115,7 +115,7 @@ private:
     QStateMachine*    _stateMachine;
     QState*    _stateMachine_1;
     QState*    _stateMachine_2;
-    QState*    _leadingTrailing;
+    QState*    _lkasefJlsaefJalsefJasdlfjae4fIafEjStateMachine;
 
 
 };
