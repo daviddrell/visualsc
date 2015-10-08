@@ -21,15 +21,20 @@
 #include "cornergrabber.h"
 #include "arrowheadgraphic.h"
 #include <QDebug>
+#include <QApplication>
+
+#define PEN_THICKNESS 1.61803398875
+#define WIDTH 5
+#define HEIGHT 5
 
 CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnASquare) :
     QGraphicsItem(parent),
     mouseDownX(0),
     mouseDownY(0),
-    _outterborderColor(Qt::black),
+    _outterborderColor(QColor(0,0,0,140)),
     _outterborderPen(),
-    _width(6),
-    _height(6),
+    _width(WIDTH),
+    _height(HEIGHT),
     _corner(corner),
     _mouseButtonState(kMouseReleased),
     _placedOnASquare(placedOnASquare),
@@ -39,7 +44,8 @@ CornerGrabber::CornerGrabber(QGraphicsItem *parent,  int corner, bool placedOnAS
     _isHovered(false)
 {
    this->setParentItem(parent);
-    _outterborderPen.setWidth(2);
+//    _outterborderPen.setWidth(2);
+    _outterborderPen.setWidthF(PEN_THICKNESS);
     _outterborderPen.setColor(_outterborderColor);
 
    this->setAcceptHoverEvents(true);
@@ -121,17 +127,57 @@ void CornerGrabber::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 void CornerGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
 {
+//    qDebug() << "CornerGrabber HoverLeaveEvent";
     _isHovered= false;
-    _outterborderColor = Qt::black;
+    _outterborderColor = QColor(0,0,0,140);
+
+    // reset the cursor
+    this->setCursorToResize(false);
+
     this->update(0,0,_width,_height);
+
+    this->removeSceneEventFilter(this->parentItem());
+
 }
 
 void CornerGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 {
-    //qDebug() << "CornerGrabber HoverEnterEvent";
+//    qDebug() << "CornerGrabber HoverEnterEvent";
     _isHovered = true;
-    _outterborderColor = Qt::red;
+    _outterborderColor = QColor(255,0,0,140);
+
+    // change the cursor to the diagonal sizer
+    this->setCursorToResize(true);
+
     this->update(0,0,_width,_height);
+    this->installSceneEventFilter(this->parentItem());
+}
+
+void CornerGrabber::setCursorToResize(bool on)
+{
+    if(on)
+    {
+
+//        if(QApplication::overrideCursor()->shape() == Qt::SizeFDiagCursor || QApplication::overrideCursor()->shape() == Qt::SizeFDiagCursor)
+//            return;
+
+        switch(_corner)
+        {
+        case 0:
+        case 2:
+            QApplication::setOverrideCursor(Qt::SizeFDiagCursor);
+            break;
+
+        case 1:
+        case 3:
+            QApplication::setOverrideCursor(Qt::SizeBDiagCursor);
+            break;
+        }
+    }
+    else
+    {
+        QApplication::restoreOverrideCursor();
+    }
 }
 
 QRectF CornerGrabber::boundingRect() const
@@ -182,6 +228,8 @@ void CornerGrabber::setAngle(int angle)
 
 void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     if ( _paintStyle == kBox)
     {
@@ -191,6 +239,7 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
         _outterborderPen.setStyle(Qt::SolidLine);
         painter->setPen(_outterborderPen);
 
+//        qDebug() << "corner pos: " << this->pos();
         QPointF topLeft (0-(_width/2), 0-(_height/2));
         QPointF bottomRight ( _width/2 ,_height/2);
 
@@ -226,5 +275,8 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, 
 
         _arrowHead->update();
     }
-
+    else if(_paintStyle == kNone)
+    {
+//qDebug() << "corner pos: " << this->pos();
+    }
 }

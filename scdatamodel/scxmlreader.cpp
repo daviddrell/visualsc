@@ -28,15 +28,267 @@
 #include "sctransition.h"
 #include "scstate.h"
 #include <QDebug>
+#include "scdatamodel.h"
 
 SCXMLReader::SCXMLReader(): QObject(NULL), _reader(),_file(), _resultMessages(), _error(false)
 {
 
 }
 
+SCXMLReader::SCXMLReader(SCDataModel* dm): QObject(NULL), _reader(),_file(), _resultMessages(), _error(false), _dm(dm)
+{
+
+}
+
+void SCXMLReader::setDataModel(SCDataModel* dm)
+{
+    _dm = dm;
+}
+
 void SCXMLReader::readFile(QString infile)
 {
     _file = infile;
+}
+
+SCState* SCXMLReader::importFile(SCState* parent)
+{
+    //_currentItem = parent;
+    _currentState = parent;
+    QFile file(_file);
+    if ( ! file.open(QFile::ReadOnly | QFile::Text))
+    {
+        _resultMessages   << QString("Error: Cannot read file ") << (_file)
+                << QString(": ") << (file.errorString());
+
+        _error = true;
+    }
+
+    _reader.setDevice(&file);
+    _reader.readNext();
+
+    // while the reader hasn't ended, keep reading elements
+    while ( !_reader.atEnd())
+    {
+        // look for a start element
+        if (!_reader.isStartElement())
+            _reader.readNext();
+
+        else    // start element found for a state.
+        {
+            qDebug() << "importFile loop";
+            importElement(_currentState);
+        }
+    }
+
+    // close the file
+    file.close();
+
+    // alert the graphicsview that the import process was complete
+    emit _dm->importedMachine(_importedMachine);
+
+    // not currently conected to anything
+    emit done(_error, _resultMessages);
+
+    return _importedMachine;
+}
+
+/**
+ * @brief SCXMLReader::importElement
+ * @param parent
+ *
+ * will create a new state inside of parent and recusively add the state's children elements including states, transitions, and text blocks
+ */
+void SCXMLReader::importElement(SCState* parent)
+{
+    qDebug() << "SCXMLReader::importElement READING... "<< _reader.name() <<" importing into parent: "<< parent->objectName();
+
+    bool readState = false;
+    bool readTrans = false;
+    bool readText = false;
+    bool readTransText = false;
+
+    if(_reader.name() == "scxml")
+    {
+        qDebug() <<"importing scxml";
+        _currentItemType = ItemType::STATE;
+
+        // keep track of the machine that is imported, this will be used later to signal the graphicsview
+        _importedMachine = _currentState = importStateMachine(parent);
+        readState = true;
+
+    }
+    else if(_reader.name() == "state")
+    {
+        qDebug() << "importing state";
+        _currentItemType = ItemType::STATE;
+        _currentState = importState(parent);
+        readState = true;
+    }
+    else if(_reader.name() == "transition")
+    {
+        qDebug() << "importing tranistion";
+        _currentItemType = ItemType::TRANSITION;
+        _currentTransition = importTransition(parent);
+        readTrans = true;
+    }
+    else if(_reader.name() == "textblock")
+    {
+
+        switch(_currentItemType)
+        {
+        case ItemType::STATE:
+            readText = true;
+            qDebug() <<"reading State TextBlockElement";
+            importIDTextBlockElement(parent);
+            break;
+
+
+        case ItemType::TRANSITION:
+            readTransText = true;
+            qDebug() <<"reading Event TextBlockElement";
+            importEventTextBlockElement(_currentTransition);
+            break;
+
+
+        default:
+            break;
+        }
+    }
+
+
+    if(readTransText)
+        return;
+
+    qDebug() << "CURRENT STATE IS: " << _currentState->objectName();
+
+
+    // now we recursively call this for all of the elements that belong to this state.
+
+    // if a state was read, then _currentState is set to that.
+    // now read all the elements that belong to this state until we reach an end of element
+    // read the next element
+    _reader.readNext();
+
+    // while there are sub elements to this, keep calling this function
+    bool continueLoop = true;
+    while (! _reader.atEnd()&&(continueLoop))
+    {
+        if ( _reader.isEndElement())
+        {
+            qDebug()<<"end of Element found... :" <<_reader.name() ;
+            if(_reader.name() == "state")
+            {
+                qDebug() << "CURRENT STATE = PARENT. PARENT is: " << parent->getName()<<+"\tCURRENT is:"<<_currentState->getName();
+                _currentState = _currentState->parentAsSCState();
+            }
+            _reader.readNext();
+            continueLoop = false;
+
+
+            break; // hit end of this tree
+        }
+
+        else if ( _reader.isStartElement()){
+            qDebug() << "this element has another start element! calling import Element for this state!";
+            importElement(_currentState);
+        }
+        _reader.readNext();
+    }
+    qDebug() << "left importElement while loop.";
+
+        // when we leave this element, set the current state back one level before what it was originally
+//    if(!readState)
+//    {
+//        //        qDebug() << "CURRENT STATE = PARENT. PARENT is: " << parent->getName()<<+"\tCURRENT is:" <<_currentState->getName();
+//        if(_currentState)
+//            _currentState = _currentState->parentAsSCState();
+//        //            qDebug() << "NOW*: CURRENT STATE = PARENT. PARENT is: " << parent->getName()<<+"\tCURRENT is:" <<_currentState->getName();
+//    }
+
+}
+
+SCTransition* SCXMLReader::importTransition(SCState* source)
+{
+    TransitionAttributes * ta = new TransitionAttributes(0,"TransitionAttributes");
+
+    for(int i = 0; i < _reader.attributes().size();i++)
+    {
+        QString key =  _reader.attributes().at(i).name().toString();
+        QString value = _reader.attributes().at(i).value().toString();
+        qDebug() << "reader attributes: " << _reader.attributes().at(i).name() << ":"<<_reader.attributes().at(i).value();
+        TransitionStringAttribute* tsa = new TransitionStringAttribute(NULL, key, value);
+        ta->addItem(tsa);
+    }
+
+    return _dm->handleMakeANewTransition(source, ta);
+}
+
+SCState* SCXMLReader::importState(SCState* parent)
+{
+    StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
+    //StateString *  sa = new StateString (0,"type", "normal");
+    //stateAttributes->addItem( sa );
+
+    for (int i = 0; i < _reader.attributes().count(); i++)
+    {
+        QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
+//        qDebug() << "reading attribute: " << XmlAttr.name();
+        // look for the Sate Attribute Name (id in SCXML)
+        if ( XmlAttr.name() == "size" )
+        {
+            SizeAttribute * sa = new SizeAttribute(NULL, XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+        else if ( XmlAttr.name() == "position" )
+        {
+            PositionAttribute * sa  = new PositionAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+        else    // string attribute
+        {
+            StateString * sa  = new StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+    }
+
+    return _dm->handleMakeANewState(parent, stateAttributes);
+}
+
+SCState* SCXMLReader::importStateMachine(SCState *parent)
+{
+    StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
+    //StateString *  sa = new StateString (0,"type", "normal");
+    //stateAttributes->addItem( sa );
+
+    for (int i = 0; i < _reader.attributes().count(); i++)
+    {
+        QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
+        //qDebug() << "reading attribute: " << XmlAttr.name();
+        // look for the Sate Attribute Name (id in SCXML)
+        if ( XmlAttr.name() == "size" )
+        {
+            SizeAttribute * sa = new SizeAttribute(NULL, XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+        else if ( XmlAttr.name() == "position" )
+        {
+            PositionAttribute * sa  = new PositionAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+        else if(XmlAttr.name() == "type")
+        {
+            // change the type from "machine"
+            StateString* sa = new StateString(NULL, XmlAttr.name().toString(), "imported machine");
+            stateAttributes->addItem(sa);
+        }
+        else    // string attribute
+        {
+            StateString * sa  = new StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+    }
+
+    return _dm->handleMakeANewState(parent, stateAttributes);
 }
 
 /**
@@ -46,6 +298,7 @@ void SCXMLReader::readFile(QString infile)
  * runs with loading the data model with states, transitions, and textblocks until the last end element is hit
  *
  * uses handleMakeANewState in scdatamodel
+ *
  *
  */
 void SCXMLReader::run()
@@ -70,6 +323,7 @@ void SCXMLReader::run()
             _reader.readNext();
         else
             readElement();
+
     }
 
     file.close();
@@ -89,6 +343,11 @@ void SCXMLReader::getReadResult(bool &success, QStringList& message)
 /**
  * @brief SCXMLReader::readStateMachine
  * Used to change the state machine's name in the data model when reading from this file
+ *
+ *
+ * SIGNAL
+ * connect in SCDataModel::connectDataModel()
+ *
  */
 void SCXMLReader::readStateMachine()
 {
@@ -99,8 +358,23 @@ void SCXMLReader::readStateMachine()
         {
             emit changeStateMachineName(xmlAttr.value().toString());
         }
-    }
+        else if(xmlAttr.name() == "uid")
+        {
+            emit changeStateMachineUid(xmlAttr.value().toString());
+        }
+        else if(xmlAttr.name() == "size")
+        {
 
+        }
+        else if(xmlAttr.name() == "position")
+        {
+
+        }
+        else
+        {
+            emit changeStateMachineAttribute(xmlAttr.name().toString(), xmlAttr.value().toString());
+        }
+    }
 }
 
 /**
@@ -118,7 +392,7 @@ void SCXMLReader::readElement()
     if (_reader.name() == "scxml")
     {
         qDebug() << "skipping scxml";
-        emit enterStateElement();           // increase the transit level
+        //emit enterStateElement();           // increase the transit level
         readStateMachine();
         //readState(kSTATE_TYPE_Machine);   // disabled adding a state every time openFile happens
         enteredAStateElement = true;
@@ -131,6 +405,7 @@ void SCXMLReader::readElement()
         readState(kSTATE_TYPE_Normal);
         enteredAStateElement = true;
     }
+
     else if (_reader.name() == "initial")
     {
         emit enterStateElement();
@@ -226,6 +501,8 @@ void SCXMLReader::readElement()
 
 }
 
+
+
 /**
  * @brief SCXMLReader::readState
  * @param stateType
@@ -250,12 +527,6 @@ void SCXMLReader::readState(STATE_TYPE stateType)
     // delete it when its done.
 
     StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
-/*
-    for(int i = 0 ; i < _reader.attributes().count(); i++)
-    {
-
-    }
-  */
 
     QString stateTypeStr;
     switch ( stateType)
@@ -284,7 +555,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
     for (int i = 0; i < _reader.attributes().count(); i++)
     {
         QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
-        qDebug() << "reading attribute: " << XmlAttr.name();
+//        qDebug() << "reading attribute: " << XmlAttr.name();
         // look for the Sate Attribute Name (id in SCXML)
         if ( XmlAttr.name() == "id")
         {
@@ -302,7 +573,12 @@ void SCXMLReader::readState(STATE_TYPE stateType)
             PositionAttribute * sa  = new PositionAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
             stateAttributes->addItem( sa );
         }
-        else // unknown attribute
+        else if( XmlAttr.name() == "isParallelState")   // retroactive change to make this parallelState instead
+        {
+            StateString * sa  = new StateString(NULL,"parallelState", XmlAttr.value().toString());
+            stateAttributes->addItem( sa );
+        }
+        else // unknown attribute, generalize it as a string attribute and add it
         {
             StateString * sa  = new StateString(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
             stateAttributes->addItem( sa );
@@ -335,41 +611,10 @@ void SCXMLReader::readTransistion()
         QString key =  _reader.attributes().at(i).name().toString();
         QString value = _reader.attributes().at(i).value().toString();
         qDebug() << "reader attributes: " << _reader.attributes().at(i).name() << ":"<<_reader.attributes().at(i).value();
-        TransitionAttributes::TransitionStringAttribute* tsa = new TransitionAttributes::TransitionStringAttribute(NULL, key, value);
+        TransitionStringAttribute* tsa = new TransitionStringAttribute(NULL, key, value);
         ta->addItem(tsa);
     }
 
-/*
-    TransitionAttributes::TransitionStringAttribute * event = new TransitionAttributes::TransitionStringAttribute(NULL,"event", _reader.attributes().value("event").toString());
-
-    TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitionStringAttribute (NULL,"cond", _reader.attributes().value("cond").toString());
-
-    TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (NULL,"target", _reader.attributes().value("target").toString());
-
-    TransitionAttributes::TransitionStringAttribute * ttype = new  TransitionAttributes::TransitionStringAttribute (NULL,"type", _reader.attributes().value("type").toString());
-
-    ta->addItem(event);
-    ta->addItem(cond);
-    ta->addItem(target);
-    ta->addItem(ttype);
-
-     qDebug() << "target : " << target->asString();
-     qDebug() << "event : " << event->asString();
-
-
-    // restrict type to interal or external
-    if ( ! _reader.attributes().value("type").isEmpty() )
-    {
-        if (_reader.attributes().value("type").toString().toLower() == "internal")
-        {   
-            ta->value("type")->setValue("internal");
-        }
-        else
-        {   
-            ta->value("type")->setValue("external");
-        }
-    }
-*/
     emit makeANewTransistion(ta);   // connected to handleMakeANewTransition in scdatamodel.cpp
 
 }
@@ -383,6 +628,47 @@ void SCXMLReader::readTransistionPath()
     qDebug()<<"readTransistionPath = " + data;
 
     emit makeANewTransistionPath(data);
+}
+
+void SCXMLReader::importIDTextBlockElement(SCState* state)
+{
+    TextBlockAttributes * tb = new TextBlockAttributes(0,"TextBlockAttributes");
+
+    for (int i = 0; i < _reader.attributes().count(); i++)
+    {
+        QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
+        GenericAttribute * a  = new GenericAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+        tb->addItem( a );
+    }
+
+   _reader.readElementText(); //-- id-textblock gets it text data from the state ID
+
+   state->getIDTextBlock()->attributes.setAttributes(*tb);
+   delete tb;
+    //emit makeANewIDTextBlockElement(tb);   // connected to handleMakeANewIDTextBlock in scdatamodel
+}
+
+void SCXMLReader::importEventTextBlockElement(SCTransition* parent)
+{
+
+    qDebug()<<"importEventTextBlockElement";
+
+    TextBlockAttributes * tb = new TextBlockAttributes(0,"TextBlockAttributes");
+
+    for (int i = 0; i < _reader.attributes().count(); i++)
+    {
+        QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
+        GenericAttribute * a  = new GenericAttribute(NULL,XmlAttr.name().toString(), XmlAttr.value().toString());
+        tb->addItem( a );
+        //qDebug() << "adding attribute: "<<a->asString();
+    }
+
+   _reader.readElementText(); //-- id-textblock gets it text data from the state ID
+
+   parent->getEventTextBlock()->attributes.setAttributes(*tb);
+   delete tb;
+   // emit makeANewTransitionTextBlockElement(tb); //connected to handleMakeANewTransitionTextBlock in scdatamodel
+    //emit makeANewIDTextBlockElement( tb);
 }
 
 /**

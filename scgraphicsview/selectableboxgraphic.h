@@ -10,13 +10,35 @@
 #include <QPainter>
 #include <QPen>
 #include <QPointF>
-#include "cornergrabber.h"
+
 
 #define BOX_BUFFER 12
 #define BOX_DEFAULT_PEN_WIDTH 2
-#define BOX_HOVER_PEN_WIDTH 4
+#define BOX_HOVER_PEN_WIDTH 3
+#define INSIDE_PARENT_BUFFER 7  // deprecated global. used when selectable textblocks were used for states
+
+// box area globals
+#define MIN_WIDTH       105     // minimum width of the true area of the box
+#define MIN_HEIGHT      42      // minimum height of the true area of the box
+
+#define VISIBLE_MARGIN  7       // margin in true area where visible area is drawn
+#define CONTENT_MARGIN  2       // margin in visible area where content is placed
+
+#define MINIMIZE_BUTTON_MARGIN 25
+
+//#define CORNER_GRAB_X_BUFFER 5
+//#define CORNER_GRAB_Y_BUFFER 5
+
+// visible box globals
+
+//#define DEFAULT_VISIBLE_AREA_MARGIN
+
+
+
+
 
 class CornerGrabber;
+class SelectableTextBlock;
 class IAttribute;
 
 /**
@@ -41,16 +63,53 @@ class IAttribute;
   * \ingroup GraphicsView
   */
 
+/* GridLocations
+ *
+ *  0   1   2
+ *  7   8   3
+ *  6   5   4
+ *
+ *  UL  U   UR
+ *  L   C   R
+ *  DL  D   DR
+ *
+ */
+enum GridLocation{
+    UL,
+    U,
+    UR,
+    R,
+    DR,
+    D,
+    DL,
+    L,
+    C
+};
+
+enum WallFace{
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+};
+
+
 class SelectableBoxGraphic :  public QGraphicsObject
 {
+
 
 Q_OBJECT
 public:
 
     SelectableBoxGraphic(QGraphicsObject*parent);
+    SelectableBoxGraphic(QGraphicsObject*parent, bool keepInsideParent);
     ~SelectableBoxGraphic();
 
-
+    void setCursorToResize(bool on);
+    int cornerHovered();
+    CornerGrabber* getCornerHovered();
+    void setCornerPositions();
+    SelectableBoxGraphic* parentAsSelectableBoxGraphic();
     void setPosAndUpdateAnchors(QPointF newPos);
     void setSizeAndUpdateAnchors(QPointF size);
     virtual void setSize(QPointF size); ///< set the size of this object
@@ -68,76 +127,122 @@ public:
     void setShowBoxLineStyle(ShowBoxStyle s );///< show box always, or only when selected
     void setDrawBoxLineStyle( DrawBoxLineStyle s);///< if drawing box, draw solid or dotted line
     void setBoxStyle (BoxStyle s); ///< set box style
-    void setHoverLineThickness(int t);///< set line thickness when hovered
-    QRectF getUsableArea();///< returns a rect relative to the SelecableBoxGraphic that represents the inside margin, or usable area of the box.
+
+//    QRectF getUsableArea();///< returns a rect relative to the SelecableBoxGraphic that represents the inside margin, or usable area of the box.
     QPointF getVisibleCenter();///< returns a point which is appears to be the center of the box (i.e. does not include drop shadow), may not be the center of boundingRect()
     QPointF getSideCenterPointInSceneCoord(int side); ///< returns the center point on a given side, for anchoring a transition line in the middle of a side
     void getAllChildren(QList<SelectableBoxGraphic*> &stateList);
 
+    void setPenWidth(qreal, qreal);
+    void setMinSize(QPoint);
+    void setMinHeight(qreal);
     //bool eventFilter(QObject *, QEvent *);
+    virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
+    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
+    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+
+        qreal getContentAreaX();
+        qreal getContentAreaY();
+
+        qreal getVisibleAreaX();
+        qreal getVisibleAreaY();
+
+        QRectF getContentAreaRect();
+        QRectF getVisibleAreaRect();
+
+
+
 
 signals:
     void stateBoxMoved(QPointF);    // this signal activates when the statebox graphic is moved or resized to alert the transition graphic to be updated as to remained anchored to its target state. Although the sink anchor is still a child of the source state graphic, it should behave like a child of its target state.
     void stateBoxResized(QRectF oldBox, QRectF newBox, int corner);
 
+    void stateBoxReleased();
+    void cornerReleased();
+
+    void cornerReleasedTest();
+
+
+
 protected:
 
+//    qreal getTotalBufferX();
+//    qreal getTotalBufferY();
+
+
+
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
+
+    QPointF _dragStart;
+    int     _gridSpace;
+    QPoint _minSize;
+    qreal _penHoverWidth;
+    qreal _penWidth;
+    int _XcornerGrabBuffer;
+    int _YcornerGrabBuffer;
+    qreal   _drawingWidth;
+    qreal   _drawingHeight;
+    qreal   _drawingOriginX;
+    qreal   _drawingOriginY;
+    bool    _isHovered;
+    bool    _isHighlighted; ///< highlighting is used to indicate visually a group of objects that are related when one of the group is selected
+    ShowBoxStyle     _showBoxStyle;
+    DrawBoxLineStyle _drawBoxLineStyle;
+    BoxStyle         _boxStyle;
+    QPen     _pen ;
+
+    int getGridLocation(QRectF, QPointF);
+    bool isBetween(qreal start, qreal end, qreal point);
+    void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+
+    bool _keepInsideParent;
+    qreal   _width;
+    qreal   _height;
+
+    QPointF _cornerDragStart;
+
+
+
+    CornerGrabber*  _corners[4];// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
+
+
+    void adjustDrawingSize(int x, int y);
+
+    int getHoveredCorner();
+    virtual void mousePressEvent(QGraphicsSceneDragDropEvent *event);
+
+
+    qreal _visibleAreaMargin;
+    qreal _contentAreaMargin;
 
 private:
 
 
     virtual void graphicHasChanged() = 0; ///< subclass must implement this, used to record user changes back to the data model
 
-    virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
     virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
-    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
-    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
-    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
     virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *event);
-    virtual void mousePressEvent(QGraphicsSceneDragDropEvent *event);
+
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
 
-    void setCornerPositions();
-    void adjustDrawingSize(int x, int y);
 
-    int getHoveredCorner();
-    void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
 
 
 private:
     //private data
 
-    QPen     _pen ;
 
-    QPointF _dragStart;
-    int     _gridSpace;
-    qreal   _width;
-    qreal   _height;
 
-    QPointF _cornerDragStart;
 
-    int _XcornerGrabBuffer;
-    int _YcornerGrabBuffer;
-    qreal   _drawingWidth;
-    qreal   _drawingHeight;
-    qreal   _drawingOrigenX;
-    qreal   _drawingOrigenY;
 
-    CornerGrabber*  _corners[4];// 0,1,2,3  - starting at x=0,y=0 and moving clockwise around the box
 
-    bool    _isHighlighted; ///< highlighting is used to indicate visually a group of objects that are related when one of the group is selected
-    bool    _isHovered;
 
-    ShowBoxStyle     _showBoxStyle;
-    DrawBoxLineStyle _drawBoxLineStyle;
-    BoxStyle         _boxStyle;
-    int              _hoverLineThickness;
 
 
 };

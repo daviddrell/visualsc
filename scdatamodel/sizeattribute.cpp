@@ -1,5 +1,5 @@
 #include "sizeattribute.h"
-
+#include <QDebug>
 
 SizeAttribute::SizeAttribute():IAttribute(), _size()
 {
@@ -49,7 +49,7 @@ void  SizeAttribute::setValue(const QString size)
     QStringList sl = size.split(",");
     if ( sl.length() == 2)
     {
-        QPointF nSize(sl[0].toInt(),sl[1].toInt());
+        QPointF nSize(sl[0].toDouble(),sl[1].toDouble());
 
         if ( nSize != _size )
         {
@@ -67,6 +67,7 @@ void  SizeAttribute::setValue(const int w,const int h)
     if ( nSize != _size )
     {
         _size = nSize;
+//        qDebug() << "SizeAttribute::emitting changed";
         emit changed(this);
     }
 }
@@ -77,6 +78,7 @@ void SizeAttribute::setValue(const QPointF nSize)
     if ( nSize != _size )
     {
         _size = nSize;
+//        qDebug() << "SizeAttribute::emitting changed";
         emit changed(this);
     }
 }

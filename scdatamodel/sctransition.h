@@ -30,6 +30,9 @@ class SCState;
 class QXmlStreamWriter;
 #include "scitem.h"
 #include "textblock.h"
+#include "transitionattributes.h"
+#include <QUuid>
+
 
 /**
 
@@ -45,6 +48,7 @@ class QXmlStreamWriter;
 
   */
 
+
 class SCDATAMODELSHARED_EXPORT  SCTransition : public SCItem
 {
     Q_OBJECT
@@ -56,15 +60,24 @@ public:
 
     SCState* parentSCState();
 
-    void deleteSafely();
 
+    bool isConnectToFinished();
+    void deleteSafely();
+    void setUid(QString);
+    QString getUid();
+    QString getUidFirstName();
+    void setEventName(QString text);
+    QString getEventName();
     //void setTextPos(QPointF);
  //   void setTextSize(qreal w, qreal h);
     void setText(QString eventText);
 
+    TransitionStringAttribute* getTransStringAttr(QString key);
+    TransitionPathAttribute* getPathAttr();
 
     virtual IAttributeContainer * getAttributes(); //reimplemented from base SCItem
     void    setAttributeValue(QString key, QString value);
+    void setPathAttr(QString pathString);
     QString getAttributeValue(QString key);
     void addAttribute(QString key, QString value);
     bool removeAttribute(QString key);
@@ -76,32 +89,46 @@ public:
     void    writeSCVXML(QXmlStreamWriter & sw);
     SCState *targetState();
 
+
+    bool doNotPrint(QString);
+    int doNotPrintSize();
+
     //QList<SCTextBlock*> getTextBlocks();
     //SCTextBlock* getTextBlock(QString textBlockName);
     SCTextBlock* getEventTextBlock();
 
      //public data members
 
+
     void setTargetState(SCState*);
+
+//    void setFont(QString);
+//    void setFontSize(int);
+    void setFont(QFont* font);
+
 
 signals:
 
     void eventChangedInFormView(SCTransition*, QString);
     void eventChangedInDataModel(SCTransition*, QString);
+    void clicked(SCTransition*);
     void selected();
     void unselected();
     void transitionAddTextBlock(SCTextBlock*);          // connected in scformview::loadtree for sctransitions. connected to the parentitem's treeAddTextBlock(SCTextBlock) in customtreewidgetitem
+    void changedTarget(SCTransition*, SCState*);
 
 private slots:
     //void handleLineSelected();
    //void handleLineUnSelected();
 
+    void handleTargetStateNameChanged(StateName*);
     void detachFromSource(QObject*);
     void detachFromSink(QObject*);
     void handleTextBlockChanged();
 
 private:
-    QList<QString> DEFAULT_PROPERTIES_LIST;
+    QList<QString> DEFAULT_ATTRIBUTES_LIST;
+    QHash<QString,int> DO_NOT_DISPLAY_HASH;
     SCState *       _targetState;
 
     //QList<SCTextBlock*> _textBlocks;

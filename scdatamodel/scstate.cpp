@@ -23,6 +23,8 @@
 #include "scstate.h"
 #include <QVariant>
 #include <QDebug>
+#include <QFont>
+
 
 SCState::SCState(QObject *parent) :
     SCItem(parent),
@@ -30,6 +32,7 @@ SCState::SCState(QObject *parent) :
     _IdTextBlock(new SCTextBlock())
 {
    initCommon();
+   this->setLevel(this->parentAsSCState()->getLevel()+1);
 }
 
 
@@ -39,6 +42,7 @@ SCState::SCState(const SCState& st) :
     _IdTextBlock(new SCTextBlock())
 {
     initCommon();
+    this->setLevel(this->parentAsSCState()->getLevel()+1);
 }
 
 
@@ -53,6 +57,7 @@ SCState::SCState( bool topState) :
     if ( topState )
     {
         this->setStateName( "State Machine" );
+        this->setLevel(0);
     }
 }
 
@@ -67,6 +72,11 @@ SCState::~SCState()
     delete _IdTextBlock;
 }
 
+SCState* SCState::parentAsSCState()
+{
+    return dynamic_cast<SCState*>(this->parent());
+}
+
 /**
  * @brief SCState::initCommon
  *
@@ -75,33 +85,43 @@ SCState::~SCState()
  */
 void SCState::initCommon()
 {
+    // set the SCTextblock's bold attribute to true by default for the state title
+    this->getIDTextBlock()->getFontBoldAttr()->setValue(true);
+
    // _stateBoxGraphic = NULL;
     QString defaultName = QString();
 
+    _initialState = NULL;
 
     SCState * parent = dynamic_cast<SCState *>(this->parent());
 
-    if  ( parent )
+    if(parent)
     {
-        QString parentsName = parent->attributes.value("name")->asString();
-
+        QString parentName = parent->attributes.value("name")->asString();
         int childCount = parent->getStateCount();
-
-        defaultName = "" + parentsName + "_" + QString::number(childCount);
+        defaultName = "" + parentName + "_" + QString::number(childCount);
     }
 
-
-    DEFAULT_PROPERTIES_LIST << "name" << "size" << "position" <<"type" <<"entryAction"<<"exitAction"<<"finalState"<<"initialState"; // type is added to the state in scxml reader.
+    // add each of the default attributes
+    DEFAULT_ATTRIBUTES_LIST << "name" << "size" << "position" <<"entryAction"<<"exitAction"<<"parallelState"<<"finalState"<<"initialState"<<"uid" <<"comments"<<"type"; // type is added to the state in scxml reader.
+    //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
     // set the initial attributes and size
     StateName * name = new StateName (this, "name",defaultName);
-    SizeAttribute * size = new SizeAttribute (this, "size",QPoint(100,50));
+    SizeAttribute * size = new SizeAttribute (this, "size",QPoint(DEFAULT_STATE_WIDTH,DEFAULT_STATE_HEIGHT));
     PositionAttribute * position = new PositionAttribute (this, "position",QPoint(0,0));
-    StateString * type = new StateString(this, "type", "default type");
+    StateString * type = new StateString(this, "type", "");
     StateString * onEntryAction = new StateString(this, "entryAction","");
     StateString * onExitAction = new StateString(this, "exitAction", "");
     StateString * finalState = new StateString(this, "finalState", "false");
     StateString * initialState = new StateString(this, "initialState", "false");
+    StateString * parallelState = new StateString(this, "parallelState", "false");
+    StateString * comments = new StateString(this, "comments", "");
+
+    QUuid u=QUuid::createUuid();
+    StateString * uid= new StateString(this, "uid", u.toString());
+
+//    qDebug() << "uid; " << u.toString();
 
     attributes.addItem(name);
     attributes.addItem(size);
@@ -111,23 +131,182 @@ void SCState::initCommon()
     attributes.addItem(onExitAction);
     attributes.addItem(finalState);
     attributes.addItem(initialState);
+    attributes.addItem(parallelState);
+    attributes.addItem(uid);
+    attributes.addItem(comments);
 
     this->setObjectName(defaultName);// to support debug tracing
 
     _IdTextBlock->setParent(this);
     _IdTextBlock->setText(name->asString());     // default state text
-    //_IdTextBlock->setText("DEFAULT ID TEXT");
 
-    // connect change the state name to handleNameChanged
-
-
-   // connect (name, SIGNAL(changed(IAttribute*)), this, SLOT(handleNameChanged(IAttribute*)));
-   // connect (size, SIGNAL(changed(IAttribute*)), this, SLOT(handleSizeChanged(IAttribute*)));
-
+    // the set of connects inherent to an SCState are for its data model text block
     // connect changing the SCTextBlock to handleTextBlockChanged()
-    connect (_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
+    connect(_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
+
+    // connect changing the name attribute to the text block
+    connect(name, SIGNAL(changed(StateName*)), _IdTextBlock, SLOT(handleAttributeChanged(StateName*)));
 
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
+}
+
+
+bool SCState::isFinal()
+{
+    return (attributes.value("finalState")->asString()=="true");
+}
+
+bool SCState::hasAnInitialState()
+{
+    return getInitialState();
+}
+
+SCState* SCState::getInitialStateMember()
+{
+    return _initialState;
+}
+
+void SCState::setInitialState(SCState * st)
+{
+    _initialState = st;
+}
+
+
+SCState* SCState::parentAt(int levelUp)
+{
+    SCState* ret = this->parentAsSCState();
+    for(int i = 0 ; i < levelUp; i++)
+    {
+        ret = ret->parentAsSCState();
+    }
+    return ret;
+}
+
+/**
+ * @brief SCState::setInitial
+ * @param boolString
+ *
+ *
+ */
+void SCState::setInitial(QString boolString)
+{
+    boolString = boolString.toLower();
+    if(boolString=="true")
+    {
+        this->parentAsSCState()->setInitialState(this);
+        attributes.value("initialState")->setValue("true");
+    }
+    else
+    {
+        this->parentAsSCState()->setInitialState(NULL);
+        attributes.value("initialState")->setValue("false");
+    }
+}
+
+bool SCState::isInitial()
+{
+    return (attributes.value("initialState")->asString()=="true");
+}
+
+bool SCState::isParallel()
+{
+    return (attributes.value("parallelState")->asString()=="true");
+}
+
+bool SCState::isStateMachine()
+{
+    for(int i = 0 ; i < this->children().size(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(this->children().at(i));
+        if(state)
+            return true;
+    }
+    return false;
+}
+
+QString SCState::getName()
+{
+    return attributes.value("name")->asString();
+}
+
+SCState* SCState::getInitialState()
+{
+    for(int i = 0 ; i < this->children().size(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(this->children().at(i));
+        if(state)
+        {
+            if(state->isInitial())
+            {
+                _initialState = state;
+                return state;
+            }
+        }
+    }
+    return NULL;
+}
+
+SCState* SCState::getFinalState()
+{
+    for(int i = 0 ; i < this->children().size(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(this->children().at(i));
+        if(state)
+        {
+            if(state->isFinal())
+                return state;
+        }
+    }
+    return NULL;
+}
+
+/**
+ * @brief SCState::resetLevels
+ * @param parent
+ *
+ * called in reselectParent when a state is changing it's parent state.
+ * this helper function will also reset the level variable to its new proper value and update each child as well;
+ *
+ */
+void SCState::resetLevels(SCState *parent)
+{
+    this->_level = parent->getLevel()+1;
+    QList<SCState*> directChildren;
+    this->getStates(directChildren);
+    for(int i = 0 ; i < directChildren.size(); i++)
+    {
+        directChildren.at(i)->resetLevels(this);
+    }
+}
+
+/**
+ * @brief SCState::reselectParent
+ * @param newParent
+ *
+ * SIGNAL
+ *
+ * changedParent(SCState*,SCState*)
+ *
+ * connects are in SCGraphicsView and SCFormView
+ *  connect(st, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*,SCState*)));
+    will handle updating when a state's parent is changed
+ *
+ */
+void SCState::reselectParent(SCState* newParent)
+{
+    qDebug() << "SCState::reselectParent";
+
+    // reset the level variables for every state and child state
+    this->resetLevels(newParent);
+
+    // alert the graphicsview and formview
+    emit changedParent(this, newParent);
+
+    // alert that the graphic has moved
+
+
+    // set the parent
+    setParent(newParent);
 }
 
 /**
@@ -150,20 +329,85 @@ void SCState::setText(QString text)
     _IdTextBlock->setText(text);
 
     // this is in SCTextBlock's setText
-    /*if  ( text != _text)
-    {
-         _text = text;
-        this->setObjectName(text);
-        emit textChanged();
-    }*/
+//    if  ( text != _text)
+//    {
+//         _text = text;
+//        this->setObjectName(text);
+//        emit textChanged();
+//    }
 }
 
+/**
+ * @brief SCState::deleteAllSafely
+ * this recursively deletes all child states, beginning with the youngest descendant, then deletes this state
+ * called in deleteSafely()
+ */
+void SCState::deleteAllSafely()
+{
 
+    qDebug() << "SCState::deleteAllSafely";
+    QList<SCState*> directChildren = this->getStates();
+
+    // base case, its ok to delete this child. this child has no children of its own, so we've gone down as far as the chain can go with this family tree.
+
+
+
+    if(directChildren.size()==0)
+    {
+        qDebug() << "no children, deleting state";
+        emit markedForDeletion(this);
+        this->deleteLater();
+    }
+    else    // this state has decendant(s), so those must be deleted before
+    {
+        for(int i = 0; i < directChildren.size(); i++)
+        {
+            SCState* st = directChildren.at(i);
+            st->deleteAllSafely();
+        }
+        qDebug() << "deleted " << directChildren.size() <<" children, now deleting self";
+        emit markedForDeletion(this);
+        this->deleteLater();
+    }
+}
+
+/**
+ * @brief SCState::deleteSafely
+ * this function is called in place of delete
+ *
+ * the problem with delete is that the QObject deconstructor gets called before the deconstructor here.
+ * this resolves that problem by using the signal markedForDeletion to properly handle deleting this state
+ * in the formview and graphicsview BEFORE its data model is destroyed.
+ *
+ * will first deleteSafely all transitions belonging to the state machine
+ * then deletes all children states, starting with descendants with no children
+ *
+ */
 void SCState::deleteSafely()
 {
-    emit markedForDeletion(this);
-    //this->removeAllTransitionsIn(); now handled by SCTransition
-    this->deleteLater();
+    // first delete all transitions that belong to this state machine
+    QList<SCTransition*> allTransitionChildren;
+    this->getAllTransitions(allTransitionChildren);
+    for(int i = 0; i < allTransitionChildren.size(); i++)
+    {
+        SCTransition* trans = allTransitionChildren.at(i);
+        trans->deleteSafely();
+    }
+
+
+    // delete all in transitions as well
+    QList<SCTransition*> allInTransitions = this->getTransitionsIn();
+//    qDebug() << "allInTransitions Size: " << allInTransitions.size();
+    for(int i = 0; i < allInTransitions.size() ; i++)
+    {
+        SCTransition* trans = allInTransitions.at(i);
+//        qDebug() << "SCState::deleteSafely deleting State: " << this->objectName() << "\tdeleting in transition: " << trans->getEventName();
+        trans->deleteSafely();
+    }
+
+
+    // next delete all states that belong to this state machine and itself
+    this->deleteAllSafely();
 }
 
 /**
@@ -181,8 +425,29 @@ void SCState::setPosition(QPointF &position)
 {
     PositionAttribute * pos = dynamic_cast<PositionAttribute *> (attributes.value("position"));
     pos->setValue(position);
-    emit positionChangedInDataModel(this, position);
+    //emit positionChangedInDataModel(this, position);
 }
+
+StateName* SCState::getStateNameAttr()
+{
+    return dynamic_cast<StateName*>(attributes.value("name"));
+}
+
+SizeAttribute* SCState::getSizeAttr()
+{
+    return dynamic_cast<SizeAttribute*>(attributes.value("size"));
+}
+
+PositionAttribute* SCState::getPosAttr()
+{
+    return dynamic_cast<PositionAttribute*>(attributes.value("position"));
+}
+
+StateString* SCState::getStringAttr(QString attrName)
+{
+    return dynamic_cast<StateString*>(attributes.value(attrName));
+}
+
 
 /**
  * @brief SCState::setSize
@@ -201,7 +466,7 @@ void SCState::setSize(QPointF &size)
     sz->setValue(size);
     emit sizeChangedInDataModel(this, size);
 
-    qDebug() << "SCState::setSize emit attributeChangedSignal for sz";
+    //qDebug() << "SCState::setSize emit attributeChangedSignal for sz";
     emit this->attributeChangedSignal(sz);
 
     //emit this->attributeChangedSignal((IAttribute*)sz);
@@ -227,34 +492,71 @@ SCTextBlock* SCState::getIDTextBlock()
  * textBlock Changed -> SCState's name changed -> tree/table update
  *
  *
- * SIGNAL
- * connect in scformview
- * connect(SCState, SIGNAL(nameChangedInDataModel(SCState*,QString)), SCFormView, SLOT(handleItemNameChangedInDataModel(SCState*,QString)));
+ *
  *
  */
 void SCState::handleTextBlockChanged()
 {
     qDebug()<<"SCState::handleTextBlockChanged";
-    StateName * name = dynamic_cast<StateName *>(attributes["name"]);
-
-    QString nameText = _IdTextBlock->getText();
-    this->setObjectName(nameText);
-    name->setValue(nameText);
-    emit nameChangedInDataModel(this,nameText); // connected to SCFormView::handleItemNameChangedInDataModel()
+    this->setStateName(_IdTextBlock->getText());
 }
 
-/*
-void SCState::setGraphic(StateBoxGraphic* graphic)
+
+/**
+ * @brief SCState::setFont
+ * @param fontName
+ *
+ * changes the font family attributes
+ */
+void SCState::setFont(QFont *font)
 {
-    _stateBoxGraphic = graphic;
-}
-*/
-/*
-void SCState::updateGraphic()
-{
+    SCTextBlock* idtb = this->getIDTextBlock();
 
+    if(!font->family().isEmpty())
+    {
+        idtb->getFontFamilyAttr()->setValue(font->family());
+    }
+
+    if(font->pointSize()!=1)
+    {
+        idtb->getFontSizeAttr()->setValue(font->pointSize());
+    }
+
+    idtb->getFontBoldAttr()->setValue(font->bold());
 }
-*/
+
+
+
+/**
+ * @brief SCState::setStateName
+ * @param n
+ *
+ * this is a public function called by the form view when the state's name is changed in the property table
+ * additionally this will be called by another slot that handles when its textblock is changed (handleTextBlockChanged)
+ *
+ *
+ * sets the state attribute State Name to the passed string
+ *
+ * SIGNAL
+ * if the StateName state attribute is updated, then it will emit changed(StateAttribute*)
+ *
+ */
+void SCState::setStateName(QString n)
+{
+    this->setObjectName(n);
+    attributes.value("name")->setValue(n);
+
+    // no need to set the textblock here, its been connected to the name attribute
+}
+
+void SCState::handleEntryActionChanged(QString ea)
+{
+    this->attributes.value("entryAction")->setValue(ea);
+}
+void SCState::handleExitActionChanged(QString exa)
+{
+    this->getStringAttr("exitAction")->setValue(exa);
+}
 
 QString SCState::getAttributeValue(QString key)
 {
@@ -273,7 +575,7 @@ IAttributeContainer * SCState::getAttributes()
 
 bool SCState::removeAttribute(QString key)
 {
-    if(DEFAULT_PROPERTIES_LIST.indexOf(key)==-1)
+    if(DEFAULT_ATTRIBUTES_LIST.indexOf(key)==-1)
     {
         attributes.remove(key);
         return true;
@@ -284,7 +586,7 @@ bool SCState::removeAttribute(QString key)
 void SCState::addAttribute(QString key, QString value)
 {
     qDebug()  << "adding state property: " << key;
-    TransitionAttributes::TransitionStringAttribute * attr = new TransitionAttributes::TransitionStringAttribute (this, key,QString());
+    TransitionStringAttribute * attr = new TransitionStringAttribute (this, key,QString());
     attr->setValue(value);
     qDebug() << "attributes count before " << attributes.count();
     attributes.addItem(attr);
@@ -339,8 +641,14 @@ QList<SCTransition*> SCState::getTransitionsTerminating()
 }
 
 
-
-
+QList<SCTransitionBranch*> SCState::getForkedTransitionsIn()
+{
+    return  _transitingForkedTransitionsIn;
+}
+QList<SCTransitionBranch*> SCState::getForkedTransitionsTerminating()
+{
+    return _transitionsForkedTerminatingHere;
+}
 
 /**
  * @brief SCState::removeTargetsTransitionIn
@@ -433,6 +741,25 @@ void SCState::addTransitionReference(SCTransition* t, TransitionTransitDirection
         _transitionsTerminatingHere.append(t);
     }
 }
+
+void SCState::addTransitionReference(SCTransitionBranch* t, TransitionTransitDirection d)
+{
+    if ( d == kTransitOut)
+    {
+        _transitingForkedTransitionsOut.append(t);
+    }
+    if ( d == kTransitIn)
+    {
+        _transitingForkedTransitionsIn.append(t);
+    }
+    if ( d == kDestination)
+    {
+        _transitionsForkedTerminatingHere.append(t);
+    }
+}
+
+
+
 
 /**
  * @brief SCState::deleteAllInTransitions
@@ -604,6 +931,36 @@ SCState* SCState::getStateByName(QString name)
 }
 
 
+SCState* SCState::getStateByUid(QString uid)
+{
+    SCState* target=NULL;
+
+    //qDebug() << "thi sis : " <<this->objectName()<< "and we have children num: " << this->children().size();
+    for(int i = 0; i < this->children().size();i++)
+    {
+
+        SCState* state = dynamic_cast<SCState*>(this->children().at(i));
+        if(state)
+        {
+            //qDebug() << "state name: " << state->objectName()<<" \tstate uid: " << state->getUid();
+            if(state->getUid() == uid)
+            {
+                //qDebug()<<"returning state as target...: " << state->objectName();
+                return state;
+            }
+            else
+            {
+                target = state->getStateByUid(uid);
+                if(target)
+                    return target;
+            }
+        }
+    }
+    return target;
+
+}
+
+
 int SCState::getLevel()
 {
     return _level;
@@ -620,6 +977,22 @@ SCState * SCState::getParentState()
     return dynamic_cast<SCState*>(this->parent());
 }
 
+/*
+QList<SCState*> SCState::getAllStates()
+{
+    QList<SCState*> ret;
+    SCState*
+    for(int i = 0; i < children.size(); i++)
+    {
+        SCState* state = dynamic_cast<SCState*>(children.at(i));
+        if(state)
+        {
+            ret.append(state);
+
+        }
+    }
+}
+*/
 void SCState::getAllStates(QList<SCState *> & stateList)
 {
 
@@ -634,6 +1007,39 @@ void SCState::getAllStates(QList<SCState *> & stateList)
     }
 }
 
+
+bool SCState::doNotPrint(QString attribute)
+{
+    return DO_NOT_DISPLAY_HASH.contains(attribute);
+}
+
+int SCState::doNotPrintSize()
+{
+    return DO_NOT_DISPLAY_HASH.size();
+}
+
+QString SCState::getUid()
+{
+    return attributes.value("uid")->asString();
+}
+
+QString SCState::getUidFirstName()
+{
+    QStringList qsl = getUid().split("-");
+    return qsl.at(0).mid(1,qsl.at(0).size());
+}
+
+/**
+ * @brief SCState::getFamilyId
+ * @return
+ *
+ * appends the name of the parent
+ *
+ */
+QString SCState::getFamilyId()
+{
+    return "getFamilyId";
+}
 
 /**
  * @brief SCState::writeSCVXML
@@ -670,52 +1076,23 @@ void SCState::writeSCVXML(QXmlStreamWriter & sw)
         if (sc)
             sc->writeSCVXML(sw);
 
-        SCTransition * st = dynamic_cast<SCTransition*>(children()[k]);
-        if (st)
-            st->writeSCVXML(sw);
+        SCTransition * tr = dynamic_cast<SCTransition*>(children()[k]);
+        if (tr)
+            tr->writeSCVXML(sw);
+
+        SCTransitionBranch* br = dynamic_cast<SCTransitionBranch*>(children()[k]);
+        if(br)
+            br->writeSCVXML(sw);
 
         SCTextBlock * tb = dynamic_cast<SCTextBlock*>(children()[k]);
         if (tb)
             tb->writeSCVXML(sw);
     }
 
-
-
-
-    /*
-    sw.writeAttribute(QString("id"), attributes.value("name")->asString());
-    sw.writeAttribute(QString("position"),attributes.value("position")->asString());
-    sw.writeAttribute(QString("size"),attributes.value("size")->asString());
-
-    for(int i=0; i < children().length(); i++)
-    {
-        SCState * sc = dynamic_cast<SCState*>(children()[i]);
-        if (sc)
-            sc->writeSCVXML(sw);
-
-        SCTransition * st = dynamic_cast<SCTransition*>(children()[i]);
-        if (st)
-            st->writeSCVXML(sw);
-
-        SCTextBlock * tb = dynamic_cast<SCTextBlock*>(children()[i]);
-        if (tb)
-            tb->writeSCVXML(sw);
-
-    }*/
-
     sw.writeEndElement();
 }
 
 
-void SCState::setStateName(QString n)
-{
-    this->setObjectName(n);
 
-
-    // no need to set the textblock here, its been connected to the name attribute
-   // _IdTextBlock.setText(n);
-
-    attributes.value("name")->setValue(n);
-}
 
 

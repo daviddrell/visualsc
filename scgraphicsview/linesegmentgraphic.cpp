@@ -1,6 +1,13 @@
 #include "linesegmentgraphic.h"
 #include <QDebug>
 
+
+
+#define LSG_CORNER_GRAB_BUFFER 5
+#define ELBOW_GUARD_BUFFER 15.0
+#define LINE_HOVER_WIDTH  10.0
+
+
 LineSegmentGraphic::LineSegmentGraphic()
 {
 
@@ -16,7 +23,12 @@ LineSegmentGraphic::LineSegmentGraphic(ElbowGrabber *startPoint, ElbowGrabber *e
     _elbows[1] = endPoint;
 
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
-    _pen.setColor(TRANSITION_DEFAULT_COLOR);
+
+    _defaultColor=QColor(0,150,200,255);
+    _hoverColor=QColor(255,0,0,180);
+
+
+    _pen.setColor(_defaultColor);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
 
     enclosePathInElbows();
@@ -111,7 +123,7 @@ void LineSegmentGraphic::forceHoverEnterEvent()
 
 
     _pen.setWidth(TRANSITION_HOVER_WIDTH);
-    _pen.setColor(TRANSITION_HOVER_COLOR);
+    _pen.setColor(_hoverColor);
     _pen.setStyle(TRANSITION_HOVER_LINE_STYLE);
 }
 
@@ -127,7 +139,7 @@ void LineSegmentGraphic::forceHoverLeaveEvent()
     disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleLineSegmentKeyPressEvent(int)));
 
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
-    _pen.setColor(TRANSITION_DEFAULT_COLOR);
+    _pen.setColor(_defaultColor);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
 }
 
@@ -145,7 +157,7 @@ void LineSegmentGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
 
 
     _pen.setWidth(TRANSITION_HOVER_WIDTH);
-    _pen.setColor(TRANSITION_HOVER_COLOR);
+    _pen.setColor(_hoverColor);
     _pen.setStyle(TRANSITION_HOVER_LINE_STYLE);
 
 
@@ -163,7 +175,7 @@ void LineSegmentGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
     disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject *>(this->parentItem()), SLOT(handleKeyPressEvent(int)));
 
     _pen.setWidth(TRANSITION_DEFAULT_WIDTH);
-    _pen.setColor(TRANSITION_DEFAULT_COLOR);
+    _pen.setColor(_defaultColor);
     _pen.setStyle(TRANSITION_DEFAULT_LINE_STYLE);
 }
 */
@@ -309,15 +321,15 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
     QList<QPointF> pointsStart;
     QList<QPointF> pointsEnd;
 
-    pointsStart.append(  QPointF(lineStartX  - CORNER_GRAB_BUFFER, lineStartY - CORNER_GRAB_BUFFER));
-    pointsStart.append(  QPointF(lineStartX + CORNER_GRAB_BUFFER, lineStartY - CORNER_GRAB_BUFFER));
-    pointsStart.append(  QPointF(lineStartX + CORNER_GRAB_BUFFER, lineStartY + CORNER_GRAB_BUFFER));
-    pointsStart.append(  QPointF(lineStartX - CORNER_GRAB_BUFFER, lineStartY + CORNER_GRAB_BUFFER));
+    pointsStart.append(  QPointF(lineStartX  - LSG_CORNER_GRAB_BUFFER, lineStartY - LSG_CORNER_GRAB_BUFFER));
+    pointsStart.append(  QPointF(lineStartX + LSG_CORNER_GRAB_BUFFER, lineStartY - LSG_CORNER_GRAB_BUFFER));
+    pointsStart.append(  QPointF(lineStartX + LSG_CORNER_GRAB_BUFFER, lineStartY + LSG_CORNER_GRAB_BUFFER));
+    pointsStart.append(  QPointF(lineStartX - LSG_CORNER_GRAB_BUFFER, lineStartY + LSG_CORNER_GRAB_BUFFER));
 
-    pointsEnd.append(  QPointF(lineEndX - CORNER_GRAB_BUFFER, lineEndY - CORNER_GRAB_BUFFER));
-    pointsEnd.append(  QPointF(lineEndX + CORNER_GRAB_BUFFER, lineEndY - CORNER_GRAB_BUFFER));
-    pointsEnd.append(  QPointF(lineEndX + CORNER_GRAB_BUFFER, lineEndY + CORNER_GRAB_BUFFER));
-    pointsEnd.append(  QPointF(lineEndX - CORNER_GRAB_BUFFER, lineEndY + CORNER_GRAB_BUFFER));
+    pointsEnd.append(  QPointF(lineEndX - LSG_CORNER_GRAB_BUFFER, lineEndY - LSG_CORNER_GRAB_BUFFER));
+    pointsEnd.append(  QPointF(lineEndX + LSG_CORNER_GRAB_BUFFER, lineEndY - LSG_CORNER_GRAB_BUFFER));
+    pointsEnd.append(  QPointF(lineEndX + LSG_CORNER_GRAB_BUFFER, lineEndY + LSG_CORNER_GRAB_BUFFER));
+    pointsEnd.append(  QPointF(lineEndX - LSG_CORNER_GRAB_BUFFER, lineEndY + LSG_CORNER_GRAB_BUFFER));
 
     qreal minDistance = 0 ;
     qreal secondMinDistance = 0;
@@ -386,11 +398,17 @@ void LineSegmentGraphic::enclosePathInSceneCoordiates(qreal lineStartX,qreal lin
 //TODO move terminal and arrow head paint to elbowgrabber
 void LineSegmentGraphic::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+
+    painter->setRenderHint(QPainter::Antialiasing, true);
+     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
   //  enclosePathInElbows();
     //_pen.setWidth(20);
-//#define SHOW_HOVER_BOXES
+//    #define SHOW_HOVER_BOXES
     painter->setPen(_pen);
-    painter->setRenderHint(QPainter::HighQualityAntialiasing);
+
+
+
+
 
 #ifndef SHOW_HOVER_BOXES
     painter->drawLine(_elbows[0]->pos(), _elbows[1]->pos());

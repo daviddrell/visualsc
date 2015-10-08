@@ -24,6 +24,7 @@
 #include <QList>
 #include "stateattributes.h"
 #include "sctransition.h"
+#include "sctransitionbranch.h"
 class QString;
 class QXmlStreamWriter;
 class QPoint;
@@ -31,6 +32,7 @@ class QPoint;
 #include "scdatamodel_global.h"
 #include "scitem.h"
 //#include "stateboxgraphic.h"
+#include <QUuid>
 
 /**
 
@@ -48,6 +50,8 @@ class QPoint;
 
   */
 
+#define DEFAULT_STATE_WIDTH  200
+#define DEFAULT_STATE_HEIGHT 124
 
 class SCDATAMODELSHARED_EXPORT  SCState : public SCItem
 {
@@ -58,19 +62,46 @@ public:
     SCState(bool topState=false);
     ~SCState();
 
-    void deleteSafely();
 
+    void deleteSafely();
+    void deleteAllSafely();
+
+    QString getName();
    // void setGraphic(StateBoxGraphic*);
 
-    virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
 
+
+    //void prepareForDelete();
+    virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
+    QString getUid();
+    QString getUidFirstName();
+    QString getFamilyId();
+    bool doNotPrint(QString);
+    int doNotPrintSize();
     enum TransitionTransitDirection { kTransitIn, kTransitOut, kDestination };
     void addTransitionReference(SCTransition*, TransitionTransitDirection );
+    void addTransitionReference(SCTransitionBranch*, TransitionTransitDirection);
 
-    void setStateName(QString n);
     void addTransistion(SCTransition*);
     void addState(SCState *);
-   // void makeTargetConnections(QList<SCTransition*> & transitionList);
+
+    bool isParallel();
+
+    bool isInitial();
+    bool isFinal();
+
+    SCState* getInitialState();
+    SCState* getInitialStateMember();
+    SCState* getFinalState();
+    bool isStateMachine();
+
+    void setInitial(QString);
+    void setInitialState(SCState*);
+
+
+    bool hasAnInitialState();
+
+    SCState* parentAsSCState();
 
     void setAttributeValue(QString key, QString value);
     void addAttribute(QString key, QString value);
@@ -79,6 +110,12 @@ public:
 
     void setText(QString text);
 
+
+    SizeAttribute* getSizeAttr();
+    PositionAttribute* getPosAttr();
+    StateName* getStateNameAttr();
+    StateString* getStringAttr(QString attrName);
+
     int  getStateCount();
 
     //void setSize (QPointF& size);
@@ -86,17 +123,27 @@ public:
 
     void setPosition (QPointF& size);
 
+    SCState* parentAt(int levelUp);
 
     void removeTargetsTransitionIn();
     void removeSourcesTransitionOut();
 
+    void reselectParent(SCState* target);
 
     QList<SCTransition*> getTransitionsIn();
     QList<SCTransition*> getTransitionsTerminating();
 
+    QList<SCTransitionBranch*> getForkedTransitionsIn();
+    QList<SCTransitionBranch*> getForkedTransitionsTerminating();
+
     void removeTransitionReferenceIn(SCTransition* trans);
     void removeTransitionReferenceOut(SCTransition* trans);
     void removeAllTransitionsIn();
+
+
+    void setFont(QFont * font);
+//    void setFont(QString fontName);
+//    void setFontSize(int fontSize);
 
     /**
       * \fn getAllTransitions
@@ -155,6 +202,8 @@ public:
     void setLevel(int level);
 
 
+    SCState* getStateByUid(QString);
+
 
     /**
       * \fn getStateByName
@@ -185,6 +234,10 @@ public:
 signals:
 
 
+     void aboutToBeDeleted(QObject*);
+     void clicked(SCState*);
+     void minimized(SCState*);
+     void expanded(SCState*);
      void changed();
      void attributeChangedSignal(IAttribute*);
 
@@ -196,11 +249,16 @@ signals:
      void positionChangedInFormView(SCState*, QPointF);
      void sizeChangedInFormView(SCState*, QPointF);
 
+     void changedParent(SCState*,SCState*);
 
+     void bringToFront(SCState*);
+     void sendToBack(SCState*);
 
 
 public slots:
-
+     void setStateName(QString n);
+     void handleEntryActionChanged(QString);
+     void handleExitActionChanged(QString);
 
 private slots:   
      void handleTextBlockChanged();
@@ -213,17 +271,26 @@ private:
 
     //private data
 
-
+    void resetLevels(SCState* parent);
     //StateBoxGraphic* _stateBoxGraphic;
     SCTextBlock * _IdTextBlock;
     QList<SCTransition*> _transitingTransitionsOut;
     QList<SCTransition*> _transitingTransitionsIn;
     QList<SCTransition*> _transitionsTerminatingHere;
 
+    QList<SCTransitionBranch*> _transitingForkedTransitionsOut;
+    QList<SCTransitionBranch*> _transitingForkedTransitionsIn;
+    QList<SCTransitionBranch*> _transitionsForkedTerminatingHere;
+
     QList<SCTextBlock*> _textBlocks;
 
     int _level ; ///< distance from top state in terms of parent-child relationships
-    QList<QString> DEFAULT_PROPERTIES_LIST;
+    QList<QString> DEFAULT_ATTRIBUTES_LIST;
+
+    QList<QString> DO_NOT_DISPLAY_LIST; // attributes that can be ignored in the property table
+    QHash<QString,int> DO_NOT_DISPLAY_HASH;
+
+    SCState* _initialState;
 
 };
 

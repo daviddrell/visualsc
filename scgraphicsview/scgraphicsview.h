@@ -24,14 +24,17 @@
 #include "scgraphicsview_global.h"
 #include "scdatamodel.h"
 #include "keycontroller.h"
-#include <QObject>
-#include <QGraphicsView>
+
+//#include <QGraphicsView>
 #include "stateattributes.h"
 #include "stateboxgraphic.h"
 #include "transitiongraphic.h"
 #include "textformattoolbar.h"
 #include "mousecontroller.h"
+#include "customgraphicsview.h"
+#include "customgraphicsscene.h"
 #include <QMap>
+#include <QObject>
 
 /**
   \defgroup GraphicsView
@@ -56,12 +59,20 @@ public:
     SCGraphicsView(QWidget *parent, SCDataModel * dm);
     ~SCGraphicsView();
 
+    CustomGraphicsScene* getCustomGraphicsScene();
     QGraphicsView * getQGraphicsView();
+    QGraphicsScene* getQGraphicsScene();
+
+    void saveImage(QString fileName);
 
 signals:
 
 private slots:
 
+    void handleNewImportedMachine(SCState*);
+    void handleRootMachineIsParallelChanged(StateString*);
+    void handleNewRootMachine(SCState*);
+    void handleAutoResize(StateBoxGraphic*);
     void handleNewState(SCState * newState);
     void handleNewTransition(SCTransition*);
     void handleStateDeleted(QObject *state);
@@ -74,18 +85,21 @@ private slots:
     void handleStateSizeChangedInFormView(SCState* state, QPointF size);
     void handleMakeTransitionConnections(SCTransition*);
     void handleNewTransitionFormView(SCTransition* t);
+    void handleChangedParent(SCState* state, SCState* newParent);
+    void handleBringToFront(SCState* state);
+    void handleSendToBack(SCState* state);
 
 private:
 
     void connectState(SCState*, StateBoxGraphic*);
-    //void connectState(SCState*);
+    void connectState(SCState*);
     void connectTransition(SCTransition*);
 
-
+    qreal distance(QPointF a, QPointF b);
     // private data
 
-    QGraphicsScene  *_scene;
-    QGraphicsView   _view;
+    CustomGraphicsScene  *_scene;
+    CustomGraphicsView   _view;
     SCDataModel    *_dm;
     QMap<SCState*,StateBoxGraphic*> _mapStateToGraphic;
     QMap<SCTransition*,TransitionGraphic *> _mapTransitionToGraphic;
@@ -108,7 +122,7 @@ private:
 
     bool eventFilter(QObject* o, QEvent* e);
     virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
-
+   // virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
 
 };
 

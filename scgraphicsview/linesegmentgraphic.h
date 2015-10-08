@@ -5,9 +5,7 @@
 #include "elbowgrabber.h"
 #include "transitiongraphic.h"
 
-#define CORNER_GRAB_BUFFER 5
-#define ELBOW_GUARD_BUFFER 15.0
-#define LINE_HOVER_WIDTH  10.0
+
 
 
 class ElbowGrabber;
@@ -51,6 +49,9 @@ private:
     QPen            _pen;
     bool            _isHovered;
     int _mouseState;
+
+    QColor          _defaultColor;
+    QColor          _hoverColor;
 
 
 

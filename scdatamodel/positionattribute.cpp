@@ -1,6 +1,6 @@
 
 #include "positionattribute.h"
-
+#include <QDebug>
 
 PositionAttribute::PositionAttribute() :IAttribute( ), _position()
 {
@@ -49,7 +49,7 @@ void PositionAttribute::setValue(const QString position)
         return;
     }
 
-    QPointF nPosition(sl[0].toInt(),sl[1].toInt());
+    QPointF nPosition(sl[0].toDouble(),sl[1].toDouble());
 
     if ( nPosition != _position )
     {
@@ -74,6 +74,7 @@ void PositionAttribute::setValue(const QPointF nPosition)
     if ( nPosition != _position )
     {
         _position = nPosition;
+        //qDebug() << "pos attr emit changed";
         emit changed(this);
     }
 }

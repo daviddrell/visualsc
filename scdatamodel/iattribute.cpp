@@ -19,6 +19,7 @@
 */
 
 #include "iattribute.h"
+#include <QDebug>
 #include <QMetaType>
 
 // IAttribute - a base class for attributes
@@ -48,15 +49,6 @@ IAttribute& IAttribute::operator =(const IAttribute& a)
     QObject(a.parent());
     _key = a._key;
     return *this;
-}
-
-void IAttribute::setValue(const QString)
-{
-}
-
-QString IAttribute::asString()
-{
-    return QString();
 }
 
 QString IAttribute::key() const {return _key; }
@@ -93,7 +85,12 @@ QString GenericAttribute::asString()
 
 void GenericAttribute::setValue(const QString value)
 {
-    _value = value;
+    if(_value!=value)
+    {
+//        qDebug() << "GenericAttribute::setValue " << this->_key<<":" << this->_value;
+        _value = value;
+        emit changed(this);
+    }
 }
 
 
@@ -137,6 +134,8 @@ IAttributeContainer::~IAttributeContainer()
 
 QString IAttributeContainer::key() {return _containerName; }
 
+
+
 bool IAttributeContainer::addItem( IAttribute* attr)
 {
     if (  this->contains( attr->key() ) )
@@ -154,12 +153,13 @@ bool IAttributeContainer::addItem( IAttribute* attr)
     }
 }
 
+
 /**
       * \fn operator=
       * \abstract sets the values of the abtribute list to the same values as the passed-in list, equivalent to setAttributes
       */
 IAttributeContainer& IAttributeContainer::operator=( const IAttributeContainer& copyFrom )
-                                                   {
+{
     setAttributes(copyFrom);
     return *this;
 }

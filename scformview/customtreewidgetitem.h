@@ -23,8 +23,11 @@
 #include <QTreeWidgetItem>
 #include "textblock.h"
 #include <QObject>
-class QObject;
-class SCTextBlock;
+
+
+class FVItem;
+
+
 
 /** \class CustomTreeWidgetItem
   *
@@ -36,15 +39,21 @@ class SCTextBlock;
   *
   */
 
-class SCFORMVIEWSHARED_EXPORT CustomTreeWidgetItem : public QTreeWidgetItem, public QObject
+class SCFORMVIEWSHARED_EXPORT CustomTreeWidgetItem :  public QObject, public QTreeWidgetItem
 {
-   // Q_OBJECT
+    Q_OBJECT
+
 public:
     CustomTreeWidgetItem(CustomTreeWidgetItem * parent=NULL);
     void setData(QObject* d);
     QObject * data();
+    FVItem* dataAsFvItem();
+
+
 public slots:
     void treeAddTextBlock(SCTextBlock*);
+    void handleAttributeChanged(StateName*);
+    void handleAttributeChanged(TransitionStringAttribute*);
 
 private:
     QObject * _stateOrTransitionItem;

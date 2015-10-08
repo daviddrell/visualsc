@@ -47,6 +47,11 @@ SCDataModel * SMProject::getDM()
     return _dm;
 }
 
+SCGraphicsView* SMProject::getSCGraphicsView()
+{
+    return _graphicsView;
+}
+
 QGraphicsView * SMProject::getQGraphicsView()
 {
     if ( _graphicsView == NULL )
@@ -91,10 +96,10 @@ void SMProject::save(QString fileName)
     _dm->save(fileName, errorMsg);
 }
 
-void SMProject::exportToCode(QString fileName)
+bool SMProject::exportToCode(QString fileName)
 {
     QString errorMessage;
-    _dm->exportToCode(fileName, errorMessage);
+    return _dm->exportToCode(fileName, errorMessage);
 }
 
 void SMProject::close()

@@ -25,6 +25,8 @@
 #include "keycontroller.h"
 #include "selectableboxgraphic.h"
 #include "mousecontroller.h"
+
+
 #include <QList>
 #include <QDebug>
 #include <QGLWidget>
@@ -33,45 +35,59 @@
 #include <QKeyEvent>
 #include <QGraphicsSceneMouseEvent>
 
+#define QREAL_MAX   std::numeric_limits<double>::max()
+#define QREAL_MIN   std::numeric_limits<double>::min()
+
+#define SCENE_DEFAULT_WIDTH     4000
+#define SCENE_DEFAULT_HEIGHT    4000
+
+
+
 SCGraphicsView::SCGraphicsView(QWidget *parentWidget, SCDataModel * dm) :
     QWidget (parentWidget),
-    _scene(new QGraphicsScene(this)),
+    _scene(new CustomGraphicsScene(this)),
     _view(parentWidget),
     _dm(dm),
     _mapStateToGraphic(),
     _hashStateToGraphic(),
-    _keyController(new KeyController()),
+    _keyController(new KeyController()), // initialize key controller
     _mouseController(new MouseController()),
-    _rightAngleMode(false)
-
-
-
+    _rightAngleMode(false)  // DEPRECATED
 {
-    _dm->setScene( _scene);
-    // initialize key controller
+    _dm->setScene(_scene);
+
+    connect(_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
+
+    // the root machine needs to update its children if isParalle is changed
+    connect(_dm, SIGNAL(newRootMachine(SCState*)), this, SLOT(handleNewRootMachine(SCState*)));
+
+    // when the reader is done importing, signal the graphics view
+    connect(_dm, SIGNAL(importedMachine(SCState*)), this, SLOT(handleNewImportedMachine(SCState*)));
 
 
+    // reading transitions from scxml file
+    connect(_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
+    connect(_dm, SIGNAL(transitionsReadyToConnect(SCTransition*)),this,SLOT(handleMakeTransitionConnections(SCTransition*)));
 
-    connect (_dm, SIGNAL(newStateSignal(SCState*)), this, SLOT(handleNewState(SCState*)));
-    connect(_dm , SIGNAL(transitionsReadyToConnect(SCTransition*)),this,SLOT(handleMakeTransitionConnections(SCTransition*)));
-    connect (_dm, SIGNAL(newTransitionSignal(SCTransition*)), this, SLOT(handleNewTransition(SCTransition*)));
-    connect(_dm, SIGNAL(formViewInsertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransitionFormView(SCTransition*)));
+    // user inserts a new transition
+    connect(_dm, SIGNAL(insertNewTransitionSignal(SCTransition*)), this, SLOT(handleNewTransitionFormView(SCTransition*)));
 
-    //connect(_dm, SIGNAL(newTextBlockSignal(SCTransition*,QString)), this, SLOT(handleNewTextBlock(SCTransition,QString)));
 
     //using openGL
 
+//    _view.setViewport(new QWidget());
     _view.setViewport( new QGLWidget (QGLFormat(QGL::SampleBuffers) ));
-    _view.setScene( _scene);
+
+    _view.setScene(_scene);
     _view.show();
+//    _view.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
     createGraph();
 
     _scene->installEventFilter(this);
-    //this->setMouseTracking(true);
 
-
-
+    // set the scene to be big, by a default amount
+    _scene->setSceneRect(0 - SCENE_DEFAULT_WIDTH/2, 0 - SCENE_DEFAULT_HEIGHT/2, SCENE_DEFAULT_WIDTH, SCENE_DEFAULT_HEIGHT);
 }
 
 SCGraphicsView::~SCGraphicsView()
@@ -79,7 +95,33 @@ SCGraphicsView::~SCGraphicsView()
     delete _scene;
 }
 
+/**
+ * @brief SCGraphicsView::handleNewImportedMachine
+ * @param state
+ *
+ * SLOT
+ * connect in SCGraphicsView construcor
+ *
+ * when a state machine is imported fully, we call this to automatically resize the state machine to enclose all of its substates
+ */
+void SCGraphicsView::handleNewImportedMachine(SCState * importedMachine)
+{
+    StateBoxGraphic* sbg = _hashStateToGraphic.value(importedMachine);
+    this->handleAutoResize(sbg);
 
+    // the top level children of this state machine were using scene based coordinates.
+    // now they get a parent state box graphic, which automatically maps their coordinates to this new parent state box graphic
+    // we also must update the data model with the updated position
+    QList<SCState*> directChildren = importedMachine->getStates();
+    for(int i = 0; i < directChildren.size(); i++)
+    {
+        SCState* child = directChildren.at(i);
+        StateBoxGraphic* childG = _hashStateToGraphic.value(child);
+
+        QPointF machineMapped = childG->pos();
+        child->setPosition(machineMapped);
+    }
+}
 
 /**
  * @brief SCGraphicsView::handleMakeTransitionConnections
@@ -102,7 +144,7 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
 
     TransitionGraphic* transGraphic = _hashTransitionToGraphic.value(trans);
 
-    TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(trans->attributes.value("target"));
+   // TransitionStringAttribute *targetName = dynamic_cast<TransitionStringAttribute *>(trans->attributes.value("target"));
 
     //SCState* parentState = trans->parentSCState();
     //SCState* targetState = lookUpTargetState(targetName->asString());
@@ -111,7 +153,7 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
 
 
 
-    qDebug() << "targetGraphic: " << targetGraphic->objectName();
+    //qDebug() << "targetGraphic: " << targetGraphic->objectName();
 
     // set the targetState for the transition
     trans->setTargetState(targetState);
@@ -124,18 +166,7 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
     connectTransition(trans);
 }
 
-/**
- * @brief SCGraphicsView::reset
- * will clear the graphics view
- */
-
-/*
-void SCGraphicsView::reset()
-{
-
-}
-*/
-bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
+bool SCGraphicsView::eventFilter(QObject*, QEvent * e)
 {
     // scene captures key presses in KeyController Object
     // the key controller object is passed to the transition graphic and its segmented lines
@@ -155,13 +186,14 @@ bool SCGraphicsView::eventFilter(QObject* o, QEvent * e)
         _mouseController->mouseInput(qgs);
         //_mouseController->printPos();
     }
-    return false;
+    return false; // propogate the event further
 }
 
 // for supporting moving the box across the scene
 void SCGraphicsView::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
     qDebug()<<"mouse moved in moveEvent";
+
 }
 
 /**
@@ -173,10 +205,13 @@ void SCGraphicsView::createGraph()
     QList<SCState*> states;
     _dm->getAllStates(states);
 
+    // connect the top state
+    connectState(_dm->getTopState());
+
     // first load all states
     for(int s = 0; s < states.count(); s++)
     {
-        handleNewState( states[s]);
+        handleNewState(states[s]);
     }
 
     // load all transitions
@@ -192,13 +227,245 @@ void SCGraphicsView::createGraph()
     }
 }
 
+CustomGraphicsScene* SCGraphicsView::getCustomGraphicsScene()
+{
+    return _scene;
+}
+
+QGraphicsScene* SCGraphicsView::getQGraphicsScene()
+{
+    return dynamic_cast<QGraphicsScene*>(_scene);
+}
 
 QGraphicsView * SCGraphicsView::getQGraphicsView()
 {
-    return & _view;
+    return dynamic_cast<QGraphicsView*>(& _view);
+}
+
+qreal SCGraphicsView::distance(QPointF a, QPointF b)
+{
+    return sqrt( (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y()));
+}
+
+/**
+ * @brief SCGraphicsView::handleAutoResize
+ * @param stateBoxGraphic
+ *
+ * SLOT
+ * connect in connectState of SCGraphicsView
+ *
+ * this will automatically resize a state box graphic based on if its a state machine or state:
+ * state machines will resize themselves to cover all of its children states.
+ *
+ * states will resize themselves to be the same size as a state in the same state machine, going by earliest added first order.
+ */
+void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
+{
+    qDebug() << "handleAutoResize";
+    QList<StateBoxGraphic*> sbgs;
+//    stateBoxGraphic->getAllStates(sbgs);
+    stateBoxGraphic->getStates(sbgs);
+    //QPointF myPos = mapToHighestParent(pos());
+    qreal x = 0;
+    qreal y = 0;
+    qreal newWidth = std::numeric_limits<double>::min();        // new dimensions of the state
+    qreal newHeight = std::numeric_limits<double>::min();
+    qreal minX = std::numeric_limits<double>::max();            // auto resize uses the smallest top/left distance to any child to determine the extra buffer zone on the bottom and right walls when resizing
+    qreal minY = std::numeric_limits<double>::max();
+
+    // if this is a state machine, then use all children to calculate the above variables
+    for(int i = 0; i < sbgs.size(); i++)
+    {
+        StateBoxGraphic* sbg = sbgs.at(i);
+
+        QPointF mts = stateBoxGraphic->mapFromItem(sbg->parentAsSelectableBoxGraphic(), sbg->pos());
+
+        qreal outX = mts.x() + sbg->getSize().x();
+        qreal outY = mts.y() + sbg->getSize().y();
+
+        qDebug() << "outX: "<<outX << "\toutY:"<<outY;
+
+        // we must make the new width include the outter most point
+        if(x+newWidth < outX)
+           newWidth = outX;
+
+        // include outter most y point
+        if(y+newHeight < outY)
+           newHeight = outY;
+
+        // determine the smallest buffer zone
+        if(mts.x() < minX)
+            minX = mts.x();
+
+        // determine the smallest buffer zone
+        if(mts.y() < minY)
+            minY = mts.y();
+    }
+
+    // a state will have no children state box graphics
+    bool onlyState = false;
+    if(sbgs.size()==0)
+    {
+        onlyState = true;
+
+        QList<SCState*> children;
+        stateBoxGraphic->getStateModel()->parentAsSCState()->getStates(children);
+
+        SCState* myState = stateBoxGraphic->getStateModel();
+        SCState* closestState = NULL;
+        qreal dist = QREAL_MAX;
+
+
+        for(int i = 0 ; i < children.size(); i++)
+        {
+            SCState* st = children.at(i);
+            if(st!=myState)
+            {
+                QPointF pos = st->getPosAttr()->asPointF();
+                qreal d = distance(stateBoxGraphic->pos(), pos);
+                if(d < dist)
+                {
+                    dist = d;
+                    closestState = st;
+                    qDebug() << "replacing shorter distance: " << d<<"\t closest state: " << closestState->objectName();
+                }
+            }
+        }
+
+        // is my
+        if(children.size() == 1)
+        {
+            qDebug() << "!! looking for other children on the same level";
+            int level = stateBoxGraphic->getStateModel()->getLevel();
+            QList<SCState*> allChildren;
+            this->_dm->getTopState()->getAllStates(allChildren);
+
+            for(int i = 0; i < allChildren.size(); i++)
+            {
+                SCState* st = allChildren.at(i);
+                if(st!=myState && st->getLevel() == level)
+                {
+                    QPointF pos = st->getPosAttr()->asPointF();
+                    qreal d = distance(stateBoxGraphic->pos(), pos);
+                    if(d < dist)
+                    {
+                        dist = d;
+                        closestState = st;
+                        qDebug() << "replacing shorter distance: " << d<<"\t closest state: " << closestState->objectName();
+                    }
+                }
+            }
+        }
+
+
+
+        if(closestState)
+        {
+            qDebug() << "abs closest state is : "<<closestState->objectName();
+            StateBoxGraphic* sbg = _hashStateToGraphic.value(closestState);
+            newWidth = sbg->getSize().x();
+            newHeight = sbg->getSize().y();
+        }
+        else
+        {
+            qDebug() << "ERROR did not find a closest state to resize to.";
+        }
+
+
+
+//        // must find another state box graphic that is in the same state machine on the same level.
+//        SCState* parentState = stateBoxGraphic->getStateModel()->parentAsSCState();
+//        QList<SCState*> states;
+//        parentState->getStates(states);
+//        for(int i = 0 ; i < states.size(); i++)
+//        {
+//            StateBoxGraphic* sbg = _hashStateToGraphic.value(states.at(i));
+//            if(sbg == stateBoxGraphic)
+//            {
+
+//            }
+//            else    // as soon as we find one that isn't the one being changed, we will mimic the size
+//            {
+//                newWidth = sbg->getSize().x();
+//                newHeight = sbg->getSize().y();
+//                break;
+//            }
+//        }
+    }
+
+    // only change the size if the size needs changing
+    if(newWidth!=std::numeric_limits<double>::min() || std::numeric_limits<double>::min() != newHeight)
+    {
+        // if this is a state and not a state machine, we set the size to be the same as one of its sibling states
+        if(onlyState)
+        {
+            QRectF oldBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), stateBoxGraphic->getSize().x(), stateBoxGraphic->getSize().y());
+            QRectF newBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), newWidth, newHeight);
+            stateBoxGraphic->setSize(QPointF(newWidth,newHeight));
+            stateBoxGraphic->setCornerPositions();
+            emit stateBoxGraphic->stateBoxResized(oldBox, newBox, 2);
+        }
+        else        // this is a state machine
+        {
+            // if children states are outside of the state machine from the top or left, then using minX and minY will have undesired results, so reposition all children to be inside of the state machine, then call this function again
+            if(minX < 0 || minY < 0)
+            {
+
+                for(int i = 0; i < sbgs.size(); i++)
+                {
+                    StateBoxGraphic* sbg = sbgs.at(i);
+
+                    QPointF newPos;
+                    if(minX < 0)
+                        newPos = QPointF(sbg->pos().x() - (minX -25) , sbg->pos().y());
+                    else
+                        newPos = QPointF(sbg->pos().x(), sbg->pos().y() - (minY -25));
+
+
+//                     newPos = QPointF(sbg->pos().x() - (minX -25) , sbg->pos().y() - (minY -25));
+
+                    sbg->setPosAndUpdateAnchors(newPos);
+                    // update the datamodel for the position and size.
+                    sbg->graphicHasChanged();
+                }
+
+                // all children are inside of the state machine, so we can call this again
+                this->handleAutoResize(stateBoxGraphic);
+            }
+            else    // all children are in the bottom right of the state machine's origin, so just resize the state machine
+            {
+                QRectF oldBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), stateBoxGraphic->getSize().x(), stateBoxGraphic->getSize().y());
+                newWidth+=minX;
+                newHeight+=minY;
+                QRectF newBox = QRectF(stateBoxGraphic->pos().x(), stateBoxGraphic->pos().y(), newWidth, newHeight);
+                stateBoxGraphic->setSize(QPointF(newWidth,newHeight));
+                stateBoxGraphic->setCornerPositions();
+
+
+                // update the datamodel for the position and size.
+                stateBoxGraphic->graphicHasChanged();
+
+
+                emit stateBoxGraphic->stateBoxResized(oldBox, newBox, 2);
+            }
+        }
+    }
 }
 
 
+
+
+
+
+/**
+ * @brief SCGraphicsView::increaseSizeOfAllAncestors
+ * @param state
+ *
+ * DEPRECATED FUNCTION
+ *
+ * this function needs to be changed to modify the data model -> emit changed -> updated graphics view
+ *
+ */
 void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
 {
     SCState * parentState = dynamic_cast<SCState *>(state->parent());
@@ -228,7 +495,6 @@ void SCGraphicsView::increaseSizeOfAllAncestors (SCState * state)
             increaseSizeOfAllAncestors (parentState);
         }
     }
-
 }
 
 /**
@@ -241,14 +507,11 @@ StateBoxGraphic * SCGraphicsView::lookUpTargetStateGraphic(QString stateId )
     SCState * stateDM = lookUpTargetState(stateId);
     if ( stateDM == NULL ) return NULL;
 
-
     qDebug()<< "The target state graphic was found. "<< stateDM->objectName();
     StateBoxGraphic* ret = _mapStateToGraphic.find(stateDM).value();
     qDebug() << "did we find anything? " << ret->objectName();
 
     return _mapStateToGraphic.find(stateDM).value();
-
-
 }
 
 /**
@@ -260,7 +523,6 @@ StateBoxGraphic * SCGraphicsView::lookUpTargetStateGraphic(QString stateId )
  */
 SCState* SCGraphicsView::lookUpTargetState(QString target )
 {
-
     QList<SCState *> states;
     _dm->getAllStates(states);
 
@@ -346,7 +608,7 @@ void SCGraphicsView::handleTransitionDeleted(QObject* tr)
  * @brief SCGraphicsView::handleNewTransition
  * @param t
  *
- * Creation of a new transition graphic from the user creating a new transition or a transition being loaded in from the scxml file.
+ * Creation of a new transition graphic from a transition being loaded from the scxml file.
  * differs from the handleNewTransitionFormView in that this transition may not necessarily know its target state when it is created, so the connectTransition function to set up the connect()s is called after all states have been loaded
  */
 void SCGraphicsView::handleNewTransition (SCTransition * t)
@@ -372,15 +634,67 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     // add the transitiongraphic to the map of transition graphics
     _mapTransitionToGraphic.insert(t, transGraphic);
     _hashTransitionToGraphic.insert(t, transGraphic);
-    // set the text position of the event attribute
-    PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
-    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
-    transGraphic->setTextPos(textPos->asPointF());
 
+    // this is done later after all states are added
+//    // set the text position of the event attribute
+//    PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
+//    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
+//    transGraphic->setTextPos(textPos->asPointF());
+
+    // wait to do connect calls
 
     qDebug()<<"SCGraphicsView::handleNewTransition inserted a new transition graphic with event name: " << t->attributes.value("event");
+}
+
+/**
+ * @brief SCGraphicsView::saveImage
+ *
+ * saves an auto resized version of the scene to a png image
+ *
+ */
+void SCGraphicsView::saveImage(QString fileName)
+{
+    // use these values to keep track of the scene bounding rect and the view position
+    QRectF viewRect = _view.viewport()->rect();
+    qreal w = viewRect.width();
+    qreal h = viewRect.height();
+
+    // keep track of the decimal, because mapToScene only accepts ints
+    qreal xDecimal = viewRect.x() - (int)viewRect.x();
+    qreal yDecimal = viewRect.x() - (int)viewRect.y();
+
+    // use the top left point as the reference
+    QPointF center = _view.mapToScene(QPoint(viewRect.x(), viewRect.y()));
+
+    // get the scene based center point by adding back the decimal and half of the width and height to x and y
+    center+= QPointF(xDecimal+w/2.0, yDecimal+h/2.0);
+
+    // save the rect of the scene
+    QRectF rect = _scene->sceneRect();
+//    qDebug() << "scene rect before save: " << _scene->sceneRect()<<"\t"<<center;
+
+    // resize the rect to bound all items
+    _scene->setSceneRect(_scene->itemsBoundingRect());
+    QImage image(_scene->sceneRect().size().toSize(), QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
 
 
+
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    _scene->render(&painter);
+
+    // save the image
+    image.save(fileName);
+
+    // resize the scene back to the old rect
+    _scene->setSceneRect(rect);
+
+    // recenter the view back on the center point
+    _view.centerOn(center);
+
+//    qDebug() << "scene rect after save: " << _scene->sceneRect() << "\t"<< _view.mapToScene(_view.viewport()->rect().center());
 }
 
 /**
@@ -405,15 +719,15 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
         return;
     }
 
-    TransitionAttributes::TransitionPositionAttribute * pos =
-            dynamic_cast<TransitionAttributes::TransitionPositionAttribute *> (  t->attributes.value("position"));
+    TransitionPositionAttribute * pos =
+            dynamic_cast<TransitionPositionAttribute *> (  t->attributes.value("position"));
     QPointF position(0,0);
     if ( pos == 0 )
         qDebug()<< "pos returned null in SCGraphicsView::handleNewTransition";
     else
         position = pos->asQPointF();
 
-    TransitionAttributes::TransitionStringAttribute *targetName = dynamic_cast<TransitionAttributes::TransitionStringAttribute *>(t->attributes.value("target"));
+    TransitionStringAttribute *targetName = dynamic_cast<TransitionStringAttribute *>(t->attributes.value("target"));
     StateBoxGraphic * targetGraphic = lookUpTargetStateGraphic( targetName->asString() );
 
     // create a transition graphic
@@ -423,13 +737,14 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
     _mapTransitionToGraphic.insert(t, transGraphic);
     _hashTransitionToGraphic.insert(t, transGraphic);
 
+
     // set the event text box position of this transition
     PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
     transGraphic->setTextPos(textPos->asPointF());
 
-
     connectTransition(t);
 
+    transGraphic->getSourceAnchor()->straightenLines();
 }
 
 
@@ -463,7 +778,9 @@ void SCGraphicsView::handleStateDeleted(QObject *state)
             qDebug() << "deleting children for state "<<" with num children: " << children.count();
             for(int k = 0; k < children.count(); k++)
             {
-                this->handleStateDeleted( (SCState*)(children.at(k)) );
+                SCState* childState = dynamic_cast<SCState*>(children.at(k));
+                if(childState)
+                    this->handleStateDeleted( (SCState*)(children.at(k)) );
             }
 
             delete i.value();
@@ -531,28 +848,167 @@ void SCGraphicsView::handleStateSizeChangedInFormView(SCState *state, QPointF si
  */
 void SCGraphicsView::handleNewTextBlock(SCTransition* trans, QString text)
 {
-    SCTextBlock* textBlock = new SCTextBlock();
+    //SCTextBlock* textBlock = new SCTextBlock();
 }
 
-/*
+void SCGraphicsView::handleBringToFront(SCState* state)
+{
+
+    SCState* top = _dm->getTopState();
+    QList<SCState*> children;
+    top->getAllStates(children);
+    qreal zMax = 0;
+    for(int i = 0; i < children.size(); i++)
+    {
+        StateBoxGraphic* child = _hashStateToGraphic.value(children.at(i));
+        if(zMax < child->zValue())
+        {
+            zMax = child->zValue();
+        }
+    }
+    StateBoxGraphic* sbg = _hashStateToGraphic.value(state);
+    sbg->setZValue(zMax+1);
+}
+
+void SCGraphicsView::handleSendToBack(SCState* state)
+{
+    SCState* top = _dm->getTopState();
+    QList<SCState*> children;
+    top->getAllStates(children);
+    qreal zMin = std::numeric_limits<double>::max();
+    for(int i = 0; i < children.size(); i++)
+    {
+        StateBoxGraphic* child = _hashStateToGraphic.value(children.at(i));
+        if(zMin > child->zValue())
+        {
+            zMin = child->zValue();
+        }
+    }
+    StateBoxGraphic* sbg = _hashStateToGraphic.value(state);
+    sbg->setZValue(zMin-1);
+}
+
+/**
+ * @brief SCGraphicsView::handleNewRootMachine
+ * @param state
+ *
+ *
+ */
+void SCGraphicsView::handleNewRootMachine(SCState* state)
+{
+    this->connectState(state);
+}
+
+/**
+ * @brief SCGraphicsView::handleRootMachineIsParallelChanged
+ *
+ * SLOT
+ * connected specifically to the root machine's parallelState Attribtue
+ * while other states will have this function in stateboxgraphic, since the root machine has no statebox graphic, update its children graphics will be handled here.
+ *
+ * is parallel state is the only attribute for the root machine that can affect something in the graphics view.
+ */
+void SCGraphicsView::handleRootMachineIsParallelChanged(StateString *)
+{
+    qDebug() << "SCGraphicsView::handleRootMachineIsParallelChanged";
+    QList<SCState*> states;
+    _dm->getTopState()->getStates(states);
+
+    for(int i = 0 ; i < states.size();i ++)
+    {
+        StateBoxGraphic* sbg = _hashStateToGraphic.value(states.at(i));
+        sbg->forceUpdate();
+    }
+}
+
+/**
+ * @brief SCGraphicsView::connectState
+ *  this is called for the root machine.
+ *  the only attribute change for root machines that causes a graphicsview change is toggling parallel state true/false
+ */
 void SCGraphicsView::connectState(SCState* state)
 {
-    // connect formview and graphics view to update the graphics view if the box is changed by property value
-    connect(state, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
-    //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
-    //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
-
-    //connect(state, SIGNAL(attributeChangedSignal(IAttribute*), ))
+    StateString* ips = state->getStringAttr("parallelState");
+    connect(ips, SIGNAL(changed(StateString*)), this, SLOT(handleRootMachineIsParallelChanged(StateString*)));
 }
-*/
+
+/**
+ * @brief SCGraphicsView::connectState
+ * @param state
+ * @param stateGraphic
+ *
+ * sets the connections for the SCState and its graphic whenever a new state is created
+ *
+ */
 void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 {
-    qDebug() << "SCGraphicsView::connectState";
+//    qDebug() << "SCGraphicsView::connectState";
     connect(state, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)));
     connect(stateGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleStateGraphicDeleted(QObject*)));
 
-    SizeAttribute* size = dynamic_cast<SizeAttribute*>(state->attributes.value("size"));
+    connect(state, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*, SCState*)));
+    connect(state, SIGNAL(bringToFront(SCState*)), this, SLOT(handleBringToFront(SCState*)));
+    connect(state, SIGNAL(sendToBack(SCState*)), this, SLOT(handleSendToBack(SCState*)));
+
+    // when the graphic is clicked also emit clicked for the state
+    connect(stateGraphic, SIGNAL(clicked(SCState*)), state, SIGNAL(clicked(SCState*)));
+
+    // when the graphic is minimized, also emit minimized/unminimized for the state
+    connect(stateGraphic, SIGNAL(minimized(SCState*)), state, SIGNAL(minimized(SCState*)));
+    connect(stateGraphic, SIGNAL(expanded(SCState*)), state, SIGNAL(expanded(SCState*)));
+
+
+    // set up data model changes to update the state box graphic
+    StateName* name = state->getStateNameAttr();
+    connect(name, SIGNAL(changed(StateName*)), stateGraphic, SLOT(handleAttributeChanged(StateName*)));
+
+    SizeAttribute* size = state->getSizeAttr();
     connect(size, SIGNAL(changed(SizeAttribute*)), stateGraphic, SLOT(handleAttributeChanged(SizeAttribute*)));
+
+    PositionAttribute* pos = state->getPosAttr();
+    connect(pos, SIGNAL(changed(PositionAttribute*)), stateGraphic, SLOT(handleAttributeChanged(PositionAttribute*)));
+
+    StateString* ips = state->getStringAttr("parallelState");
+    connect(ips, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleIsParallelStateChanged(StateString*)));
+
+    StateString* initialState = state->getStringAttr("initialState");
+    connect(initialState, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleInitialStateChanged(StateString*)));
+
+    StateString* finalState = state->getStringAttr("finalState");
+    connect(finalState, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleFinalStateChanged(StateString*)));
+
+    StateString* ena = state->getStringAttr("entryAction");
+    connect(ena ,SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleEntryActionChanged(StateString*)));
+
+    StateString* exa = state->getStringAttr("exitAction");
+    connect(exa , SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleExitActionChanged(StateString*)));
+
+    //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
+    //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
+
+
+
+    // set up state box graphic changes to update the data model
+    // handle when a state is double clicked
+    connect(stateGraphic, SIGNAL(resizeState(StateBoxGraphic*)), this, SLOT(handleAutoResize(StateBoxGraphic*)));
+
+    // handle a state name change from the graphics view
+    connect(stateGraphic, SIGNAL(nameChanged(QString)), state, SLOT(setStateName(QString)));
+
+    // handle a state entry action change
+    connect(stateGraphic, SIGNAL(entryActionChanged(QString)), state, SLOT(handleEntryActionChanged(QString)));
+
+    // handle state exit action change to update the data model
+    connect(stateGraphic, SIGNAL(exitActionChanged(QString)), state, SLOT(handleExitActionChanged(QString)));
+
+
+
+    // font connects
+    connect(state->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontFamilyAttribute*)));
+
+    connect(state->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontSizeAttribute*)));
+
+    connect(state->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontBoldAttribute*)));
 }
 
 
@@ -561,7 +1017,8 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
  * @param trans
  *
  * calls all graphics related connects for transition graphics, their elbows, and the transition deconstructors
- *
+ * calls all data model/attribute connects for sctransition to transitiongraphics
+ * calls all data model/attribute connects for sctextblock of the transition to the selectable text block of the transition
  * additionally, repositions the anchors to their target states
  *
  */
@@ -578,25 +1035,28 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     // set the connects for the transition graphic
     connect(trans, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
     connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
+
     // create the connection to automatically move anchor elbows when state graphics are moved.
     connect(parentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
     connect(targetGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleTargetStateGraphicMoved(QPointF)));
 
+
+
+    // additionally snap the anchors when done moving the source and sink
+    connect(parentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
+    connect(targetGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleTargetStateGraphicReleased()));
+
+    // snap the anchors when done RESIZING
+    connect(parentGraphic, SIGNAL(cornerReleased()), transGraphic, SLOT(handleParentStateGraphicResizedReleased()));
+    connect(targetGraphic, SIGNAL(cornerReleased()), transGraphic, SLOT(handleTargetStateGraphicResizedReleased()));
 
     connect(transGraphic->getSourceAnchor(),SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
     connect(transGraphic->getSinkAnchor(),SIGNAL(anchorMoved(QPointF)),targetGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
     //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
 
     // do this to set closest wall from default
-
-
-        emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
-        emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
-
-
-
-
-
+    emit transGraphic->getSourceAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSourceAnchor()->pos()));
+    emit transGraphic->getSinkAnchor()->anchorMoved(parentGraphic->mapToScene(transGraphic->getSinkAnchor()->pos()));
 
     // create the connect to automatically move anchor elbows when state graphics are moved.
     connect(parentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleParentStateGraphicResized(QRectF, QRectF, int)));
@@ -604,9 +1064,26 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
 
     // connect this state box's grand parents update anchors when they are resized
     StateBoxGraphic* grandParentGraphic = parentGraphic->parentItemAsStateBoxGraphic();
+    bool isSibling = false;
     while(grandParentGraphic)
     {
         connect(grandParentGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentStateGraphicResized(QRectF, QRectF, int)));
+        connect(grandParentGraphic, SIGNAL(stateBoxReleased()), transGraphic, SLOT(handleParentStateGraphicReleased()));
+
+
+        // this is a special case of connect for the transition
+        // we connect a sink anchor to stay in place, unless the target graphic is a sibling of the source graphic
+        // if the two are siblings, the anchor is already updated because the source and target are moving together
+        if(grandParentGraphic->childItems().contains(transGraphic->getTargetStateGraphic()) && !isSibling)
+        {
+            isSibling = true;
+        }
+
+        if(!isSibling)
+        {
+            connect(grandParentGraphic, SIGNAL(stateBoxMoved(QPointF)), transGraphic, SLOT(handleParentStateGraphicMoved(QPointF)));
+        }
+
         grandParentGraphic = grandParentGraphic->parentItemAsStateBoxGraphic();
     }
 
@@ -614,10 +1091,115 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     StateBoxGraphic* grandParentTargetGraphic = targetGraphic->parentItemAsStateBoxGraphic();
     while(grandParentTargetGraphic)
     {
-
         connect(grandParentTargetGraphic, SIGNAL(stateBoxResized(QRectF, QRectF, int)),transGraphic, SLOT(handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int)));
         grandParentTargetGraphic = grandParentTargetGraphic->parentItemAsStateBoxGraphic();
     }
+
+    // connect the event name data model to the text block
+    TransitionStringAttribute* eventName = trans->getTransStringAttr("event");
+    connect(eventName, SIGNAL(changed(TransitionStringAttribute*)), transGraphic, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
+
+    // when the transition graphic emits clicked, also emit it for the sctransition
+    connect(transGraphic, SIGNAL(clicked(SCTransition*)), trans, SIGNAL(clicked(SCTransition*)));
+
+    // connect the text block graphic of this transition to the data model
+    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontFamilyAttribute*)));
+    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontSizeAttribute*)));
+
+    connect(trans->getEventTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontBoldAttribute*)));
+
+
+}
+
+
+//#define REMAKE_TRANSITIONS
+
+/**
+ * @brief SCGraphicsView::handleChangedParent
+ * @param state
+ * @param newParent
+ *
+ * when the data model is about to change the parent of a state, first make sure that all the anchors are updated properly in the graphics view
+ *
+ */
+void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
+{
+
+#ifdef REMAKE_TRANSITIONS
+    StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
+    StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
+
+    stateGraphic->setParentItem(newParentGraphic);
+
+
+
+#endif
+
+#ifndef REMAKE_TRANSITIONS
+
+    // adjusts the path string to match the new parent scheme
+    StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
+    StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
+
+    // first, keep track of all scene based positions of sink anchors, the only transition elbows to stay in place
+    QList<QPointF*> tPoints;
+    QList<SCTransition*> transitions;
+    state->getAllTransitions(transitions);
+    // these are the sink anchors that belong to out transitions of the state
+    for(int i = 0; i < transitions.size(); i++)
+    {
+        SCTransition* trans = transitions.at(i);
+        TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
+        StateBoxGraphic* oldSourceState = _hashStateToGraphic.value(trans->parentSCState());
+        tPoints.append(new QPointF(oldSourceState->mapToScene(transG->getSinkAnchor()->pos())));
+    }
+
+    QList<QPointF*> tPointsIn;
+    QList<SCTransition*> transitionsIn;
+    // these are the sink anchors that point to this state
+    transitionsIn = state->getTransitionsIn();
+    for(int i = 0; i < transitionsIn.size(); i++)
+    {
+        SCTransition* trans = transitionsIn.at(i);
+        TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
+        StateBoxGraphic* oldSourceState = _hashStateToGraphic.value(trans->parentSCState());
+        tPointsIn.append(new QPointF(oldSourceState->mapToScene(transG->getSinkAnchor()->pos())));
+    }
+
+
+
+
+
+    // change the parent of the state box graphic
+//    QPointF oldPos = newParentGraphic->mapFromScene(stateGraphic->mapToHighestParent())
+    stateGraphic->setParentItem(newParentGraphic);
+
+
+
+    // The box will move on the screen because it is changing coordinate systems. so we also must update the anchor positions to snap to their targets once more
+    // update all the state's anchors positions to snap to their targets
+    for(int i = 0; i < transitions.size(); i++)
+    {
+        SCTransition* trans = transitions.at(i);
+        TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
+        emit transG->getSinkAnchor()->anchorMoved(*tPoints.at(i));
+    }
+
+    // update all the transitions in's sink anchors
+    for(int i = 0; i < transitionsIn.size(); i++)
+    {
+        SCTransition* trans = transitionsIn.at(i);
+        TransitionGraphic* transG = _hashTransitionToGraphic.value(trans);
+        emit transG->getSinkAnchor()->anchorMoved(*tPointsIn.at(i));
+
+    }
+
+
+
+
+    qDeleteAll(tPoints.begin(), tPoints.end());
+    qDeleteAll(tPointsIn.begin(), tPointsIn.end());
+#endif
 }
 
 /**
@@ -635,6 +1217,7 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
  */
 void SCGraphicsView::handleNewState (SCState *newState)
 {
+    qDebug () << "SCGraphicsView::handleNewState";
     static int zVal = 0;
     // SCState connects
 
@@ -664,6 +1247,12 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     // create the stateboxgraphic
     stateGraphic = new StateBoxGraphic(parentGraphic, newState);
+
+    //
+    // if a parent state is a parallel state, then its children run in parallel.
+    // this is show by the children being drawn with dotted lines. So inform
+    // the children to watch the parent's isParallelAttribute
+    //
 
     // new states will be on top
     stateGraphic->setZValue(zVal++);
@@ -698,6 +1287,12 @@ void SCGraphicsView::handleNewState (SCState *newState)
 
     // make the parent bigger to hold this state
     // and since its bigger, make its parent bigger.....
-    increaseSizeOfAllAncestors (newState);
+   // increaseSizeOfAllAncestors (newState);
+
+
+    // load the text blocks
+
+    // reposition the text items after loading their text
+    stateGraphic->updateElements();
 
 }

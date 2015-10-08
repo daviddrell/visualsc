@@ -31,8 +31,8 @@
 
 
 
-class SelectableLineSegmentGraphic;
 
+class SelectableLineSegmentGraphic;
 class StateAttributes;
 
 class SMProject : public QObject
@@ -49,9 +49,11 @@ public:
 
     void readInputFile(QString file);
     void save(QString file);
-    void exportToCode(QString file);
+    bool exportToCode(QString file);
     QGraphicsView * getQGraphicsView();
     SCDataModel  * getDM();
+
+    SCGraphicsView* getSCGraphicsView();
 
 signals:
     void error(QString err);

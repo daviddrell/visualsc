@@ -12,10 +12,10 @@
 #include "linesegmentgraphic.h"
 #include "selectabletextblock.h"
 #include <QObject>
-#include "textbox.h"
 
-#define TRANSITION_DEFAULT_COLOR Qt::blue
-#define TRANSITION_HOVER_COLOR Qt::red
+
+//#define TRANSITION_DEFAULT_COLOR Qt::blue
+//#define TRANSITION_HOVER_COLOR Qt::red
 #define TRANSITION_DEFAULT_LINE_STYLE Qt::SolidLine
 #define TRANSITION_HOVER_LINE_STYLE Qt::DashLine
 #define TRANSITION_DEFAULT_WIDTH 2
@@ -29,10 +29,12 @@ class TransitionGraphic : public QGraphicsObject
 {
     Q_OBJECT
 
+
 public:
     explicit TransitionGraphic( StateBoxGraphic *parentState, StateBoxGraphic *targetState, SCTransition *t, KeyController * keys, MouseController* mouse);
     void printInfo();
     StateBoxGraphic* parentItemAsStateBoxGraphic();
+    StateBoxGraphic* getTargetStateGraphic();
     ~TransitionGraphic();
 
     void setTargetStateGraphic(StateBoxGraphic* sbg);
@@ -52,22 +54,34 @@ public:
     ElbowGrabber* getSourceAnchor();
     ElbowGrabber* getSinkAnchor();
 
+    SCTransition* getTransitionModel();
+
+    SelectableTextBlock* getEventTextGraphic();
 
 
 signals:
   // void startEndMoved(QPointF newPos);
   // void anchorMoved(QPointF newPos);
+    void clicked(SCTransition*);
 
 public slots:
     void updateModel ();
     void handleParentStateGraphicMoved(QPointF);
     void handleTargetStateGraphicMoved(QPointF);
 
+    void handleParentStateGraphicReleased();
+    void handleTargetStateGraphicReleased();
+
+    void handleParentStateGraphicResizedReleased();
+    void handleTargetStateGraphicResizedReleased();
+
     void handleParentStateGraphicResized(QRectF,QRectF, int);
     void handleGrandParentStateGraphicResized(QRectF, QRectF, int);
     //void handleParentStateGraphicResized(qreal, qreal, qreal, qreal);
     void handleTargetStateGraphicResized(QRectF, QRectF, int);
     void handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int);
+
+    void handleAttributeChanged(TransitionStringAttribute* tsa);
 
 
 
@@ -80,7 +94,12 @@ protected:
 
 private :
 
+    bool horizontallyAligned(ElbowGrabber* one, ElbowGrabber* two);
+    bool verticallyAligned(ElbowGrabber* one, ElbowGrabber* two);
+//    void bindLine(ElbowGrabber* one, ElbowGrabber* two);
+
         // private methods
+
     void bindNeighborElbows(ElbowGrabber* elbow);
     void updateElbow(QPointF newPos, ElbowGrabber* elbow);
     void updateLineSegments(ElbowGrabber* elbow);
@@ -88,7 +107,7 @@ private :
     void createCustomPath(QPointF mouseLocation, ElbowGrabber*);
 
     // private data
-    SCTransition  * _transitionDM;  // data model for the transition object
+    SCTransition  * _transitionModel;  // data model for the transition object
     //QList<SelectableLineSegmentGraphic *>  _lineSegments;
     QList<LineSegmentGraphic *> _lineSegments;
     QList<ElbowGrabber *> _elbows;

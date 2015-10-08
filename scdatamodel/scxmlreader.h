@@ -29,8 +29,11 @@
 #include "stateattributes.h"
 #include "transitionattributes.h"
 #include "textblock.h"
-#include "sctransition.h"
+#include "sctransition.h"//
+//#include "scdatamodel.h"
 
+
+class SCDataModel;
 class StateData;
 
 #include "scdatamodel_global.h"
@@ -46,28 +49,33 @@ class  SCDATAMODELSHARED_EXPORT  SCXMLReader : public QObject
     };
 
 public:
-    SCXMLReader( );
+    SCXMLReader();
+    SCXMLReader(SCDataModel* dm);
     void readFile(QString infile);
     virtual void run();
-
+    SCState* importFile(SCState* parent);
+    void setDataModel(SCDataModel* dm);
     void getReadResult(bool &success, QStringList& message);
 
 signals:
-     void done(bool result, QStringList message);
-     void makeANewState(StateAttributes*);
-     void enterStateElement();
-     void leaveStateElement();
+    void done(bool result, QStringList message);
+    void makeANewState(StateAttributes*);
+    void makeANewChildState(SCState* parent, StateAttributes*);
+    void enterStateElement();
+    void leaveStateElement();
 
-     void changeStateMachineName(QString);
-     void enterTransistionElement();
-     void leaveTransistionElement();
-     void makeANewTransistion(TransitionAttributes*);
+    void changeStateMachineAttribute(QString, QString);
+    void changeStateMachineName(QString);
+    void changeStateMachineUid(QString);
+    void enterTransistionElement();
+    void leaveTransistionElement();
+    void makeANewTransistion(TransitionAttributes*);
 
-     void enterTransitionPathElement();
-     void leaveTransitionPathElement();
-     void makeANewTransistionPath(QString path);
-     void makeANewIDTextBlockElement( TextBlockAttributes*);
-     void makeANewTransitionTextBlockElement(TextBlockAttributes*);
+    void enterTransitionPathElement();
+    void leaveTransitionPathElement();
+    void makeANewTransistionPath(QString path);
+    void makeANewIDTextBlockElement( TextBlockAttributes*);
+    void makeANewTransitionTextBlockElement(TextBlockAttributes*);
 
 
 
@@ -79,11 +87,21 @@ private:
     QString _file;
     QStringList _resultMessages;
     int _currentItemType;
+    //SCItem* _currentItem;
+    SCState* _currentState;
+    SCState* _importedMachine;
+    SCTransition* _currentTransition;
 
+    void importIDTextBlockElement(SCState* parent);
+    void importEventTextBlockElement(SCTransition* parent);
     void readIDTextBlockElement();
     void readEventTextBlockElement();
     void readElement();
+    void importElement(SCState* parent);
     void readState(STATE_TYPE t= kSTATE_TYPE_Normal);
+    SCTransition* importTransition(SCState* source);
+    SCState* importState(SCState* parent);
+    SCState* importStateMachine(SCState* parent);
     void readTransistion();
     void readTransistionPath();
     void readFinal();
@@ -91,6 +109,7 @@ private:
     void readOnExit();
     void readStateMachine();
 
+    SCDataModel* _dm;
 
     //private data
     bool _error;

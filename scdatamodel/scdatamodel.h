@@ -29,6 +29,8 @@
 #include <QXmlStreamWriter>
 #include <QTextStream>
 #include <codewriter.h>
+#include <QSettings>
+#include "scforkedtransition.h"
 
 class QGraphicsScene;
 
@@ -74,12 +76,18 @@ class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 public:
 
 
-
+    QSettings* _settings;
+    QString _lastSavePath;
+    QString _lastImportPath;
+    QString _lastExportPath;
     void connectDataModel();
     void reset();
     static SCDataModel * singleton();
 
+    QString getCFileName();
+
     // direct interface
+    void importFile(SCState* parent,QString scxmlFileName);
     void openFile(QString scxmlFileName);
     void open(QString scxmlFile);
 
@@ -115,6 +123,8 @@ public:
       */
     //SCTransition* insertNewTransition(SCState *source, QString event );
     SCTransition* insertNewTransition(SCState *source, SCState* target);
+    SCTransition* insertNewTransition(SCState *source, SCState *target, QString eventName, QString pathString);
+    SCForkedTransition* insertNewTransition(QList<SCState*> states, SCState* target);
 
     void logError(QString message);///< inform the user there was an error
     void logInfo(QString message);///< inform the user of anything that is not an error such as progress, etc
@@ -124,20 +134,47 @@ public:
 
     bool insertNewTextBlock(SCItem* item, QString name);
 
+    QList<SCState*> getStateMachines();
+
+    bool checkDataModel();
+
+public slots:
+    SCState* handleMakeANewState(SCState*, StateAttributes*);
+    SCTransition* handleMakeANewTransition(SCState* source, TransitionAttributes*);
+    void handleReset();
+    void handleOpen(QString);
+
+
+    void handleStateFontChanged(QFont*);
+    void handleTransitionFontChanged(QFont*);
 
 signals:
+    void importedMachine(SCState*);
     void openCompleted(bool sucess, QStringList message);
     void newStateSignal(SCState * newState);
     void newTransitionSignal(SCTransition * newTransition);
     void newTextBlockSignal(SCTransition*, QString);
     void transitionsReadyToConnect(SCTransition*);
-    void formViewInsertNewTransitionSignal(SCTransition*);
+    void insertNewTransitionSignal(SCTransition*);
+    void newRootMachine(SCState*);
+    void insertNewTransitionSignal(SCForkedTransition*);
+    void message(QString);
+    void itemClicked();
+
+    void setProgramFont(QFont*);
+
+    void setProgramFontFamily(FontFamilyAttribute*);
+    void setProgramFontSize(FontSizeAttribute*);
+    void setProgramFontBold(FontBoldAttribute*);
+//    void setFont(QString);
+//    void setFontSize(int);
 
 
 private slots:
 
     void handleMakeANewState(StateAttributes*);
     void handleMakeANewTransition(TransitionAttributes*);
+    void handleTransitionBeingDeleted(QObject*);
     void handleLeaveTransitionElement();
     void handleMakeANewTransitionPath(QString path);
     void handleTransitUp();
@@ -145,24 +182,30 @@ private slots:
     void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
     void handleMakeANewEventTextBlock(TextBlockAttributes* attributes);
     void handleMakeANewTransitionProperty(const QString name);
-    void handleStateNameChangedInFormView(SCState*, QString);
-    void handleStatePositionChangedInFormView(SCState*, QPointF);
-    void handleStateSizeChangedInFormView(SCState*, QPointF);
-
-    void handleEventNameChangedInFormView(SCTransition*, QString);
-    void handleEventPositionChangedInFormView(SCTransition*, QString);
-    void handleEventSizeChangedInFormView(SCTransition*, QString);
 
     void handleStateMachineNameLoad(QString);
+    void handleStateMachineUidLoad(QString);
+    void handleStateMachineAttributeLoad(QString key, QString value);
 
+    void handleCheckEventCollision(TransitionStringAttribute*);
+
+    void handleItemClicked(SCState*);
+    void handleItemClicked(SCTransition*);
+
+    void handleChangeProgramFont(FontFamilyAttribute*);
+    void handleChangeProgramFont(FontSizeAttribute*);
+    void handleChangeProgramFont(FontBoldAttribute*);
 
 private:
 
 
+    void connectTransition(SCTransition*);
+    void connectState(SCState*);
+
     QString toClassName(QString);
     QString toClassFileName(QString);
-    void connectState(SCState*);
-    void connectTransition(SCTransition*);
+
+
 
     SCXMLReader     _reader;
     QXmlStreamWriter *_writer;
@@ -174,12 +217,15 @@ private:
     QGraphicsScene * _scene;
     //QList<SCState*> _states;
     QList<SCTransition*> _transitions;
+    QList<SCTransition*> _importedTransitions;
+
+    SCItem* _lastClickedItem;
 
 
 
 //private methods
     SCDataModel(QObject * parent=NULL);
-    void connectTransitionsToStatePath();
+    void connectTransitionsToStatePath(QList<SCTransition*> tlist);
     void makeTransitionConnections(SCState * targetState, SCTransition* trans);
     //void deleteInTransitions(SCState* state);
 };

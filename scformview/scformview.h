@@ -34,6 +34,10 @@
 #include <QTableWidgetItem>
 #include "scitem.h"
 #include "fvitem.h"
+#include "customtablewidgetitem.h"
+#include "scforkedtransition.h"
+#include "sctransitionbranch.h"
+
 
 class StateSelectionWindow;
 
@@ -58,6 +62,7 @@ class QTableWidget;
 class QLabel;
 class SCTextBlock;
 class SCItem;
+class SMProject;
 
 QT_END_NAMESPACE
 
@@ -81,11 +86,36 @@ class SCFORMVIEWSHARED_EXPORT SCFormView : public QMainWindow
     Q_OBJECT
 public:
     explicit SCFormView(QWidget *parent = 0, SCDataModel * dm=0);
-    void reset();
     void highlightRootItem();
     void highlightPreviousItem();
+    void highlightItem(SCItem*);
+    void clearSelectedItems();
+    void setProject(SMProject*);
+
+    SCState* getCurrentlySelectedState();
+    SCTransition* getCurrentlySelectedTransition();
+
+public slots:
+    void handleItemClicked(SCTransitionBranch*);
+    void handleItemClicked(SCState*);
+    void handleItemMinimize(SCState*);
+    void handleItemExpand(SCState*);
+    void handleItemClicked(SCTransition*);
+signals:
+    void openClick();
+    void exportClick();
+    void importClick();
+    void saveImageClick();
+    void saveClick();
+    void saveAsClick();
+    void newClick();
+//    void treeItemSelected(int);
 
 private slots:
+
+    void import();
+    void aboutAttributes();
+    void handleNewRootMachine(SCState*);
     void handleMakeTransitionConnections(SCTransition* trans);
     void backgroundButtonGroupClicked(QAbstractButton *button);
     void buttonGroupClicked(int id);
@@ -93,6 +123,7 @@ private slots:
     void pointerGroupClicked(int id);
     void bringToFront();
     void sendToBack();
+
     void insertTransition();
     void insertState();
     void textInserted(QGraphicsTextItem *item);
@@ -108,19 +139,33 @@ private slots:
     void handleFontChange();
     void handleBoldChanged();
 
+    void reselectParent();
+    void reselectTarget();
+    void handleReselectParent(SCState*);
+    void handleReselectTransitionParent(SCState*);
+    void handleReselectTransitionTarget(SCState*);
+    void handleChangedParent(SCState* ,SCState*);
+    void handleChangedTransitionTarget(SCTransition*, SCState*);
+
     void about();
+    void viewKeybinds();
 
     void handleTreeViewItemClicked(QTreeWidgetItem*,int);
+    void handleTreeViewItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
+    void handleNewTransition(SCForkedTransition*);
     void handleNewTransition(SCTransition*);
+    void handleTransitionBranchDeleted(QObject*);
     void handleTransitionDeleted(QObject *);
     void handleStateDeleted(QObject*);
     void handleNewState(SCState*);
-    void handleTextBlockDeleted(QObject*);
+//    void handleTextBlockDeleted(QObject*);
     void handlePropertyChanged(IAttribute * attr);
     void handlePropertyCellChanged(int, int);
-    void handleStateSelectionWindowStateSelected(SCState *st, QString name);
+    void handleTextBlockPropertyCellChanged(int,int);
+    void handleStateSelectionWindowStateSelected(SCState *st);
 
-    void setSelectedTreeItem(QObject *);
+
+   // void setSelectedTreeItem(QObject *);
 
     void sendMessage(QString title, QString message);
     const QString promptTextInput(QString windowTitle, QString message, QString defaultText, bool* ok);
@@ -139,10 +184,18 @@ private slots:
     void handleItemSizeChangedInDataModel(SCTextBlock*, QPointF);
 
 
-     void handleItemNameChangedInDataModel(SCTransition*, QString);
+    void handleItemNameChangedInDataModel(SCTransition*, QString);
+
+private slots:
+    void updateEditToolBar();
 
 private:
 
+    bool uniformSelection(int);
+    void changeEditToolBar(int);
+
+
+    void updateCurrentlySelected();
     void deleteTreeItem(SCItem*);
 
     int propertyTableIndexOf(QString propertyName);
@@ -157,18 +210,29 @@ private:
     void initTree();
 
     void connectState(SCState*);
-    void connectState(SCState *, QTableWidgetItem*);
+    void connectState(SCState*, CustomTableWidgetItem*, QString);
+    void connectState(SCState*, CustomTreeWidgetItem*);
+
+    void connectTextBlock(SCTextBlock*, CustomTableWidgetItem*, QString);
+
+
+    void connectTransition(SCTransitionBranch*);
+    void connectTransition(SCTransitionBranch* br, CustomTableWidgetItem*, QString);
+    void connectTransition(SCTransitionBranch* br, CustomTreeWidgetItem* treeItem);
+
     void connectTransition(SCTransition*);
+    void connectTransition(SCTransition *, CustomTableWidgetItem*, QString);
+    void connectTransition(SCTransition*,CustomTreeWidgetItem*);
 
 
-    IAttributeContainer * getCurrentlySelectedAttributes();
-    IAttributeContainer * getPreviouslySelectedAttributes();
+    //IAttributeContainer * getCurrentlySelectedAttributes();
+    //IAttributeContainer * getPreviouslySelectedAttributes();
 
-    IAttributeContainer * getCurrentlySelectedTextBlockAttributes();
-    IAttributeContainer * getPreviouslySelectedTextBlockAttributes();
+    //IAttributeContainer * getCurrentlySelectedTextBlockAttributes();
+    //IAttributeContainer * getPreviouslySelectedTextBlockAttributes();
 
-    QString               getCurrentlySelectedTitle();
-    QString               getCurrentlySelectedType();
+    //QString               getCurrentlySelectedTitle();
+    //QString               _currentlySelected->getType();
     QObject*              getNeighborState(QObject*s);
 
     void createToolBox();
@@ -186,12 +250,18 @@ private:
 
     void deleteItem(QObject * item);
     void setAttributeConnections(IAttributeContainer * atts, bool shouldConnect);
+
+    void loadPropertyTable(FVItem*);
+    void loadPropertyTable(SCState*);
+    void loadPropertyTable(SCTransition*);
+    void loadPropertyTable(SCTransitionBranch *);
+
     void setTextBlockAttributeConnections(IAttributeContainer* atts, bool connect);
     void clearPropertyTable();
     void clearTextBlockPropertyTable();
     void reloadPropertyTable();
 
-    void itemInsertProperty(SCItem* item, const QString name);
+    void itemInsertProperty(FVItem* item, const QString name);
     void itemInsertTextBlock(SCItem* item, const QString name);
 
     void clearAndLoadPropertyTable(SCItem*,SCItem*);
@@ -211,6 +281,15 @@ private:
     QGraphicsView *view;
 
     QAction *exitAction;
+    QAction *importAction;
+    QAction *newAction;
+    QAction *openAction;
+    QAction *saveImageAction;
+    QAction *saveAction;
+    QAction *saveAsAction;
+    QAction *exportAction;
+
+
     QAction *addAction;
     QAction *deleteAction;
 
@@ -219,7 +298,11 @@ private:
     QAction *insertTransitionAction;
     QAction *insertStateAction;
     QAction *aboutAction;
+    QAction *viewKeybindsAction;
+    QAction *reselectParentAction;
+    QAction *reselectTargetAction;
 
+    QAction *attributeInfoAction;
 
     QMenu *fileMenu;
     QMenu *itemMenu;
@@ -276,7 +359,7 @@ private:
     QHash<SCItem*, FVItem*> _items;
     //QList<FVItem*> _items;
 
-
+    SMProject* _project;
 
 };
 

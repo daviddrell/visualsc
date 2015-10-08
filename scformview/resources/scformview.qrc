@@ -18,5 +18,35 @@
         <file>textbox.png</file>
         <file>leftarrow.png</file>
         <file>roundminus.png</file>
+        <file>family.png</file>
+        <file>rightarrow.png</file>
+        <file>cancel.png</file>
+        <file>cardboardbox.png</file>
+        <file>rightarrowhollow.png</file>
+        <file>deletesign.png</file>
+        <file>cancelw10.png</file>
+        <file>minusw10.png</file>
+        <file>plusw10.png</file>
+        <file>framein.png</file>
+        <file>frameout.png</file>
+        <file>cardboardboxnew.png</file>
+        <file>rightarrowhollownew.png</file>
+        <file>diagonalarrowhollow.png</file>
+        <file>reselect.png</file>
+        <file>reselectgrey.png</file>
+        <file>info.png</file>
+        <file>infow8.png</file>
+        <file>export.png</file>
+        <file>import.png</file>
+        <file>newfile.png</file>
+        <file>openfolder.png</file>
+        <file>save.png</file>
+        <file>zoomin.png</file>
+        <file>zoomout.png</file>
+        <file>picture.png</file>
+        <file>center.png</file>
+        <file>fork.png</file>
+        <file>Bold-50.png</file>
+        <file>Bold-32.png</file>
     </qresource>
 </RCC>

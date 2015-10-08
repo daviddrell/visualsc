@@ -1,6 +1,7 @@
 #include "texteditbox.h"
 #include <QDebug>
 #include <QImage>
+#include <QApplication>
 
 TextEditBox::TextEditBox(SCTextBlock * textBlock) :
         QGraphicsObject(NULL),
@@ -45,6 +46,16 @@ TextEditBox::~TextEditBox()
 {
     delete _SaveButton;
     delete _textItem;
+}
+
+void TextEditBox::hoverEnterEvent(QGraphicsSceneHoverEvent *)
+{
+    QApplication::setOverrideCursor(Qt::IBeamCursor);
+}
+
+void TextEditBox::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
+{
+    QApplication::restoreOverrideCursor();
 }
 
 void TextEditBox::handleCancelButtonClicked()

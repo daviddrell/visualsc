@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "stateattributes.h"
+#include <QDebug>
 
 StateAttributes::StateAttributes() :
         IAttributeContainer()
@@ -120,14 +121,6 @@ void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 }
 
 
-QString StateAttributes::asString()
-{
-    return QString();
-}
-
-void StateAttributes::setValue(const QString)
-{
-}
 
   //  NAME
 
@@ -159,12 +152,13 @@ QString StateName::asString()
     return _name;
 }
 
-void    StateName::setValue(const QString name)
+void StateName::setValue(const QString name)
 {
     if ( name != _name )
     {
         _name = name;
-        emit changed(this );
+        qDebug() << "emit changed!";
+        emit changed(this);
     }
 }
 
@@ -188,7 +182,11 @@ StateString::~StateString()
 
 StateString& StateString::operator=( StateString& sa )
 {
-    _value = sa._value;
+    if ( sa._value != _value )
+    {
+        _value = sa._value;
+        emit changed(this);
+    }
     return *this;
 }
 
@@ -199,10 +197,8 @@ QString StateString::asString()
 }
 
 
-void    StateString::setValue(const QString value)
+void StateString::setValue(const QString value)
 {
-    _value= value;
-
     if ( value != _value )
     {
         _value = value;

@@ -1,12 +1,17 @@
 #ifndef SELECTABLETEXTBLOCK_H
 #define SELECTABLETEXTBLOCK_H
 
-#include "maskedtextedit.h"
 #include "selectableboxgraphic.h"
+#include "maskedtextedit.h"
 #include "textblock.h"
 #include "iattribute.h"
+
+
+
+
 class QKeyEvent;
 class QGraphicsSceneMouseEvent;
+
 
 /**
   * \class SelectableTextBlock
@@ -41,35 +46,76 @@ public:
 
 
     virtual void setSize(QPoint size); ///< from base class
+    virtual void graphicHasChanged(); ///< pure virtual in base SelectableBoxGraphic, subclass must implement this, used to record user changes back to the data model
+    SelectableBoxGraphic* parentAsSelectableBoxGraphic();
+
+    void setText(QString);
+
+    void setTextWidth(qreal w);
+    void setTextHeight(qreal h);
+
+    qreal getUsableX();
+    qreal getUsableY();
+    qreal getUsableWidth();
+    qreal getUsableHeight();
+
+    qreal getTotalTextItemBufferX();
+    qreal getTotalTextItemBufferY();
+    virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
+    void recenterText();
+
+    void mousePressEvent(QGraphicsSceneMouseEvent* event);
+
+signals:
+    void textBlockMoved(QPointF);
 
 
 protected:
 
     void keyPressEvent ( QKeyEvent * event ); // [virtual protected]
     void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
+//    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+//    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+
+
 
 
 private slots:
 
+    void handleTextItemEdited();
     void handleTextChanged();
     void handleAttributeChanged(IAttribute *attr);
+    void handleAttributeChanged(SizeAttribute *attr);
+    void handleAttributeChanged(PositionAttribute* attr);
     void handleAttributeAdded(IAttribute *attr);
     void handleAttributeDeleted(IAttribute *attr);
     void handleEditBoxSavedText(QString text);
+    void handleParentStateGraphicResized(QRectF, QRectF, int);
+    void handleFontChanged(FontFamilyAttribute*);
+    void handleFontChanged(FontSizeAttribute*);
+    void handleFontChanged(FontBoldAttribute*);
 
 private:
 
     // private methods
-
+    int clamp(int,int,int);
+    qreal clampMin(qreal,qreal);
    void connectAttributes(IAttributeContainer *attributes);
-   virtual void graphicHasChanged(); ///< pure virtual in base SelectableBoxGraphic, subclass must implement this, used to record user changes back to the data model
+   void resizeToFitParent();
+
+
+   void cornerEventHandler(CornerGrabber* corner, QGraphicsSceneMouseEvent* mevent);
+   void textItemEventHandler(MaskedTextEdit* text, QGraphicsSceneMouseEvent* mevent);
 
    // private data
 
-   QPoint _minSize;
+
    int           _verticalTextMargin;
    int           _horizontalTextMargin;
+
    MaskedTextEdit _textItem;
+
+   bool _centerText;
 
    SCTextBlock * _textBlockModel;
 };

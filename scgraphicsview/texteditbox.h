@@ -41,6 +41,10 @@ private slots:
     void handleCancelButtonClicked();
 
 private:
+    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+
+
     SCTextBlock *_textBlock;
     ButtonGraphic *_SaveButton;
     ButtonGraphic *_CancelButton;

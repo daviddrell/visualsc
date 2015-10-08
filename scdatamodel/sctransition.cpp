@@ -20,8 +20,11 @@
 #include "sctransition.h"
 #include "scstate.h"
 #include "QXmlStreamWriter"
-
+#include "transitionattributes.h"
 #include <QDebug>
+#include <QFont>
+
+
 
 SCTransition::SCTransition(QObject * parent):
         SCItem(parent),
@@ -39,54 +42,68 @@ SCTransition::SCTransition(QObject * parent):
      path
      */
 
-    DEFAULT_PROPERTIES_LIST << "target" << "event" << "comments" << "path";
+    // items in this list cannot be deleted by the user
+    DEFAULT_ATTRIBUTES_LIST << "target" << "event" << "comments" << "path" << "uid";
 
+    //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
     // SCTransition will load with target, event, commentary, and path
-    TransitionAttributes::TransitionStringAttribute * target = new TransitionAttributes::TransitionStringAttribute (this, "target",QString());
+    TransitionStringAttribute * target = new TransitionStringAttribute (this, "target",QString());
     attributes.addItem(target);
 
-    TransitionAttributes::TransitionStringAttribute * event = new TransitionAttributes::TransitionStringAttribute (this, "event",QString());
+    TransitionStringAttribute * event = new TransitionStringAttribute (this, "event","event");
     attributes.addItem(event);
+    this->_eventTextBlock->setText(event->asString());
+    this->setObjectName(event->asString());
 
-    TransitionAttributes::TransitionStringAttribute * comments = new TransitionAttributes::TransitionStringAttribute (this, "comments",QString());
+    TransitionStringAttribute * comments = new TransitionStringAttribute (this, "comments",QString());
     attributes.addItem(comments);
 
     QList<QPointF> emptyPath;
-    TransitionAttributes::TransitionPathAttribute * path = new TransitionAttributes::TransitionPathAttribute (this, QString("path"),emptyPath);
+    TransitionPathAttribute * path = new TransitionPathAttribute (this, QString("path"),emptyPath);
     attributes.addItem(path);
 
+    TransitionStringAttribute* uid = new TransitionStringAttribute(this, "uid", QString());
+    attributes.addItem(uid);
 
+    TransitionStringAttribute* connectToFinished = new TransitionStringAttribute(this, "connectToFinished", "false");
+    attributes.addItem(connectToFinished);
 
-    _eventTextBlock->setParent(this);
-    _eventTextBlock->setText("event");  // default event text
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
+    connect(event, SIGNAL(changed(TransitionStringAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
 
-    SCState* parentState = dynamic_cast<SCState*>(parent);
-    connect(parentState, SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromStates()));
-    /*
-
-    TransitionAttributes::TransitionStringAttribute * cond = new TransitionAttributes::TransitizgonStringAttribute (this, "cond",QString());
-    attributes.addItem(cond);
-
-    TransitionAttributes::TransitionStringAttribute * type = new TransitionAttributes::TransitionStringAttribute (this, "type",QString("internal"));
-    attributes.addItem(type);
-
-
-    TransitionAttributes::TransitionPositionAttribute * position = new TransitionAttributes::TransitionPositionAttribute (this, "position",QPointF(0,0));
-    attributes.addItem(position);
-*/
-
-
+    // set the event sctextblock's parent
+    _eventTextBlock->setParent(this);
+    //_eventTextBlock->setText("event");  // default event text
 }
 
 SCTransition::~SCTransition()
 {
     qDebug()<< "SCTransition destroyed: " + QString::number((long)this);
-
-
     delete _eventTextBlock;
+}
+
+TransitionPathAttribute* SCTransition::getPathAttr()
+{
+    return dynamic_cast<TransitionPathAttribute*>(this->attributes.value("path"));
+}
+
+void SCTransition::setPathAttr(QString pathString)
+{
+    this->getPathAttr()->setValue(pathString);
+}
+
+
+void SCTransition::handleTargetStateNameChanged(StateName * stateName)
+{
+    qDebug() << "SCTransition::handleTargetStateNameChanged";
+    this->attributes.value("target")->setValue(stateName->asString());
+}
+
+TransitionStringAttribute* SCTransition::getTransStringAttr(QString key)
+{
+    return dynamic_cast<TransitionStringAttribute*>(this->attributes.value(key));
 }
 
 SCState* SCTransition::parentSCState()
@@ -99,25 +116,60 @@ void SCTransition::setText(QString eventText)
     _eventTextBlock->setText(eventText);
 }
 
+void SCTransition::setUid(QString uid)
+{
+    attributes.value("uid")->setValue(uid);
+}
+
+QString SCTransition::getUid()
+{
+    return attributes.value("uid")->asString();
+}
+
+QString SCTransition::getUidFirstName()
+{
+    QStringList qsl = getUid().split("-");
+    return qsl.at(0).mid(1,qsl.at(0).size());
+}
+
+bool SCTransition::doNotPrint(QString attribute)
+{
+    return DO_NOT_DISPLAY_HASH.contains(attribute);
+}
+
+int SCTransition::doNotPrintSize()
+{
+    return DO_NOT_DISPLAY_HASH.size();
+}
+
 /**
  * @brief SCTransition::handleTextBlockChanged
  *
- * SLOT
  *
- * signal
- * connect in scformview
+ * when the textblock is changed through the graphics view, use set EventName to set the object name and attribute value for the event of this transition
  *
  */
 void SCTransition::handleTextBlockChanged()
 {
-    qDebug() << "SCTransition::handleTextBlockChanged";
-    IAttribute* event = attributes.value("event");
-    QString eventText = _eventTextBlock->getText();
+    //this->attributes.value("event")->setValue(_eventTextBlock->getText());
+    this->setEventName(_eventTextBlock->getText());
+}
 
-    this->setObjectName(eventText);
-    event->setValue(eventText);
-    qDebug() << "event changed in data model:  emit eventChangedInDataModel(this, eventText);" << eventText;
-    emit eventChangedInDataModel(this, eventText);
+/**
+ * @brief SCTransition::setEventName
+ * @param text
+ *
+ * called by scformview when the property table is changed for a transition's event name
+ */
+void SCTransition::setEventName(QString text)
+{
+    this->setObjectName(text);
+    attributes.value("event")->setValue(text);
+}
+
+QString SCTransition::getEventName()
+{
+    return attributes.value("event")->asString();
 }
 
 SCState *SCTransition::targetState()
@@ -125,14 +177,30 @@ SCState *SCTransition::targetState()
     return _targetState;
 }
 
+/**
+ * @brief SCTransition::setTargetState
+ * @param state
+ *
+ * reselects the transition's target state
+ *
+ * SIGNAL
+ * changedTarget(SCTransiton*, SCState*)
+ *
+ * notifies the SCFormView and SCGraphicsView to update the transition change.
+ */
 void SCTransition::setTargetState(SCState* state)
 {
+    // first update the formview and graphicsview
+    // emit changedTarget(this, state);
     if(_targetState)
     {
-        disconnect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
+//        disconnect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
     }
     _targetState = state;
-    connect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
+
+    // set the transition to point to this new state
+    //this->setUid(_targetState->getUid());
+//    connect(_targetState,SIGNAL(markedForDeletion(QObject*)), this, SLOT(detachFromSink(QObject*)));
 }
 
 SCTextBlock* SCTransition::getEventTextBlock()
@@ -176,6 +244,26 @@ SCTextBlock* SCTransition::getTextBlock(QString textBlockName)
     return NULL;
 }
 */
+
+
+void SCTransition::setFont(QFont *font)
+{
+    SCTextBlock* idtb = this->getEventTextBlock();
+
+    if(!font->family().isEmpty())
+    {
+        idtb->getFontFamilyAttr()->setValue(font->family());
+    }
+
+    if(font->pointSize()!=1)
+    {
+        idtb->getFontSizeAttr()->setValue(font->pointSize());
+    }
+
+    idtb->getFontBoldAttr()->setValue(font->bold());
+}
+
+
 IAttributeContainer * SCTransition::getAttributes()
 {
     return & attributes;
@@ -183,14 +271,14 @@ IAttributeContainer * SCTransition::getAttributes()
 
 void SCTransition::addAttribute(QString key, QString value)
 {
-    TransitionAttributes::TransitionStringAttribute * attr = new TransitionAttributes::TransitionStringAttribute (this, key,QString());
+    TransitionStringAttribute * attr = new TransitionStringAttribute (this, key,QString());
     attr->setValue(value);
     attributes.addItem(attr);
 }
 
 bool SCTransition::removeAttribute(QString key)
 {
-    if(DEFAULT_PROPERTIES_LIST.indexOf(key)==-1)   // remove the attribute it it's not part of the core properties
+    if(DEFAULT_ATTRIBUTES_LIST.indexOf(key)==-1)   // remove the attribute it it's not part of the core properties
     {
         attributes.remove(key);
         return true;
@@ -207,37 +295,41 @@ void SCTransition::setAttributeValue(QString key, QString value)
     }
 }
 
+bool SCTransition::isConnectToFinished()
+{
+    return (attributes.value("connectToFinished")->asString()=="true");
+}
+
 void SCTransition::deleteSafely()
 {
+    qDebug() << "emit markedForDeletion in SCTransiton::deleteSafely()";
+
+    // unhook the transition from its parent and target before deleting it
+    this->detachFromSink(this);
+    this->detachFromSource(this);
+
     emit markedForDeletion(this);
-/*
-    SCState* source = parentSCState();
-    SCState* target = targetState();
-    if(source)
-        source->removeTransitionReferenceOut(this);
-
-    if(target)
-        target->removeTransitionReferenceIn(this);
-        */
-
     this->deleteLater();
 }
 
-void SCTransition::detachFromSource(QObject* o)
+void SCTransition::detachFromSource(QObject*)
 {
-    SCState* source = parentSCState();
+    SCState* source = this->parentSCState();
     if(source)
+    {
         source->removeTransitionReferenceOut(this);
-
+        qDebug() << "detachFromSource Transition: "<< this->getEventName() << "from source: " << source->getName();
+    }
 }
 
-void SCTransition::detachFromSink(QObject* o)
+void SCTransition::detachFromSink(QObject*)
 {
-    SCState* target = targetState();
+    SCState* target = this->targetState();
     if(target)
+    {
         target->removeTransitionReferenceIn(this);
-
-    this->deleteSafely();
+        qDebug() << "detachFromSink Transition: " << this->getEventName() << " from target: " << target->getName();
+    }
 }
 
 /*
@@ -267,20 +359,8 @@ void SCTransition::writeSCVXML(QXmlStreamWriter & sw)
     while(i.hasNext())              // for every attribute, write into the scxml
     {
         QString key = i.next().key();
-
-        if(key != "path")           // do a special write for the path
-        {
-            qDebug() << "writing " << key <<"...";
-            sw.writeAttribute(key, attributes.value(key)->asString());
-        }
-    }
-
-    if (  attributes.contains("path"))  // write all the path values in a separate element
-    {
-         sw.writeStartElement(QString("path"));
-         QString path = attributes.value("path")->asString();
-         sw.writeAttribute(QString("d"),path);
-         sw.writeEndElement();
+        qDebug() << "writing " << key <<"...";
+        sw.writeAttribute(key, attributes.value(key)->asString());
     }
 
     // additionally, write each of the attributes of this transitions's children.

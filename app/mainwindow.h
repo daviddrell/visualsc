@@ -25,9 +25,11 @@
 #include "smproject.h"
 #include <QString>
 #include "textformattoolbar.h"
+#include <QButtonGroup>
+#include <QRadioButton>
 
 class SCFormView;
-
+//class SCGraphicsView;
 class QSettings;
 
 namespace Ui {
@@ -44,24 +46,83 @@ public:
 
     // void keyPressEvent(QKeyEvent * e);
 
+signals:
+    void reset();
+    void open(QString);
+    void scaleChanged(qreal);
+    void gridToggled(bool);
+
 private:
     Ui::MainWindow *ui;
-
+    void sendMessage(QString title, QString message);
     SMProject *_project;
-    QSettings *_settings;
-    static QString _keyLastFilePath;
+
+    QString _currentFolder;
+    QString _currentFileFullPath;
+    QString _currentExportFullPath;
+    QString _currentImageFullPath;
+
+    QString _settingsFileName;
+
     SCFormView *_formEditorWindow;
     TextFormatToolBar *_textFormatToolBar;
+    void delay();
+
+    void loadSettings();
+    void saveSettings();
+    void createSettings();
+
+    void createFontBar();
 
 
+    qreal _scale;
+    qreal clamp(qreal val, qreal min, qreal max);
+    void scale(qreal scale);
+
+    bool _gridEnable;
+
+    QComboBox* _fontBox;
+    QComboBox* _fontSizeBox;
+
+
+    QAction* _boldAction;
+
+//    QButtonGroup _fontSelection;
+    QRadioButton* _stateFontRadioButton;
+    QRadioButton* _transitionFontRadioButton;
+    QRadioButton* _selectedRadioButton;
+
+    void addToolbarSpacer(QToolBar *toolbar);
 
 
 private slots:
+    void handleMessage(QString);
     void handleFileOpenClick();
     void handleFileSaveClick();
     void handleExportCodeClick();
     void handleNewClick();
     void handleReadInputFileDone(bool,QStringList);
+    void handleItemClicked();
+    void handleBoldToggled(bool toggle);
+
+    void handleFontRadioChanged();
+
+    void on_actionImport_triggered();
+
+    void on_actionShortcuts_triggered();
+    void on_actionSave_As_triggered();
+    void on_actionNew_triggered();
+    void on_actionZoomOut_triggered();
+    void on_actionZoomIn_triggered();
+    void on_actionSaveImage_triggered();
+    void on_actionGrid_toggled(bool arg1);
+
+
+    void handleChangeFont(QString);
+//    void handleSetProgramFont(QFont*);
+    void handleSetProgramFontFamily(FontFamilyAttribute*);
+    void handleSetProgramFontSize(FontSizeAttribute*);
+    void handleSetProgramFontBold(FontBoldAttribute*);
 };
 
 #endif // MAINWINDOW_H

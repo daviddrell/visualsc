@@ -1,5 +1,6 @@
 #include "scitem.h"
 #include "textblock.h"
+#include <QDebug>
 
 SCItem::SCItem() : QObject()
 {
@@ -17,6 +18,7 @@ SCTextBlock* SCItem::getTextBlock(QString textBlockName)
 
 void SCItem::deleteSafely()
 {
+    qDebug () << "emit markedForDeletion() in SCItem::deleteSafely()";
     emit markedForDeletion(this);
     this->deleteLater();
 }

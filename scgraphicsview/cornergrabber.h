@@ -59,13 +59,15 @@ public:
 
     enum {kMouseReleased=0, kMouseDown, kMouseMoving}; ///< define the mouse states
 
-    enum PaintStyle {kBox, kCrossHair, kArrowHead};
+    enum PaintStyle {kBox, kCrossHair, kArrowHead, kNone};
     void setPaintStyle(PaintStyle s);///< set box or cross-hairs
 
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
     bool isHovered();
     void setHovered(bool);
+
+    void setCursorToResize(bool on);
 
 private:
 

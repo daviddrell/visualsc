@@ -53,10 +53,14 @@ TransitionAttributes::TransitionAttributes(const TransitionAttributes& ta):
 
 }
 
+
+
 TransitionAttributes::~TransitionAttributes()
 {
 
 }
+
+
 
 void TransitionAttributes::addAttribute(const QString attrName)
 {
@@ -67,10 +71,8 @@ void TransitionAttributes::addAttribute(const QString attrName)
     {
         IAttribute* newAttr=NULL;
 
-        TransitionStringAttribute *str;
-
-
-        TransitionStringAttribute * newStr = new TransitionStringAttribute (*str);
+//        TransitionStringAttribute *str;
+        TransitionStringAttribute * newStr = new TransitionStringAttribute();
         newStr->setValue(attrName);
         addItem(newStr);
         newAttr = newStr;
@@ -89,7 +91,6 @@ void TransitionAttributes::addAttribute(const QString attrName)
 void TransitionAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 {
     QMapIterator<QString,IAttribute*> i(sourceAttrList);
-
     while(i.hasNext())
     {
         QString key = i.next().key();
@@ -241,11 +242,11 @@ void TransitionAttributes::initCommon()
 {
     qRegisterMetaType<TransitionAttributes>("TransitionAttributes");
 
-    qRegisterMetaType<TransitionStringAttribute>("TransitionAttributes::TransitionPathAttribute");
+    qRegisterMetaType<TransitionStringAttribute>("TransitionPathAttribute");
 
-    qRegisterMetaType<TransitionStringAttribute>("TransitionAttributes::TransitionStringAttribute");
+    qRegisterMetaType<TransitionStringAttribute>("TransitionStringAttribute");
 
-    qRegisterMetaType<TransitionPositionAttribute>("TransitionAttributes::TransitionPositionAttribute");
+    qRegisterMetaType<TransitionPositionAttribute>("TransitionPositionAttribute");
 
 }
 
@@ -258,29 +259,29 @@ void TransitionAttributes::initCommon()
 
 
 
-TransitionAttributes::TransitionPathAttribute::TransitionPathAttribute():
+TransitionPathAttribute::TransitionPathAttribute():
         IAttribute(),
         _pathPoints()
 {
 }
 
-TransitionAttributes::TransitionPathAttribute::TransitionPathAttribute(QObject * parent, QString key, QList<QPointF>& initValue):
+TransitionPathAttribute::TransitionPathAttribute(QObject * parent, QString key, QList<QPointF>& initValue):
         IAttribute(parent,key),
         _pathPoints(initValue)
 {
 }
 
-TransitionAttributes::TransitionPathAttribute::TransitionPathAttribute(const TransitionPathAttribute & pathAttribute ) :
+TransitionPathAttribute::TransitionPathAttribute(const TransitionPathAttribute & pathAttribute ) :
         IAttribute(pathAttribute)
 {
 }
 
 
-TransitionAttributes::TransitionPathAttribute::~TransitionPathAttribute()
+TransitionPathAttribute::~TransitionPathAttribute()
 {
 }
 
-TransitionAttributes::TransitionPathAttribute& TransitionAttributes::TransitionPathAttribute::operator=( QList<QPointF>& path )
+TransitionPathAttribute& TransitionPathAttribute::operator=( QList<QPointF>& path )
 {
     _pathPoints.clear();
 
@@ -293,7 +294,7 @@ TransitionAttributes::TransitionPathAttribute& TransitionAttributes::TransitionP
     return *this;
 }
 
-QString TransitionAttributes::TransitionPathAttribute::asString()
+QString TransitionPathAttribute::asString()
 {
     //    <path d="M 100 100  L 300 100 L 200 300 "
 
@@ -314,13 +315,14 @@ QString TransitionAttributes::TransitionPathAttribute::asString()
     return string;
 }
 
-QList<QPointF> TransitionAttributes::TransitionPathAttribute::asQPointFList()
+QList<QPointF> TransitionPathAttribute::asQPointFList()
 {
     return QList<QPointF>(_pathPoints);
 }
 
-void TransitionAttributes::TransitionPathAttribute::setValue(const QString inStr)
+void TransitionPathAttribute::setValue(const QString inStr)
 {
+    qDebug() << "TransitionPathAttribute::setValue";
     _pathPoints.clear();
 
     QString data = inStr;
@@ -359,9 +361,11 @@ void TransitionAttributes::TransitionPathAttribute::setValue(const QString inStr
         else
             break;
     }
+    qDebug() << "leaving TPA Setvalue!";
+
 }
 
-void TransitionAttributes::TransitionPathAttribute::setValue(QList<QPointF>& path )
+void TransitionPathAttribute::setValue(QList<QPointF>& path )
 {
     _pathPoints = path;
 
@@ -378,44 +382,46 @@ void TransitionAttributes::TransitionPathAttribute::setValue(QList<QPointF>& pat
 
 
 
-TransitionAttributes::TransitionStringAttribute::TransitionStringAttribute( ):
+TransitionStringAttribute::TransitionStringAttribute( ):
         IAttribute(),
         _string()
 {
 }
 
-TransitionAttributes::TransitionStringAttribute::TransitionStringAttribute(QObject * parent, QString key, QString initValue):
+TransitionStringAttribute::TransitionStringAttribute(QObject * parent, QString key, QString initValue):
         IAttribute(parent,key),
         _string(initValue)
 {
 }
 
-TransitionAttributes::TransitionStringAttribute::TransitionStringAttribute(const TransitionStringAttribute & stringAttribute ) :
+TransitionStringAttribute::TransitionStringAttribute(const TransitionStringAttribute & stringAttribute ) :
         IAttribute(stringAttribute)
 {
 }
 
-TransitionAttributes::TransitionStringAttribute::~TransitionStringAttribute()
+TransitionStringAttribute::~TransitionStringAttribute()
 {
 }
 
-TransitionAttributes::TransitionStringAttribute& TransitionAttributes::TransitionStringAttribute::operator=( QString& str)
+TransitionStringAttribute& TransitionStringAttribute::operator=( QString& str)
 {
     _string = str;
     return *this;
 }
 
-QString TransitionAttributes::TransitionStringAttribute::asString()
+QString TransitionStringAttribute::asString()
 {
     return _string;
 }
 
-
-
-void TransitionAttributes::TransitionStringAttribute::setValue(QString str )
+void TransitionStringAttribute::setValue(QString str )
 {
-    _string = str;
-    emit changed(this);
+    if(_string!=str)
+    {
+        _string = str;
+        qDebug() << "TransitionStringAttributes::setValue emitting change!";
+        emit changed(this);
+    }
 
 }
 
@@ -429,47 +435,47 @@ void TransitionAttributes::TransitionStringAttribute::setValue(QString str )
 //////////////////////////////////////////
 
 
-TransitionAttributes::TransitionPositionAttribute::TransitionPositionAttribute( ) :
+TransitionPositionAttribute::TransitionPositionAttribute( ) :
         IAttribute(),
         _position()
 {
 }
 
-TransitionAttributes::TransitionPositionAttribute::TransitionPositionAttribute(QObject * parent, QString key, QPointF initValue) :
+TransitionPositionAttribute::TransitionPositionAttribute(QObject * parent, QString key, QPointF initValue) :
         IAttribute(parent,key),
         _position(initValue)
 {
 }
 
-TransitionAttributes::TransitionPositionAttribute::TransitionPositionAttribute(const TransitionStringAttribute & stringAttribute ) :
+TransitionPositionAttribute::TransitionPositionAttribute(const TransitionStringAttribute & stringAttribute ) :
         IAttribute(stringAttribute)
 {
 }
 
-TransitionAttributes::TransitionPositionAttribute::~TransitionPositionAttribute( )
+TransitionPositionAttribute::~TransitionPositionAttribute( )
 {
 }
 
-TransitionAttributes::TransitionPositionAttribute& TransitionAttributes::TransitionPositionAttribute::operator=( QString& str)
+TransitionPositionAttribute& TransitionPositionAttribute::operator=( QString& str)
 {
     this->setValue(str);
     return *this;
 }
 
 
-QString TransitionAttributes::TransitionPositionAttribute::asString()
+QString TransitionPositionAttribute::asString()
 {
     return (QString::number(_position.x()) + QString(",") +  QString::number(_position.y()));
 }
 
 
-QPointF TransitionAttributes::TransitionPositionAttribute::asQPointF()
+QPointF TransitionPositionAttribute::asQPointF()
 {
     return _position;
 }
 
 
-void TransitionAttributes::TransitionPositionAttribute::setValue(const int w,const int h)
+void TransitionPositionAttribute::setValue(const int w,const int h)
 {
     _position.setX(w);
     _position.setY(h);
@@ -478,7 +484,7 @@ void TransitionAttributes::TransitionPositionAttribute::setValue(const int w,con
 }
 
 
-void TransitionAttributes::TransitionPositionAttribute::setValue(const QPointF s)
+void TransitionPositionAttribute::setValue(const QPointF s)
 {
     _position = s;
     emit changed(this);
@@ -486,13 +492,13 @@ void TransitionAttributes::TransitionPositionAttribute::setValue(const QPointF s
 }
 
 
-void TransitionAttributes::TransitionPositionAttribute::setValue(const QString position)
+void TransitionPositionAttribute::setValue(const QString position)
 {
     QStringList sl = position.split(",");
     if ( sl.length() == 2)
     {
-        _position.setX( sl[0].toInt() );
-        _position.setY( sl[1].toInt() );
+        _position.setX( sl[0].toDouble() );
+        _position.setY( sl[1].toDouble() );
         emit changed(this);
     }
 }

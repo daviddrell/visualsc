@@ -5,11 +5,13 @@
 #include <QFile>
 #include <scstate.h>
 #include <sctransition.h>
-#include <cwstate.h>
-#include <cwtransition.h>
+#include "cwstate.h"
+#include "cwtransition.h"
+#include "cwstatemachine.h"
 
-class CodeWriter
+class CodeWriter : QObject
 {
+    Q_OBJECT
 public:
     CodeWriter(SCState*,QString,QString, QString);
     ~CodeWriter();
@@ -20,12 +22,16 @@ public:
 
     void addStateMachine(SCState*);
     void setRootMachine(SCState*);
-    void addState(SCState*);
-    void setChildren(QList<SCState*>);
-    void createSignalsAndSlots();
+    //void addState(SCState*);
+    //void setChildren(QList<SCState*>);
+  //  void createSignalsAndSlots();
+    void createStateMachines();
+    void connectStateMachine(CWStateMachine*);
+
+public slots:
+    void handleNewRelayEvent(CWTransition*);
 
 private:
-
 
 
     void cWriteConstructor();
@@ -40,6 +46,11 @@ private:
     void hWriteActionRelaySlots();
     void hWriteStates();
 
+    void resolveCollisions(QList<CWState*>);
+    void resolveCollision(CWState* one, CWState* two);
+//    void resolveCollisionsInsideStateMachines(QList<CWStateMachine*>);
+//    void resolveCollisionsBetweenStateMachines(QList<CWStateMachine*>);
+
     QString toCamel(QString);
     void hPrint(QString);
     void hPrintln(QString);
@@ -49,17 +60,34 @@ private:
     void cPrintln(QString, int);
 
     QString className;
+    QString stateMachineName;
     QFile cFile;
     QFile hFile;
     QTextStream cOut;
     QTextStream hOut;
 
     SCState* _rootMachine;
-    QList<SCState*> _children;
-    QList<SCState*> _childrenMachines;
+    //SCState* _initialState;
 
-    QHash<SCState*, CWState*> _states;
-    QHash<SCTransition*, CWTransition*> _transitions;
+    //QList<SCState*> _children;
+    //zQList<SCState*> _childrenMachines;
+    QList<SCState*> _machines;
+
+    QHash<SCState*, CWState*> _stateHash;
+    QHash<SCState*, CWStateMachine*> _machineHash;
+
+    //QHash<SCTransition*, CWTransition*> _transitions;
+
+//    QList<CWEvent*> _events;
+    QHash<QString, QList<QString>*> _eventRelaySignals;
+
+    QHash<QString, int> _actionDeclare;
+    QHash<QString, int> _eventDeclare;
+    QHash<QString, int> _eventDefine;
+
+    bool isActionDeclared(QString);
+    bool isEventDeclared(QString);
+    bool isEventDefined(QString);
 
 };
 

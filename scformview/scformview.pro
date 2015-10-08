@@ -46,7 +46,8 @@ HEADERS += \
     scformview_global.h \
     formviewobject.h \
     fvstate.h \
-    fvitem.h
+    fvitem.h \
+    customtablewidgetitem.h
 
 SOURCES += \
     scformview.cpp \
@@ -54,7 +55,11 @@ SOURCES += \
     stateselectionwindow.cpp \
     formviewobject.cpp \
     fvstate.cpp \
-    fvitem.cpp
+    fvitem.cpp \
+    customtablewidgetitem.cpp
 
 RESOURCES += \
     resources/scformview.qrc
+
+DISTFILES += \
+    resources/family.png

@@ -1,28 +1,23 @@
 #ifndef ELBOWGRABBER_H
 #define ELBOWGRABBER_H
 
+//#include "elbowgrabber.h"
 #include <QGraphicsItem>
+//#include <QObject>
 #include "transitiongraphic.h"
 #include "LineSegmentGraphic.h"
 
-#define ELBOW_DEFAULT_WIDTH 2
-#define ELBOW_HOVER_WIDTH 3
-#define ELBOW_DEFAULT_PAINT_STYLE kBox
-#define DEFAULT_OUTTER_BORDER_WIDTH 3
-#define DEFAULT_OUTTER_BORDER_HEIGHT 3
-#define HOVER_OUTTER_BORDER_WIDTH 6
-#define HOVER_OUTTER_BORDER_HEIGHT 6
-#define ELBOW_ARROWHEAD_DEFAULT_WIDTH 6;
-#define ELBOW_ARROWHEAD_HOVER_WIDTH 8;
 
 class ArrowHeadGraphic;
 class TransitionGraphic;
 class LineSegmentGraphic;
 
-class ElbowGrabber : public QObject ,  public QGraphicsItem
+class ElbowGrabber : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 
+
+    enum Zone{FLAT, ANGLED, VERTICAL};
 public:
     ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys);
     ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyController* keys);
@@ -43,6 +38,18 @@ public:
 
     void forceLineHoverLeaveEvent();
 
+    void setXSnap(qreal x);
+    void setYSnap(qreal y);
+    void setPosSnap(QPointF);
+    void setPosSnap(qreal x, qreal y);
+//setPosNoSnap(QPointF);
+//    void setPosNoSnap(qreal x, qreal y);
+    void straightenLines();
+    int getZone(qreal);
+    int getZone(QPointF);
+    qreal distance(ElbowGrabber* one, ElbowGrabber* two);
+    qreal distanceX(QPointF, QPointF);
+    qreal distanceY(QPointF, QPointF);
 
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
 
@@ -66,6 +73,8 @@ public:
     void setSnappedSide(int);
     int getSnappedSide();
 
+    void encloseLinePaths();
+
 signals:
     void anchorMoved(QPointF newPos);   // signal the stateboxgraphic parent and target that the anchors need updating, newPos given in scene scope
 
@@ -73,8 +82,8 @@ private:
 
 
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
-   // virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
-   // virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+//    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+//    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
 
     // once the hover event handlers are implemented in this class,
     // the mouse events must also be implemented because of
@@ -88,6 +97,7 @@ private:
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
     void updateArrowHead();
+
 
     QColor _outterborderColor; ///< the hover event handlers will toggle this between red and black
     QPen _outterborderPen; ///< the pen is used to paint the red/black border
@@ -111,6 +121,9 @@ private:
     LineSegmentGraphic* _segments[2];
 
     KeyController*  _keyController;
+
+    QColor _defaultColor;
+    QColor  _hoverColor;
 };
 
 #endif // ELBOWGRABBER_H

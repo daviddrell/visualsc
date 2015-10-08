@@ -3,12 +3,25 @@
 #include "arrowheadgraphic.h"
 #include <QDebug>
 
+#define PI                  3.14159265359
+#define SNAP_ANGLE          11
+#define SNAP_DISTANCE       30
+
+#define ELBOW_DEFAULT_WIDTH 2
+#define ELBOW_HOVER_WIDTH 3
+#define ELBOW_DEFAULT_PAINT_STYLE kBox
+#define DEFAULT_OUTTER_BORDER_WIDTH 2.61
+#define DEFAULT_OUTTER_BORDER_HEIGHT 2.61
+#define HOVER_OUTTER_BORDER_WIDTH 5.61
+#define HOVER_OUTTER_BORDER_HEIGHT 5.61
+#define ELBOW_ARROWHEAD_DEFAULT_WIDTH 6;
+#define ELBOW_ARROWHEAD_HOVER_WIDTH 8;
 
 
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys) :
     mouseDownX(0),
     mouseDownY(0),
-    _outterborderColor(TRANSITION_DEFAULT_COLOR),
+    //_outterborderColor(_defaultColor),
     _outterborderPen(),
     _width(DEFAULT_OUTTER_BORDER_WIDTH),
     _height(DEFAULT_OUTTER_BORDER_HEIGHT),
@@ -22,22 +35,29 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, KeyController* keys
     _terminator(false),
     _keyController(keys)
 {
+    _segments[0] = NULL;
+    _segments[1] = NULL;
+    _defaultColor=QColor(0,0,125,255);
+    _hoverColor=QColor(216,0,0,255);
 
     this->setParentItem(parentGraphic);
    // qDebug() << "Elbow Parent: " << parentGraphic << " pos: "<< this->pos();
 
+
+
     _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
-    _outterborderPen.setColor(_outterborderColor);
+    _outterborderPen.setColor(_defaultColor);
     //this->setAcceptHoverEvents(true);
 
-    _segments[0] = NULL;
-    _segments[1] = NULL;
+
+
+
 }
 
 ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyController* keys) :
     mouseDownX(0),
     mouseDownY(0),
-    _outterborderColor(TRANSITION_DEFAULT_COLOR),
+    //_outterborderColor(_defaultColor),
     _outterborderPen(),
     _width(DEFAULT_OUTTER_BORDER_WIDTH),
     _height(DEFAULT_OUTTER_BORDER_HEIGHT),
@@ -51,19 +71,24 @@ ElbowGrabber::ElbowGrabber(TransitionGraphic* parentGraphic, QPointF point, KeyC
     _terminator(false),
     _keyController(keys)
 {
+    _segments[0] = NULL;
+    _segments[1] = NULL;
+    _defaultColor=QColor(0,0,125,255);
+    _hoverColor=QColor(216,0,0,255);
 
     this->setParentItem(parentGraphic);
 
-    this->setPos(point);
+     this->setPos(point);
    // this->setPos(0,0);
    // qDebug() << "Elbow Parent: " << parentGraphic << " pos: "<< this->pos();
 
     _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
-    _outterborderPen.setColor(_outterborderColor);
+    _outterborderPen.setColor(_defaultColor);
     //this->setAcceptHoverEvents(true);
 
-    _segments[0] = NULL;
-    _segments[1] = NULL;
+
+
+
 }
 
 void ElbowGrabber::setSnappedSide(int side)
@@ -131,7 +156,7 @@ void ElbowGrabber::setPaintStyle(PaintStyle s)
             _arrowHead->setWidth(_width);
             _arrowHead->setHeight(_height);
             _arrowHead->setPos( - _width/2, - _height/2);
-            _arrowHead->setColor(TRANSITION_DEFAULT_COLOR);
+            _arrowHead->setColor(_defaultColor);
         }
     }
     else
@@ -221,9 +246,9 @@ void ElbowGrabber::forceHoverEnterEvent()
 
     connect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject*>(this->parentItem()), SLOT(handleElbowKeyPressEvent(int)));
 
-    _outterborderColor = TRANSITION_HOVER_COLOR;
+    _outterborderColor = _hoverColor;
     _outterborderPen.setWidth(ELBOW_HOVER_WIDTH);
-    _outterborderPen.setColor(TRANSITION_HOVER_COLOR);
+    _outterborderPen.setColor(_hoverColor);
 
     if(_paintStyle==kArrowHead)
     {
@@ -248,9 +273,9 @@ void ElbowGrabber::forceHoverLeaveEvent()
 
     disconnect(_keyController, SIGNAL(keyPressed(int)), dynamic_cast<QObject*>(this->parentItem()), SLOT(handleElbowKeyPressEvent(int)));
 
-    _outterborderColor = TRANSITION_DEFAULT_COLOR;
+    _outterborderColor = _defaultColor;
     _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
-    _outterborderPen.setColor(TRANSITION_DEFAULT_COLOR);
+    _outterborderPen.setColor(_defaultColor);
     if(_paintStyle==kArrowHead)
     {
         _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
@@ -267,30 +292,30 @@ void ElbowGrabber::forceHoverLeaveEvent()
 
 
 // Hover Events now received in Transition Graphic Scene Event filter
-/*
-void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
-{
-    qDebug() << "ElbowGrabber HoverLeaveEvent";
-    _outterborderColor = TRANSITION_DEFAULT_COLOR;
-    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
-    _outterborderPen.setColor(TRANSITION_DEFAULT_COLOR);
-    _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
-    _height = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
-    //this->update(0,0,_width,_height);
-}
 
-void ElbowGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
-{
-   qDebug() << "ElbowGrabber HoverEnterEvent";
-    _outterborderColor = TRANSITION_HOVER_COLOR;
-    _outterborderPen.setWidth(ELBOW_HOVER_WIDTH);
-    _outterborderPen.setColor(TRANSITION_HOVER_COLOR);
-    _width = ELBOW_ARROWHEAD_HOVER_WIDTH;
-    _height = ELBOW_ARROWHEAD_HOVER_WIDTH;
-    //_outterborderPen.setStyle();
-    //this->update(0,0,_width,_height);
-}
-*/
+//void ElbowGrabber::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
+//{
+//    qDebug() << "ElbowGrabber HoverLeaveEvent";
+////    _outterborderColor = _defaultColor;
+////    _outterborderPen.setWidth(ELBOW_DEFAULT_WIDTH);
+////    _outterborderPen.setColor(_defaultColor);
+////    _width = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+////    _height = ELBOW_ARROWHEAD_DEFAULT_WIDTH;
+////    //this->update(0,0,_width,_height);
+//}
+
+//void ElbowGrabber::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
+//{
+//   qDebug() << "ElbowGrabber HoverEnterEvent";
+////    _outterborderColor = _hoverColor;
+////    _outterborderPen.setWidth(ELBOW_HOVER_WIDTH);
+////    _outterborderPen.setColor(_hoverColor);
+////    _width = ELBOW_ARROWHEAD_HOVER_WIDTH;
+////    _height = ELBOW_ARROWHEAD_HOVER_WIDTH;
+////    //_outterborderPen.setStyle();
+////    //this->update(0,0,_width,_height);
+//}
+
 QRectF ElbowGrabber::boundingRect() const
 {
     int captureMargin = 12;
@@ -304,29 +329,256 @@ QRectF ElbowGrabber::boundingRect() const
 QPointF ElbowGrabber::getCenterPoint()
 {
 
-     if (_placedOnASquare)
-     {
-         /*
-         if ( _corner == 0 )
-             return QPointF(pos().x() + _width/2,pos().y() + _height/2);
-         else  if ( _corner == 1 )
-             return QPointF(pos().x() - _width/2,pos().y() + _height/2);
-         else  if ( _corner == 2 )
-             return QPointF(pos().x() - _width/2,pos().y() - _height/2);
-         else
-             return QPointF(pos().x() + _width/2,pos().y() - _height/2);
-             */
-     }
-     else
-     {
+
          return QPointF(pos()) ;
-     }
+
 
 }
 
 void ElbowGrabber::setAngle(int angle)
 {
     _arrowAngle = angle - 45; // subtract 45 because of how we draw it
+}
+
+//void ElbowGrabber::setX(qreal x)
+//{
+//    straightenLines(this);
+//    QGraphicsItem::setX(x);
+//}
+
+void ElbowGrabber::setXSnap(qreal x)
+{
+    QGraphicsItem::setX(x);
+    straightenLines();
+}
+
+void ElbowGrabber::setYSnap(qreal y)
+{
+    QGraphicsItem::setY(y);
+    straightenLines();
+}
+
+void ElbowGrabber::setPosSnap(QPointF point)
+{
+    QGraphicsItem::setPos(point);
+    straightenLines();
+}
+
+void ElbowGrabber::setPosSnap(qreal x, qreal y)
+{
+    QGraphicsItem::setPos(x,y);
+    straightenLines();
+}
+
+qreal ElbowGrabber::distanceX(QPointF one, QPointF two)
+{
+    return fabs(one.x()-two.x());
+}
+
+qreal ElbowGrabber::distanceY(QPointF one, QPointF two)
+{
+    return fabs(one.y()-two.y());
+}
+
+qreal ElbowGrabber::distance(ElbowGrabber* one, ElbowGrabber* two)
+{
+    qreal x1 = one->x();
+    qreal y1 = one->y();
+    qreal x2 = two->x();
+    qreal y2 = two->y();
+
+    return sqrt((y2-y1)*(y2-y1) + (x2-x1)*(x2-x1));
+}
+
+int ElbowGrabber::getZone(qreal angle)
+{
+   if( angle > (90 - SNAP_ANGLE) && angle <= 90)
+       return Zone::VERTICAL;
+   else if( angle >= 0 && angle < SNAP_ANGLE)
+       return Zone::FLAT;
+
+   return Zone::ANGLED;
+}
+
+int ElbowGrabber::getZone(QPointF pos)
+{
+    qreal xDist = distanceX(this->pos(), pos);
+    qreal yDist = distanceY(this->pos(), pos);
+
+    bool xCross = xDist <= SNAP_DISTANCE;
+    bool yCross = yDist <= SNAP_DISTANCE;
+
+    if(xCross&&yCross)
+    {
+        if(xDist < yDist)
+            return Zone::VERTICAL;
+        else
+            return Zone::FLAT;
+
+    }
+    else if(xCross )
+    {
+        // check if it is within a range
+        return Zone::VERTICAL;
+    }
+    else if(yCross)
+    {
+        return Zone::FLAT;
+    }
+    else
+    {
+        return Zone::ANGLED;
+    }
+}
+
+
+/**
+ * @brief TransitionGraphic::straightenLines
+ * @param mid
+ *
+ * used to snap elbows to other elbows
+ *
+ */
+void ElbowGrabber::straightenLines()
+{
+    ElbowGrabber* mid = this;
+
+    int leftZone = -1;
+    int rightZone = -1;
+
+    qreal leftDeg;
+    qreal rightDeg;
+
+    // check the elbows around the middle one, get their angle and relative zone (~90, ~45, ~0) if the elbow exists
+    LineSegmentGraphic* one = mid->getSegment(0);
+    ElbowGrabber* left;
+    if(one)
+    {
+        left = one->getElbow(0);
+        if(left)
+        {
+            qreal m = (mid->y() - left->y())/(mid->x()- left->x());  // y = mx + b
+            qreal theta = atan(m);          // find the angle between the two points
+            leftDeg = fabs(theta * 180/PI);
+
+            //leftZone = getZone(leftDeg);
+            leftZone = getZone(left->pos());
+            //qDebug()<<"angle between left and mid is " << thetaDeg<<" in zone "<<zone;
+        }
+    }
+
+    LineSegmentGraphic* two = mid->getSegment(1);
+    ElbowGrabber* right;
+    if(two)
+    {
+        right = two->getElbow(1);
+        if(right)
+        {
+            qreal m = (mid->y() - right->y())/(mid->x()- right->x());  // y = mx + b
+            qreal theta = atan(m);          // find the angle between the two points
+            rightDeg = fabs(theta * 180/PI);
+
+            //rightZone = getZone(rightDeg);
+            rightZone = getZone(right->pos());
+            //qDebug()<<"angle between mid and right is " << thetaDeg<<" in zone "<<zone;
+
+        }
+    }
+
+    // if the elbows compete for the same zone, the select the closer one to snap to
+    if(rightZone == leftZone && rightZone!=-1)
+    {
+        qreal leftToMid = distance(left,mid);
+        qreal rightToMid = distance(mid,right);
+
+        if(leftToMid > rightToMid)
+        {
+            switch(rightZone)
+            {
+            case Zone::FLAT:
+                mid->QGraphicsItem::setY(right->y());
+                break;
+            case Zone::ANGLED:
+                break;
+            case Zone::VERTICAL:
+                mid->QGraphicsItem::setX(right->x());
+                break;
+            }
+        }
+        else
+        {
+            switch(leftZone)
+            {
+            case Zone::FLAT:
+                mid->QGraphicsItem::setY(left->y());
+                break;
+            case Zone::ANGLED:
+                break;
+            case Zone::VERTICAL:
+                mid->QGraphicsItem::setX(left->x());
+                break;
+            }
+        }
+    }
+    else    // check the neighbor elbows and snap them if needed
+    {
+        if(rightZone!=-1)
+        {
+            switch(rightZone)
+            {
+            case Zone::FLAT:
+                mid->QGraphicsItem::setY(right->y());
+                break;
+            case Zone::ANGLED:
+                break;
+            case Zone::VERTICAL:
+                mid->QGraphicsItem::setX(right->x());
+                break;
+            }
+        }
+        if(leftZone!=-1)
+        {
+            switch(leftZone)
+            {
+            case Zone::FLAT:
+                mid->QGraphicsItem::setY(left->y());
+                break;
+            case Zone::ANGLED:
+                break;
+            case Zone::VERTICAL:
+                mid->QGraphicsItem::setX(left->x());
+                break;
+            }
+        }
+    }
+
+
+
+
+    // if this is an anchor, ensure that it is still attached to its parent state box graphic
+    if(mid->isAnchor())
+        emit mid->anchorMoved(this->parentAsTransitionGraphic()->parentItemAsStateBoxGraphic()->mapToScene(this->pos()));
+
+    // make sure the line segment path is updated as well
+    this->encloseLinePaths();
+
+    this->update();
+
+}
+
+/**
+ * @brief ElbowGrabber::encloseLinePaths
+ *
+ * redraws the paths of line segments attached to this elbow
+ *
+ */
+void ElbowGrabber::encloseLinePaths()
+{
+    if(this->getSegment(0))
+        this->getSegment(0)->enclosePathInElbows();
+
+    if(this->getSegment(1))
+        this->getSegment(1)->enclosePathInElbows();
 }
 
 void ElbowGrabber::updateArrowHead()
@@ -367,33 +619,37 @@ void ElbowGrabber::updateArrowHead()
     }
 }
 
-void ElbowGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void ElbowGrabber::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    painter->setRenderHint(QPainter::HighQualityAntialiasing);
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+
     if ( _paintStyle == kBox)
     {
         // fill the box with solid color, use sharp corners
 
-        _outterborderPen.setCapStyle(Qt::SquareCap);
+        _outterborderPen.setCapStyle(Qt::RoundCap);
         _outterborderPen.setStyle(Qt::SolidLine);
         painter->setPen(_outterborderPen);
 
-        QPointF topLeft (0-(_width/2), 0-(_height/2));
-        QPointF bottomRight ( _width/2 ,_height/2);
+        QPointF topLeft (0-(_width/2.0), 0-(_height/2.0));
+        QPointF bottomRight ( _width/2.0 ,_height/2.0);
 
         QRectF rect (topLeft, bottomRight);
 
         QBrush brush (Qt::SolidPattern);
         brush.setColor (_outterborderColor);
 
-        if ( _outterborderColor == Qt::red)
-        {
-            painter->fillRect(rect,brush);
-        }
-        else
-        {
-            painter->drawRect(rect);
-        }
+
+
+
+
+        painter->drawEllipse(rect);
+        painter->fillRect(rect, brush);
+
+//            painter->drawRect(rect);
+//            painter->fillRect(rect,brush);
+
     }
     else  if (_paintStyle == kCrossHair)
     {

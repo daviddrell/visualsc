@@ -25,8 +25,12 @@
 #include <QVariant>
 #include <QMap>
 #include <QMapIterator>
+#include "scdatamodel_global.h"
 
 //#include "sizeattribute.h"
+//#include "stateattributes.h"
+
+
 
 /**
    \defgroup Attributes
@@ -122,6 +126,10 @@
 
 class SizeAttribute;
 class PositionAttribute;
+class StateName;
+class StateString;
+class TransitionStringAttribute;
+class GenericAttribute;
 
 class IAttribute: public QObject
 {
@@ -137,23 +145,29 @@ public:
 
     IAttribute& operator=(const IAttribute& a);
 
-    virtual QString asString();
-    virtual void setValue(const QString value) ;
+    virtual QString asString(){return QString();}
+    virtual void setValue(const QString value){}
     virtual QString key() const;
 
 signals:
-    void changed( IAttribute* attr);
-    void changed( SizeAttribute* size);
-    void changed( PositionAttribute* pos);
+
+// individual attribute changed signals
+    void changed(IAttribute* attr);
+    void changed(SizeAttribute* size);
+    void changed(PositionAttribute* pos);
+    void changed(StateName* sn);
+    void changed(TransitionStringAttribute* tsa);
+    void changed(StateString*);
     void error(QString err);
 
-private:
+protected:
     QString _key;
 
 };
 
-class GenericAttribute: public IAttribute
+class SCDATAMODELSHARED_EXPORT GenericAttribute: public IAttribute
 {
+    Q_OBJECT
 public:
 
     GenericAttribute();
@@ -166,6 +180,9 @@ public:
 
     virtual QString asString();
     virtual void setValue(const QString value);
+
+signals:
+    void changed(GenericAttribute*);
 
 private:
     QString _value;
@@ -218,6 +235,7 @@ public:
       */
     bool addItem( IAttribute* attr);
 
+//    void removeItem(QString key, bool deleteItem);
 
     /**
       * \fn setAttributes

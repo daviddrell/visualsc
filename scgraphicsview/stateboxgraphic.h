@@ -19,18 +19,16 @@
 */
 
 
-#ifndef STATEBOX_H
-#define STATEBOX_H
+#ifndef STATEBOXGRAPHIC_H
+#define STATEBOXGRAPHIC_H
 
 
 #include "selectableboxgraphic.h"
 #include "selectabletextblock.h"
+#include "fixedtextblock.h"
+#include "togglebutton.h"
 
-#define SOURCE_ANCHOR_BUFFER 2.0    // smaller value means closer to real dimensions
-#define SOURCE_ANCHOR_POS_BUFFER 9.0    // was 2
 
-#define SINK_ANCHOR_BUFFER 5.5
-#define SINK_ANCHOR_POS_BUFFER 8.5
 
 #include "sizeattribute.h"
 class SCState;
@@ -53,35 +51,8 @@ class IAttribute;
 
 
 
-/* GridLocations
- *
- *  0   1   2
- *  7   8   3
- *  6   5   4
- *
- *  UL  U   UR
- *  L   C   R
- *  DL  D   DR
- *
- */
-enum GridLocation{
-    UL,
-    U,
-    UR,
-    R,
-    DR,
-    D,
-    DL,
-    L,
-    C
-};
 
-enum WallFace{
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST
-};
+
 
 enum WallCorners{
     NORTHWEST,
@@ -106,11 +77,10 @@ public:
     StateBoxGraphic(QGraphicsObject*parent, SCState * state);
     ~StateBoxGraphic();
 
-    SelectableTextBlock TextItem;    ///<  text to go in the title area.
+   // SelectableTextBlock* TextItem;    ///<  text to go in the title area.
 
-
+    virtual void graphicHasChanged (); ///< implemented to receive updates from the SelectableBoxGraphic
     int getGridLocation(QPointF mts,QPointF point);
-    bool isBetween(qreal start, qreal end, qreal point);
     void setGridSpace(int space);
     //void setTitle(QString t);
     void setSize(QPointF size);
@@ -123,22 +93,73 @@ public:
     QPointF mapToHighestParent(QPointF pos);
     StateBoxGraphic* parentItemAsStateBoxGraphic();
 
+    void getStates(QList<StateBoxGraphic*> &stateList);
+    void getAllStates(QList<StateBoxGraphic*> &stateList);
+    //void getAllTransitions(QList<TransitionGraphic*> &transList);
+
+    FixedTextBlock* getStateTitle();
+    void forceUpdate();
+
+    void setName(QString);
+    QString getStateName();
+
+    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
+    virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
+    virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+
+    void setMinHeight(qreal h);
+
+
+signals:
+    void resizeState(StateBoxGraphic*);
+    void clicked(SCState*);
+    void minimized(SCState*);
+    void expanded(SCState*);
+    void nameChanged(QString);
+    void exitActionChanged(QString);
+    void entryActionChanged(QString);
+
+
+protected:
+    void paintWithVisibleBox (QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+
 public slots:
+    void updateElements();
     void handleTransitionLineStartMoved(QPointF newPos);
     void handleTransitionLineEndMoved(QPointF newPos);
+    void handleIsParallelStateChanged(StateString*);
+    void handleInitialStateChanged(StateString*);
+    void handleFinalStateChanged(StateString*);
     void handleAttributeChanged(SizeAttribute*);
+    void handleAttributeChanged(PositionAttribute* pos);
+    void handleAttributeChanged(StateName*);
+    void handleExitActionChanged(StateString*);
+    void handleEntryActionChanged(StateString*);
+    void handleTextBlockAttributeChanged(SizeAttribute*);
+    void handleTextBlockAttributeChanged(PositionAttribute*);
+    void handleTextBlockMoved(QPointF);
+    void handleMinimize();
+
 
 private:
 
-    QRectF* getBufferedBoxRect(qreal buffer,qreal offset);
+//    bool mouseEventIgnore();
+
+    virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
+    virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
+
+    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+
     double xDistance(QPointF, QPointF);
     double yDistance(QPointF, QPointF);
     double distance(QPointF,QPointF);
     double distance(qreal,qreal,qreal,qreal);
     int getSmallest(double*, int);
     int findNearestWall(QRectF,QPointF);
-    virtual void graphicHasChanged (); ///< implemented to receive updates from the SelectableBoxGraphic
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
+    bool isContained(QRectF);
+
 
 
     // private slots
@@ -150,7 +171,6 @@ private slots:
 
 private:
     int call;
-    int update;
     int returnClosestWallFace(QPointF mts,QPointF newPos);
     int returnClosestWallFace(qreal a, qreal b, qreal c, qreal d);
     //private data
@@ -160,9 +180,25 @@ private:
     QPointF _diagLineStart;
     QPointF _diagLineEnd;
     bool    _diagLineDrawIt;
+
+
+
     QPointF _intersection;
+
+    QColor  _finalStateColor;
+    QColor  _initialStateColor;
+
+    FixedTextBlock* _stateTitle;
+    FixedTextBlock* _entryActionTitle;
+    FixedTextBlock* _exitActionTitle;
+
+    ToggleButton* _minimize;
+
+    QPointF _restoreSize;
+    QPointF _minimizeSize;
+
 
 
 };
 
-#endif // STATEBOX_H
+#endif // STATEBOXGRAPHIC_H
