@@ -19,8 +19,8 @@
 */
 
 
-#ifndef STATEBOX_H
-#define STATEBOX_H
+#ifndef STATEBOXGRAPHIC_H
+#define STATEBOXGRAPHIC_H
 
 
 #include "selectableboxgraphic.h"
@@ -53,12 +53,6 @@ class IAttribute;
 
 
 
-enum WallFace{
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST
-};
 
 enum WallCorners{
     NORTHWEST,
@@ -113,10 +107,7 @@ public:
     virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
 
-    qreal getBufferX();
-    qreal getBufferY();
-    QRectF getBufferedRect();
-
+    void setMinHeight(qreal h);
 
 
 signals:
@@ -149,6 +140,7 @@ public slots:
     void handleTextBlockMoved(QPointF);
     void handleMinimize();
 
+
 private:
 
 //    bool mouseEventIgnore();
@@ -156,7 +148,9 @@ private:
     virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );// [virtual protected]
 
-    QRectF* getBufferedBoxRect(qreal buffer,qreal offset);
+    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover enter events
+    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ); ///< must be re-implemented to handle mouse hover leave events
+
     double xDistance(QPointF, QPointF);
     double yDistance(QPointF, QPointF);
     double distance(QPointF,QPointF);
@@ -165,6 +159,8 @@ private:
     int findNearestWall(QRectF,QPointF);
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
     bool isContained(QRectF);
+
+
 
     // private slots
 
@@ -201,6 +197,8 @@ private:
     QPointF _restoreSize;
     QPointF _minimizeSize;
 
+
+
 };
 
-#endif // STATEBOX_H
+#endif // STATEBOXGRAPHIC_H

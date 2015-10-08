@@ -25,6 +25,8 @@
 #include "smproject.h"
 #include <QString>
 #include "textformattoolbar.h"
+#include <QButtonGroup>
+#include <QRadioButton>
 
 class SCFormView;
 //class SCGraphicsView;
@@ -70,6 +72,8 @@ private:
     void saveSettings();
     void createSettings();
 
+    void createFontBar();
+
 
     qreal _scale;
     qreal clamp(qreal val, qreal min, qreal max);
@@ -77,6 +81,18 @@ private:
 
     bool _gridEnable;
 
+    QComboBox* _fontBox;
+    QComboBox* _fontSizeBox;
+
+
+    QAction* _boldAction;
+
+//    QButtonGroup _fontSelection;
+    QRadioButton* _stateFontRadioButton;
+    QRadioButton* _transitionFontRadioButton;
+    QRadioButton* _selectedRadioButton;
+
+    void addToolbarSpacer(QToolBar *toolbar);
 
 
 private slots:
@@ -86,6 +102,11 @@ private slots:
     void handleExportCodeClick();
     void handleNewClick();
     void handleReadInputFileDone(bool,QStringList);
+    void handleItemClicked();
+    void handleBoldToggled(bool toggle);
+
+    void handleFontRadioChanged();
+
     void on_actionImport_triggered();
 
     void on_actionShortcuts_triggered();
@@ -95,6 +116,13 @@ private slots:
     void on_actionZoomIn_triggered();
     void on_actionSaveImage_triggered();
     void on_actionGrid_toggled(bool arg1);
+
+
+    void handleChangeFont(QString);
+//    void handleSetProgramFont(QFont*);
+    void handleSetProgramFontFamily(FontFamilyAttribute*);
+    void handleSetProgramFontSize(FontSizeAttribute*);
+    void handleSetProgramFontBold(FontBoldAttribute*);
 };
 
 #endif // MAINWINDOW_H

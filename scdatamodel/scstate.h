@@ -140,6 +140,11 @@ public:
     void removeTransitionReferenceOut(SCTransition* trans);
     void removeAllTransitionsIn();
 
+
+    void setFont(QFont * font);
+//    void setFont(QString fontName);
+//    void setFontSize(int fontSize);
+
     /**
       * \fn getAllTransitions
       * \brief Get all transitions including decendant state's transitions

@@ -29,15 +29,20 @@
 #include "scformview.h"
 #include <QTime>
 #include <QMessageBox>
+#include <QDesktopWidget>
+#include "scitem.h"
 //#include "scgraphicsview.h"
 //#include "customgraphicsscene.h"
 
 #define POP_UP_X    160
 #define POP_UP_Y    200
 
-#define SCALE_STEP 0.161803398875
+//#define SCALE_STEP 0.161803398875
+#define SCALE_STEP 0.15
 #define SCALE_MIN   0.1
 #define SCALE_MAX   3
+
+#define DEFAULT_FONT_SIZE 10
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -61,13 +66,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-
+    // Designer code
     ui->setupUi(this);
 
+
+
+
+    // custom action connects
     connect ( ui->actionOpen, SIGNAL(triggered()), this, SLOT(handleFileOpenClick()));
     connect ( ui->actionSave, SIGNAL(triggered()), this, SLOT(handleFileSaveClick()));
     connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
+
 
 
 #ifdef ENABLE_TEXT_TOOL_BAR
@@ -78,46 +88,18 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
     this->setWindowTitle("Visual Statechart Editor");
 
-    this->resize(1272,1000);
-    this->move(633,0);
+
+    // add font widgets
+    createFontBar();
 
 
-
-// uncomment this macro to autoload a file
-//#define AUTO_LOAD_FILE
-
-#ifdef AUTO_LOAD_FILE
-
-#define DEFAULT_FILE "C:/visualsc/xmlfiles/statesequencemachine.scxml"
-    QString fileName =DEFAULT_FILE;
-    _settings->setValue(_keyLastFilePath, fileName);
-    /*
-    _project = new SMProject(  ui->centralWidget );
-    connect (_project, SIGNAL(readInputFileCompleted(bool,QStringList)), this, SLOT(handleReadInputFileDone(bool,QStringList)) );
-    _project->readInputFile(fileName);
-    */
-
-    _project = new SMProject(  ui->centralWidget );
-    connect( this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
-   // _project->initNewSM(); moved to constructor
-    ui->gridLayout->addWidget( _project->getQGraphicsView() );
-    _formEditorWindow = new SCFormView(0, _project->getDM());
-    _formEditorWindow->show();
-
-
-    // open the file
-    _project->getDM()->openFile(fileName);
-
-    // reselect the new root machine tree widget in the tree view
-    _formEditorWindow->highlightRootItem();
-
-#endif
-
-#ifndef AUTO_LOAD_FILE
+    // create the project
     _project = new SMProject(  ui->centralWidget );
     ui->gridLayout->addWidget( _project->getQGraphicsView() );
     _formEditorWindow = new SCFormView(0, _project->getDM());
 
+
+    // main window actions
     connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
     connect(_formEditorWindow, SIGNAL(openClick()), this, SLOT(handleFileOpenClick()));
     connect(_formEditorWindow, SIGNAL(saveImageClick()), this, SLOT(on_actionSaveImage_triggered()));
@@ -129,24 +111,74 @@ MainWindow::MainWindow(QWidget *parent) :
     _formEditorWindow->show();
 
 
-#endif
 
+
+
+
+    // connects for the mainwindow to other modules
+
+
+    // if the data model sends an error message, the main window will display it with a pop up
     connect(_project->getDM(), SIGNAL(message(QString)), this, SLOT(handleMessage(QString)));
 
+    // data model has special needs when doing a full reset
     connect(this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
-//    connect(this, SIGNAL(reset()), _formEditorWindow, SLOT(handleReset()));
+
+    // no special protocol needed for formview. regular item deletion and creation is good enough
     connect(this, SIGNAL(open(QString)), _project->getDM(), SLOT(handleOpen(QString)));
 
-//    connect(this, SIGNAL(scaleChanged(qreal)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleScaleChanged(qreal)));
-
+    // when the grid action is toggled, the graphics view's scene will change its background
     connect(this, SIGNAL(gridToggled(bool)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
 
 
+    // mainwindow component connects
 
+    // when the font combo box is activated, the data model will change the font family attribute for all items
+    connect(_fontBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
+    connect(_fontSizeBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
 
+    // when the data model signals set program font, set the program font
+    connect(_project->getDM(), SIGNAL(setProgramFontFamily(FontFamilyAttribute*)), this, SLOT(handleSetProgramFontFamily(FontFamilyAttribute*)));
+    connect(_project->getDM(),SIGNAL(setProgramFontSize(FontSizeAttribute*)), this, SLOT(handleSetProgramFontSize(FontSizeAttribute*)));
+    connect(_project->getDM(), SIGNAL(setProgramFontBold(FontBoldAttribute*)), this, SLOT(handleSetProgramFontBold(FontBoldAttribute*)));
+
+    // when the data model emits a clicked signal, change the radio button selection
+    connect(_project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
+
+    // load settings from settings.ini if it exists, otherwise create a settings.ini file
     _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
-    qDebug () << "settings file " << _settingsFileName;
+//    qDebug () << "settings file " << _settingsFileName;
     loadSettings();
+
+
+    // resize the window
+    // based on the current resolution, set the formview and graphicsview sizes
+    // the height will be the same between the two
+    // the width of the formview will take up 1/3 of the screen
+    // the width of the graphicsview will take up 2/3 of the screen
+
+#define W7_BORDER   7.5                 // each of the windows 7 window borders are 7.5 pixels.
+
+    QRect desktop = QApplication::desktop()->availableGeometry();
+    qreal sysW = desktop.width();
+    qreal sysH = desktop.height();
+
+    sysW -= 2*(W7_BORDER);              // account for window border
+    qreal gW = sysW*2/3;
+    qreal fW = sysW*1/3;
+    fW -= W7_BORDER;                    // space between windows
+    gW -= W7_BORDER;
+    qreal gH = sysH - 37.5;             // 30 pixels + 7.5 pixels
+
+
+    qDebug() << "fw: " <<fW << " gw: "<< gW <<" gH: "<<gH;
+
+    this->resize(gW,gH);
+    this->move( fW + W7_BORDER+ W7_BORDER,0);
+
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -156,6 +188,306 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::handleSetProgramFontFamily(FontFamilyAttribute * ffa)
+{
+    int fontIndex = _fontBox->findText(ffa->asString(), Qt::MatchFixedString);
+    if(fontIndex>-1)
+    {
+        _fontBox->setCurrentIndex(fontIndex);
+    }
+}
+
+void MainWindow::handleSetProgramFontSize(FontSizeAttribute * fsa)
+{
+    int sizeIndex = _fontSizeBox->findText(QString::number(fsa->asInt()),0);
+    if(sizeIndex > -1)
+    {
+        _fontSizeBox->setCurrentIndex(sizeIndex);
+    }
+}
+
+void MainWindow::handleSetProgramFontBold(FontBoldAttribute * fba)
+{
+    _boldAction->setChecked(fba->asBool());
+}
+
+void MainWindow::createFontBar()
+{
+    // Create the Fonts List
+    QStringList fontList;
+    QStringList fontSizeList;
+    QFontDatabase qfd;
+    foreach(const QString &family, qfd.families())
+    {
+        //   qDebug() << family;
+        fontList.append(family);
+    }
+
+    // create a list of font sizes based on the first font
+    if(fontList.size() > 0)
+    {
+        foreach(int point, qfd.smoothSizes(fontList.at(0), qfd.styles(fontList.at(0)).at(0)))
+        {
+            fontSizeList.append(QString::number(point));
+        }
+    }
+
+    // add combobox
+    ui->mainToolBar->addSeparator();
+
+    _fontBox = new QComboBox();
+    _fontBox->setEditable(true);
+    _fontBox->addItems(fontList);
+    ui->mainToolBar->addWidget(_fontBox);
+
+    int fontIndex = _fontBox->findText("arial", Qt::MatchFixedString);
+
+    // set default to arial, if it exists
+    if(fontIndex>-1)
+    {
+        _fontBox->setCurrentIndex(fontIndex);
+    }
+
+//    this->addToolbarSpacer(ui->mainToolBar);
+//    ui->mainToolBar->setStyleSheet("spacing: 20px");
+
+    // add font size combox box
+    _fontSizeBox = new QComboBox();
+    _fontSizeBox->setEditable(true);
+    _fontSizeBox->addItems(fontSizeList);
+    ui->mainToolBar->addWidget(_fontSizeBox);
+
+    int fontSizeIndex = _fontSizeBox->findText(QString::number(DEFAULT_FONT_SIZE),0);
+    if(fontSizeIndex>-1)
+    {
+        _fontSizeBox->setCurrentIndex(fontSizeIndex);
+    }
+
+
+
+
+    // bold button
+    _boldAction = new QAction(tr("Bold"), this);
+    _boldAction->setCheckable(true);
+    QPixmap pixmap(":/SCFormView/Bold-32.png");
+    _boldAction->setIcon(QIcon(pixmap));
+    _boldAction->setShortcut(tr("Ctrl+B"));
+    connect(_boldAction, SIGNAL(triggered(bool)), this, SLOT(handleBoldToggled(bool)));
+
+    ui->mainToolBar->addAction(_boldAction);
+
+    ui->mainToolBar->addSeparator();
+
+    // radio buttons
+    _selectedRadioButton = new QRadioButton("Selected", this);
+    _stateFontRadioButton = new QRadioButton("States", this);
+    _transitionFontRadioButton = new QRadioButton("Transitions", this);
+
+    // when a group radio button is selected, uncheck bold (this is to make it easier to trigger making all bold simultaneously)
+    connect(_stateFontRadioButton, SIGNAL(clicked()), this, SLOT(handleFontRadioChanged()));
+    connect(_transitionFontRadioButton, SIGNAL(clicked()), this, SLOT(handleFontRadioChanged()));
+
+    ui->mainToolBar->addWidget(_selectedRadioButton);
+    ui->mainToolBar->addWidget(_stateFontRadioButton);
+    ui->mainToolBar->addWidget(_transitionFontRadioButton);
+
+    _selectedRadioButton->toggle();
+
+
+
+    ui->mainToolBar->addSeparator();
+
+}
+
+void MainWindow::handleBoldToggled(bool toggle)
+{
+    qDebug() << "bold: " << toggle;
+
+    QFont font;
+
+    if(toggle)
+    {
+       font = QFont("",1,QFont::Bold);
+    }
+    else
+    {
+       font = QFont("",1);
+    }
+
+    if(_selectedRadioButton->isChecked())
+    {
+        SCState* st = _formEditorWindow->getCurrentlySelectedState();
+        SCTransition* trans = _formEditorWindow->getCurrentlySelectedTransition();
+
+        if(st)
+        {
+            st->setFont(&font);
+        }
+        else if(trans)
+        {
+            trans->setFont(&font);
+        }
+        else
+        {
+
+        }
+    }
+    else if(_stateFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleStateFontChanged(&font);
+    }
+    else if(_transitionFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleTransitionFontChanged(&font);
+    }
+    else
+    {
+
+    }
+
+}
+
+/**
+ * @brief MainWindow::handleItemClicked
+ * @param item
+ *
+ * SLOT
+ *
+ * when the datamodel emits the itemclicked signal, the mainwindow handles it here
+ *
+ */
+void MainWindow::handleItemClicked()
+{
+    if(_selectedRadioButton->isChecked())
+    {
+
+    }
+    else
+    {
+        _selectedRadioButton->toggle();
+
+    }
+}
+
+///**
+// * @brief MainWindow::handleSetProgramFont
+// * @param font
+// *
+// * SLOT
+// *
+// * this is triggered by SCDataModel when the mainwindow font boxes should update
+// * for each valid font attribute given, update the corresponding combo box
+// *
+// */
+//void MainWindow::handleSetProgramFont(QFont* font)
+//{
+//    qDebug() << "mainwindow::handlesetprogramfont";
+//    // set font, if it exists
+//    int fontIndex = _fontBox->findText(font->family(), Qt::MatchFixedString);
+//    if(fontIndex>-1)
+//    {
+//        _fontBox->setCurrentIndex(fontIndex);
+//    }
+
+//    int fontSizeIndex = _fontSizeBox->findText(QString::number(font->pointSize()),0);
+//    if(fontSizeIndex>-1)
+//    {
+//        _fontSizeBox->setCurrentIndex(fontSizeIndex);
+//    }
+
+
+////    if(_boldAction->isChecked()!=font->bold()) //        _boldAction->toggle();
+
+//}
+
+/**
+ * @brief MainWindow::addToolbarSpacer
+ * @param toolbar
+ *
+ * Test code found online to implement a custom spacer in the toolbar
+ */
+void MainWindow::addToolbarSpacer(QToolBar *toolbar)
+{
+    QWidget *widget = new QWidget;
+    QHBoxLayout *spacerLayout = new QHBoxLayout;
+    QSpacerItem *spacer =
+            new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Minimum);
+    spacerLayout->addSpacerItem(spacer);
+    widget->setLayout(spacerLayout);
+    toolbar->addWidget(widget);
+}
+
+/**
+ * @brief MainWindow::handleChangeFont
+ *
+ * SLOT
+ * connected to both font family and size combo boxes.
+ * whenever a combo box is activated, create a font from the current values
+ * based on the radio toggle, update the corresponding item(s) font
+ *
+ */
+void MainWindow::handleChangeFont(QString)
+{
+    qDebug() << "mainwindow::handlechangefont";
+    QString fontFam = _fontBox->currentText();
+    QString fontSizeStr = _fontSizeBox->currentText();
+
+    bool ok;
+
+    int size = fontSizeStr.toInt(&ok);
+    if(!ok)
+    {
+        sendMessage("Error","Cannot change font size to "+ fontSizeStr);
+        return;
+    }
+
+    QFont font(fontFam,size);
+    font.setBold(_boldAction->isChecked());
+
+    if(_selectedRadioButton->isChecked())
+    {
+        SCState* st = _formEditorWindow->getCurrentlySelectedState();
+        SCTransition* trans = _formEditorWindow->getCurrentlySelectedTransition();
+
+        if(st)
+        {
+            st->setFont(&font);
+        }
+        else if(trans)
+        {
+            trans->setFont(&font);
+        }
+        else
+        {
+
+        }
+
+    }
+    else if(_stateFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleStateFontChanged(&font);
+    }
+    else if(_transitionFontRadioButton->isChecked())
+    {
+        _project->getDM()->handleTransitionFontChanged(&font);
+    }
+    else
+    {
+        qDebug() << "ERROR NEITHER state or transition radio button selected for font";
+    }
+}
+
+/**
+ * @brief MainWindow::handleFontRadioChanged
+ *
+ * SLOT
+ *
+ * when a radio is triggered that represents a group of items, change the bold button to not checked
+ */
+void MainWindow::handleFontRadioChanged()
+{
+//    _boldAction->setChecked(false);
+}
 
 void MainWindow::handleMessage(QString msg)
 {
@@ -170,23 +502,23 @@ void MainWindow::saveSettings()
 {
     QSettings settings(_settingsFileName, QSettings::IniFormat);
     settings.setValue("workingDirectory",_currentFolder);
-
-//    if(_gridEnable)
-//        settings.setValue("gridEnable", "true");
-//    else
-
     settings.setValue("gridEnable",_gridEnable);
 
     settings.sync();
     qDebug ()<< "saveSettings " << settings.fileName();
 }
 
+
 /**
  * @brief MainWindow::loadSettings
  * load settings from settings.ini
+ * if no settings are found, create a settings.ini file
+ *
+ * .exe must have write privilege
  */
 void MainWindow::loadSettings()
 {
+
     QSettings settings(_settingsFileName, QSettings::IniFormat);
 
     if(settings.childKeys().size()==0)
@@ -196,10 +528,12 @@ void MainWindow::loadSettings()
         return;
     }
 
+    qDebug() << "====================" <<"\tloading settings\t" << "====================";
+
     const QStringList keys = settings.childKeys();
     foreach(const QString &key, keys)
     {
-        qDebug() << "loading setting: " <<key <<"\t with value: "<<settings.value(key);
+        qDebug() << "" <<key <<"\t:\t"<<settings.value(key);
         if(key=="workingDirectory")
             _currentFolder = settings.value(key).toString();
         else if(key == "gridEnable")
@@ -212,6 +546,8 @@ void MainWindow::loadSettings()
             }
         }
     }
+
+    qDebug() << "====================" <<"\tdone loading settings\t" << "====================";
 }
 
 /**
@@ -229,6 +565,10 @@ void MainWindow::createSettings()
     qDebug() << "creating settings in " << _settingsFileName;
 }
 
+/**
+ * @brief MainWindow::delay
+ * deprecated function
+ */
 void MainWindow::delay()
 {
     QTime dieTime= QTime::currentTime().addSecs(1);
@@ -240,9 +580,16 @@ void MainWindow::delay()
     qDebug()<<"delay num states: "  <<states.size();
 }
 
+/**
+ * @brief MainWindow::handleNewClick
+ *
+ * SLOT
+ *
+ * when a new project is clicked, reset the program
+ */
 void MainWindow::handleNewClick()
 {
-    // alert the graphics view and form view to reset
+    // alert the data model, graphics view, and form view to reset
     emit reset();
 
     // reset the current save and export files.
@@ -250,8 +597,6 @@ void MainWindow::handleNewClick()
     _currentExportFullPath = "";
 
     this->setWindowTitle("Visual Statechart Editor");
-
-    //
 }
 
 void MainWindow::handleFileOpenClick()
@@ -363,8 +708,18 @@ void MainWindow::on_actionSave_As_triggered()
 
 void MainWindow::handleExportCodeClick()
 {
+
     if(_project==NULL)
         return;
+
+    // return if the the check on the datamodel came out wrong
+    if(!_project->getDM()->checkDataModel())
+    {
+        this->setWindowTitle("Exported failed: please correct errors");
+        return;
+    }
+
+    bool exportStatus;
 
     // check if we have exported the file before
     if(_currentExportFullPath.isEmpty())
@@ -387,14 +742,16 @@ void MainWindow::handleExportCodeClick()
         {
             _currentExportFullPath = exportName;
             _currentFolder = QFileInfo(_currentExportFullPath).path();
-            _project->exportToCode(_currentExportFullPath);
-            this->setWindowTitle("Exported to "+_currentExportFullPath);
-            saveSettings();
+            exportStatus = _project->exportToCode(_currentExportFullPath);
         }
     }
     else
     {
-        _project->exportToCode(_currentExportFullPath);
+        exportStatus = _project->exportToCode(_currentExportFullPath);
+    }
+
+    if(exportStatus)
+    {
         this->setWindowTitle("Exported to "+_currentExportFullPath);
         saveSettings();
     }
@@ -409,6 +766,7 @@ void MainWindow::on_actionImport_triggered()
 
     if(!current)
     {
+        sendMessage("!","Please select the state to be imported into");
         return;
     }
 
@@ -528,8 +886,13 @@ void MainWindow::scale(qreal step)
     qreal mult = (_scale+step)/(_scale);
     _project->getQGraphicsView()->scale(mult, mult);
     _scale *= mult;
-    qDebug() << "setting scale to : " << _scale;
-    emit scaleChanged(_scale);  // alert the graphicsView that the scale changed
+
+    QString output = QString::number(_scale*100) +"%";
+    this->setWindowTitle(output);
+//    qDebug() << "setting scale to : " << _scale;
+//    emit scaleChanged(_scale);  // alert the graphicsView that the scale changed
+
+
 }
 
 void MainWindow::on_actionSaveImage_triggered()

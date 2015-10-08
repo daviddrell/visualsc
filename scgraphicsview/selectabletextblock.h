@@ -1,15 +1,16 @@
 #ifndef SELECTABLETEXTBLOCK_H
 #define SELECTABLETEXTBLOCK_H
 
-#include "maskedtextedit.h"
 #include "selectableboxgraphic.h"
+#include "maskedtextedit.h"
 #include "textblock.h"
 #include "iattribute.h"
 
+
+
+
 class QKeyEvent;
 class QGraphicsSceneMouseEvent;
-
-
 
 
 /**
@@ -90,6 +91,9 @@ private slots:
     void handleAttributeDeleted(IAttribute *attr);
     void handleEditBoxSavedText(QString text);
     void handleParentStateGraphicResized(QRectF, QRectF, int);
+    void handleFontChanged(FontFamilyAttribute*);
+    void handleFontChanged(FontSizeAttribute*);
+    void handleFontChanged(FontBoldAttribute*);
 
 private:
 

@@ -22,6 +22,7 @@
 #include "QXmlStreamWriter"
 #include "transitionattributes.h"
 #include <QDebug>
+#include <QFont>
 
 
 
@@ -163,7 +164,7 @@ void SCTransition::handleTextBlockChanged()
 void SCTransition::setEventName(QString text)
 {
     this->setObjectName(text);
-    attributes.value("event")->setValue(text);;
+    attributes.value("event")->setValue(text);
 }
 
 QString SCTransition::getEventName()
@@ -243,6 +244,26 @@ SCTextBlock* SCTransition::getTextBlock(QString textBlockName)
     return NULL;
 }
 */
+
+
+void SCTransition::setFont(QFont *font)
+{
+    SCTextBlock* idtb = this->getEventTextBlock();
+
+    if(!font->family().isEmpty())
+    {
+        idtb->getFontFamilyAttr()->setValue(font->family());
+    }
+
+    if(font->pointSize()!=1)
+    {
+        idtb->getFontSizeAttr()->setValue(font->pointSize());
+    }
+
+    idtb->getFontBoldAttr()->setValue(font->bold());
+}
+
+
 IAttributeContainer * SCTransition::getAttributes()
 {
     return & attributes;

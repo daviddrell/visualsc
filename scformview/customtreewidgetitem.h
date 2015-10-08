@@ -48,6 +48,8 @@ public:
     void setData(QObject* d);
     QObject * data();
     FVItem* dataAsFvItem();
+
+
 public slots:
     void treeAddTextBlock(SCTextBlock*);
     void handleAttributeChanged(StateName*);

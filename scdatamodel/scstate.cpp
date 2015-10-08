@@ -23,6 +23,7 @@
 #include "scstate.h"
 #include <QVariant>
 #include <QDebug>
+#include <QFont>
 
 
 SCState::SCState(QObject *parent) :
@@ -84,6 +85,9 @@ SCState* SCState::parentAsSCState()
  */
 void SCState::initCommon()
 {
+    // set the SCTextblock's bold attribute to true by default for the state title
+    this->getIDTextBlock()->getFontBoldAttr()->setValue(true);
+
    // _stateBoxGraphic = NULL;
     QString defaultName = QString();
 
@@ -303,9 +307,6 @@ void SCState::reselectParent(SCState* newParent)
 
     // set the parent
     setParent(newParent);
-
-
-
 }
 
 /**
@@ -499,6 +500,32 @@ void SCState::handleTextBlockChanged()
     qDebug()<<"SCState::handleTextBlockChanged";
     this->setStateName(_IdTextBlock->getText());
 }
+
+
+/**
+ * @brief SCState::setFont
+ * @param fontName
+ *
+ * changes the font family attributes
+ */
+void SCState::setFont(QFont *font)
+{
+    SCTextBlock* idtb = this->getIDTextBlock();
+
+    if(!font->family().isEmpty())
+    {
+        idtb->getFontFamilyAttr()->setValue(font->family());
+    }
+
+    if(font->pointSize()!=1)
+    {
+        idtb->getFontSizeAttr()->setValue(font->pointSize());
+    }
+
+    idtb->getFontBoldAttr()->setValue(font->bold());
+}
+
+
 
 /**
  * @brief SCState::setStateName

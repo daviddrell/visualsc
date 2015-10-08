@@ -31,12 +31,10 @@
 #include "scstate.h"
 #include <QTimer>
 #include <QKeyEvent>
-#include "stateboxgraphic.h"
 #include <QApplication>
+#include "cornergrabber.h"
 
-
-
-class StateBoxGraphic;
+//class StateBoxGraphic;
 
 /**
   *  This box can be re-sized and it can be moved. For moving, we capture
@@ -64,8 +62,8 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _width(DEFAULT_STATE_WIDTH),
         _height(DEFAULT_STATE_HEIGHT),
         _cornerDragStart(0,0),
-        _XcornerGrabBuffer(7),
-        _YcornerGrabBuffer(7),
+        _XcornerGrabBuffer(VISIBLE_MARGIN),
+        _YcornerGrabBuffer(VISIBLE_MARGIN),
         _drawingWidth(  _width -   _XcornerGrabBuffer),
         _drawingHeight( _height -  _YcornerGrabBuffer),
         _drawingOriginX( _XcornerGrabBuffer),
@@ -76,7 +74,9 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent):
         _drawBoxLineStyle(kDrawDotted),
         _boxStyle(kTransparent),
         _keepInsideParent(false),
-        _minSize(QPoint(40,40))
+        _minSize(QPoint(40,40)),
+        _visibleAreaMargin(VISIBLE_MARGIN),
+        _contentAreaMargin(CONTENT_MARGIN)
 {
     _corners[0] = NULL;
     _corners[1] = NULL;
@@ -115,8 +115,8 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
         _width(DEFAULT_STATE_WIDTH),
         _height(DEFAULT_STATE_HEIGHT),
         _cornerDragStart(0,0),
-        _XcornerGrabBuffer(7),
-        _YcornerGrabBuffer(7),
+        _XcornerGrabBuffer(VISIBLE_MARGIN),
+        _YcornerGrabBuffer(VISIBLE_MARGIN),
         _drawingWidth(  _width -   _XcornerGrabBuffer),
         _drawingHeight( _height -  _YcornerGrabBuffer),
         _drawingOriginX( _XcornerGrabBuffer),
@@ -126,7 +126,9 @@ SelectableBoxGraphic::SelectableBoxGraphic(QGraphicsObject * parent, bool keepIn
         _showBoxStyle(kWhenSelected),
         _drawBoxLineStyle(kDrawDotted),
         _boxStyle(kTransparent),
-        _keepInsideParent(keepInsideParent)
+        _keepInsideParent(keepInsideParent),
+        _visibleAreaMargin(VISIBLE_MARGIN),
+        _contentAreaMargin(CONTENT_MARGIN)
 {
 
     _corners[0] = NULL;
@@ -248,9 +250,6 @@ void SelectableBoxGraphic::adjustDrawingSize(int x, int y)
 
     _drawingWidth =  _width - _XcornerGrabBuffer;
     _drawingHeight=  _height - _YcornerGrabBuffer;
-
-
-
 }
 
 /**
@@ -727,22 +726,22 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     else
     {
         emit stateBoxMoved(diff);     // emit stateBoxMoved to signal the children transition graphics to update their sink anchors
-        QList<SelectableBoxGraphic*> children;
-        this->getAllChildren(children);
+//        QList<SelectableBoxGraphic*> children;
+//        this->getAllChildren(children);
 
-        // also emit statebox moved for all children STATE BOXES
+//        // also emit statebox moved for all children STATE BOXES
 
-        for(int i = 0; i < children.size();i++)
-        {
-            SelectableBoxGraphic* st = dynamic_cast<SelectableBoxGraphic*>(children.at(i));
-            SelectableTextBlock* tb = dynamic_cast<SelectableTextBlock*> (children.at(i));
+//        for(int i = 0; i < children.size();i++)
+//        {
+//            SelectableBoxGraphic* st = dynamic_cast<SelectableBoxGraphic*>(children.at(i));
+//            SelectableTextBlock* tb = dynamic_cast<SelectableTextBlock*> (children.at(i));
 
-            // enforce that this is a state and not a text block
-            if(st && !tb)
-            {
-                emit children.at(i)->stateBoxMoved(diff);
-            }
-        }
+//            // enforce that this is a state and not a text block
+//            if(st && !tb)
+//            {
+//                emit children.at(i)->stateBoxMoved(diff);
+//            }
+//        }
         this->setPos(location);
 
         //this->graphicHasChanged();
@@ -752,6 +751,11 @@ void SelectableBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 void SelectableBoxGraphic::setMinSize(QPoint size)
 {
     _minSize = size;
+}
+
+void SelectableBoxGraphic::setMinHeight(qreal h)
+{
+    _minSize.setY(h);
 }
 
 bool SelectableBoxGraphic::isBetween(qreal start, qreal end, qreal point)
@@ -1023,32 +1027,47 @@ QRectF SelectableBoxGraphic::boundingRect() const
  */
 QPointF SelectableBoxGraphic::getVisibleCenter()
 {
-    QRectF area = getUsableArea();
-
+    //    QRectF area = getContentAreaRect();
+QRectF area = QRectF(0,0,0,0);
     double centerX = ((area.x() + area.width())/2.0);
     double centerY = ((area.y() + area.height())/2.0);
 
     return mapToScene(QPointF(centerX, centerY));
 }
 
-QRectF SelectableBoxGraphic::getUsableArea()
-{
-    int x0 =  getTotalBufferX();
-    int y0 =  getTotalBufferY();
-    int width =  this->getSize().x()- 2*getTotalBufferX();
-    int height =  this->getSize().y()-2*getTotalBufferY();
 
-    return QRectF(x0,y0, width, height);
+qreal SelectableBoxGraphic::getContentAreaX()
+{
+    return _contentAreaMargin+_visibleAreaMargin;
 }
 
-qreal SelectableBoxGraphic::getTotalBufferX()
+qreal SelectableBoxGraphic::getContentAreaY()
 {
-    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER;
+    return _contentAreaMargin+_visibleAreaMargin;
 }
-qreal SelectableBoxGraphic::getTotalBufferY()
+
+
+qreal SelectableBoxGraphic::getVisibleAreaX()
 {
-    return CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER;
+    return _visibleAreaMargin;
 }
+
+qreal SelectableBoxGraphic::getVisibleAreaY()
+{
+    return _visibleAreaMargin;
+}
+
+
+QRectF SelectableBoxGraphic::getContentAreaRect()
+{
+    return QRectF(getContentAreaX(),getContentAreaY(), this->_width-2*getContentAreaX(), this->_height-2*getContentAreaY());
+}
+
+QRectF SelectableBoxGraphic::getVisibleAreaRect()
+{
+    return QRectF(getVisibleAreaX(),getVisibleAreaY(), _width - 2*getVisibleAreaX(), _height-2*getVisibleAreaY());
+}
+
 
 
 QPointF SelectableBoxGraphic::getSideCenterPointInSceneCoord(int side)

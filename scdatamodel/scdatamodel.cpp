@@ -37,7 +37,8 @@ SCDataModel::SCDataModel(QObject * parent) :
     _currentState(NULL),
     _currentTransition(NULL),
     _topState(NULL),
-    _scene(0)
+    _scene(0),
+    _lastClickedItem(NULL)
 {
     _reader.setDataModel(this);
     _settings = new QSettings(this);
@@ -67,6 +68,7 @@ void SCDataModel::connectDataModel()
     connect(&_reader, SIGNAL(changeStateMachineAttribute(QString, QString)), this, SLOT(handleStateMachineAttributeLoad(QString,QString)));
 
 
+
 }
 
 /**
@@ -82,6 +84,123 @@ void SCDataModel::connectTransition(SCTransition * trans)
     qDebug() << "scdatamodel::connecttransition";
     connect(trans->getTransStringAttr("event"), SIGNAL(changed(TransitionStringAttribute*)), this, SLOT(handleCheckEventCollision(TransitionStringAttribute*)));
     connect(trans,SIGNAL(markedForDeletion(QObject*)),this,SLOT(handleTransitionBeingDeleted(QObject*)));
+
+    // when the transition is clicked, scdatamodel will do something
+    connect(trans, SIGNAL(clicked(SCTransition*)), this, SLOT(handleItemClicked(SCTransition*)));
+
+    // propogate clicked signal outside the datamodel
+    connect(trans, SIGNAL(clicked(SCTransition*)), this, SIGNAL(itemClicked()));
+
+    // propogate font attribute changes to the mainwindow combo boxes
+    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
+    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
+    connect(trans->getEventTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), this, SLOT( handleChangeProgramFont(FontBoldAttribute*)));
+}
+
+/**
+ * @brief SCDataModel::connectState
+ * @param st
+ *
+ * called when a state is created.
+ * calls scdatamodel scope connects.
+ */
+void SCDataModel::connectState(SCState * st)
+{
+    qDebug() << "scdm::connectState";
+     // when the state is clicked, scdatamodel will do something
+    connect(st, SIGNAL(clicked(SCState*)), this, SLOT(handleItemClicked(SCState*)));
+
+    // propogate clicked signal outside the datamodel
+    connect(st,SIGNAL(clicked(SCState*)), this, SIGNAL(itemClicked()));
+
+    // propogate font attribute changes to the mainwindow combo boxes
+//    connect(st->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SLOT(handleChangeProgramFont(FontFamilyAttribute*)));
+//    connect(st->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SLOT(handleChangeProgramFont(FontSizeAttribute*)));
+//    connect(st->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), this, SLOT(handleChangeProgramFont(FontBoldAttribute*)));
+
+
+    connect(st->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), this, SIGNAL(setProgramFontFamily(FontFamilyAttribute*)));
+
+    connect(st->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), this, SIGNAL(setProgramFontBold(FontBoldAttribute*)));
+
+    connect(st->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), this, SIGNAL(setProgramFontSize(FontSizeAttribute*)));
+
+}
+
+/**
+ * @brief SCDataModel::handleChangeProgramFont
+ * @param ffa
+ *
+ * SLOT
+ *
+ * connected to the sctextblock attributes of items
+ * propogates attribute changes to change the program font in mainwindow
+ *
+ */
+void SCDataModel::handleChangeProgramFont(FontFamilyAttribute * ffa)
+{
+    QFont font(ffa->asString(), 1);
+    emit setProgramFont(&font);
+}
+void SCDataModel::handleChangeProgramFont(FontSizeAttribute * fsa)
+{
+    QFont font("", fsa->asInt());
+    emit setProgramFont(&font);
+}
+
+void SCDataModel::handleChangeProgramFont(FontBoldAttribute * fba)
+{
+    QFont font("",1);
+    font.setBold(fba);
+
+    emit setProgramFont(&font);
+}
+
+
+/**
+ * @brief SCDataModel::handleItemClicked
+ * @param st
+ *
+ * when the state is clicked, do stuff
+ *
+ */
+void SCDataModel::handleItemClicked(SCState * st)
+{
+//    SCState* lastClickedSt = dynamic_cast<SCState*>(_lastClickedItem);
+
+    if(_lastClickedItem==st)
+        return;
+
+    _lastClickedItem = st;
+
+//    QFont font(st->getIDTextBlock()->getFontFamilyAttr()->asString(), st->getIDTextBlock()->getFontSizeAttr()->asInt());
+//    font.setBold(st->getIDTextBlock()->getFontBoldAttr()->asBool());
+//    emit setProgramFont(&font);
+    SCTextBlock* tb = st->getIDTextBlock();
+    emit setProgramFontFamily(tb->getFontFamilyAttr());
+    emit setProgramFontSize(tb->getFontSizeAttr());
+    emit setProgramFontBold(tb->getFontBoldAttr());
+}
+
+void SCDataModel::handleItemClicked(SCTransition * trans)
+{
+//    SCTransition* lastClickedTr = dynamic_cast<SCTransition*>(_lastClickedItem);
+
+    if(_lastClickedItem==trans)
+        return;
+
+    _lastClickedItem = trans;
+
+
+//    QFont font(trans->getEventTextBlock()->getFontFamilyAttr()->asString(), trans->getEventTextBlock()->getFontSizeAttr()->asInt());
+
+//    font.setBold(trans->getEventTextBlock()->getFontBoldAttr()->asBool());
+//    emit setProgramFont(&font);
+
+    SCTextBlock* tb = trans->getEventTextBlock();
+    emit setProgramFontFamily(tb->getFontFamilyAttr());
+    emit setProgramFontSize(tb->getFontSizeAttr());
+    emit setProgramFontBold(tb->getFontBoldAttr());
 }
 
 /**
@@ -313,12 +432,13 @@ qDebug() << "time to save files " << fileName;
 QString hFileName;
 QString cppFileName;
 QString className = toClassName(_topState->attributes.value("name")->asString());
+
+
 //#define FORCE_STATE_MACHINE_NAME
 #ifndef FORCE_STATE_MACHINE_NAME
     // get the file name minus cpp and add h
     cppFileName = fileName;
     hFileName = fileName.mid(0,fileName.size()-3) + "h";
-
 #endif
 
 #ifdef FORCE_STATE_MACHINE_NAME
@@ -344,21 +464,29 @@ QString className = toClassName(_topState->attributes.value("name")->asString())
    // _topState->getStates(list);
 
 
-    QList<SCState* > all;
-    all.append(_topState);
-    _topState->getAllStates(all);
+//    QList<SCState* > all;
+//    all.append(_topState);
+//    _topState->getAllStates(all);
 
 
-    for(int i = 0; i < all.size();i++)
-    {
-        SCState* state = all.at(i);
-        if(state->isStateMachine())
-        {
-            cw.addStateMachine(state);
-        }
-    }
-    //cw.createSignalsAndSlots();
+//    for(int i = 0; i < all.size();i++)
+//    {
+//        SCState* state = all.at(i);
+//        if(state->isStateMachine())
+//        {
+//            cw.addStateMachine(state);
+//        }
+//    }
+
+    // add the state machines to the codewriter
+    QList<SCState*> stateMachines = this->getStateMachines();
+    foreach(SCState* sm, stateMachines)
+        cw.addStateMachine(sm);
+
+    // define the signal and slot names
     cw.createStateMachines();
+
+    // create the files
     cw.writeHFile();
     cw.writeCppFile();
 
@@ -600,6 +728,7 @@ bool SCDataModel::deleteItem(QObject * item)
 SCState* SCDataModel::insertNewState(SCState *parent)
 {
     SCState * state = new SCState (parent);
+    connectState(state);
     emit newStateSignal(state);
     return state;
 }
@@ -806,7 +935,7 @@ SCState* SCDataModel::handleMakeANewState(SCState* parent,StateAttributes*  sa)
 
     //_currentState  = state;
 
-
+    connectState(state);
     // connected to scformview slot handleNewState
     // connected to scgraphicsview slot handleNewState
     emit newStateSignal(state);
@@ -883,7 +1012,7 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
 
     _currentState  = state;
 
-
+    connectState(state);
     // connected to scformview slot handleNewState
     // connected to scgraphicsview slot handleNewState
     emit newStateSignal(state);
@@ -986,72 +1115,6 @@ bool SCDataModel::deleteProperty(SCItem* item, QString propertyName)
     return false;    // should not reach this
 
 }
-
-
-
-void SCDataModel::handleEventNameChangedInFormView(SCTransition * trans, QString eventName)
-{
-    qDebug() << "SCDataModel::handleEventNameChangedInFormView";
-    trans->setText(eventName);
-}
-
-void SCDataModel::handleEventSizeChangedInFormView(SCTransition *, QString)
-{
-
-}
-
-void SCDataModel::handleEventPositionChangedInFormView(SCTransition *, QString)
-{
-
-}
-
-void SCDataModel::handleStateSizeChangedInFormView(SCState *state, QPointF size)
-{
-    qDebug() << "SCDataModel::handleStateSizeChangeInFormView";
-    state->setSize(size);
-}
-
-/**
- * @brief SCDataModel::handleStateNameChangedInFormView
- *
- * SLOT
- *
- * connect in SCDataModel
- * connect(SCState,SIGNAL(nameChangedInFormView(SCState*,QString)), SCDataModel,SLOT(handleStateNameChangedInFormView(SCState*,QString)));
- *
- *
- * called when the user types in the name in the property table
- * will update the data model's textbox with the new name
- * by calling SCState::setText, which will then emit a signal to change the graphics view text
- *
- *
- */
-void SCDataModel::handleStateNameChangedInFormView(SCState* state, QString name)
-{
-    qDebug() << "SCDataModel::handleStateNameChangedInFormView";
-    state->setText(name);
-}
-
-/**
- * @brief SCDataModel::handleStatePositionChangedInFormView
- * @param state
- * @param point
- *
- * SLOT
- * connect in SCDataModel
- * connect(SCState,SIGNAL(positionChangedInFormView(SCState*,QPointF)),SCDataModel,SLOT(handleStatePositionChangedInFormView(SCState*,QPointF)));
- *
- *
- * change the SCState's position
- *
- * this also will emit signal position changed in datamodel
- */
-void SCDataModel::handleStatePositionChangedInFormView(SCState* state, QPointF point)
-{
-    qDebug() << "SCDataModel::handleStatePositionChangeInFormView";
-    state->setPosition(point);
-}
-
 
 /**
  * @brief SCDataModel::insertNewTransition
@@ -1332,3 +1395,124 @@ void SCDataModel::handleMakeANewTransitionPath (QString pathStr)
 }
 
 
+/**
+ * @brief SCDataModel::handleStateFontChanged
+ * @param font
+ *
+ * change all states fonts to given Qfont
+ */
+void SCDataModel::handleStateFontChanged(QFont * font)
+{
+    QList<SCState*> states;
+    _topState->getAllStates(states);
+
+    foreach(SCState* st, states)
+    {
+        st->setFont(font);
+    }
+
+}
+
+/**
+ * @brief SCDataModel::handleTransitionFontChanged
+ * @param font
+ *
+ * change all transition fonts to given qfont
+ */
+void SCDataModel::handleTransitionFontChanged(QFont * font)
+{
+    QList<SCTransition*> transitions;
+    _topState->getAllTransitions(transitions);
+
+    foreach(SCTransition* trans, transitions)
+    {
+        trans->setFont(font);
+    }
+
+}
+
+
+
+/**
+ * @brief SCDataModel::checkDataModel
+ *
+ * checks data model for exporting correctness
+ * called before export procedure (in mainwindow.cpp) to alert user if any errors will be produced in the generated code
+ */
+bool SCDataModel::checkDataModel()
+{
+    QString errorLog;
+
+    // initial states check
+    // ensures that user has an initial state for all non-parallel state machines
+    QList<SCState*> stateMachines = this->getStateMachines();
+    foreach(SCState* sm, stateMachines)
+    {
+        if(sm->isParallel())
+        {
+            QList<SCState*> initialStates;
+            QList<SCState*> directChildren;
+            sm->getStates(directChildren);
+            foreach(SCState* child, directChildren)
+            {
+                if(child->isInitial())
+                    initialStates.append(child);
+            }
+
+            if(initialStates.size()!=0)
+            {
+                //            errorLog.append("State");
+                errorLog.append("State machine \""+sm->objectName()+"\" is parallel and should not have an initial state\n");
+            }
+        }
+        else
+        {
+            // check number of initial states
+            QList<SCState*> initialStates;
+            QList<SCState*> directChildren;
+            sm->getStates(directChildren);
+            foreach(SCState* child, directChildren)
+            {
+                if(child->isInitial())
+                    initialStates.append(child);
+            }
+
+            if(initialStates.size()==0)
+            {
+                //            errorLog.append("State");
+                errorLog.append("State machine \""+sm->objectName()+"\" is missing an initial state\n");
+            }
+            else if(initialStates.size()>1)
+            {
+                errorLog.append("State machine \""+sm->objectName()+"\" has too many initial states ("+QString::number(initialStates.size())+")\n");
+            }
+        }
+    }
+
+    // if there were errors, then emit a message and return false
+    if(!errorLog.isEmpty())
+    {
+        emit message(errorLog);
+        return false;
+    }
+
+    // return true if there were no errors
+    return true;
+}
+
+QList<SCState*> SCDataModel::getStateMachines()
+{
+    QList<SCState*> sm;
+    QList<SCState*> allStates;
+
+    // add the top state and add all of its children
+    allStates.append(_topState);
+    _topState->getAllStates(allStates);
+
+    // add every statemachine to sm
+    foreach(SCState* st, allStates)
+        if(st->isStateMachine())
+            sm.append(st);
+
+    return sm;
+}

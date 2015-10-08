@@ -1,18 +1,10 @@
 VisualSc - Visual Statechart Editor for SCXML.
 Developed by Matthew Zhan and David Drell.
 
-Install Micosoft Visual C++ 2013 (REQUIRED):
+Install Micosoft Visual C++ 2013 (REQUIRED)
 https://drive.google.com/file/d/0B1lDetBy1i69TUVrWjZRd21qOWM/view?usp=sharing
 
-Install Visual Statechart 1.0.9:
-https://drive.google.com/file/d/0B1lDetBy1i69MnlveTM1MURuUk0/view?usp=sharing
+Install Visual Statechart 2.0.0
+https://drive.google.com/file/d/0B1lDetBy1i69RzJMQmlfeXhENFk/view?usp=sharing
 
-VisualSc is a graphical state chart editor built on Qt.
-It adds graphical attributes to state elements in a SCXML file.
-
-When completed, the project will include statemachine engines
-(in various languages) that read SCXML directly so that one
-can design a state machine graphically and transform that image
-into a running statemachine (via SCXML files) bypassing the source
-code phase. Additionally, VisualSc will allow a developer to annimate
-actual state chart execution using debug tracing from the runtime machines.
+VisualSc is an editor for hierarchical statecharts developed in C++ with Qt and is based on the statechart model by David Harel. One can save and load statecharts using .SCXML and export statecharts to C++ code. The purpose of this program is to provide the user a platform to quickly create and easily manage statechart states and transitions with an editable graphics view and an organized form view. Additionally, VisualSc can port a statechart directly to code, modeling the statechart using the Qt framework with QStates.

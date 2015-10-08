@@ -10,16 +10,35 @@
 #include <QPainter>
 #include <QPen>
 #include <QPointF>
-#include "cornergrabber.h"
+
 
 #define BOX_BUFFER 12
 #define BOX_DEFAULT_PEN_WIDTH 2
 #define BOX_HOVER_PEN_WIDTH 3
-#define INSIDE_PARENT_BUFFER 7
+#define INSIDE_PARENT_BUFFER 7  // deprecated global. used when selectable textblocks were used for states
 
-#define BOX_DRAW_BUFFER 2
+// box area globals
+#define MIN_WIDTH       105     // minimum width of the true area of the box
+#define MIN_HEIGHT      42      // minimum height of the true area of the box
+
+#define VISIBLE_MARGIN  7       // margin in true area where visible area is drawn
+#define CONTENT_MARGIN  2       // margin in visible area where content is placed
+
+#define MINIMIZE_BUTTON_MARGIN 25
+
+//#define CORNER_GRAB_X_BUFFER 5
+//#define CORNER_GRAB_Y_BUFFER 5
+
+// visible box globals
+
+//#define DEFAULT_VISIBLE_AREA_MARGIN
+
+
+
+
 
 class CornerGrabber;
+class SelectableTextBlock;
 class IAttribute;
 
 /**
@@ -67,9 +86,13 @@ enum GridLocation{
     C
 };
 
+enum WallFace{
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+};
 
-#define CORNER_GRAB_X_BUFFER 7
-#define CORNER_GRAB_Y_BUFFER 7
 
 class SelectableBoxGraphic :  public QGraphicsObject
 {
@@ -105,18 +128,32 @@ public:
     void setDrawBoxLineStyle( DrawBoxLineStyle s);///< if drawing box, draw solid or dotted line
     void setBoxStyle (BoxStyle s); ///< set box style
 
-    QRectF getUsableArea();///< returns a rect relative to the SelecableBoxGraphic that represents the inside margin, or usable area of the box.
+//    QRectF getUsableArea();///< returns a rect relative to the SelecableBoxGraphic that represents the inside margin, or usable area of the box.
     QPointF getVisibleCenter();///< returns a point which is appears to be the center of the box (i.e. does not include drop shadow), may not be the center of boundingRect()
     QPointF getSideCenterPointInSceneCoord(int side); ///< returns the center point on a given side, for anchoring a transition line in the middle of a side
     void getAllChildren(QList<SelectableBoxGraphic*> &stateList);
 
     void setPenWidth(qreal, qreal);
     void setMinSize(QPoint);
+    void setMinHeight(qreal);
     //bool eventFilter(QObject *, QEvent *);
     virtual QRectF boundingRect() const; ///< must be re-implemented in this class to provide the diminsions of the box to the QGraphicsView
     virtual void mousePressEvent (QGraphicsSceneMouseEvent * event );
     virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
     virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
+
+        qreal getContentAreaX();
+        qreal getContentAreaY();
+
+        qreal getVisibleAreaX();
+        qreal getVisibleAreaY();
+
+        QRectF getContentAreaRect();
+        QRectF getVisibleAreaRect();
+
+
+
+
 signals:
     void stateBoxMoved(QPointF);    // this signal activates when the statebox graphic is moved or resized to alert the transition graphic to be updated as to remained anchored to its target state. Although the sink anchor is still a child of the source state graphic, it should behave like a child of its target state.
     void stateBoxResized(QRectF oldBox, QRectF newBox, int corner);
@@ -124,11 +161,17 @@ signals:
     void stateBoxReleased();
     void cornerReleased();
 
+    void cornerReleasedTest();
+
+
 
 protected:
 
-    qreal getTotalBufferX();
-    qreal getTotalBufferY();
+//    qreal getTotalBufferX();
+//    qreal getTotalBufferY();
+
+
+
     virtual void paint (QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget); ///< must be re-implemented here to pain the box on the paint-event
 
     QPointF _dragStart;
@@ -169,6 +212,9 @@ protected:
     int getHoveredCorner();
     virtual void mousePressEvent(QGraphicsSceneDragDropEvent *event);
 
+
+    qreal _visibleAreaMargin;
+    qreal _contentAreaMargin;
 
 private:
 

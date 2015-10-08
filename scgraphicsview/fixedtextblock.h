@@ -10,6 +10,9 @@
 #include "textblock.h"
 
 class StateBoxGraphic;
+//class SelectableBoxGraphic;
+
+
 enum Font{
         Normal,
         Small
@@ -35,7 +38,7 @@ public:
     StateBoxGraphic* parentAsStateBoxGraphic();
     void reposition();
     void resize();
-    void recenterText();
+    void cropDocument();
     QPointF getSize();
     void setText(QString);
     void setFont(int);
@@ -43,11 +46,14 @@ public:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );///< allows the main object to be moved in the scene by capturing the mouse move events
     void mouseReleaseEvent (QGraphicsSceneMouseEvent * event );
-
     bool isHovered();
+    void adjustHeight();
+
+    void setBase(FixedTextBlock* ftb);
 
 signals:
     void changed(QString);
+    void heightChanged(qreal);
 
 public slots:
     void handleTextItemEdited();
@@ -55,6 +61,12 @@ public slots:
     void handleStateSizeChanged(SizeAttribute*);
     void handleHoverLeave();
     void handleHoverEnter();
+
+    void handleFontChanged(FontFamilyAttribute*);
+    void handleFontChanged(FontSizeAttribute*);
+    void handleFontChanged(FontBoldAttribute*);
+
+    void handleBaseHeightChanged(qreal delta);
 
 protected:
     qreal clampMin(qreal value, qreal min);
@@ -72,6 +84,7 @@ protected:
 
 private:
     MaskedTextEdit _textItem;
+    FixedTextBlock* _base;
 };
 
 #endif // FIXEDTEXTBLOCK_H

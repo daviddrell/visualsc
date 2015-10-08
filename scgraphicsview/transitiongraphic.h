@@ -56,6 +56,8 @@ public:
 
     SCTransition* getTransitionModel();
 
+    SelectableTextBlock* getEventTextGraphic();
+
 
 signals:
   // void startEndMoved(QPointF newPos);

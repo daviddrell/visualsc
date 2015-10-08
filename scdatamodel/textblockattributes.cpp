@@ -3,6 +3,7 @@
 #include <QStringList>
 #include "positionattribute.h"
 #include "sizeattribute.h"
+#include <QDebug>
 
 
 //************ Text **************
@@ -355,6 +356,7 @@ void FontBoldAttribute::setValue(const bool bold)
     if ( bold != _bold)
     {
         _bold = bold;
+        qDebug() << "FontBoldAttribute setValue to: " << bold<<" and emitting changed";
         emit changed(this);
     }
 }

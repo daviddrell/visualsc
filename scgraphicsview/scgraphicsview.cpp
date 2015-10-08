@@ -414,7 +414,17 @@ void SCGraphicsView::handleAutoResize(StateBoxGraphic* stateBoxGraphic)
                 for(int i = 0; i < sbgs.size(); i++)
                 {
                     StateBoxGraphic* sbg = sbgs.at(i);
-                    sbg->setPosAndUpdateAnchors(sbg->pos()-QPointF(minX-25,minY-25));
+
+                    QPointF newPos;
+                    if(minX < 0)
+                        newPos = QPointF(sbg->pos().x() - (minX -25) , sbg->pos().y());
+                    else
+                        newPos = QPointF(sbg->pos().x(), sbg->pos().y() - (minY -25));
+
+
+//                     newPos = QPointF(sbg->pos().x() - (minX -25) , sbg->pos().y() - (minY -25));
+
+                    sbg->setPosAndUpdateAnchors(newPos);
                     // update the datamodel for the position and size.
                     sbg->graphicHasChanged();
                 }
@@ -990,6 +1000,15 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
     // handle state exit action change to update the data model
     connect(stateGraphic, SIGNAL(exitActionChanged(QString)), state, SLOT(handleExitActionChanged(QString)));
+
+
+
+    // font connects
+    connect(state->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontFamilyAttribute*)));
+
+    connect(state->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontSizeAttribute*)));
+
+    connect(state->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontBoldAttribute*)));
 }
 
 
@@ -998,7 +1017,8 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
  * @param trans
  *
  * calls all graphics related connects for transition graphics, their elbows, and the transition deconstructors
- *
+ * calls all data model/attribute connects for sctransition to transitiongraphics
+ * calls all data model/attribute connects for sctextblock of the transition to the selectable text block of the transition
  * additionally, repositions the anchors to their target states
  *
  */
@@ -1081,6 +1101,14 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
 
     // when the transition graphic emits clicked, also emit it for the sctransition
     connect(transGraphic, SIGNAL(clicked(SCTransition*)), trans, SIGNAL(clicked(SCTransition*)));
+
+    // connect the text block graphic of this transition to the data model
+    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontFamilyAttribute*)));
+    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontSizeAttribute*)));
+
+    connect(trans->getEventTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontBoldAttribute*)));
+
+
 }
 
 
@@ -1108,6 +1136,8 @@ void SCGraphicsView::handleChangedParent(SCState* state, SCState* newParent)
 #endif
 
 #ifndef REMAKE_TRANSITIONS
+
+    // adjusts the path string to match the new parent scheme
     StateBoxGraphic* stateGraphic = _hashStateToGraphic.value(state);
     StateBoxGraphic* newParentGraphic = _hashStateToGraphic.value(newParent);
 
@@ -1259,8 +1289,6 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // and since its bigger, make its parent bigger.....
    // increaseSizeOfAllAncestors (newState);
 
-//    stateGraphic->getStateTitle()->resize();
-//    stateGraphic->getStateTitle()->recenterText();
 
     // load the text blocks
 

@@ -20,31 +20,37 @@
 */
 
 #include "selectabletextblock.h"
-#include "positionattribute.h"
-#include "sizeattribute.h"
 #include <QDebug>
 #include <QKeyEvent>
-#include "texteditbox.h"
-#include "scdatamodel.h"
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QTextDocument>
+#include <QFontDatabase>
+#include "positionattribute.h"
+#include "sizeattribute.h"
+#include "texteditbox.h"
+#include "scdatamodel.h"
 #include "transitiongraphic.h"
+#include "cornergrabber.h"
+
 
 #define DEFAULT_PEN_WIDTH       1
 #define HOVER_PEN_WIDTH         1
 
-#define MIN_WIDTH               50
-#define MIN_HEIGHT              24 + 2*(CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_Y_BUFFER)
+//#define MIN_WIDTH               50
+//#define MIN_HEIGHT              24 + 2*(CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_Y_BUFFER)
 
 //#define POP_UP_EDIT_MODE
+
+#define TB_MIN_WIDTH    50
+#define TB_MIN_HEIGHT   24 + 2*(VISIBLE_MARGIN+CONTENT_MARGIN)
 
 SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent,true),
        // _minSize(QPoint(MIN_WIDTH,MIN_HEIGHT)),
         _verticalTextMargin(10),
         _horizontalTextMargin(5),
-        _textItem(this, QRect(0,0, TEXTBLOCK_DEFAULT_WIDTH-2*(TEXT_ITEM_X_BUFFER), TEXTBLOCK_DEFAULT_HEIGHT-2*(TEXT_ITEM_Y_BUFFER))),
+        _textItem(this, QRect(0,0, TEXTBLOCK_DEFAULT_WIDTH, TEXTBLOCK_DEFAULT_HEIGHT)),
         _textBlockModel(textBlockModel),
         _centerText(true)
 {
@@ -67,12 +73,13 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     // set the text into the viewable area of the rectangle
 //    QRectF viewArea = this->getUsableArea();
 //    _textItem.setPos( viewArea.x() , viewArea.y() );
-    _textItem.setPos(TEXT_ITEM_X_BUFFER, TEXT_ITEM_Y_BUFFER);
+    _textItem.setPos(0,0);
     qDebug()<<"text item is :" << _textItem.pos();
-    QFont serifFont("Arial", 10, QFont::Bold);
-    _textItem.setFont(serifFont);
+//    QFont serifFont("Arial", 10, QFont::Bold);
+//    _textItem.setFont(serifFont);
 
-
+    QFont f(textBlockModel->getFontFamilyAttr()->asString(), textBlockModel->getFontSizeAttr()->asInt(), QFont::Bold);
+    _textItem.setFont(f);
 
     // set the initial text to what the datamodel loaded
     //_textItem.setPlainText( _textBlockModel->getText());
@@ -85,7 +92,7 @@ SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *te
     setBoxStyle(SelectableBoxGraphic::kTransparent );
     setFlags(QGraphicsItem::ItemClipsChildrenToShape);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
-    setMinSize(QPoint(MIN_WIDTH,MIN_HEIGHT));
+    setMinSize(QPoint(TB_MIN_WIDTH,TB_MIN_HEIGHT));
     setPenWidth(DEFAULT_PEN_WIDTH,HOVER_PEN_WIDTH);
 
 #ifdef POP_UP_EDIT_MODE
@@ -160,6 +167,51 @@ void SelectableTextBlock::resizeToFitParent()
     }
 
 
+}
+
+void SelectableTextBlock::handleFontChanged(FontSizeAttribute * fa)
+{
+    qDebug() << "stb::handleFontChanged ";
+    QFont f = _textItem.font();
+    f.setPointSize(fa->asInt());
+    _textItem.setFont(f);
+    recenterText();
+}
+
+void SelectableTextBlock::handleFontChanged(FontFamilyAttribute *ga)
+{
+    qDebug() << "stb::handleFontChanged()";
+    QFont f = _textItem.font();
+    f.setFamily(ga->asString());
+    _textItem.setFont(f);
+    this->recenterText();
+
+//    QFontDatabase qfd;
+//    foreach(const QString &family, qfd.families())
+//    {
+//        qDebug() << "================================="<< family <<"====================================";
+//        qDebug() << family;
+//        foreach(const QString &style, qfd.styles(family))
+//        {
+
+//            QString sizes;
+//            foreach (int points, qfd.smoothSizes(family,style))
+//            {
+//                sizes += QString::number(points) + " ";
+//            }
+//            //qDebug() << "\t"<<style <<"\t" << sizes;
+//        }
+//        qDebug() << "==============================================================================\n";
+//    }
+
+}
+
+void SelectableTextBlock::handleFontChanged(FontBoldAttribute * fba)
+{
+    QFont f = _textItem.font();
+    f.setBold(fba->asBool());
+    _textItem.setFont(f);
+    this->recenterText();
 }
 
 void SelectableTextBlock::textItemEventHandler(MaskedTextEdit *text, QGraphicsSceneMouseEvent *mevent)
@@ -465,7 +517,6 @@ void SelectableTextBlock::cornerEventHandler(CornerGrabber *corner, QGraphicsSce
 
         emit stateBoxResized(oldBox, newBox, corner->getCorner());
         this->recenterText();
-        this->update();
     }
 }
 
@@ -925,7 +976,7 @@ void SelectableTextBlock::handleAttributeChanged(IAttribute *attr)
 
         QFont font = _textItem.font();
 
-        _textItem.setFont(font);
+//        _textItem.setFont(font);
 
         if ( fb->asBool() )
         {
@@ -1008,6 +1059,8 @@ qreal SelectableTextBlock::clampMin(qreal value, qreal min)
  */
 void SelectableTextBlock::recenterText()
 {
+    qDebug() << "STB::recenterText()";
+
     // sets the width and height of the textItem based on the plainText
     _textItem.adjustSize();
 
@@ -1033,6 +1086,7 @@ void SelectableTextBlock::recenterText()
         qreal newY = this->getSize().y()/2.0 - _textItem.document()->size().height()/2.0;
         _textItem.setPos(this->clampMin(newX,getTotalTextItemBufferX()), this->clampMin(newY,getTotalTextItemBufferY()));
     }
+    update();
 }
 
 
@@ -1045,12 +1099,12 @@ void SelectableTextBlock::recenterText()
 
 qreal SelectableTextBlock::getTotalTextItemBufferX()
 {
-    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_X_BUFFER;
+    return (VISIBLE_MARGIN+CONTENT_MARGIN);
 }
 
 qreal SelectableTextBlock::getTotalTextItemBufferY()
 {
-    return CORNER_GRAB_Y_BUFFER + BOX_DRAW_BUFFER + TEXT_ITEM_Y_BUFFER;
+    return (VISIBLE_MARGIN+CONTENT_MARGIN);
 }
 
 /**

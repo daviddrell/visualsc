@@ -7,13 +7,13 @@
 #define WIDTH 16
 #define HEIGHT 16
 
-#define BUFFER_X 12
-#define BUFFER_Y 12
+#define BUFFER_X 9
+#define BUFFER_Y 7
 
 #define THICKNESS 1.67
 //#define THICKNESS 1.61803398875
 
-#define ARROW_BUFFER 5
+#define ARROW_BUFFER 4
 
 ToggleButton::ToggleButton(StateBoxGraphic* parentGraphic, int corner):
     QGraphicsItem(parentGraphic),
@@ -81,7 +81,7 @@ void ToggleButton::reposition()
     StateBoxGraphic* parent = this->parentAsStateBoxGraphic();
 //    QRectF rect(parent->getBufferX(), parent->getBufferY(), parent->getSize().x()- 2*parent->getBufferX(), parent->getSize.y()-2*parent->getBufferY());
 
-    QRectF rect = parent->getBufferedRect();
+    QRectF rect = parent->getContentAreaRect();
 
     switch(_corner)
     {
@@ -109,7 +109,7 @@ void ToggleButton::handleStateSizeChanged(SizeAttribute * sa)
         StateBoxGraphic* parent = this->parentAsStateBoxGraphic();
     //    QRectF rect(parent->getBufferX(), parent->getBufferY(), parent->getSize().x()- 2*parent->getBufferX(), parent->getSize.y()-2*parent->getBufferY());
 
-        QRectF rect = parent->getBufferedRect();
+        QRectF rect = parent->getContentAreaRect();
 
         switch(_corner)
         {
@@ -233,11 +233,16 @@ void ToggleButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     QPointF south(x+w/2.0, y+h);
     QPointF west(x,y+h/2.0);
 
+//#define DRAW_ELLIPSE
+#ifdef DRAW_ELLIPSE
+    // draw the ellipse
+    painter->drawEllipse(totalRect);
+#endif
+
     // on means active, and in this case active means minimized <
     if(_on)
     {
         // draw a <
-        painter->drawEllipse(totalRect);
         painter->drawLine(north,west);
         painter->drawLine(west,south);
 
@@ -246,8 +251,6 @@ void ToggleButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     else
     {
         // draw a V
-
-        painter->drawEllipse(totalRect);
         painter->drawLine(east,south);
         painter->drawLine(south,west);
     }

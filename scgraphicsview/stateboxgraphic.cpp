@@ -19,7 +19,6 @@
 */
 
 #include "stateboxgraphic.h"
-
 #include <QBrush>
 #include <QLinearGradient>
 #include <QDebug>
@@ -30,9 +29,10 @@
 #include "textblock.h"
 #include "selectablelinesegmentgraphic.h"
 #include <QApplication>
+#include "cornergrabber.h"
 
 
-
+#define HIDE_CORNER_GRABBERS
 
 #define PEN_DEFAULT_WIDTH       2.472135954999419
 #define PEN_HOVER_WIDTH         4
@@ -56,10 +56,6 @@
 #define BOX_GREEN_OFFSET        0
 #define BOX_BLUE_OFFSET         1
 
-#define MIN_WIDTH       105
-#define MIN_HEIGHT      42
-
-#define MINIMIZE_BUFFER_ON_TEXT 25
 
 
 // height of the state name fixed text block
@@ -67,6 +63,9 @@
 
 #define ENTRY_TOP           STATE_NAME_HEIGHT+2
 #define ENTRY_HEIGHT        24
+
+
+
 
 
 StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
@@ -78,13 +77,19 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _diagLineEnd(),
         _diagLineDrawIt(false),
         _intersection(),
-        _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, MINIMIZE_BUFFER_ON_TEXT, true)),
+        _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, MINIMIZE_BUTTON_MARGIN, true)),
         _entryActionTitle(new FixedTextBlock(this, ENTRY_TOP, ENTRY_HEIGHT,0, true)),
         _exitActionTitle(new FixedTextBlock(this, ENTRY_HEIGHT,0,0  , false))
 {
+
+
+
     // set the default text
     _stateTitle->setText(this->getStateName());
+//    _stateTitle->setFont(Font::Small);
 
+    // attach entry action title to the state title
+    _entryActionTitle->setBase(_stateTitle);
     _entryActionTitle->setText(this->getStateModel()->getStringAttr("entryAction")->asString());
     _entryActionTitle->setFont(Font::Small);
     _entryActionTitle->switchPen(PenStyle::Experimental);
@@ -103,12 +108,20 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     setPenWidth(PEN_DEFAULT_WIDTH, PEN_HOVER_WIDTH);
     //TextItem.setPos(25,10);
 
+#ifdef HIDE_CORNER_GRABBERS
+    _corners[0]->setPaintStyle( CornerGrabber::kNone);
+    _corners[1]->setPaintStyle( CornerGrabber::kNone);
+    _corners[2]->setPaintStyle( CornerGrabber::kNone);
+    _corners[3]->setPaintStyle( CornerGrabber::kNone);
+#endif
+
     //TextItem.setParentItem(this);
     //PositionAttribute* position = dynamic_cast<PositionAttribute*> (_stateModel->attributes.value("position"));
     //qDebug() << "setting position: " << mapFromScene(position->asPointF());
     //qDebug() << "setting position: " << mapToScene(position->asPointF());
     //qDebug() << "setting position: " << mapToParent(position->asPointF());
 
+    // set the inner border colors of initial and final states
     _initialStateColor = QColor(104,237,153,255);
     _finalStateColor = QColor(242,119,119,255);
 
@@ -137,6 +150,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
     _minimizeSize = QPointF(MIN_WIDTH,MIN_HEIGHT);
 
 }
+
 
 /**
  * @brief StateBoxGraphic::handleMinimize
@@ -209,7 +223,12 @@ void StateBoxGraphic::handleMinimize()
     }
 }
 
-
+void StateBoxGraphic::setMinHeight(qreal h)
+{
+//    SelectableBoxGraphic::setMinHeight(h);
+    _minSize.setY(h);
+    _minimizeSize.setY(h);
+}
 
 void StateBoxGraphic::handleExitActionChanged(StateString *ss )
 {
@@ -225,15 +244,15 @@ void StateBoxGraphic::updateElements()
 {
     _stateTitle->resize();
     _stateTitle->reposition();
-    _stateTitle->recenterText();
+    _stateTitle->cropDocument();
 
     _entryActionTitle->resize();
     _entryActionTitle->reposition();
-    _entryActionTitle->recenterText();
+    _entryActionTitle->cropDocument();
 
     _exitActionTitle->resize();
     _exitActionTitle->reposition();
-    _exitActionTitle->recenterText();
+    _exitActionTitle->cropDocument();
 
     _minimize->reposition();
 
@@ -423,41 +442,6 @@ int StateBoxGraphic::getSmallest(double* ar, int len)
         }
     }
     return index;
-}
-
-qreal StateBoxGraphic::getBufferX()
-{
-    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER;
-}
-
-qreal StateBoxGraphic::getBufferY()
-{
-    return CORNER_GRAB_X_BUFFER + BOX_DRAW_BUFFER;
-}
-
-QRectF StateBoxGraphic::getBufferedRect()
-{
-    QRectF rect( this->getBufferX(), this->getBufferY(), getSize().x() - 2*getBufferX(), getSize().y() - 2* getBufferY());
-    return rect;
-}
-
-/**
- * @brief StateBoxGraphic::getBufferedBoxRect
- * @param bufferLength
- * @return
- *
- * Returns a modified QRectF of the statebox that has a reduced width and height to match the box shown and ignore the stylistic shadow of the state box
- *
- */
-QRectF* StateBoxGraphic::getBufferedBoxRect(qreal bufferLength, qreal offset)
-{
-    QRectF box = getUsableArea();
-    QRectF* ret = new QRectF(box);
-    ret->setWidth(ret->width()-bufferLength);
-    ret->setHeight(ret->height()-bufferLength);
-    ret->setX(ret->x()-offset);
-    ret->setY(ret->y()-offset);
-    return ret;
 }
 
 /**
@@ -802,7 +786,7 @@ void StateBoxGraphic::handleAttributeChanged(SizeAttribute* size)
     QPoint sz = size->asPointF().toPoint();
     setSizeAndUpdateAnchors(sz);
     this->_stateTitle->resize();
-    this->_stateTitle->recenterText();
+    this->_stateTitle->cropDocument();
 
 }
 
@@ -1139,7 +1123,7 @@ void StateBoxGraphic::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 
 //        event->setAccepted(true);
 
-    qDebug() << "emitting clicked";
+//    qDebug() << "emitting clicked";
     emit clicked(this->getStateModel());
     //event->setAccepted(true);
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -1227,12 +1211,66 @@ void StateBoxGraphic::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 
 }
 
+// remove the corner grabbers
+void StateBoxGraphic::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
+{
+    _isHovered = false;
+
+    QApplication::restoreOverrideCursor();
+
+    for(int i = 0; i < 4; i++)
+    {
+        _corners[i]->setVisible(false);
+//        _corners[i]->removeSceneEventFilter(this);
+
+    }
+
+//    _corners[0]->setParentItem(NULL);
+//    _corners[1]->setParentItem(NULL);
+//    _corners[2]->setParentItem(NULL);
+//    _corners[3]->setParentItem(NULL);
+
+//    delete _corners[0];
+//    _corners[0] = NULL;
+
+//    delete _corners[1];
+//    _corners[1] = NULL;
+
+//    delete _corners[2];
+//    _corners[2] = NULL;
+
+//    delete _corners[3];
+//    _corners[3] = NULL;
+
+   // _pen.setWidthF(_penWidth);
+
+
+}
+
+
+// create the corner grabbers
+
+void StateBoxGraphic::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
+{
+    //qDebug() << "SelectableBoxGraphic HoverEnterEvent";
+    _isHovered = true;
+
+    //QApplication::setOverrideCursor(Qt::OpenHandCursor);
+
+
+    for(int i = 0; i < 4; i++)
+    {
+        _corners[i]->setVisible(true);
+//        _corners[i]->installSceneEventFilter(this);
+    }
+
+
+    setCornerPositions();
+}
+
 bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event )
 {
     //        qDebug() << " QEvent == " + QString::number(event->type());
-
-
-
     QGraphicsSceneMouseEvent * mevent = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
     if ( mevent == NULL)
     {
@@ -1251,19 +1289,17 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
         // if the mouse went down, record the x,y coords of the press, record it inside the corner object
         case QEvent::GraphicsSceneMousePress:
         {
-            qDebug() << "mouse press";
+//            qDebug() << "mouse press";
             corner->setMouseState(CornerGrabber::kMouseDown);
             corner->mouseDownX = mevent->pos().x();
             corner->mouseDownY = mevent->pos().y();
             //corner->setHovered(true);
-
-
         }
             break;
 
         case QEvent::GraphicsSceneMouseRelease:
         {
-            qDebug() << "mouse release";
+//            qDebug() << "mouse release";
             corner->setMouseState(CornerGrabber::kMouseReleased);
             //corner->setHovered(false);
             emit cornerReleased();
@@ -1273,7 +1309,7 @@ bool StateBoxGraphic::sceneEventFilter( QGraphicsItem * watched, QEvent * event 
 
         case QEvent::GraphicsSceneMouseMove:
         {
-            qDebug() << "mouse move";
+//            qDebug() << "mouse move";
             corner->setMouseState(CornerGrabber::kMouseMoving );
         }
             break;

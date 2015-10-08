@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="Life in a day" parallelState="false" position="0,0" size="200,124" type="machine" uid="{0f846a8d-a330-45f8-82f1-676815fc6627}" xmlns="http://www.w3.org/2005/07/scxml">
+    <state comments="" entryAction="Unwind" exitAction="Feel Refreshed" finalState="false" initialState="false" name="Play" parallelState="false" position="-400,405" size="293,231" type="" uid="{5183079b-af6a-42d8-88f5-480aa05d6b59}">
+        <textblock font-bold="true" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="10,10" size="122,42"/>
+        <transition comments="" connectToFinished="false" event="Go to Bed" path="M 0 129 L -157.646 129 L -157.646 -173 " target="Sleep" uid="{e8f1b255-fcf9-40c1-9ca7-1ebbbe77b380}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="-212,8" size="122,42"/>
+        </transition>
+    </state>
+    <state comments="" entryAction="Go Unconcious, Dream, Snore" exitAction="Open Eyes" finalState="false" initialState="true" name="Sleep" parallelState="false" position="-765,-54" size="341,286" type="" uid="{e8f1b255-fcf9-40c1-9ca7-1ebbbe77b380}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="Vivaldi" font-size="18" font-underline="false" position="10,10" size="122,42"/>
+        <transition comments="" connectToFinished="false" event="Wake Up" path="M 341 128 L 759 128 " target="Work" uid="{7f1e01ac-69b0-416c-912e-ed140db6ba7e}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="120,-38" size="122,42"/>
+        </transition>
+        <state comments="" entryAction="" exitAction="" finalState="false" initialState="true" name="NREM" parallelState="false" position="18,108" size="105,75" type="" uid="{e8598c5a-4cae-41b9-89c1-62f0e158bbec}">
+            <textblock font-bold="true" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="10,10" size="122,42"/>
+            <transition comments="" connectToFinished="false" event="time passes" path="M 105 25 L 200 25 " target="REM" uid="{82555364-e9a7-4639-881b-acfbc3c791ec}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="-18,-54" size="97,42"/>
+            </transition>
+        </state>
+        <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="REM" parallelState="false" position="218,103" size="105,75" type="" uid="{82555364-e9a7-4639-881b-acfbc3c791ec}">
+            <textblock font-bold="true" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="10,10" size="122,42"/>
+            <transition comments="" connectToFinished="false" event="time passes again" path="M 0 63.5 L -95 63.5 " target="NREM" uid="{e8598c5a-4cae-41b9-89c1-62f0e158bbec}">
+                <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="-79,9" size="137,43"/>
+            </transition>
+        </state>
+    </state>
+    <state comments="" entryAction="Meet people, Turn on Computer" exitAction="Get paid, Accomplish goals" finalState="false" initialState="false" name="Work" parallelState="true" position="-6,-83" size="250,340" type="" uid="{7f1e01ac-69b0-416c-912e-ed140db6ba7e}">
+        <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="Terminal" font-size="16" font-underline="false" position="10,10" size="122,42"/>
+        <transition comments="" connectToFinished="false" event="Finish Tasks" path="M 121 340 L 121 617 L -101 617 " target="Play" uid="{5183079b-af6a-42d8-88f5-480aa05d6b59}">
+            <textblock font-bold="false" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="-2,33" size="122,42"/>
+        </transition>
+        <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="Talk" parallelState="false" position="35,140" size="180,60" type="" uid="{3c48d1ec-bc7c-4423-9ca4-e98b94a6eb82}">
+            <textblock font-bold="true" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="10,10" size="122,42"/>
+        </state>
+        <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="Program" parallelState="false" position="35,80" size="180,60" type="" uid="{ac1c65a7-abfa-4ffd-8c5e-d8fa6597f28e}">
+            <textblock font-bold="true" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="10,10" size="122,42"/>
+        </state>
+        <state comments="" entryAction="" exitAction="" finalState="false" initialState="false" name="Think" parallelState="false" position="35,200" size="180,60" type="" uid="{561ab67e-5005-4d5e-a029-f1403aa07fd4}">
+            <textblock font-bold="true" font-color="rgb(0,0,0)" font-family="arial" font-size="10" font-underline="false" position="10,10" size="122,42"/>
+        </state>
+    </state>
+</scxml>

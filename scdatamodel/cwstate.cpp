@@ -61,18 +61,21 @@ void CWState::createSignalsAndSlots()
     _entryRelaySlot =    "Slot_StateEntry__" + _stateName+"()";
     _exitRelaySlot =     "Slot_StateExit__"+ _stateName+"()";
 
-
+    // get all things separated by n spaces "," then k spaces where n and k are 0, 1, 2, 3, ... spaces
+    QRegExp sep("\\s*,\\s*");
 
     // add all entry actions
     QString entryAction = _myState->getStringAttr("entryAction")->asString();
     if(!entryAction.isEmpty())
     {
-        // delete any spaces, this will cause an error
-        entryAction.replace(" ","");
-        QStringList entries = entryAction.split(",");
+        // delete any spaces, otherwise there will be an error
+        QStringList entries = entryAction.split(sep);
         for(int i = 0; i < entries.size(); i++)
         {
-            QString entry = "Action___"+toCamel(entries.at(i))+"()";
+            if(entries.at(i).isEmpty())
+                continue;
+
+            QString entry = QString("Action___"+toCamel(entries.at(i))+"()");
             this->addEntryAction(entry);
         }
     }
@@ -83,11 +86,13 @@ void CWState::createSignalsAndSlots()
     if(!exitAction.isEmpty())
     {
         // delete any spaces, otherwise an assertion error is thrown
-        exitAction.replace(" ","");
-        QStringList exits = exitAction.split(",");
+        QStringList exits = exitAction.split(sep);
         for(int i = 0; i < exits.size(); i++)
         {
-            QString exit = "Action___"+toCamel(exits.at(i))+"()";
+            if(exits.at(i).isEmpty())
+                continue;
+
+            QString exit = QString("Action___"+toCamel(exits.at(i))+"()");
             this->addExitAction(exit);
         }
     }
@@ -117,26 +122,41 @@ QList<CWTransition*> CWState::getTransitions()
  */
 QString CWState::toCamel(QString text)
 {
-    QStringList qls = text.split(" ");
-    //if(qls.size()==1)
-      //  return text;
+    // get all words separted by 1+n spaces, n = 0, 1, 2, 3, ...
+    QRegExp sep("\\s+");
+    QStringList qls = text.split(sep);
 
     QString ret;
     QString part;
     QChar firstLetter;
 
-    part = qls.at(0);
+    // find the starting word, where the word is not an empty string
+    int start = 0;
+    for(int i = 0 ; i < qls.size(); i++)
+    {
+        if(!qls.at(i).isEmpty())
+        {
+            start = i;
+            break;
+        }
+    }
+
+    // the first letter of the first word will be lowercase
+    part = qls.at(start);
     firstLetter = part.at(0);
 
-#ifdef FORCE_CAMEL_FIRST_WORD_LOWERCASE
-    ret+=part.toLower();
-#endif
-#ifndef FORCE_CAMEL_FIRST_WORD_LOWERCASE
+
     ret+= firstLetter.toLower();
     ret+= part.mid(1,part.size());
-#endif
-    for(int i = 1 ; i < qls.size(); i++)
+
+
+    // now, for every word, capitialize the first letter
+    for(int i = start+1 ; i < qls.size(); i++)
     {
+        // check if there was trailing spaces
+        if(qls.at(i).isEmpty())
+            continue;
+
         part = qls.at(i);
         firstLetter = part.at(0);
 

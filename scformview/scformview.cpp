@@ -45,13 +45,14 @@
 #include <QApplication>
 #include <QHeaderView>
 #include <QFileDialog>
+#include <QDesktopWidget>
 
 
 #define PROPERTY_TABLE_WIDTH_1  108     // smallest value while still having clearance for the longest attribute name connectToFinished
 #define PROPERTY_TABLE_WIDTH_2  170
 
 #define WINDOW_WIDTH    618
-#define WINDOW_HEIGHT   1000
+#define WINDOW_HEIGHT   1002
 
 
 //#define TREEVIEW_COLOR_ENABLE
@@ -72,7 +73,9 @@ SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         _currentlySelected(NULL)//,
         //_previouslySelected(NULL)
 {
-this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+
+
     createActions();
     createMenus();
     createToolbars();
@@ -169,6 +172,27 @@ this->resize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 
     initTree();
+
+
+    // resize the window
+    // based on the current resolution, set the formview and graphicsview sizes
+    // the height will be the same between the two
+    // the width of the formview will take up 1/3 of the screen
+    // the width of the graphicsview will take up 2/3 of the screen
+
+#define W7_BORDER   7.5                 // each of the windows 7 window borders are 7.5 pixels.
+
+    QRect desktop = QApplication::desktop()->availableGeometry();
+    qreal sysW = desktop.width();
+    qreal sysH = desktop.height();
+
+    sysW -= 2*(W7_BORDER);              // account for window border
+    qreal fW = sysW*1/3;
+    fW -= W7_BORDER;                    // space between windows
+    qreal gH = sysH - 37.5;             // 30 pixels + 7.5 pixels
+
+
+    this->resize(fW,gH);
 }
 
 
@@ -583,6 +607,16 @@ void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
             sendMessage("Invalid Position","Please enter coordinates: \"x,y\"");
         }
     }
+    else if (key == "font-family")
+    {
+        qDebug() << "font changed to: " << value;
+        tb->getFontFamilyAttr()->setValue(value);
+    }
+    else if(key == "font-size")
+    {
+        qDebug() << "font size changed to " << value;
+        tb->getFontSizeAttr()->setValue(value);
+    }
 }
 
 /**
@@ -605,7 +639,7 @@ void SCFormView::handleTextBlockPropertyCellChanged(int r, int c)
  */
 void SCFormView::handlePropertyCellChanged(int r, int c)
 {
-    qDebug() << "SCFormView::handle PropertyCellChanged type is " << _currentlySelected->getType();
+//    qDebug() << "SCFormView::handle PropertyCellChanged type is " << _currentlySelected->getType();
 
     // only process the second column
     if ( c != 1 ) return;
@@ -928,6 +962,14 @@ void SCFormView::handleItemClicked(SCTransitionBranch* br)
     this->highlightItem(br);
 }
 
+/**
+ * @brief SCFormView::connectTextBlock
+ * @param textBlock
+ * @param tableItem
+ * @param key
+ *
+ * when the attribute changes, update the corresponding table widget text
+ */
 void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem *tableItem, QString key)
 {
     if(key=="size")
@@ -937,6 +979,18 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
     else if(key == "position")
     {
         connect(textBlock->getPosAttr(), SIGNAL(changed(PositionAttribute*)), tableItem, SLOT(handleAttributeChanged(PositionAttribute*)));
+    }
+    else if (key == "font-family")
+    {
+        connect(textBlock->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), tableItem, SLOT(handleAttributeChanged(FontFamilyAttribute*)));
+    }
+    else if (key == "font-size")
+    {
+        connect(textBlock->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), tableItem, SLOT(handleAttributeChanged(FontSizeAttribute*)));
+    }
+    else if( key == "font-bold")
+    {
+        connect(textBlock->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), tableItem, SLOT(handleAttributeChanged(FontBoldAttribute*)));
     }
 }
 
@@ -971,6 +1025,8 @@ void SCFormView::connectState(SCState* st)
 {
     // SCState connects
     connect(st, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleStateDeleted(QObject*)), Qt::QueuedConnection);
+
+    // when a state changes parent
     connect(st, SIGNAL(changedParent(SCState*,SCState*)), this, SLOT(handleChangedParent(SCState*,SCState*)));
 
     // when a state emits the clicked signal, select it in form view
@@ -1629,7 +1685,7 @@ void SCFormView::setAttributeConnections(IAttributeContainer * atts, bool should
  *
  *
  * loads the textblock properties given in the attributes list into the secondary property table
- *
+ * and connects them to the data model
  *
  */
 void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, bool connect)
@@ -1639,6 +1695,7 @@ void SCFormView::setTextBlockAttributeConnections(IAttributeContainer* atts, boo
 
     if(connect)
     {
+        textBlockPropertyTable->setHorizontalHeaderLabels(QString("Attribute;Value").split(";"));
         int row = 0;
 
         // insert the name at the top
@@ -2479,6 +2536,9 @@ void SCFormView::handleReselectParent(SCState * target)
  * @param state
  * @param newParent
  *
+ *
+ * SLOT
+ *
  * state changed parent to newParent
  *
  * deletes all out transitions and recreates them using their old properties
@@ -2493,29 +2553,40 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
     QTreeWidgetItem* currentParentWidget    = _items.value(state->getParentState())->getTreeWidget();
     QTreeWidgetItem* newParentWidget        = _items.value(newParent)->getTreeWidget();
 
-    //stateWidget->setParent();
+    // retain expansion bool for the state machine and its children
+    // Qt will automatically set "expanded" for all children and itself to false when using addChild
+    bool stateExp = stateWidget->isExpanded();
+    QList<bool> childExpansion;
+    for(int i = 0; i < stateWidget->childCount(); i++)
+        childExpansion.append(stateWidget->child(i)->isExpanded());
 
-    //_items.value(state)->getTreeWidget()->setParent(_items.value(newParent)->getTreeWidget());
-    //_items.value(newParent)->getTreeWidget()->addChild(_items.value(state)->getTreeWidget());
+    // change the parent of the state in the tree view
     currentParentWidget->removeChild(stateWidget);
     newParentWidget->addChild(stateWidget);
-    stateWidget->setExpanded(true);
 
+    // re-apply expansion bool
+    stateWidget->setExpanded(stateExp);
+    for(int i = 0; i < stateWidget->childCount(); i++)
+        stateWidget->child(i)->setExpanded(childExpansion.at(i));
 
+    // for every transition that is a child of this state machine, delete it, then create a new one
+    // this is done to circumvent calling all proper disconnects for grand parent states
     QList<SCTransition*> transitions;
     state->getAllTransitions(transitions);
     // these are the sink anchors that belong to out transitions of the state
     for(int i = 0; i < transitions.size(); i++)
     {
         SCTransition* trans = transitions.at(i);
+        SCState* source = trans->parentSCState();
+
         QString eventName = trans->getEventName();
         QString pathStr = trans->getPathAttr()->asString();
         qDebug() << "pathStr: " << pathStr;
         _dm->deleteItem(trans);
-        _dm->insertNewTransition(state, trans->targetState(), eventName, pathStr);
+        _dm->insertNewTransition(source, trans->targetState(), eventName, pathStr);
     }
 
-
+    // select the root item because the current state gets unselected
     highlightRootItem();
 }
 
@@ -2533,17 +2604,12 @@ void SCFormView::handleChangedParent(SCState* state,SCState* newParent)
  */
 void SCFormView::insertTransition()
 {
-
-    //SCState * st = dynamic_cast<SCState *> (_currentlySelected);
     SCState* st = _currentlySelected->getState();
-    if ( st == NULL ) return;
+    if ( st == NULL )
+        return;
 
     if ( st->parent() == NULL)
     {
-        /*
-        QMessageBox msgBox;
-        msgBox.setText("cannot add state from root machine");
-        msgBox.exec();*/
         sendMessage("Error", "Cannot add transition from root machine");
         return;
     }
@@ -2557,12 +2623,6 @@ void SCFormView::insertTransition()
     connect( _targetStateSelectionWindow, SIGNAL(stateSelected(SCState*)), this, SLOT(handleStateSelectionWindowStateSelected(SCState*)));
 
     _targetStateSelectionWindow->show();
-
-
-
-
-
-
 }
 
 /**
@@ -3178,13 +3238,12 @@ void SCFormView::handleNewRootMachine(SCState*)
 
 SCState* SCFormView::getCurrentlySelectedState()
 {
-    if(!_currentlySelected->isState())
-    {
-        sendMessage("Error", "Please select a state");
-        return NULL;
-    }
-
     return _currentlySelected->getState();
+}
+
+SCTransition* SCFormView::getCurrentlySelectedTransition()
+{
+    return _currentlySelected->getTransition();
 }
 
 /**

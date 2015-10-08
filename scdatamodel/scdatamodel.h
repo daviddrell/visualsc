@@ -134,11 +134,19 @@ public:
 
     bool insertNewTextBlock(SCItem* item, QString name);
 
+    QList<SCState*> getStateMachines();
+
+    bool checkDataModel();
+
 public slots:
     SCState* handleMakeANewState(SCState*, StateAttributes*);
     SCTransition* handleMakeANewTransition(SCState* source, TransitionAttributes*);
     void handleReset();
     void handleOpen(QString);
+
+
+    void handleStateFontChanged(QFont*);
+    void handleTransitionFontChanged(QFont*);
 
 signals:
     void importedMachine(SCState*);
@@ -151,6 +159,15 @@ signals:
     void newRootMachine(SCState*);
     void insertNewTransitionSignal(SCForkedTransition*);
     void message(QString);
+    void itemClicked();
+
+    void setProgramFont(QFont*);
+
+    void setProgramFontFamily(FontFamilyAttribute*);
+    void setProgramFontSize(FontSizeAttribute*);
+    void setProgramFontBold(FontBoldAttribute*);
+//    void setFont(QString);
+//    void setFontSize(int);
 
 
 private slots:
@@ -165,13 +182,6 @@ private slots:
     void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
     void handleMakeANewEventTextBlock(TextBlockAttributes* attributes);
     void handleMakeANewTransitionProperty(const QString name);
-    void handleStateNameChangedInFormView(SCState*, QString);
-    void handleStatePositionChangedInFormView(SCState*, QPointF);
-    void handleStateSizeChangedInFormView(SCState*, QPointF);
-
-    void handleEventNameChangedInFormView(SCTransition*, QString);
-    void handleEventPositionChangedInFormView(SCTransition*, QString);
-    void handleEventSizeChangedInFormView(SCTransition*, QString);
 
     void handleStateMachineNameLoad(QString);
     void handleStateMachineUidLoad(QString);
@@ -179,10 +189,18 @@ private slots:
 
     void handleCheckEventCollision(TransitionStringAttribute*);
 
+    void handleItemClicked(SCState*);
+    void handleItemClicked(SCTransition*);
+
+    void handleChangeProgramFont(FontFamilyAttribute*);
+    void handleChangeProgramFont(FontSizeAttribute*);
+    void handleChangeProgramFont(FontBoldAttribute*);
+
 private:
 
 
     void connectTransition(SCTransition*);
+    void connectState(SCState*);
 
     QString toClassName(QString);
     QString toClassFileName(QString);
@@ -200,6 +218,8 @@ private:
     //QList<SCState*> _states;
     QList<SCTransition*> _transitions;
     QList<SCTransition*> _importedTransitions;
+
+    SCItem* _lastClickedItem;
 
 
 
