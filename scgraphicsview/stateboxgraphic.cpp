@@ -1730,11 +1730,7 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
 
     // draw the top box, the visible one
 
-
-
     _pen.setColor(Qt::black);
-
-
 
     if ( _isHovered )
         _pen.setWidthF(_penHoverWidth);
@@ -1751,10 +1747,7 @@ void StateBoxGraphic::paintWithVisibleBox (QPainter *painter, const QStyleOption
     else
         _pen.setStyle( Qt::DotLine );
 
-
-
     painter->setPen(_pen);
-
 
     if ( _boxStyle != kTransparent )
     {
