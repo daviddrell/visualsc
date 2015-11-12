@@ -96,10 +96,10 @@ void SMProject::save(QString fileName)
     _dm->save(fileName, errorMsg);
 }
 
-bool SMProject::exportToCode(QString fileName)
+bool SMProject::exportToCode(QString fileName, SCDataModel::STATE_CODE_MODEL model)
 {
     QString errorMessage;
-    return _dm->exportToCode(fileName, errorMessage);
+    return _dm->exportToCode(fileName, errorMessage,model);
 }
 
 void SMProject::close()

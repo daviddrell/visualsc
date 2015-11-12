@@ -17,25 +17,22 @@ public:
     ~CodeWriter();
 
 
-    bool writeHFile();
-    bool writeCppFile();
+    virtual bool writeHFile();
+    virtual bool writeCppFile();
 
     void addStateMachine(SCState*);
     void setRootMachine(SCState*);
-    //void addState(SCState*);
-    //void setChildren(QList<SCState*>);
-  //  void createSignalsAndSlots();
-    void createStateMachines();
+    virtual void createStateMachines();
     void connectStateMachine(CWStateMachine*);
 
 public slots:
     void handleNewRelayEvent(CWTransition*);
 
-private:
+protected:
 
 
-    void cWriteConstructor();
-    void cWriteDeconstructor();
+    virtual void cWriteConstructor();
+    virtual void cWriteDeconstructor();
     void cWriteEventSlots();
     void cWriteEntryExitSlots();
 
@@ -44,12 +41,10 @@ private:
     void hWriteStateChangeSignals();
     void hWriteEventRelaySignals();
     void hWriteActionRelaySlots();
-    void hWriteStates();
+    virtual void hWriteStates();
 
     void resolveCollisions(QList<CWState*>);
     void resolveCollision(CWState* one, CWState* two);
-//    void resolveCollisionsInsideStateMachines(QList<CWStateMachine*>);
-//    void resolveCollisionsBetweenStateMachines(QList<CWStateMachine*>);
 
     QString toCamel(QString);
     void hPrint(QString);
@@ -67,18 +62,11 @@ private:
     QTextStream hOut;
 
     SCState* _rootMachine;
-    //SCState* _initialState;
-
-    //QList<SCState*> _children;
-    //zQList<SCState*> _childrenMachines;
     QList<SCState*> _machines;
 
     QHash<SCState*, CWState*> _stateHash;
     QHash<SCState*, CWStateMachine*> _machineHash;
 
-    //QHash<SCTransition*, CWTransition*> _transitions;
-
-//    QList<CWEvent*> _events;
     QHash<QString, QList<QString>*> _eventRelaySignals;
 
     QHash<QString, int> _actionDeclare;

@@ -75,6 +75,7 @@ class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 
 public:
 
+    enum STATE_CODE_MODEL {PSTATE, QSTATE};///< when exporting to code, which state model to use
 
     QSettings* _settings;
     QString _lastSavePath;
@@ -92,7 +93,7 @@ public:
     void open(QString scxmlFile);
 
     bool save(QString scxmlFile, QString & message);
-    bool exportToCode(QString cName, QString &message);
+    bool exportToCode(QString cName, QString &message, SCDataModel::STATE_CODE_MODEL model);
 
     void initializeEmptyStateMachine();
 

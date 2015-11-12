@@ -91,6 +91,8 @@ private:
     QRadioButton* _stateFontRadioButton;
     QRadioButton* _transitionFontRadioButton;
     QRadioButton* _selectedRadioButton;
+    QRadioButton* _pStateRadioButton;
+    QRadioButton* _qStateRadioButton;
 
     void addToolbarSpacer(QToolBar *toolbar);
 
@@ -106,7 +108,7 @@ private slots:
     void handleBoldToggled(bool toggle);
 
     void handleFontRadioChanged();
-
+    void handlePStateQStateChanged();
     void on_actionImport_triggered();
 
     void on_actionShortcuts_triggered();

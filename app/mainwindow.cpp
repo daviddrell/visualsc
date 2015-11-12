@@ -111,10 +111,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _formEditorWindow->show();
 
 
-
-
-
-
     // connects for the mainwindow to other modules
 
 
@@ -175,9 +171,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->resize(gW,gH);
     this->move( fW + W7_BORDER+ W7_BORDER,0);
-
-
-
 
 }
 
@@ -282,6 +275,12 @@ void MainWindow::createFontBar()
     _selectedRadioButton = new QRadioButton("Selected", this);
     _stateFontRadioButton = new QRadioButton("States", this);
     _transitionFontRadioButton = new QRadioButton("Transitions", this);
+    _pStateRadioButton= new QRadioButton("PState Code", this);
+    _qStateRadioButton= new QRadioButton("QState Code", this);
+
+
+    connect(_pStateRadioButton,SIGNAL(clicked()),this,SLOT(handlePStateQStateChanged()));
+    connect(_qStateRadioButton,SIGNAL(clicked()),this,SLOT(handlePStateQStateChanged()));
 
     // when a group radio button is selected, uncheck bold (this is to make it easier to trigger making all bold simultaneously)
     connect(_stateFontRadioButton, SIGNAL(clicked()), this, SLOT(handleFontRadioChanged()));
@@ -290,12 +289,14 @@ void MainWindow::createFontBar()
     ui->mainToolBar->addWidget(_selectedRadioButton);
     ui->mainToolBar->addWidget(_stateFontRadioButton);
     ui->mainToolBar->addWidget(_transitionFontRadioButton);
+    ui->mainToolBar->addWidget(_pStateRadioButton);
+    ui->mainToolBar->addWidget(_qStateRadioButton);
 
     _selectedRadioButton->toggle();
-
-
-
     ui->mainToolBar->addSeparator();
+
+    _pStateRadioButton->setChecked(false);
+    _qStateRadioButton->setChecked(true);
 
 }
 
@@ -474,6 +475,24 @@ void MainWindow::handleChangeFont(QString)
     else
     {
         qDebug() << "ERROR NEITHER state or transition radio button selected for font";
+    }
+}
+
+void MainWindow::handlePStateQStateChanged()
+{
+    if ( QObject::sender() == _qStateRadioButton)
+    {
+        if ( _qStateRadioButton->isChecked())
+            _pStateRadioButton->setChecked(false);
+        else
+            _pStateRadioButton->setChecked(true);
+    }
+    else if ( QObject::sender() == _pStateRadioButton)
+    {
+        if ( _pStateRadioButton->isChecked())
+            _qStateRadioButton->setChecked(false);
+        else
+            _qStateRadioButton->setChecked(true);
     }
 }
 
@@ -721,6 +740,12 @@ void MainWindow::handleExportCodeClick()
 
     bool exportStatus;
 
+    SCDataModel::STATE_CODE_MODEL model;
+    if ( _pStateRadioButton->isChecked())
+        model = SCDataModel::PSTATE;
+    else
+        model = SCDataModel::QSTATE;
+
     // check if we have exported the file before
     if(_currentExportFullPath.isEmpty())
     {
@@ -742,12 +767,12 @@ void MainWindow::handleExportCodeClick()
         {
             _currentExportFullPath = exportName;
             _currentFolder = QFileInfo(_currentExportFullPath).path();
-            exportStatus = _project->exportToCode(_currentExportFullPath);
+            exportStatus = _project->exportToCode(_currentExportFullPath,model);
         }
     }
     else
     {
-        exportStatus = _project->exportToCode(_currentExportFullPath);
+        exportStatus = _project->exportToCode(_currentExportFullPath,model);
     }
 
     if(exportStatus)

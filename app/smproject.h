@@ -49,7 +49,7 @@ public:
 
     void readInputFile(QString file);
     void save(QString file);
-    bool exportToCode(QString file);
+    bool exportToCode(QString file, SCDataModel::STATE_CODE_MODEL model );
     QGraphicsView * getQGraphicsView();
     SCDataModel  * getDM();
 

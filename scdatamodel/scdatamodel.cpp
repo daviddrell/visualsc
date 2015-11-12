@@ -27,6 +27,7 @@
 #include <QEventLoop>
 #include <QTime>
 #include <QCoreApplication>
+#include "codewriterpstate.h"
 
 SCDataModel::SCDataModel(QObject * parent) :
     QObject (parent),
@@ -414,24 +415,25 @@ QString SCDataModel::toClassName(QString className)
         word = qsl.at(i);
         ret += word.at(0).toUpper() + word.mid(1,word.size()).toLower();
     }
+    ret += "SM";
     return ret;
 }
 
 
 QString SCDataModel::getCFileName()
 {
-    QString name = _topState->getName();
+    QString name = toClassName( _topState->getName());
     name.replace(" ","");
     return name.toLower()+".cpp";
 }
 
-bool SCDataModel::exportToCode(QString fileName, QString &errorMessage)
+bool SCDataModel::exportToCode(QString fileName, QString &, SCDataModel::STATE_CODE_MODEL model)
 {
-qDebug() << "time to save files " << fileName;
+    qDebug() << "time to save files " << fileName;
 
-QString hFileName;
-QString cppFileName;
-QString className = toClassName(_topState->attributes.value("name")->asString());
+    QString hFileName;
+    QString cppFileName;
+    QString className = toClassName(_topState->attributes.value("name")->asString());
 
 
 //#define FORCE_STATE_MACHINE_NAME
@@ -457,38 +459,37 @@ QString className = toClassName(_topState->attributes.value("name")->asString())
 
 #endif
 
-    CodeWriter cw(this->getTopState(), className, cppFileName, hFileName);
+    CodeWriter *cw;
+    if ( model == SCDataModel::PSTATE)
+    {
+        cw =(CodeWriter*) new CodeWriterPState (this->getTopState(), className, cppFileName, hFileName);
+        // add the state machines to the codewriter
+        QList<SCState*> list;
+        this->getAllStates(list);
+        foreach(SCState* sm, list)
+            cw->addStateMachine(sm);
 
-    //QList<SCState *> list;
-    //_topState->getAllStates(list);
-   // _topState->getStates(list);
+    }
+    else if ( model == SCDataModel::QSTATE)
+    {
+        cw = new CodeWriter (this->getTopState(), className, cppFileName, hFileName);
+        // add the state machines to the codewriter
+        QList<SCState*> stateMachines = this->getStateMachines();
+        foreach(SCState* sm, stateMachines)
+            cw->addStateMachine(sm);
+
+    }
 
 
-//    QList<SCState* > all;
-//    all.append(_topState);
-//    _topState->getAllStates(all);
-
-
-//    for(int i = 0; i < all.size();i++)
-//    {
-//        SCState* state = all.at(i);
-//        if(state->isStateMachine())
-//        {
-//            cw.addStateMachine(state);
-//        }
-//    }
-
-    // add the state machines to the codewriter
-    QList<SCState*> stateMachines = this->getStateMachines();
-    foreach(SCState* sm, stateMachines)
-        cw.addStateMachine(sm);
 
     // define the signal and slot names
-    cw.createStateMachines();
+    cw->createStateMachines();
 
     // create the files
-    cw.writeHFile();
-    cw.writeCppFile();
+    cw->writeHFile();
+    cw->writeCppFile();
+
+    delete cw;
 
     return true;
 }

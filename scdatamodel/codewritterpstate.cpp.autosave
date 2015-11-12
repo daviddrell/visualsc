@@ -1,0 +1,94 @@
+#include "codewritterpstate.h"
+
+CodeWriterPState::CodeWriterPState(SCState* rootMachine, QString classNameString,QString cFileName, QString hFileName) :
+    CodeWriter(rootMachine, classNameString, cFileName, hFileName)
+{
+
+}
+
+CodeWriterPState::~CodeWriterPState()
+{
+
+}
+
+bool CodeWriterPState::writeCppFile()
+{
+
+}
+
+bool CodeWriterPState::writeHFile()
+{
+    if(!hFile.open(QIODevice::WriteOnly|QIODevice::Text))
+    {
+        qDebug() << "ERROR writing to .h file!";
+        return false;
+    }
+
+    hPrintln("// This header file was generated using VisualSC's Export Code Function\n");
+    hPrintln("// Visual Statechart is an open source project. Visit us at https://github.com/daviddrell/visualsc");
+    hPrintln("#ifndef "+ className.toUpper() + "_H\n#define "+className.toUpper()+"_H\n");
+    hPrintln("#include \"pstate.h\"");
+    hPrintln("using std::string;\n");
+    hPrintln("class "+className);
+    hPrintln("{");
+    hPrintln("//////////////////",1);
+    hPrintln("//",1);
+    hPrintln("//    Public interface",1);
+    hPrintln("//",1);
+    hPrintln("//    Call inputEvent() to drive events into the state machine",1);
+    hPrintln("//",1);
+    hPrintln("//    To take action, inherit from this class and override handleAction()",1);
+    hPrintln("//",1);
+    hPrintln("//    To monitor state changes, inherit from this class and override handleStateChanges()",1);
+    hPrintln("//",1);
+    hPrintln("//////////////////\n",1);
+
+    // public
+    hPrintln("public:\n");
+    hPrintln(className+"();",1);
+    hPrintln("~"+className+"();\n",1);
+    hPrintln("\n",1);
+    hPrintln("void start();\n",1);
+    hPrintln("void inputEvent(string evt);\n",1);
+    hPrintln("virtual void handleAction(string action);\n",1);
+    hPrintln("virtual void handleStateEntered(string state);\n",1);
+    hPrintln("virtual void handleStateExited(string state);\n",1);
+
+    // private
+    hPrintln("private:\n");
+    hPrintln("static void stateEnteredStatic(void *p, UInt32 funcIndex, void *userDefined, PStateEnteredArgsT *pArgs);\n",1);
+    hPrintln("static void stateExitedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateExitedArgsT *pArgs);\n",1);
+    hPrintln("static void stateFinishedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateFinishedArgsT *pArgs);\n",1);
+
+    hPrintln("void stateEntered(PStateEnteredArgsT *pArgs);\n");
+    hPrintln("void stateExited(PStateExitedArgsT  *pArgs);\n");
+    hPrintln("void stateFinished(PStateFinishedArgsT  *pArgs);\n");
+
+
+    //write the statemachine states
+    this->hWriteStates();
+
+    // end if define
+    hPrintln("\n};\n\n#endif // "+className.toUpper()+"_H");
+
+    // true if no complications
+    return true;
+
+}
+
+/**
+ * @brief CodeWriterPState::hWriteStates
+ *
+ * .h write of PStates
+ *
+ */
+void CodeWriterPState::hWriteStates()
+{
+    for(int i = 0 ; i < _machines.size(); i++)
+    {
+        SCState* machine = _machines.at(i);
+        hPrintln("PState*    "+ machine->objectName() +";\n",1);
+    }
+    hPrintln("\n");
+}
+
