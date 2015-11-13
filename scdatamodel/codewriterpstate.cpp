@@ -15,7 +15,111 @@ CodeWriterPState::~CodeWriterPState()
 void CodeWriterPState::createStateMachines()
 {
 
+}
 
+void CodeWriterPState::createCppBody()
+{
+    // this function just creates the rest of the cpp implemenation
+
+    //cPrintln( className +"::~" +className +"()" );
+    cPrintln("void "+className+ "::start()",0);
+    cPrintln("{",0);
+    cPrintln(_rootStateClassName+"->start();",1);
+    cPrintln("}\n",0);
+
+    cPrintln("void "+className+ "::inputEvent(string evt)",0);
+    cPrintln("{",0);
+    cPrintln(_rootStateClassName+"->signalEvent(evt);",1);
+    cPrintln("}\n",0);
+
+
+    cPrintln("void "+className+ "::stateEnteredStatic(void *, UInt32, void *userDefined, PStateEnteredArgsT *pArgs)",0);
+    cPrintln("{",0);
+    cPrintln(className+"* s= ("+className+"*) userDefined;",1);
+    cPrintln("s->stateEntered(pArgs);",1);
+    cPrintln("}\n",0);
+
+
+    cPrintln("void "+className+ "::stateEntered(PStateEnteredArgsT *pArgs)",0);
+    cPrintln("{",0);
+    cPrintln("handleStateEntered(pArgs->s->GetModT()->name);",1);
+    cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
+    cPrintln("{",1);
+    cPrintln("handleAction(pArgs->actions[i]);",2);
+    cPrintln("}",1);
+    cPrintln("}\n",0);
+
+
+
+    cPrintln("void "+className+ "::stateExitedStatic(void *, UInt32, void *userDefined, PStateExitedArgsT *pArgs)",0);
+    cPrintln("{",0);
+    cPrintln(className+"* s= ("+className+"*) userDefined;" ,1);
+    cPrintln("s->stateExited(pArgs);",1);
+    cPrintln("}\n",0);
+
+
+    cPrintln("void "+className+ "::stateExited(PStateExitedArgsT  *pArgs)",0);
+    cPrintln("{",0);
+    cPrintln("handleStateExited(pArgs->s->GetModT()->name);",1);
+    cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
+    cPrintln("{",1);
+    cPrintln("handleAction(pArgs->actions[i]);",2);
+    cPrintln("}",1);
+    cPrintln("}\n",0);
+
+
+    cPrintln("void "+className+ "::stateFinishedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateFinishedArgsT *pArgs)",0);
+    cPrintln("{",0);
+    cPrintln(className+"* s= ("+className+"*) userDefined;" ,1);
+    cPrintln("s->stateFinished(pArgs);",1);
+    cPrintln("}\n",0);
+
+
+    cPrintln("void "+className+ "::stateFinished(PStateFinishedArgsT  *pArgs)",0);
+    cPrintln("{",0);
+    cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
+    cPrintln("{",1);
+    cPrintln("handleAction(pArgs->actions[i]);",2);
+    cPrintln("}",1);
+    cPrintln("}\n",0);
+
+}
+
+
+QStringList CodeWriterPState::getExitActions(SCState *s)
+{
+    QStringList actions;
+    QString ActionStr = s->getStringAttr("exitAction")->asString();
+    if(!ActionStr.isEmpty())
+    {
+        // delete any spaces, otherwise there will be an error
+        QStringList entries = ActionStr.split(',');
+        for(int i = 0; i < entries.count(); i++)
+        {
+            if(entries.at(i).isEmpty())
+                continue;
+            actions.append(entries.at(i).trimmed());
+        }
+    }
+    return actions;
+}
+
+QStringList CodeWriterPState::getEntryActions(SCState *s)
+{
+    QStringList actions;
+    QString ActionStr = s->getStringAttr("entryAction")->asString();
+    if(!ActionStr.isEmpty())
+    {
+        // delete any spaces, otherwise there will be an error
+        QStringList entries = ActionStr.split(',');
+        for(int i = 0; i < entries.count(); i++)
+        {
+            if(entries.at(i).isEmpty())
+                continue;
+            actions.append(entries.at(i).trimmed());
+        }
+    }
+    return actions;
 }
 
 void CodeWriterPState::cWriteStateInitialization(SCState *s)
@@ -38,23 +142,43 @@ void CodeWriterPState::cWriteStateInitialization(SCState *s)
         cPrintln(toCamel(s->objectName()) +"->addTransition(" + toCamel(target->objectName()) + ", \""+tName+"\");",1);
     }
 
+    QStringList entryActions = getEntryActions(s);
+    for(int a = 0 ; a < entryActions.count(); a++)
+    {
+        cPrintln(toCamel(s->objectName()) +"->addEnterAction(\"" + entryActions[a] + "\");",1);
+    }
+
+    QStringList exitActions = getExitActions(s);
+    for(int a = 0 ; a < exitActions.count(); a++)
+    {
+        cPrintln(toCamel(s->objectName()) +"->addExitAction(\"" + exitActions[a] + "\");",1);
+    }
+
+
+    //
+    // add child states
+    //
     QList<SCState*> states = s->getStates();
     for(int i = 0 ; i < states.count(); i++)
     {
         SCState *c = states[i];
-        cPrintln(toCamel(s->objectName() +"->addChildState(" + toCamel(c->objectName()) + ");"),1);
+        cPrintln(toCamel(s->objectName()) +"->addChildState(" + toCamel(c->objectName() + ");"),1);
     }
+    cPrintln("");
 
     for(int i = 0 ; i < states.count(); i++)
     {
         SCState *c = states[i];
         cWriteStateInitialization(c);
     }
-    cPrintln("");
+
 }
 
 void CodeWriterPState::cWriteDeconstructor()
 {
+    cPrintln( className +"::~" +className +"()" );
+    cPrintln( "{\n}" );
+
 }
 
 void CodeWriterPState::cWriteConstructor()
@@ -72,10 +196,16 @@ void CodeWriterPState::cWriteConstructor()
         return;
     }
 
+    _rootStateClassName =  toCamel( rootState->objectName());
+
     cPrintln( className +"::" +className +"()" );
     cPrintln( "{" );
-    cPrintln( toCamel( rootState->objectName()) +" = new PState(\""+toCamel(rootState->objectName())+"\");",1);
+    cPrintln( _rootStateClassName +" = new PState(\""+toCamel(rootState->objectName())+"\");",1);
 
+
+    //
+    // add all:   stateInstances = new PState()
+    //
     for(int i = 0 ; i < _machines.size(); i++)
     {
         SCState* machine = _machines.at(i);
@@ -83,15 +213,40 @@ void CodeWriterPState::cWriteConstructor()
     }
     cPrintln( "" );
 
-
+    //
+    // initialize the root state
+    //
     cPrintln( toCamel( rootState->objectName()) +"->setIsRoot(true);" ,1);
+    cWriteStateInitialization(rootState);
+
+    /*
+
+    QString isFinal = rootState->isFinal() ? "true" : "false";
+    QString isInitial = rootState->isInitial() ? "true" : "false";
+    QString isParallel = rootState->isParallel() ? "true" : "false";
+
+    cPrintln(toCamel(rootState->objectName() +"->setIsInitialState(" + isInitial + ");"),1);
+    cPrintln(toCamel(rootState->objectName() +"->setIsFinalState(" + isFinal + ");"),1);
+    cPrintln(toCamel(rootState->objectName() +"->setIsParallel(" + isParallel + ");"),1);
+
+    cPrintln( "" );
+
+    //
+    // initialize all the child states
+    //
 
     QList<SCState*> states =rootState->getStates();
     for(int i = 0 ; i < states.count(); i++)
     {
         SCState *s = states[i];
+        cPrintln(toCamel(rootState->objectName() +"->addChildState(" + toCamel(s->objectName()) + ");"),1);
         cWriteStateInitialization(s);
     }
+    */
+
+    //
+    // add the call backs
+    //
 
     cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateEntered, (CallbackFuncPtrT)stateEnteredStatic, this, kSameTaskCallback);",1);
     cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateExited, (CallbackFuncPtrT)stateExitedStatic, this, kSameTaskCallback);",1);
@@ -104,9 +259,8 @@ void CodeWriterPState::cWriteConstructor()
 bool CodeWriterPState::writeCppFile()
 {
     // intro
-    cPrintln("/* This .cpp file was generated using VisualSC's Export Code Function\n");
-    cPrintln("\n");
-    cPrintln("The state machine class is modeled as a PState machine and encapsulates a hierarchical state machine by holding PStates for each state");
+    cPrintln("/*\n    This .cpp file was generated using VisualSC's Export Code Function.");
+    cPrintln("    The state machine class is modeled as a PState machine and encapsulates a hierarchical state machine by holding PStates for each state.\n");
     cPrintln("*/\n");
 
     // include statements
@@ -118,6 +272,7 @@ bool CodeWriterPState::writeCppFile()
     // write the deconstructor
     this->cWriteDeconstructor();
 
+    this->createCppBody();
 
     return true;
 }
@@ -158,9 +313,9 @@ bool CodeWriterPState::writeHFile()
     hPrintln("\n",1);
     hPrintln("void start();",1);
     hPrintln("void inputEvent(string evt);",1);
-    hPrintln("virtual void handleAction(string action);",1);
-    hPrintln("virtual void handleStateEntered(string state);",1);
-    hPrintln("virtual void handleStateExited(string state);\n\n",1);
+    hPrintln("virtual void handleAction(string action)=0;",1);
+    hPrintln("virtual void handleStateEntered(string state)=0;",1);
+    hPrintln("virtual void handleStateExited(string state)=0;\n\n",1);
 
     // private
     hPrintln("private:\n");

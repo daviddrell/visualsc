@@ -18,6 +18,11 @@ protected:
     virtual void cWriteDeconstructor();
     virtual void hWriteStates();
     void cWriteStateInitialization(SCState *s);
+    void createCppBody();
+    QStringList getEntryActions(SCState *s);
+    QStringList getExitActions(SCState *s);
+
+    QString _rootStateClassName;
 
 };
 
