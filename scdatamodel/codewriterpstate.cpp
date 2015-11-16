@@ -24,7 +24,7 @@ void CodeWriterPState::createCppBody()
     //cPrintln( className +"::~" +className +"()" );
     cPrintln("void "+className+ "::start()",0);
     cPrintln("{",0);
-    cPrintln(_rootStateClassName+"->start();",1);
+    cPrintln(_rootStateClassName+"->startSM();",1);
     cPrintln("}\n",0);
 
     cPrintln("void "+className+ "::inputEvent(string evt)",0);
