@@ -21,9 +21,12 @@ protected:
     void createCppBody();
     QStringList getEntryActions(SCState *s);
     QStringList getExitActions(SCState *s);
+    QString createEventEnum();
+    QString createActionEnum();
 
     QString _rootStateClassName;
-
+    QMap<QString,QString>  _eventNums; // key= string user types into the visual editor, value = enum version of the string
+    QMap<QString,QString>  _actionNums; // key= string user types into the visual editor, value = enum version of the string
 };
 
 #endif // CODEWRITTERPSTATE_H

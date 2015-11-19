@@ -27,20 +27,20 @@ void CodeWriterPState::createCppBody()
     cPrintln(_rootStateClassName+"->startSM();",1);
     cPrintln("}\n",0);
 
-    cPrintln("void "+className+ "::inputEvent(string evt)",0);
+    cPrintln("void "+className+ "::inputEvent(int evt)",0);
     cPrintln("{",0);
     cPrintln(_rootStateClassName+"->signalEvent(evt);",1);
     cPrintln("}\n",0);
 
 
-    cPrintln("void "+className+ "::stateEnteredStatic(void *, UInt32, void *userDefined, PStateEnteredArgsT *pArgs)",0);
+    cPrintln("void "+className+ "::stateEnteredStatic(void *, UInt32, void *userDefined, PStateCallbackArgsT *pArgs)",0);
     cPrintln("{",0);
     cPrintln(className+"* s= ("+className+"*) userDefined;",1);
     cPrintln("s->stateEntered(pArgs);",1);
     cPrintln("}\n",0);
 
 
-    cPrintln("void "+className+ "::stateEntered(PStateEnteredArgsT *pArgs)",0);
+    cPrintln("void "+className+ "::stateEntered(PStateCallbackArgsT *pArgs)",0);
     cPrintln("{",0);
     cPrintln("handleStateEntered(pArgs->s->GetModT()->name);",1);
     cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
@@ -51,14 +51,14 @@ void CodeWriterPState::createCppBody()
 
 
 
-    cPrintln("void "+className+ "::stateExitedStatic(void *, UInt32, void *userDefined, PStateExitedArgsT *pArgs)",0);
+    cPrintln("void "+className+ "::stateExitedStatic(void *, UInt32, void *userDefined, PStateCallbackArgsT *pArgs)",0);
     cPrintln("{",0);
     cPrintln(className+"* s= ("+className+"*) userDefined;" ,1);
     cPrintln("s->stateExited(pArgs);",1);
     cPrintln("}\n",0);
 
 
-    cPrintln("void "+className+ "::stateExited(PStateExitedArgsT  *pArgs)",0);
+    cPrintln("void "+className+ "::stateExited(PStateCallbackArgsT  *pArgs)",0);
     cPrintln("{",0);
     cPrintln("handleStateExited(pArgs->s->GetModT()->name);",1);
     cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
@@ -68,14 +68,14 @@ void CodeWriterPState::createCppBody()
     cPrintln("}\n",0);
 
 
-    cPrintln("void "+className+ "::stateFinishedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateFinishedArgsT *pArgs)",0);
+    cPrintln("void "+className+ "::stateFinishedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateCallbackArgsT *pArgs)",0);
     cPrintln("{",0);
     cPrintln(className+"* s= ("+className+"*) userDefined;" ,1);
     cPrintln("s->stateFinished(pArgs);",1);
     cPrintln("}\n",0);
 
 
-    cPrintln("void "+className+ "::stateFinished(PStateFinishedArgsT  *pArgs)",0);
+    cPrintln("void "+className+ "::stateFinished(PStateCallbackArgsT  *pArgs)",0);
     cPrintln("{",0);
     cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
     cPrintln("{",1);
@@ -83,7 +83,28 @@ void CodeWriterPState::createCppBody()
     cPrintln("}",1);
     cPrintln("}\n",0);
 
+
+    cPrintln("std::string SessionModelStateMachineSM::actionCodeToString(int action)");
+    cPrintln("{");
+    cPrintln("switch (action)",1);
+    cPrintln("{",1);
+
+    QMap<QString,QString>::iterator i;
+    for( i =  _actionNums.begin(); i != _actionNums.end();i++)
+    {
+        cPrintln("case "+ i.value()+":",1);
+        cPrintln("return \""+ i.key() +"\";",2);
+        cPrintln("break;",2);
+    }
+
+    cPrintln("default:",1);
+    cPrintln("return \"action not found in table\";",2);
+    cPrintln("break;",2);
+    cPrintln("}",1);
+    cPrintln("}");
 }
+
+
 
 
 QStringList CodeWriterPState::getExitActions(SCState *s)
@@ -139,19 +160,19 @@ void CodeWriterPState::cWriteStateInitialization(SCState *s)
         SCTransition* t = transitions[i];
         SCState* target = t->targetState();
         QString tName = t->objectName();
-        cPrintln(toCamel(s->objectName()) +"->addTransition(" + toCamel(target->objectName()) + ", \""+tName+"\");",1);
+        cPrintln(toCamel(s->objectName()) +"->addTransition(" + toCamel(target->objectName()) + ","+ _eventNums[tName]+");",1);
     }
 
     QStringList entryActions = getEntryActions(s);
     for(int a = 0 ; a < entryActions.count(); a++)
     {
-        cPrintln(toCamel(s->objectName()) +"->addEnterAction(\"" + entryActions[a] + "\");",1);
+        cPrintln(toCamel(s->objectName()) +"->addEnterAction(" + _actionNums[ entryActions[a]] + ");",1);
     }
 
     QStringList exitActions = getExitActions(s);
     for(int a = 0 ; a < exitActions.count(); a++)
     {
-        cPrintln(toCamel(s->objectName()) +"->addExitAction(\"" + exitActions[a] + "\");",1);
+        cPrintln(toCamel(s->objectName()) +"->addExitAction(" + _actionNums[exitActions[a]] + ");",1);
     }
 
 
@@ -219,31 +240,6 @@ void CodeWriterPState::cWriteConstructor()
     cPrintln( toCamel( rootState->objectName()) +"->setIsRoot(true);" ,1);
     cWriteStateInitialization(rootState);
 
-    /*
-
-    QString isFinal = rootState->isFinal() ? "true" : "false";
-    QString isInitial = rootState->isInitial() ? "true" : "false";
-    QString isParallel = rootState->isParallel() ? "true" : "false";
-
-    cPrintln(toCamel(rootState->objectName() +"->setIsInitialState(" + isInitial + ");"),1);
-    cPrintln(toCamel(rootState->objectName() +"->setIsFinalState(" + isFinal + ");"),1);
-    cPrintln(toCamel(rootState->objectName() +"->setIsParallel(" + isParallel + ");"),1);
-
-    cPrintln( "" );
-
-    //
-    // initialize all the child states
-    //
-
-    QList<SCState*> states =rootState->getStates();
-    for(int i = 0 ; i < states.count(); i++)
-    {
-        SCState *s = states[i];
-        cPrintln(toCamel(rootState->objectName() +"->addChildState(" + toCamel(s->objectName()) + ");"),1);
-        cWriteStateInitialization(s);
-    }
-    */
-
     //
     // add the call backs
     //
@@ -275,6 +271,77 @@ bool CodeWriterPState::writeCppFile()
     this->createCppBody();
 
     return true;
+}
+
+QString CodeWriterPState::createEventEnum()
+{
+    QString enumStr;
+    enumStr.append("enum " + className +"_EVENTS\n    {\n");
+
+    SCDataModel * dm = SCDataModel::singleton();
+    QList<SCState*> allchildStates;
+    dm->getAllStates(allchildStates);
+
+    for(int i = 0 ; i < allchildStates.count(); i++)
+    {
+        SCState* s = allchildStates.at(i);
+        QList<SCTransition*> transitions;
+        s->getTransitions(transitions);
+        for(int i=0; i < transitions.count(); i++)
+        {
+            SCTransition* t = transitions[i];
+            QString tName = t->objectName();
+            if ( ! _eventNums.contains(tName))
+            {
+                QString eventStr = toCamel("k "+tName) + "_EVENT";
+                _eventNums.insert(tName,eventStr);
+                enumStr.append( "        "+ eventStr +",\n");
+            }
+        }
+    }
+    enumStr.append("    };\n");
+    return enumStr;
+}
+
+QString CodeWriterPState::createActionEnum()
+{
+    QString enumStr;
+    enumStr.append("enum " + className +"_ACTIONS\n    {\n");
+
+    SCDataModel * dm = SCDataModel::singleton();
+    QList<SCState*> allchildStates;
+    dm->getAllStates(allchildStates);
+
+    for(int i = 0 ; i < allchildStates.count(); i++)
+    {
+        SCState* s = allchildStates.at(i);
+        QStringList actions = getEntryActions(s);
+
+        foreach(QString action, actions)
+        {
+            if ( ! _actionNums.contains(action))
+            {
+                QString actionStr =toCamel("k "+action)+"_ACTION";
+                _actionNums.insert(action,actionStr);
+                enumStr.append( "        "+ actionStr +",\n");
+            }
+        }
+        actions.clear();
+        actions = getExitActions(s);
+
+        foreach(QString action, actions)
+        {
+            if ( ! _actionNums.contains(action))
+            {
+                QString actionStr =toCamel("k "+action)+"_ACTION";
+                _actionNums.insert(action,actionStr);
+                enumStr.append( "        "+ actionStr +",\n");
+            }
+        }
+    }
+    enumStr.append("    };\n");
+    return enumStr;
+
 }
 
 bool CodeWriterPState::writeHFile()
@@ -312,20 +379,28 @@ bool CodeWriterPState::writeHFile()
     hPrintln("~"+className+"();\n",1);
     hPrintln("\n",1);
     hPrintln("void start();",1);
-    hPrintln("void inputEvent(string evt);",1);
-    hPrintln("virtual void handleAction(string action)=0;",1);
+    hPrintln("void inputEvent(int evt);",1);
+    hPrintln("virtual void handleAction(int action)=0;",1);
     hPrintln("virtual void handleStateEntered(string state)=0;",1);
     hPrintln("virtual void handleStateExited(string state)=0;\n\n",1);
 
+    QString eventsEnum = createEventEnum();
+    hPrintln(eventsEnum,1);
+
+    QString actionsEnum = createActionEnum();
+    hPrintln(actionsEnum,1);
+
+    hPrintln("std::string actionCodeToString(int action);\n",1);
+
     // private
     hPrintln("private:\n");
-    hPrintln("static void stateEnteredStatic(void *p, UInt32 funcIndex, void *userDefined, PStateEnteredArgsT *pArgs);",1);
-    hPrintln("static void stateExitedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateExitedArgsT *pArgs);",1);
-    hPrintln("static void stateFinishedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateFinishedArgsT *pArgs);",1);
+    hPrintln("static void stateEnteredStatic(void *p, UInt32 funcIndex, void *userDefined, PStateCallbackArgsT *pArgs);",1);
+    hPrintln("static void stateExitedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateCallbackArgsT *pArgs);",1);
+    hPrintln("static void stateFinishedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateCallbackArgsT *pArgs);",1);
 
-    hPrintln("void stateEntered(PStateEnteredArgsT *pArgs);",1);
-    hPrintln("void stateExited(PStateExitedArgsT  *pArgs);",1);
-    hPrintln("void stateFinished(PStateFinishedArgsT  *pArgs);\n\n",1);
+    hPrintln("void stateEntered(PStateCallbackArgsT *pArgs);",1);
+    hPrintln("void stateExited(PStateCallbackArgsT  *pArgs);",1);
+    hPrintln("void stateFinished(PStateCallbackArgsT  *pArgs);\n\n",1);
 
 
     //write the statemachine states
@@ -348,7 +423,6 @@ bool CodeWriterPState::writeHFile()
 void CodeWriterPState::hWriteStates()
 {
     SCDataModel * dm = SCDataModel::singleton();
-
     SCState * rootState = dm->getTopState();
     QList<SCState*> allchildStates;
     dm->getAllStates(allchildStates);
