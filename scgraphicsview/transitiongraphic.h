@@ -12,7 +12,7 @@
 #include "linesegmentgraphic.h"
 #include "selectabletextblock.h"
 #include <QObject>
-
+#include "scdatamodel.h"
 
 //#define TRANSITION_DEFAULT_COLOR Qt::blue
 //#define TRANSITION_HOVER_COLOR Qt::red
@@ -31,7 +31,7 @@ class TransitionGraphic : public QGraphicsObject
 
 
 public:
-    explicit TransitionGraphic( StateBoxGraphic *parentState, StateBoxGraphic *targetState, SCTransition *t, KeyController * keys, MouseController* mouse);
+    explicit TransitionGraphic(SCDataModel*dm, StateBoxGraphic *parentState, StateBoxGraphic *targetState, SCTransition *t, KeyController * keys, MouseController* mouse);
     void printInfo();
     StateBoxGraphic* parentItemAsStateBoxGraphic();
     StateBoxGraphic* getTargetStateGraphic();
@@ -93,13 +93,11 @@ protected:
 
 
 private :
+    // private methods
 
     bool horizontallyAligned(ElbowGrabber* one, ElbowGrabber* two);
     bool verticallyAligned(ElbowGrabber* one, ElbowGrabber* two);
-//    void bindLine(ElbowGrabber* one, ElbowGrabber* two);
-
-        // private methods
-
+    virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
     void bindNeighborElbows(ElbowGrabber* elbow);
     void updateElbow(QPointF newPos, ElbowGrabber* elbow);
     void updateLineSegments(ElbowGrabber* elbow);
@@ -107,27 +105,19 @@ private :
     void createCustomPath(QPointF mouseLocation, ElbowGrabber*);
 
     // private data
-    SCTransition  * _transitionModel;  // data model for the transition object
-    //QList<SelectableLineSegmentGraphic *>  _lineSegments;
+    SCTransition*               _transitionModel;  // data model for the transition object
     QList<LineSegmentGraphic *> _lineSegments;
-    QList<ElbowGrabber *> _elbows;
-    ElbowGrabber*   _anchors[2];
-    //StateBoxGraphic *_parentStateGraphic;
-    StateBoxGraphic *_targetStateGraphic;
-    KeyController * _keyController;
-    MouseController* _mouseController;
-    LineSegmentGraphic* _hoveredLine;
-    ElbowGrabber* _hoveredElbow;
-
-    //TextBox* _transitionTextBox;
-
-    SelectableTextBlock* _eventText;    ///<  text to go in the title area.
-
-
-    bool _hasMovedSinceCreatingElbow;
-    bool _isCurrentlyDeleting;
-
-    virtual bool sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) ;
+    QList<ElbowGrabber *>       _elbows;
+    ElbowGrabber*               _anchors[2];
+    StateBoxGraphic*            _targetStateGraphic;
+    KeyController*              _keyController;
+    MouseController*            _mouseController;
+    LineSegmentGraphic*         _hoveredLine;
+    ElbowGrabber*               _hoveredElbow;
+    SelectableTextBlock*        _eventText;    ///<  text to go in the title area.
+    bool                        _hasMovedSinceCreatingElbow;
+    bool                        _isCurrentlyDeleting;
+    SCDataModel*                _dm;
 
 
 private slots:

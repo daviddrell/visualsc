@@ -1,6 +1,6 @@
 #include "buttongraphic.h"
 #include <QPixmap>
-#include "scdatamodel.h"
+#include "datamodellist.h"
 #include <QPainter>
 #include <QDebug>
 #include <QApplication>
@@ -86,7 +86,7 @@ void ButtonGraphic::setNormalGraphic(QString source)
     if (_normalGraphic->isNull() )
     {
         QString err = "setNormalGraphic: error loading image[" + source +"] file";
-        SCDataModel::singleton()->logError(err);
+        DataModelList::singleton()->root()->logError(err);
     }
 }
 
@@ -96,7 +96,7 @@ void ButtonGraphic::setHoveredGraphic(QString source)
     if (_hoveredGraphic->isNull() )
     {
         QString err = "setHoveredGraphic: error loading image[" + source +"] file";
-        SCDataModel::singleton()->logError(err);
+        DataModelList::singleton()->root()->logError(err);
     }
 }
 
@@ -106,6 +106,6 @@ void ButtonGraphic::setDepressedGraphic(QString source)
     if (_depressedGraphic->isNull()  )
     {
         QString err = "setDepressedGraphic: error loading image[" + source +"] file";
-        SCDataModel::singleton()->logError(err);
+        DataModelList::singleton()->root()->logError(err);
     }
 }

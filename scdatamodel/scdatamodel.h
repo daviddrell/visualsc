@@ -76,6 +76,7 @@ class SCDATAMODELSHARED_EXPORT SCDataModel : public QObject
 public:
 
     enum STATE_CODE_MODEL {PSTATE, QSTATE};///< when exporting to code, which state model to use
+    SCDataModel(QObject * parent=NULL);
 
     QSettings* _settings;
     QString _lastSavePath;
@@ -83,7 +84,6 @@ public:
     QString _lastExportPath;
     void connectDataModel();
     void reset();
-    static SCDataModel * singleton();
 
     QString getCFileName();
 
@@ -225,10 +225,10 @@ private:
 
 
 //private methods
-    SCDataModel(QObject * parent=NULL);
     void connectTransitionsToStatePath(QList<SCTransition*> tlist);
     void makeTransitionConnections(SCState * targetState, SCTransition* trans);
     //void deleteInTransitions(SCState* state);
 };
+
 
 #endif // SCDATAMODEL_H

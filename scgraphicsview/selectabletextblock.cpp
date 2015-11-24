@@ -45,14 +45,15 @@
 #define TB_MIN_WIDTH    50
 #define TB_MIN_HEIGHT   24 + 2*(VISIBLE_MARGIN+CONTENT_MARGIN)
 
-SelectableTextBlock::SelectableTextBlock(QGraphicsObject *parent,SCTextBlock *textBlockModel) :
+SelectableTextBlock::SelectableTextBlock(SCDataModel* dm,QGraphicsObject *parent,SCTextBlock *textBlockModel) :
         SelectableBoxGraphic(parent,true),
        // _minSize(QPoint(MIN_WIDTH,MIN_HEIGHT)),
         _verticalTextMargin(10),
         _horizontalTextMargin(5),
         _textItem(this, QRect(0,0, TEXTBLOCK_DEFAULT_WIDTH, TEXTBLOCK_DEFAULT_HEIGHT)),
         _textBlockModel(textBlockModel),
-        _centerText(true)
+        _centerText(true),
+        _dm(dm)
 {
 
     // Set accept hover events to false so the corners hover events are not interfered with
@@ -765,7 +766,7 @@ void SelectableTextBlock::keyPressEvent ( QKeyEvent * event )
         connect (editBox, SIGNAL(saveButtonClicked(QString)), this, SLOT(handleEditBoxSavedText(QString)));
         //QPointF myPos = this->mapToScene( this->pos() );
         QPointF myPos = pos();
-        SCDataModel::singleton()->getScene()->addItem( editBox);
+        _dm->getScene()->addItem( editBox);
         editBox->setPos( myPos.x(), myPos.y() +100 );
     }
 }

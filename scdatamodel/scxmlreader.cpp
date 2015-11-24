@@ -388,7 +388,7 @@ void SCXMLReader::readElement()
     bool enteredATransistionPathElement = false;
 
     qDebug() << "READING... "<< _reader.name();
-
+#if 0
     if (_reader.name() == "scxml")
     {
         qDebug() << "skipping scxml";
@@ -397,8 +397,8 @@ void SCXMLReader::readElement()
         //readState(kSTATE_TYPE_Machine);   // disabled adding a state every time openFile happens
         enteredAStateElement = true;
     }
-
-    if (_reader.name() == "state")
+#endif
+    if (_reader.name() == "state" || _reader.name() == "scxml")
     {
         _currentItemType = ItemType::STATE;
         emit enterStateElement();
@@ -557,7 +557,7 @@ void SCXMLReader::readState(STATE_TYPE stateType)
         QXmlStreamAttribute XmlAttr =_reader.attributes().at(i);
 //        qDebug() << "reading attribute: " << XmlAttr.name();
         // look for the Sate Attribute Name (id in SCXML)
-        if ( XmlAttr.name() == "id")
+        if ( XmlAttr.name() == "id" || XmlAttr.name() == "name")
         {
             qDebug()<<"reader in state id = " + XmlAttr.value().toString();
             StateName *  sa = new StateName (0,"name", XmlAttr.value().toString() );

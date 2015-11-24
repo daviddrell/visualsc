@@ -70,11 +70,9 @@
 SCFormView::SCFormView(QWidget *parent, SCDataModel *dataModel) :
         QMainWindow(parent, Qt::Window),
         _dm(dataModel),
-        _currentlySelected(NULL)//,
-        //_previouslySelected(NULL)
+        _currentlySelected(NULL),
+        _topState(NULL)
 {
-
-
 
     createActions();
     createMenus();
@@ -219,6 +217,8 @@ void SCFormView::import()
  */
 void SCFormView::highlightRootItem()
 {
+    if (_topState == NULL ) return;
+
     _currentlySelected = _topState;
     stateChartTreeView->setCurrentItem(_currentlySelected->getTreeWidget());
 }
@@ -286,20 +286,12 @@ void SCFormView::highlightPreviousItem()
  */
 void SCFormView::initTree()
 {
-     //_currentlySelected = _previouslySelected = _dm->getTopState();
-
-    //_topState = new FVItem(_dm->getTopState(), FVItem::STATE);
-
     QList<SCState*> states;
-    states.append( _dm->getTopState());
+    SCState* topState = _dm->getTopState();
+    if ( topState != NULL )
+        states.append( topState);
     loadTreeState(NULL, states, true);
-
     highlightRootItem();
-
-    /*
-    CustomTreeWidgetItem* twid = findItem(_currentlySelected);
-    twid->setSelected(true); // rehighlight the item that was highlighted
-    handleTreeViewItemClicked((QTreeWidgetItem*)twid, 0);*/
 }
 
 /**
@@ -433,12 +425,28 @@ void SCFormView::handleNewTransition(SCForkedTransition * ft)
  */
 void SCFormView::handleNewState(SCState* st)
 {
-    // parent of this widget will be the state's parent's widget
+    CustomTreeWidgetItem* item = NULL;
+    FVItem* parentfv=NULL;
     SCState* parentState = st->getParentState();
-    FVItem* parentfv = _items.value(parentState);
+    if ( parentState == NULL)
+    {
+        item = new CustomTreeWidgetItem();
+        stateChartTreeView->addTopLevelItem((QTreeWidgetItem*)item);
+        FVItem* fvItem = new FVItem(st, FVItem::STATE, item);
+        // link the tree widget to the fv item, expand the widget, set its text and icon
+        item->setData(fvItem);
+        item->setExpanded(true);
+        item->setText(0, st->getName());
+        item->setIcon(0,QIcon(":/SCFormView/cardboardbox.png"));
+        _items.insert(st,fvItem);
+        return;
+    }
+
+    // parent of this widget will be the state's parent's widget
+    parentfv = _items.value(parentState);
 
     // create the tree widget and fv item associated with this state
-    CustomTreeWidgetItem* item = new CustomTreeWidgetItem(parentfv->getTreeWidget());
+    item = new CustomTreeWidgetItem(parentfv->getTreeWidget());
     FVItem* fvItem = new FVItem(st, FVItem::STATE, item);
 
     // link the tree widget to the fv item, expand the widget, set its text and icon

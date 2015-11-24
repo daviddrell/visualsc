@@ -21,7 +21,7 @@
 #define ANGLE_SNAP_DEGREE   11
 
 
-TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys, MouseController* mouse) :
+TransitionGraphic::TransitionGraphic(SCDataModel*dm,StateBoxGraphic *parentGraphic, StateBoxGraphic *targetGraphic, SCTransition * t, KeyController * keys, MouseController* mouse) :
     QGraphicsObject(NULL),
     _transitionModel(t),
     _lineSegments(),
@@ -31,7 +31,8 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     _mouseController(mouse),
     _hasMovedSinceCreatingElbow(true),
     _isCurrentlyDeleting(false),
-    _eventText(NULL)
+    _eventText(NULL),
+    _dm(dm)
 {
 
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -40,10 +41,7 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
     TransitionPathAttribute * p = dynamic_cast<TransitionPathAttribute *> (  t->attributes.value("path"));
 
     QList<QPointF> pointList = p->asQPointFList();
-    /*qDebug() << "Printing Point List of size: " <<pointList.count();
-    for(int i = 0; i < pointList.count();i++)
-        qDebug() << pointList.at(i);
-*/
+
 
     // populate the transition graphic with elbows.
     // if this is a new transition graphic, then create two elbows
@@ -70,10 +68,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         getClosestSides( & sourceSide, & targetSide);
         QPointF sourceAnchor = (this->parentItemAsStateBoxGraphic()->getSideCenterPointInSceneCoord(sourceSide));
         QPointF targetAnchor = (_targetStateGraphic->getSideCenterPointInSceneCoord(targetSide));
-
-        // use the statebox function handleTransitionLineStartMoved & handleTransitionLineEndMoved to update the anchors to this position and snap them to the box border.
-       // _anchors[0]->setPos(mapFromScene(sourceAnchor));
-       // _anchors[1]->setPos(mapFromScene(targetAnchor));
 
         LineSegmentGraphic* segment = new LineSegmentGraphic(_anchors[0], _anchors[1], this, _keyController);
         segment->setZValue(_anchors[0]->zValue()-1);            // move the line segment behind its anchors
@@ -130,10 +124,6 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
             segment->setAcceptHoverEvents(true);                    // allow the line segment to be hovered
 
 
-           // connect(segment, SIGNAL(startEndMoved(QPointF)), parentGraphic, SLOT(handleTransitionLineStartMoved(QPointF)));
-           // connect(segment, SIGNAL(updateModel()), this, SLOT(updateModel()));
-
-
             if(i==0 || i== _elbows.count()-2)   // anchor elbows at the end and beginning
             {
                 if(i==0){                       // source anchor
@@ -181,36 +171,10 @@ TransitionGraphic::TransitionGraphic(StateBoxGraphic *parentGraphic, StateBoxGra
         _anchors[0]->setAnchor(true);
         _anchors[1]->setAnchor(true);
 
-        //_anchors[1]->setAcceptHoverEvents(true);    // enable the sink anchor to be hovered
-
-        /* moved to transition connect
-        connect(_anchors[0],SIGNAL(anchorMoved(QPointF)),parentGraphic,SLOT(handleTransitionLineStartMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
-        connect(_anchors[1],SIGNAL(anchorMoved(QPointF)),_targetStateGraphic,SLOT(handleTransitionLineEndMoved(QPointF)));  // state box will handle snapping the source elbow/anchor to its border instead of standard movement
-        //qDebug() << "hooking anchor to state graphic: " << _targetStateGraphic->objectName();
-
-        // do this to set closest wall from default
-        emit _anchors[0]->anchorMoved(mapToScene(_anchors[0]->pos()));
-        emit _anchors[1]->anchorMoved(mapToScene(_anchors[1]->pos()));
-        */
-
-        //TextItem.setPos(25,10);
-        //TextItem.setParentItem(_anchors[1]);
-
-        // set the event text to be tied to the source anchor
-        //_eventText->setParentItem(_anchors[0]);
-
-        //_eventText->setPos(0,0);
-
-
     } // end of loading a transition from file
 
-/*
-    _transitionTextBox = new TextBox(_anchors[0], "Hello World");
-    _transitionTextBox->setVisible(false);
-    _transitionTextBox->setPos(100,100);
-    */
 
-    _eventText = new SelectableTextBlock((QGraphicsObject*) _anchors[0], t->getEventTextBlock());
+    _eventText = new SelectableTextBlock(_dm,(QGraphicsObject*) _anchors[0], t->getEventTextBlock());
 
 }   // end of constructor
 

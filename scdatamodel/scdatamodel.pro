@@ -36,7 +36,8 @@ SOURCES += scdatamodel.cpp \
     cwstatemachine.cpp \
     sctransitionbranch.cpp \
     scforkedtransition.cpp \
-    codewriterpstate.cpp
+    codewriterpstate.cpp \
+    datamodellist.cpp
 
 HEADERS += scdatamodel.h\
     SCDataModel_global.h \
@@ -58,7 +59,8 @@ HEADERS += scdatamodel.h\
     cwstatemachine.h \
     sctransitionbranch.h \
     scforkedtransition.h \
-    codewriterpstate.h
+    codewriterpstate.h \
+    datamodellist.h
 
 OTHER_FILES += \
     COPYING.txt

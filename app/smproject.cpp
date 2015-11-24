@@ -25,9 +25,9 @@
 #include <QDebug>
 
 
-SMProject::SMProject(QWidget *parentWidget): QObject(parentWidget),
+SMProject::SMProject(SCDataModel *dm,QWidget *parentWidget): QObject(parentWidget),
         _file(),
-        _dm(SCDataModel::singleton()),
+        _dm(dm),
         _graphicsView( NULL ),
         _parentWidget(parentWidget)
 {
@@ -39,6 +39,7 @@ SMProject::~SMProject()
 {
     close();
     if (_graphicsView) delete _graphicsView;
+    if (_dm) delete _dm;
 }
 
 
@@ -49,6 +50,11 @@ SCDataModel * SMProject::getDM()
 
 SCGraphicsView* SMProject::getSCGraphicsView()
 {
+    if ( _graphicsView == NULL )
+    {
+        // this is new empty project as opposed to a projected loaded from a file
+        _graphicsView = new SCGraphicsView(_parentWidget,  _dm);
+    }
     return _graphicsView;
 }
 

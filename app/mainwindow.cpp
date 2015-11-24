@@ -31,8 +31,8 @@
 #include <QMessageBox>
 #include <QDesktopWidget>
 #include "scitem.h"
-//#include "scgraphicsview.h"
-//#include "customgraphicsscene.h"
+#include "datamodellist.h"
+
 
 #define POP_UP_X    160
 #define POP_UP_Y    200
@@ -52,32 +52,25 @@ MainWindow::MainWindow(QWidget *parent) :
         _formEditorWindow(0),
         _textFormatToolBar(NULL),
         _scale(1),
-        _gridEnable(false)
+        _gridEnable(false),
+        _tabWidget(NULL)
 {
-
-
 
     QCoreApplication::setOrganizationName("David W Drell");
     QCoreApplication::setOrganizationDomain("davidwdrell.net");
     QCoreApplication::setApplicationName("Visual Statechart Editor");
 
-
-
-
-
-
     // Designer code
     ui->setupUi(this);
 
-
-
+    _tabWidget = new QTabWidget();
+    ui->gridLayout->addWidget(_tabWidget);
 
     // custom action connects
     connect ( ui->actionOpen, SIGNAL(triggered()), this, SLOT(handleFileOpenClick()));
     connect ( ui->actionSave, SIGNAL(triggered()), this, SLOT(handleFileSaveClick()));
     connect ( ui->actionExportCode, SIGNAL(triggered()), this, SLOT(handleExportCodeClick()));
     connect ( ui->actionNew, SIGNAL(triggered()), this, SLOT(handleNewClick()));
-
 
 
 #ifdef ENABLE_TEXT_TOOL_BAR
@@ -91,55 +84,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // add font widgets
     createFontBar();
-
-
-    // create the project
-    _project = new SMProject(  ui->centralWidget );
-    ui->gridLayout->addWidget( _project->getQGraphicsView() );
-    _formEditorWindow = new SCFormView(0, _project->getDM());
-
-
-    // main window actions
-    connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
-    connect(_formEditorWindow, SIGNAL(openClick()), this, SLOT(handleFileOpenClick()));
-    connect(_formEditorWindow, SIGNAL(saveImageClick()), this, SLOT(on_actionSaveImage_triggered()));
-    connect(_formEditorWindow, SIGNAL(saveClick()), this, SLOT(handleFileSaveClick()));
-    connect(_formEditorWindow, SIGNAL(saveAsClick()), this, SLOT(on_actionSave_As_triggered()));
-    connect(_formEditorWindow, SIGNAL(importClick()), this, SLOT(on_actionImport_triggered()));
-    connect(_formEditorWindow, SIGNAL(exportClick()), this, SLOT(handleExportCodeClick()));
-
-    _formEditorWindow->show();
-
-
-    // connects for the mainwindow to other modules
-
-
-    // if the data model sends an error message, the main window will display it with a pop up
-    connect(_project->getDM(), SIGNAL(message(QString)), this, SLOT(handleMessage(QString)));
-
-    // data model has special needs when doing a full reset
-    connect(this, SIGNAL(reset()), _project->getDM(), SLOT(handleReset()));
-
-    // no special protocol needed for formview. regular item deletion and creation is good enough
-    connect(this, SIGNAL(open(QString)), _project->getDM(), SLOT(handleOpen(QString)));
-
-    // when the grid action is toggled, the graphics view's scene will change its background
-    connect(this, SIGNAL(gridToggled(bool)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
-
-
-    // mainwindow component connects
-
     // when the font combo box is activated, the data model will change the font family attribute for all items
     connect(_fontBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
     connect(_fontSizeBox, SIGNAL(activated(QString)), this, SLOT(handleChangeFont(QString)));
 
-    // when the data model signals set program font, set the program font
-    connect(_project->getDM(), SIGNAL(setProgramFontFamily(FontFamilyAttribute*)), this, SLOT(handleSetProgramFontFamily(FontFamilyAttribute*)));
-    connect(_project->getDM(),SIGNAL(setProgramFontSize(FontSizeAttribute*)), this, SLOT(handleSetProgramFontSize(FontSizeAttribute*)));
-    connect(_project->getDM(), SIGNAL(setProgramFontBold(FontBoldAttribute*)), this, SLOT(handleSetProgramFontBold(FontBoldAttribute*)));
-
-    // when the data model emits a clicked signal, change the radio button selection
-    connect(_project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
 
     // load settings from settings.ini if it exists, otherwise create a settings.ini file
     _settingsFileName = QDir::currentPath()+"/"+"settings.ini";
@@ -631,18 +579,77 @@ void MainWindow::handleFileOpenClick()
     if(newFileFullPath.isEmpty())
         return;
 
+    if ( _project != NULL)
+    {
+         _project->getDM()->handleReset();
+         delete _project;
+         _project =  NULL;
+    }
 
     _currentFileFullPath = newFileFullPath;
     _currentFolder = QFileInfo(_currentFileFullPath).path();
 
     this->setWindowTitle(_currentFileFullPath);
 
-    emit reset();
-    emit open(_currentFileFullPath);
+    // create the project
+    SCDataModel * dm = new SCDataModel();
+
+    // this is the root dm
+    DataModelList::singleton()->setRoot(dm);
+
+    _project = new SMProject( dm, ui->centralWidget );
+
+    //ui->gridLayout->addWidget( _project->getQGraphicsView() );
+    _tabWidget->addTab( _project->getQGraphicsView(),"name");
+
+    _formEditorWindow = new SCFormView(0, _project->getDM());
+
+
+    // main window actions
+    connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
+    connect(_formEditorWindow, SIGNAL(openClick()), this, SLOT(handleFileOpenClick()));
+    connect(_formEditorWindow, SIGNAL(saveImageClick()), this, SLOT(on_actionSaveImage_triggered()));
+    connect(_formEditorWindow, SIGNAL(saveClick()), this, SLOT(handleFileSaveClick()));
+    connect(_formEditorWindow, SIGNAL(saveAsClick()), this, SLOT(on_actionSave_As_triggered()));
+    connect(_formEditorWindow, SIGNAL(importClick()), this, SLOT(on_actionImport_triggered()));
+    connect(_formEditorWindow, SIGNAL(exportClick()), this, SLOT(handleExportCodeClick()));
+
+    _formEditorWindow->show();
+
+
+    // connects for the mainwindow to other modules
+
+    // if the data model sends an error message, the main window will display it with a pop up
+    connect(_project->getDM(), SIGNAL(message(QString)), this, SLOT(handleMessage(QString)));
+
+    // when the grid action is toggled, the graphics view's scene will change its background
+    connect(this, SIGNAL(gridToggled(bool)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
+
+    // when the data model signals set program font, set the program font
+    connect(_project->getDM(), SIGNAL(setProgramFontFamily(FontFamilyAttribute*)), this, SLOT(handleSetProgramFontFamily(FontFamilyAttribute*)));
+    connect(_project->getDM(),SIGNAL(setProgramFontSize(FontSizeAttribute*)), this, SLOT(handleSetProgramFontSize(FontSizeAttribute*)));
+    connect(_project->getDM(), SIGNAL(setProgramFontBold(FontBoldAttribute*)), this, SLOT(handleSetProgramFontBold(FontBoldAttribute*)));
+
+    // when the data model emits a clicked signal, change the radio button selection
+    connect(_project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
+
+    _project->getDM()->handleOpen(_currentFileFullPath);
+
+    SCState* rootState = _project->getDM()->getTopState();
+    IAttribute* nameAttr = rootState->attributes["name"];
+
+    // follow name changes in root state
+    connect(nameAttr,SIGNAL(changed(IAttribute*)),this,SLOT(handleRootStateNameChanged(IAttribute*)));
+
+    _tabWidget->setTabText(0, nameAttr->asString());
 
     saveSettings();
 }
 
+void MainWindow::handleRootStateNameChanged(IAttribute*nameAttr)
+{
+    _tabWidget->setTabText(0, nameAttr->asString());
+}
 
 void MainWindow::handleReadInputFileDone(bool ,QStringList)
 {

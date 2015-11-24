@@ -1,5 +1,5 @@
 #include "codewriterpstate.h"
-#include "scdatamodel.h"
+#include "datamodellist.h"
 
 CodeWriterPState::CodeWriterPState(SCState* rootMachine, QString classNameString,QString cFileName, QString hFileName) :
     CodeWriter(rootMachine, classNameString, cFileName, hFileName)
@@ -210,7 +210,7 @@ void CodeWriterPState::cWriteConstructor()
         return ;
     }
 
-    SCDataModel * dm = SCDataModel::singleton();
+    SCDataModel * dm = DataModelList::singleton()->root();
     SCState * rootState = dm->getTopState();
     if  ( rootState == 0 )
     {
@@ -278,7 +278,7 @@ QString CodeWriterPState::createEventEnum()
     QString enumStr;
     enumStr.append("enum " + className +"_EVENTS\n    {\n");
 
-    SCDataModel * dm = SCDataModel::singleton();
+    SCDataModel * dm =  DataModelList::singleton()->root();
     QList<SCState*> allchildStates;
     dm->getAllStates(allchildStates);
 
@@ -308,7 +308,7 @@ QString CodeWriterPState::createActionEnum()
     QString enumStr;
     enumStr.append("enum " + className +"_ACTIONS\n    {\n");
 
-    SCDataModel * dm = SCDataModel::singleton();
+    SCDataModel * dm =  DataModelList::singleton()->root();
     QList<SCState*> allchildStates;
     dm->getAllStates(allchildStates);
 
@@ -422,7 +422,7 @@ bool CodeWriterPState::writeHFile()
  */
 void CodeWriterPState::hWriteStates()
 {
-    SCDataModel * dm = SCDataModel::singleton();
+    SCDataModel * dm =  DataModelList::singleton()->root();
     SCState * rootState = dm->getTopState();
     QList<SCState*> allchildStates;
     dm->getAllStates(allchildStates);

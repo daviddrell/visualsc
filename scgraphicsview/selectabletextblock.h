@@ -5,8 +5,7 @@
 #include "maskedtextedit.h"
 #include "textblock.h"
 #include "iattribute.h"
-
-
+#include "scdatamodel.h"
 
 
 class QKeyEvent;
@@ -41,7 +40,7 @@ class SelectableTextBlock : public SelectableBoxGraphic
     Q_OBJECT
 
 public:
-    SelectableTextBlock(QGraphicsObject *parent=NULL,SCTextBlock *textBlockModel=NULL);
+    SelectableTextBlock(SCDataModel* dm, QGraphicsObject *parent=NULL,SCTextBlock *textBlockModel=NULL);
     ~SelectableTextBlock();
 
 
@@ -109,15 +108,12 @@ private:
 
    // private data
 
-
    int           _verticalTextMargin;
    int           _horizontalTextMargin;
-
    MaskedTextEdit _textItem;
-
    bool _centerText;
-
    SCTextBlock * _textBlockModel;
+   SCDataModel*  _dm;
 };
 
 #endif // SELECTABLETEXTBLOCK_H

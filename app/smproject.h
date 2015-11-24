@@ -28,8 +28,7 @@
 #include "scgraphicsview.h"
 #include <QTimer>
 #include "scdatamodel.h"
-
-
+#include "scformview.h"
 
 
 class SelectableLineSegmentGraphic;
@@ -40,7 +39,7 @@ class SMProject : public QObject
     Q_OBJECT
 
 public:
-    SMProject(QWidget *parentWidget);
+    SMProject(SCDataModel* dm, QWidget *parentWidget);
     ~SMProject();
 
     void initNewSM();
@@ -54,6 +53,7 @@ public:
     SCDataModel  * getDM();
 
     SCGraphicsView* getSCGraphicsView();
+    SCFormView*     getSCFormView();
 
 signals:
     void error(QString err);
@@ -66,10 +66,11 @@ private:
 
     // private data
 
-    QString         _file;
+    QString           _file;
     SCDataModel      *_dm;
-    SCGraphicsView   * _graphicsView;
-    QWidget          * _parentWidget;
+    SCGraphicsView   *_graphicsView;
+    QWidget          *_parentWidget;
+    SCFormView       *_formView;
 
 
 

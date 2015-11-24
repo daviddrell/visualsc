@@ -31,8 +31,11 @@ SCState::SCState(QObject *parent) :
     attributes(this, "stateAttributes"),
     _IdTextBlock(new SCTextBlock())
 {
-   initCommon();
-   this->setLevel(this->parentAsSCState()->getLevel()+1);
+    initCommon();
+    if ( parent == NULL )
+        this->setLevel(1);
+    else
+        this->setLevel(this->parentAsSCState()->getLevel()+1);
 }
 
 
@@ -42,8 +45,10 @@ SCState::SCState(const SCState& st) :
     _IdTextBlock(new SCTextBlock())
 {
     initCommon();
-    this->setLevel(this->parentAsSCState()->getLevel()+1);
-}
+    if ( this->parent() == NULL )
+        this->setLevel(1);
+    else
+        this->setLevel(this->parentAsSCState()->getLevel()+1);}
 
 
 

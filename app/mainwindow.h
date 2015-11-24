@@ -27,9 +27,9 @@
 #include "textformattoolbar.h"
 #include <QButtonGroup>
 #include <QRadioButton>
+#include <QTabWidget>
 
 class SCFormView;
-//class SCGraphicsView;
 class QSettings;
 
 namespace Ui {
@@ -54,9 +54,9 @@ signals:
 
 private:
     Ui::MainWindow *ui;
+    void addToolbarSpacer(QToolBar *toolbar);
     void sendMessage(QString title, QString message);
     SMProject *_project;
-
     QString _currentFolder;
     QString _currentFileFullPath;
     QString _currentExportFullPath;
@@ -94,10 +94,10 @@ private:
     QRadioButton* _pStateRadioButton;
     QRadioButton* _qStateRadioButton;
 
-    void addToolbarSpacer(QToolBar *toolbar);
-
+    QTabWidget*   _tabWidget;
 
 private slots:
+    void handleRootStateNameChanged(IAttribute*);
     void handleMessage(QString);
     void handleFileOpenClick();
     void handleFileSaveClick();

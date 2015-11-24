@@ -230,15 +230,6 @@ void SCDataModel::handleCheckEventCollision(TransitionStringAttribute * tsa)
 
 }
 
-SCDataModel * SCDataModel::singleton()
-{
-    static SCDataModel * instance=NULL;
-    if ( instance == NULL)
-        instance = new SCDataModel(NULL);
-
-    return instance;
-}
-
 /**
  * @brief SCDataModel::handleStateMachineNameLoad
  * @param machineName
@@ -822,6 +813,8 @@ void SCDataModel::handleReset()
 
 void SCDataModel::getAllStates(QList<SCState *>& list)
 {
+    if ( _topState == NULL ) return;
+
     return _topState->getAllStates(list);
 }
 
@@ -872,14 +865,15 @@ void SCDataModel::initializeEmptyStateMachine()
     StateName *nm = new StateName(NULL,"name", "State Machine");
     stateAttributes->addItem(nm);
 
+#if 0
     _topState = new SCState(true);
     _topState->attributes.setAttributes( *stateAttributes);
     _topState->setLevel(_level);
 
 
     _currentState  = _topState;
-
-    //emit newStateSignal(_topState);
+#endif
+    _currentState  = _topState = NULL;
 
     qDebug() << "initialized empty state machine! " << "_currentState: " <<nm->asString()<<" on level: "<<_level;
     delete sa;
@@ -1010,6 +1004,9 @@ void SCDataModel::handleMakeANewState(StateAttributes*  sa)
     state->setText(name);
 
     qDebug() << "adding state at level  :" + QString::number(_level) + ", name : " + name;
+
+    if ( _topState == NULL)
+        _topState= state;
 
     _currentState  = state;
 

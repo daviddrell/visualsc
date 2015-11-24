@@ -153,11 +153,6 @@ signals:
 
 // individual attribute changed signals
     void changed(IAttribute* attr);
-    void changed(SizeAttribute* size);
-    void changed(PositionAttribute* pos);
-    void changed(StateName* sn);
-    void changed(TransitionStringAttribute* tsa);
-    void changed(StateString*);
     void error(QString err);
 
 protected:

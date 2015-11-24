@@ -627,7 +627,7 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
     }
 
     // create the transition graphic, stack its deconstructor, and create the link between the SCtransition to its graphic
-    TransitionGraphic* transGraphic = new TransitionGraphic(parentGraphic, NULL, t, _keyController, _mouseController);
+    TransitionGraphic* transGraphic = new TransitionGraphic(_dm,parentGraphic, NULL, t, _keyController, _mouseController);
     //connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
     //connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
 
@@ -731,7 +731,7 @@ void SCGraphicsView::handleNewTransitionFormView(SCTransition* t)
     StateBoxGraphic * targetGraphic = lookUpTargetStateGraphic( targetName->asString() );
 
     // create a transition graphic
-    TransitionGraphic * transGraphic = new TransitionGraphic(parentGraphic, targetGraphic,  t , _keyController,_mouseController);
+    TransitionGraphic * transGraphic = new TransitionGraphic(_dm,parentGraphic, targetGraphic,  t , _keyController,_mouseController);
 
     // add the transitiongraphic to the map of transition graphics
     _mapTransitionToGraphic.insert(t, transGraphic);
@@ -928,6 +928,7 @@ void SCGraphicsView::handleRootMachineIsParallelChanged(StateString *)
  */
 void SCGraphicsView::connectState(SCState* state)
 {
+    if ( state == NULL) return;
     StateString* ips = state->getStringAttr("parallelState");
     connect(ips, SIGNAL(changed(StateString*)), this, SLOT(handleRootMachineIsParallelChanged(StateString*)));
 }
