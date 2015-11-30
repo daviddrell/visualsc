@@ -71,11 +71,10 @@ SCTransition::SCTransition(QObject * parent):
 
     // handle textBlock Changed for the event text box
     connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
-    connect(event, SIGNAL(changed(TransitionStringAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
+    connect(event, SIGNAL(changed(IAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(IAttribute*)));
 
     // set the event sctextblock's parent
     _eventTextBlock->setParent(this);
-    //_eventTextBlock->setText("event");  // default event text
 }
 
 SCTransition::~SCTransition()
@@ -95,9 +94,8 @@ void SCTransition::setPathAttr(QString pathString)
 }
 
 
-void SCTransition::handleTargetStateNameChanged(StateName * stateName)
+void SCTransition::handleTargetStateNameChanged(IAttribute * stateName)
 {
-    qDebug() << "SCTransition::handleTargetStateNameChanged";
     this->attributes.value("target")->setValue(stateName->asString());
 }
 

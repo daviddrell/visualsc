@@ -161,14 +161,10 @@ signals:
     void insertNewTransitionSignal(SCForkedTransition*);
     void message(QString);
     void itemClicked();
-
     void setProgramFont(QFont*);
-
-    void setProgramFontFamily(FontFamilyAttribute*);
-    void setProgramFontSize(FontSizeAttribute*);
-    void setProgramFontBold(FontBoldAttribute*);
-//    void setFont(QString);
-//    void setFontSize(int);
+    void setProgramFontFamily(IAttribute*);
+    void setProgramFontSize(IAttribute*);
+    void setProgramFontBold(IAttribute*);
 
 
 private slots:
@@ -183,19 +179,13 @@ private slots:
     void handleMakeANewIDTextBlock(TextBlockAttributes *attributes);
     void handleMakeANewEventTextBlock(TextBlockAttributes* attributes);
     void handleMakeANewTransitionProperty(const QString name);
-
     void handleStateMachineNameLoad(QString);
     void handleStateMachineUidLoad(QString);
     void handleStateMachineAttributeLoad(QString key, QString value);
-
-    void handleCheckEventCollision(TransitionStringAttribute*);
-
+    void handleCheckEventCollision(IAttribute*);
     void handleItemClicked(SCState*);
     void handleItemClicked(SCTransition*);
-
-    void handleChangeProgramFont(FontFamilyAttribute*);
-    void handleChangeProgramFont(FontSizeAttribute*);
-    void handleChangeProgramFont(FontBoldAttribute*);
+    void handleChangeProgramFont(IAttribute*);
 
 private:
 

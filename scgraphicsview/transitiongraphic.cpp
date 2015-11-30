@@ -1357,7 +1357,7 @@ void TransitionGraphic::setTextSize(qreal w, qreal h)
  *
  * when the data model is updated, change the event text in the graphics view
  */
-void TransitionGraphic::handleAttributeChanged(TransitionStringAttribute *tsa)
+void TransitionGraphic::handleAttributeChanged(IAttribute *tsa)
 {
     _eventText->setText(tsa->asString());
 }

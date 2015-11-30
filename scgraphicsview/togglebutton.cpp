@@ -103,12 +103,9 @@ void ToggleButton::reposition()
     this->setPos(this->pos() - center);
 }
 
-void ToggleButton::handleStateSizeChanged(SizeAttribute * sa)
+void ToggleButton::handleStateSizeChanged(IAttribute * sa)
 {
-    //    QGraphicsItem* parent = this->parentItem();
         StateBoxGraphic* parent = this->parentAsStateBoxGraphic();
-    //    QRectF rect(parent->getBufferX(), parent->getBufferY(), parent->getSize().x()- 2*parent->getBufferX(), parent->getSize.y()-2*parent->getBufferY());
-
         QRectF rect = parent->getContentAreaRect();
 
         switch(_corner)

@@ -67,14 +67,9 @@ FVItem* CustomTreeWidgetItem::dataAsFvItem()
     return dynamic_cast<FVItem*>(_stateOrTransitionItem);
 }
 
-void CustomTreeWidgetItem::handleAttributeChanged(StateName* sn)
+void CustomTreeWidgetItem::handleAttributeChanged(IAttribute* attr)
 {
-    qDebug() << "CustomTreeWidgetItem::handleATtribtueCHanged";
-    this->setText(0, sn->asString());
+    this->setText(0, attr->asString());
 }
 
-void CustomTreeWidgetItem::handleAttributeChanged(TransitionStringAttribute* tsa)
-{
-    this->setText(0, tsa->asString());
-}
 

@@ -49,11 +49,9 @@ public:
     QObject * data();
     FVItem* dataAsFvItem();
 
-
 public slots:
     void treeAddTextBlock(SCTextBlock*);
-    void handleAttributeChanged(StateName*);
-    void handleAttributeChanged(TransitionStringAttribute*);
+    void handleAttributeChanged(IAttribute*);
 
 private:
     QObject * _stateOrTransitionItem;

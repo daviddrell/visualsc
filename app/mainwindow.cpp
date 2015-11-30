@@ -129,7 +129,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::handleSetProgramFontFamily(FontFamilyAttribute * ffa)
+void MainWindow::handleSetProgramFontFamily(IAttribute * ffa)
 {
     int fontIndex = _fontBox->findText(ffa->asString(), Qt::MatchFixedString);
     if(fontIndex>-1)
@@ -138,8 +138,10 @@ void MainWindow::handleSetProgramFontFamily(FontFamilyAttribute * ffa)
     }
 }
 
-void MainWindow::handleSetProgramFontSize(FontSizeAttribute * fsa)
+void MainWindow::handleSetProgramFontSize(IAttribute * attr)
 {
+    FontSizeAttribute* fsa = dynamic_cast<FontSizeAttribute*>(attr);
+    if ( fsa == NULL) return;
     int sizeIndex = _fontSizeBox->findText(QString::number(fsa->asInt()),0);
     if(sizeIndex > -1)
     {
@@ -147,8 +149,10 @@ void MainWindow::handleSetProgramFontSize(FontSizeAttribute * fsa)
     }
 }
 
-void MainWindow::handleSetProgramFontBold(FontBoldAttribute * fba)
+void MainWindow::handleSetProgramFontBold(IAttribute * attr)
 {
+    FontBoldAttribute* fba = dynamic_cast<FontBoldAttribute*>(attr);
+    if ( fba == NULL ) return;
     _boldAction->setChecked(fba->asBool());
 }
 
@@ -626,9 +630,9 @@ void MainWindow::handleFileOpenClick()
     connect(this, SIGNAL(gridToggled(bool)), _project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
 
     // when the data model signals set program font, set the program font
-    connect(_project->getDM(), SIGNAL(setProgramFontFamily(FontFamilyAttribute*)), this, SLOT(handleSetProgramFontFamily(FontFamilyAttribute*)));
-    connect(_project->getDM(),SIGNAL(setProgramFontSize(FontSizeAttribute*)), this, SLOT(handleSetProgramFontSize(FontSizeAttribute*)));
-    connect(_project->getDM(), SIGNAL(setProgramFontBold(FontBoldAttribute*)), this, SLOT(handleSetProgramFontBold(FontBoldAttribute*)));
+    connect(_project->getDM(), SIGNAL(setProgramFontFamily(IAttribute*)), this, SLOT(handleSetProgramFontFamily(IAttribute*)));
+    connect(_project->getDM(),SIGNAL(setProgramFontSize(IAttribute*)), this, SLOT(handleSetProgramFontSize(IAttribute*)));
+    connect(_project->getDM(), SIGNAL(setProgramFontBold(IAttribute*)), this, SLOT(handleSetProgramFontBold(IAttribute*)));
 
     // when the data model emits a clicked signal, change the radio button selection
     connect(_project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));

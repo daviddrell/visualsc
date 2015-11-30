@@ -81,7 +81,7 @@ public slots:
     void handleTargetStateGraphicResized(QRectF, QRectF, int);
     void handleGrandParentTargetStateGraphicResized(QRectF, QRectF, int);
 
-    void handleAttributeChanged(TransitionStringAttribute* tsa);
+    void handleAttributeChanged(IAttribute* tsa);
 
 
 

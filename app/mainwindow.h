@@ -122,9 +122,9 @@ private slots:
 
     void handleChangeFont(QString);
 //    void handleSetProgramFont(QFont*);
-    void handleSetProgramFontFamily(FontFamilyAttribute*);
-    void handleSetProgramFontSize(FontSizeAttribute*);
-    void handleSetProgramFontBold(FontBoldAttribute*);
+    void handleSetProgramFontFamily(IAttribute*);
+    void handleSetProgramFontSize(IAttribute*);
+    void handleSetProgramFontBold(IAttribute*);
 };
 
 #endif // MAINWINDOW_H

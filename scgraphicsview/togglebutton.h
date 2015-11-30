@@ -4,11 +4,8 @@
 #include <QObject>
 #include <QGraphicsItem>
 #include <QPen>
-//#include "stateboxgraphic.h"
-
-
+#include "iattribute.h"
 class StateBoxGraphic;
-class SizeAttribute;
 
 class ToggleButton : public QObject, public QGraphicsItem
 {
@@ -33,7 +30,7 @@ signals:
     void toggled();
 
 public slots:
-    void handleStateSizeChanged(SizeAttribute*);
+    void handleStateSizeChanged(IAttribute*);
 
 
 protected:

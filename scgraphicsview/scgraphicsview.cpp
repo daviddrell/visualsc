@@ -961,33 +961,28 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
     // set up data model changes to update the state box graphic
     StateName* name = state->getStateNameAttr();
-    connect(name, SIGNAL(changed(StateName*)), stateGraphic, SLOT(handleAttributeChanged(StateName*)));
+    connect(name, SIGNAL(changed(IAttribute*)), stateGraphic, SLOT(handleAttributeChanged(IAttribute*)));
 
     SizeAttribute* size = state->getSizeAttr();
-    connect(size, SIGNAL(changed(SizeAttribute*)), stateGraphic, SLOT(handleAttributeChanged(SizeAttribute*)));
+    connect(size, SIGNAL(changed(IAttribute*)), stateGraphic, SLOT(handleAttributeChanged(IAttribute*)));
 
     PositionAttribute* pos = state->getPosAttr();
-    connect(pos, SIGNAL(changed(PositionAttribute*)), stateGraphic, SLOT(handleAttributeChanged(PositionAttribute*)));
+    connect(pos, SIGNAL(changed(IAttribute*)), stateGraphic, SLOT(handleAttributeChanged(IAttribute*)));
 
     StateString* ips = state->getStringAttr("parallelState");
-    connect(ips, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleIsParallelStateChanged(StateString*)));
+    connect(ips, SIGNAL(changed(IAttribute*)), stateGraphic, SLOT(handleIsParallelStateChanged(IAttribute*)));
 
     StateString* initialState = state->getStringAttr("initialState");
-    connect(initialState, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleInitialStateChanged(StateString*)));
+    connect(initialState, SIGNAL(changed(IAttribute*)), stateGraphic, SLOT(handleInitialStateChanged(IAttribute*)));
 
     StateString* finalState = state->getStringAttr("finalState");
-    connect(finalState, SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleFinalStateChanged(StateString*)));
+    connect(finalState, SIGNAL(changed(IAttribute*)), stateGraphic, SLOT(handleFinalStateChanged(IAttribute*)));
 
     StateString* ena = state->getStringAttr("entryAction");
-    connect(ena ,SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleEntryActionChanged(StateString*)));
+    connect(ena ,SIGNAL(changed(IAttribute*)), stateGraphic, SLOT(handleEntryActionChanged(IAttribute*)));
 
     StateString* exa = state->getStringAttr("exitAction");
-    connect(exa , SIGNAL(changed(StateString*)), stateGraphic, SLOT(handleExitActionChanged(StateString*)));
-
-    //connect(state, SIGNAL(positionChangedInFormView(SCState*,QPointF)), this, SLOT(handleStatePositionChangedInFormView(SCState*, QPointF)));
-    //connect(state, SIGNAL(sizeChangedInFormView(SCState*,QPointF)), this, SLOT(handleStateSizeChangedInFormView(SCState*,QPointF)));
-
-
+    connect(exa , SIGNAL(changed(IAttribute*)), stateGraphic, SLOT(handleExitActionChanged(IAttribute*)));
 
     // set up state box graphic changes to update the data model
     // handle when a state is double clicked
@@ -1005,11 +1000,11 @@ void SCGraphicsView::connectState(SCState* state, StateBoxGraphic* stateGraphic)
 
 
     // font connects
-    connect(state->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontFamilyAttribute*)));
+    connect(state->getIDTextBlock()->getFontFamilyAttr(), SIGNAL(changed(IAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(IAttribute*)));
 
-    connect(state->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontSizeAttribute*)));
+    connect(state->getIDTextBlock()->getFontSizeAttr(), SIGNAL(changed(IAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(IAttribute*)));
 
-    connect(state->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(FontBoldAttribute*)));
+    connect(state->getIDTextBlock()->getFontBoldAttr(), SIGNAL(changed(IAttribute*)), stateGraphic->getStateTitle(), SLOT(handleFontChanged(IAttribute*)));
 }
 
 
@@ -1098,18 +1093,15 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
 
     // connect the event name data model to the text block
     TransitionStringAttribute* eventName = trans->getTransStringAttr("event");
-    connect(eventName, SIGNAL(changed(TransitionStringAttribute*)), transGraphic, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
+    connect(eventName, SIGNAL(changed(IAttribute*)), transGraphic, SLOT(handleAttributeChanged(IAttribute*)));
 
     // when the transition graphic emits clicked, also emit it for the sctransition
     connect(transGraphic, SIGNAL(clicked(SCTransition*)), trans, SIGNAL(clicked(SCTransition*)));
 
     // connect the text block graphic of this transition to the data model
-    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontFamilyAttribute*)));
-    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontSizeAttribute*)));
-
-    connect(trans->getEventTextBlock()->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(FontBoldAttribute*)));
-
-
+    connect(trans->getEventTextBlock()->getFontFamilyAttr(), SIGNAL(changed(IAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(IAttribute*)));
+    connect(trans->getEventTextBlock()->getFontSizeAttr(), SIGNAL(changed(IAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(IAttribute*)));
+    connect(trans->getEventTextBlock()->getFontBoldAttr(), SIGNAL(changed(IAttribute*)), transGraphic->getEventTextGraphic(), SLOT(handleFontChanged(IAttribute*)));
 }
 
 

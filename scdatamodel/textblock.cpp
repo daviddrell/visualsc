@@ -106,16 +106,6 @@ void  SCTextBlock::setText(QString text)
     }
 }
 
-void SCTextBlock::handleAttributeChanged(StateName * sn)
-{
-    this->setText(sn->asString());
-}
-
-void SCTextBlock::handleAttributeChanged(TransitionStringAttribute* tsa)
-{
-    this->setText(tsa->asString());
-}
-
 
 /**
  * @brief SCTextBlock::handleAttributeChanged
@@ -125,7 +115,7 @@ void SCTextBlock::handleAttributeChanged(TransitionStringAttribute* tsa)
  */
 void SCTextBlock::handleAttributeChanged(IAttribute *attr)
 {
-    qDebug()<<"SCTextBlock::handleAttributeChanged "<<attr->asString();
+    this->setText(attr->asString());
 }
 
 

@@ -121,7 +121,7 @@ private slots:
     //void handleLineSelected();
    //void handleLineUnSelected();
 
-    void handleTargetStateNameChanged(StateName*);
+    void handleTargetStateNameChanged(IAttribute*);
     void detachFromSource(QObject*);
     void detachFromSink(QObject*);
     void handleTextBlockChanged();

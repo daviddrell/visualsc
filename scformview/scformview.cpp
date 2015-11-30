@@ -982,23 +982,23 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
 {
     if(key=="size")
     {
-        connect(textBlock->getSizeAttr(), SIGNAL(changed(SizeAttribute*)), tableItem, SLOT(handleAttributeChanged(SizeAttribute*)));
+        connect(textBlock->getSizeAttr(), SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
     }
     else if(key == "position")
     {
-        connect(textBlock->getPosAttr(), SIGNAL(changed(PositionAttribute*)), tableItem, SLOT(handleAttributeChanged(PositionAttribute*)));
+        connect(textBlock->getPosAttr(), SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
     }
     else if (key == "font-family")
     {
-        connect(textBlock->getFontFamilyAttr(), SIGNAL(changed(FontFamilyAttribute*)), tableItem, SLOT(handleAttributeChanged(FontFamilyAttribute*)));
+        connect(textBlock->getFontFamilyAttr(), SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
     }
     else if (key == "font-size")
     {
-        connect(textBlock->getFontSizeAttr(), SIGNAL(changed(FontSizeAttribute*)), tableItem, SLOT(handleAttributeChanged(FontSizeAttribute*)));
+        connect(textBlock->getFontSizeAttr(), SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
     }
     else if( key == "font-bold")
     {
-        connect(textBlock->getFontBoldAttr(), SIGNAL(changed(FontBoldAttribute*)), tableItem, SLOT(handleAttributeChanged(FontBoldAttribute*)));
+        connect(textBlock->getFontBoldAttr(), SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
     }
 }
 
@@ -1013,8 +1013,7 @@ void SCFormView::connectTextBlock(SCTextBlock * textBlock, CustomTableWidgetItem
  */
 void SCFormView::connectState(SCState *state, CustomTreeWidgetItem* treeItem)
 {
-    connect(state->getStateNameAttr(), SIGNAL(changed(StateName*)), treeItem, SLOT(handleAttributeChanged(StateName*)));
-
+    connect(state->getStateNameAttr(), SIGNAL(changed(IAttribute*)), treeItem, SLOT(handleAttributeChanged(IAttribute*)));
 }
 
 
@@ -1059,7 +1058,7 @@ void SCFormView::connectTransition(SCTransition* trans)
 
     // when the target's name changes, also change the transition's attribute
     StateName* targetStateName = trans->targetState()->getStateNameAttr();
-    connect(targetStateName, SIGNAL(changed(StateName*)), trans, SLOT(handleTargetStateNameChanged(StateName*)));
+    connect(targetStateName, SIGNAL(changed(IAttribute*)), trans, SLOT(handleTargetStateNameChanged(IAttribute*)));
 
     // highlight the transition when it is clicked
     connect(trans, SIGNAL(clicked(SCTransition*)), this,SLOT(handleItemClicked(SCTransition*)));
@@ -1291,7 +1290,7 @@ void SCFormView::connectTransition(SCTransition * trans, CustomTableWidgetItem *
 
 void SCFormView::connectTransition(SCTransition *trans, CustomTreeWidgetItem* treeItem)
 {
-    connect(trans->getTransStringAttr("event"), SIGNAL(changed(TransitionStringAttribute*)), treeItem, SLOT(handleAttributeChanged(TransitionStringAttribute*)));
+    connect(trans->getTransStringAttr("event"), SIGNAL(changed(IAttribute*)), treeItem, SLOT(handleAttributeChanged(IAttribute*)));
 }
 
 
@@ -1335,41 +1334,24 @@ void SCFormView::connectState(SCState* state, CustomTableWidgetItem* tableItem, 
     if(attributeKey == "size")
     {
         SizeAttribute* size = state->getSizeAttr();
-        connect(size, SIGNAL(changed(SizeAttribute*)), tableItem, SLOT(handleAttributeChanged(SizeAttribute*)));
+        connect(size, SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
     }
     else if(attributeKey == "position")
     {
         PositionAttribute* pos = state->getPosAttr();
-        connect(pos, SIGNAL(changed(PositionAttribute*)), tableItem, SLOT(handleAttributeChanged(PositionAttribute*)));
+        connect(pos, SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
     }
     else if(attributeKey == "name")
     {
         StateName* name = state->getStateNameAttr();
-        connect(name, SIGNAL(changed(StateName*)), tableItem, SLOT(handleAttributeChanged(StateName*)));
+        connect(name, SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
 
     }
     else    // this is a string attribute, so connect it
     {
         StateString * ss = state->getStringAttr(attributeKey);
-        connect(ss, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
+        connect(ss, SIGNAL(changed(IAttribute*)), tableItem, SLOT(handleAttributeChanged(IAttribute*)));
     }
-//    else if(attributeKey == "uid")
-//    {
-//        StateString* uid = state->getStringAttr("uid");
-//        connect(uid, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
-//    }
-//    else if(attributeKey == "entryAction")
-//    {
-//        StateString* ea = state->getStringAttr("entryAction");
-//        connect(ea, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
-//    }
-//    else if(attributeKey == "exitAction")
-//    {
-//        StateString* ea = state->getStringAttr("exitAction");
-//        connect(ea, SIGNAL(changed(StateString*)), tableItem, SLOT(handleAttributeChanged(StateString*)));
-//    }
-
-
 }
 
 

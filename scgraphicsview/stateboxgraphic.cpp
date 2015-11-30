@@ -132,9 +132,9 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     // connect the size attribute of this state model to the state title box
     SizeAttribute* sa = this->getStateModel()->getSizeAttr();
-    connect(sa, SIGNAL(changed(SizeAttribute*)), this->_stateTitle, SLOT(handleStateSizeChanged(SizeAttribute*)));
-    connect(sa, SIGNAL(changed(SizeAttribute*)), this->_entryActionTitle, SLOT(handleStateSizeChanged(SizeAttribute*)));
-    connect(sa, SIGNAL(changed(SizeAttribute*)), this->_exitActionTitle, SLOT(handleStateSizeChanged(SizeAttribute*)));
+    connect(sa, SIGNAL(changed(IAttribute*)), this->_stateTitle, SLOT(handleStateSizeChanged(IAttribute*)));
+    connect(sa, SIGNAL(changed(IAttribute*)), this->_entryActionTitle, SLOT(handleStateSizeChanged(IAttribute*)));
+    connect(sa, SIGNAL(changed(IAttribute*)), this->_exitActionTitle, SLOT(handleStateSizeChanged(IAttribute*)));
 
     _stateTitle->reposition();
     _entryActionTitle->reposition();
@@ -144,7 +144,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     // minimize toggle button
     _minimize = new ToggleButton(this, WallCorners::NORTHEAST);
-    connect(sa, SIGNAL(changed(SizeAttribute*)), this->_minimize, SLOT(handleStateSizeChanged(SizeAttribute*)));
+    connect(sa, SIGNAL(changed(IAttribute*)), this->_minimize, SLOT(handleStateSizeChanged(IAttribute*)));
     connect(_minimize, SIGNAL(toggled()), this, SLOT(handleMinimize()));
 
     _minimizeSize = QPointF(MIN_WIDTH,MIN_HEIGHT);
@@ -230,12 +230,12 @@ void StateBoxGraphic::setMinHeight(qreal h)
     _minimizeSize.setY(h);
 }
 
-void StateBoxGraphic::handleExitActionChanged(StateString *ss )
+void StateBoxGraphic::handleExitActionChanged(IAttribute *ss )
 {
     this->_exitActionTitle->setText(ss->asString());
 }
 
-void StateBoxGraphic::handleEntryActionChanged(StateString * ss)
+void StateBoxGraphic::handleEntryActionChanged(IAttribute * ss)
 {
     this->_entryActionTitle->setText(ss->asString());
 }
@@ -367,7 +367,7 @@ void StateBoxGraphic::forceUpdate()
  *
  * when a state's initial state attribute is changed, update the screen
  */
-void StateBoxGraphic::handleInitialStateChanged(StateString *)
+void StateBoxGraphic::handleInitialStateChanged(IAttribute*)
 {
     this->update();
 }
@@ -376,7 +376,7 @@ void StateBoxGraphic::handleInitialStateChanged(StateString *)
  * @brief StateBoxGraphic::handleFinalStateChanged
  * when a state's final state attribute is changed, udpate the screen
  */
-void StateBoxGraphic::handleFinalStateChanged(StateString *)
+void StateBoxGraphic::handleFinalStateChanged(IAttribute*)
 {
     this->update();
 }
@@ -388,16 +388,12 @@ void StateBoxGraphic::handleFinalStateChanged(StateString *)
  * when a state's parallelState Attribute is changed. update all direct children
  *
  */
-void StateBoxGraphic::handleIsParallelStateChanged(StateString* ss)
+void StateBoxGraphic::handleIsParallelStateChanged(IAttribute*)
 {
-
     QList<StateBoxGraphic*> directChildren;
     this->getStates(directChildren);
-
-    qDebug () << "attempting to redraw children...";
     for(int i = 0 ; i < directChildren.size(); i++)
     {
-//        directChildren.at(i)->hoverEnterEvent(
         directChildren.at(i)->forceUpdate();
     }
 }
@@ -780,30 +776,29 @@ FixedTextBlock* StateBoxGraphic::getStateTitle()
     return _stateTitle;
 }
 
-void StateBoxGraphic::handleAttributeChanged(SizeAttribute* size)
+void StateBoxGraphic::handleAttributeChanged(IAttribute* attr)
 {
-    //qDebug() << "StateBoxGraphic::handleAttributeChanged(SizeAttribute*)";
-    QPoint sz = size->asPointF().toPoint();
-    setSizeAndUpdateAnchors(sz);
-    this->_stateTitle->resize();
-    this->_stateTitle->cropDocument();
+    SizeAttribute* size = dynamic_cast<SizeAttribute*>(attr);
+    PositionAttribute* pos = dynamic_cast<PositionAttribute*>(attr);
+    StateName * name = dynamic_cast<StateName*>(attr);
 
+    if ( size != NULL)
+    {
+        QPoint sz = size->asPointF().toPoint();
+        setSizeAndUpdateAnchors(sz);
+        this->_stateTitle->resize();
+        this->_stateTitle->cropDocument();
+    }
+    else if ( pos != NULL)
+    {
+        setPosAndUpdateAnchors(pos->asPointF());
+    }
+    else if(name != NULL)
+    {
+        this->setName(name->asString());
+    }
 }
 
-void StateBoxGraphic::handleAttributeChanged(PositionAttribute* pos)
-{
-    //qDebug() << "StateBoxGraphic::handleAttributeChanged position attr";
-    setPosAndUpdateAnchors(pos->asPointF());
-}
-
-void StateBoxGraphic::handleAttributeChanged(StateName* name)
-{
-    qDebug() << "StateBoxGraphic::handleAttributeChanged";
-    //this->TextItem->setText(name->asString());
-
-    // sets the fixed text block's plain text
-    this->setName(name->asString());
-}
 
 void StateBoxGraphic::setName(QString stateName)
 {

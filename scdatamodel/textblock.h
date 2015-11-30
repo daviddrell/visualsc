@@ -46,8 +46,6 @@ public:
 
 public slots:
     void handleAttributeChanged(IAttribute *attr);
-    void handleAttributeChanged(StateName*);
-    void handleAttributeChanged(TransitionStringAttribute*);
 
 signals:
      void textChanged();

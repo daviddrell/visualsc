@@ -84,15 +84,11 @@ private slots:
     void handleTextItemEdited();
     void handleTextChanged();
     void handleAttributeChanged(IAttribute *attr);
-    void handleAttributeChanged(SizeAttribute *attr);
-    void handleAttributeChanged(PositionAttribute* attr);
     void handleAttributeAdded(IAttribute *attr);
     void handleAttributeDeleted(IAttribute *attr);
     void handleEditBoxSavedText(QString text);
     void handleParentStateGraphicResized(QRectF, QRectF, int);
-    void handleFontChanged(FontFamilyAttribute*);
-    void handleFontChanged(FontSizeAttribute*);
-    void handleFontChanged(FontBoldAttribute*);
+    void handleFontChanged(IAttribute*);
 
 private:
 

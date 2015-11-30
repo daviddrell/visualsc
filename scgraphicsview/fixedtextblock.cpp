@@ -102,31 +102,35 @@ bool FixedTextBlock::isHovered()
     return _hovered;
 }
 
-void FixedTextBlock::handleFontChanged(FontSizeAttribute * fa)
+
+void FixedTextBlock::handleFontChanged(IAttribute * fa)
 {
-    qDebug() << "ftb::handleFontChanged ";
-    QFont f = _textItem.font();
-    f.setPointSize(fa->asInt());
-    _textItem.setFont(f);
-    this->adjustHeight();
+    FontSizeAttribute* fsize= dynamic_cast<FontSizeAttribute*>(fa);
+    FontFamilyAttribute* ffamily = dynamic_cast<FontFamilyAttribute*>(fa);
+    FontBoldAttribute* fbold = dynamic_cast<FontBoldAttribute*>(fa);
+    if ( fsize != NULL)
+    {
+        QFont f = _textItem.font();
+        f.setPointSize(fsize->asInt());
+        _textItem.setFont(f);
+        this->adjustHeight();
+    }
+    else if ( ffamily != NULL)
+    {
+        QFont f = _textItem.font();
+        f.setFamily(ffamily->asString());
+        _textItem.setFont(f);
+        this->adjustHeight();
+    }
+    else if ( fbold != NULL)
+    {
+        QFont f = _textItem.font();
+        f.setBold(fbold->asBool());
+        _textItem.setFont(f);
+        this->adjustHeight();
+    }
 }
 
-void FixedTextBlock::handleFontChanged(FontFamilyAttribute *ga)
-{
-    qDebug() << "ftb::handleFontChanged()";
-    QFont f = _textItem.font();
-    f.setFamily(ga->asString());
-    _textItem.setFont(f);
-    this->adjustHeight();
-}
-
-void FixedTextBlock::handleFontChanged(FontBoldAttribute* fba)
-{
-    QFont f = _textItem.font();
-    f.setBold(fba->asBool());
-    _textItem.setFont(f);
-    this->adjustHeight();
-}
 
 /**
  * @brief FixedTextBlock::mouseMoveEvent
@@ -179,7 +183,7 @@ QPointF FixedTextBlock::getSize()
     return QPointF(_width,_height);
 }
 
-void FixedTextBlock::handleStateSizeChanged(SizeAttribute *)
+void FixedTextBlock::handleStateSizeChanged(IAttribute *)
 {
 //    qDebug() << "FixedTextBlock::handleStateSizeChanged";
     this->resize();

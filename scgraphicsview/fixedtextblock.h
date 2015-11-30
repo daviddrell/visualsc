@@ -58,14 +58,10 @@ signals:
 public slots:
     void handleTextItemEdited();
     void handleStateBoxResized(QRectF, QRectF, int);
-    void handleStateSizeChanged(SizeAttribute*);
+    void handleStateSizeChanged(IAttribute*);
     void handleHoverLeave();
     void handleHoverEnter();
-
-    void handleFontChanged(FontFamilyAttribute*);
-    void handleFontChanged(FontSizeAttribute*);
-    void handleFontChanged(FontBoldAttribute*);
-
+    void handleFontChanged(IAttribute*);
     void handleBaseHeightChanged(qreal delta);
 
 protected:

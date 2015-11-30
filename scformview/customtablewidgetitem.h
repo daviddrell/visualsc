@@ -24,15 +24,7 @@ signals:
     void textChanged(QString);
 
 public slots:
-    void handleAttributeChanged(SizeAttribute*);
-    void handleAttributeChanged(PositionAttribute*);
-    void handleAttributeChanged(StateName*);
-    void handleAttributeChanged(TransitionStringAttribute*);
-    void handleAttributeChanged(StateString*);
-    void handleAttributeChanged(GenericAttribute*);
-    void handleAttributeChanged(FontFamilyAttribute*);
-    void handleAttributeChanged(FontSizeAttribute*);
-    void handleAttributeChanged(FontBoldAttribute*);
+    void handleAttributeChanged(IAttribute*);
 
 };
 
