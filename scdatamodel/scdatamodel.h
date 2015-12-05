@@ -91,14 +91,11 @@ public:
     void importFile(SCState* parent,QString scxmlFileName);
     void openFile(QString scxmlFileName);
     void open(QString scxmlFile);
-
+    void open(SCState*s);///< make a datamodel from one substate
     bool save(QString scxmlFile, QString & message);
     bool exportToCode(QString cName, QString &message, SCDataModel::STATE_CODE_MODEL model);
-
     void initializeEmptyStateMachine();
-
     bool deleteItem(QObject * item);
-
     void getStates(QList<SCState *>& list);
     void getAllStates(QList<SCState *>& list);
     SCState* getStateByName(QString name);
@@ -108,9 +105,9 @@ public:
     void setScene(QGraphicsScene *scene);
     QGraphicsScene * getScene();
 
-    static SCState *getAsState(QObject*);
-    static SCTransition *getAsTransition(QObject*);
-    static SCTextBlock *getAsTextBlock(QObject*);
+    static SCState*      getAsState(QObject*);
+    static SCTransition* getAsTransition(QObject*);
+    static SCTextBlock*  getAsTextBlock(QObject*);
 
     /** \fn insertNewState
       * \brief Creates and returns a pointer to a new state inserted in the provided parent state.
@@ -165,6 +162,7 @@ signals:
     void setProgramFontFamily(IAttribute*);
     void setProgramFontSize(IAttribute*);
     void setProgramFontBold(IAttribute*);
+    void newSubStateTabRequested(SCState*); ///< create a new data model from this state downward
 
 
 private slots:
@@ -189,7 +187,7 @@ private slots:
 
 private:
 
-
+    void recurisvelyCopyStateMachine(SCState*src,SCState*parent);
     void connectTransition(SCTransition*);
     void connectState(SCState*);
 

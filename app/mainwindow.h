@@ -106,6 +106,7 @@ private slots:
     void handleReadInputFileDone(bool,QStringList);
     void handleItemClicked();
     void handleBoldToggled(bool toggle);
+    void handleNewSubStateTab(SCState*subState);
 
     void handleFontRadioChanged();
     void handlePStateQStateChanged();

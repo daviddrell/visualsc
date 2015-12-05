@@ -1974,7 +1974,7 @@ void SCFormView::reloadPropertyTable()
 void SCFormView::handlePropertyChanged(IAttribute *attr)
 {
     // user changed something, walk the table to find the attribute that the user changed,
-    // and update the data model
+    // and update the data modelt
 
     QString parentName;
     QString currentTreeItemName;

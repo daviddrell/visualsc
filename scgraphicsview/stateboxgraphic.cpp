@@ -68,10 +68,8 @@
 
 
 
-StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
+StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel, SCDataModel*dm, KeyController* kc):
         SelectableBoxGraphic(parent),
-        //TextItem(parent,stateModel->getIDTextBlock()),
-        //TextItem(new SelectableTextBlock(this, stateModel->getIDTextBlock())),
         _stateModel(stateModel),
         _diagLineStart(),
         _diagLineEnd(),
@@ -79,14 +77,13 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
         _intersection(),
         _stateTitle(new FixedTextBlock(this, 0, STATE_NAME_HEIGHT, MINIMIZE_BUTTON_MARGIN, true)),
         _entryActionTitle(new FixedTextBlock(this, ENTRY_TOP, ENTRY_HEIGHT,0, true)),
-        _exitActionTitle(new FixedTextBlock(this, ENTRY_HEIGHT,0,0  , false))
+        _exitActionTitle(new FixedTextBlock(this, ENTRY_HEIGHT,0,0  , false)),
+        _dm(dm),
+        _keyController(kc)
 {
-
-
 
     // set the default text
     _stateTitle->setText(this->getStateName());
-//    _stateTitle->setFont(Font::Small);
 
     // attach entry action title to the state title
     _entryActionTitle->setBase(_stateTitle);
@@ -102,11 +99,9 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
     setShowBoxLineStyle ( SelectableBoxGraphic::kAlways );
     setDrawBoxLineStyle  ( SelectableBoxGraphic::kDrawSolid );
-    //setBoxStyle(SelectableBoxGraphic::kSolidWithShadow );
     setBoxStyle(SelectableBoxGraphic::kSolidNoShadow);
     setMinSize(QPoint(MIN_WIDTH,MIN_HEIGHT));
     setPenWidth(PEN_DEFAULT_WIDTH, PEN_HOVER_WIDTH);
-    //TextItem.setPos(25,10);
 
 #ifdef HIDE_CORNER_GRABBERS
     _corners[0]->setPaintStyle( CornerGrabber::kNone);
@@ -143,7 +138,7 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel):
 
 
     // minimize toggle button
-    _minimize = new ToggleButton(this, WallCorners::NORTHEAST);
+    _minimize = new ToggleButton(this, WallCorners::NORTHEAST,_keyController,  _dm,_stateModel);
     connect(sa, SIGNAL(changed(IAttribute*)), this->_minimize, SLOT(handleStateSizeChanged(IAttribute*)));
     connect(_minimize, SIGNAL(toggled()), this, SLOT(handleMinimize()));
 

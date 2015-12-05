@@ -39,6 +39,22 @@ SCState::SCState(QObject *parent) :
 }
 
 
+
+SCState::SCState(const SCState& st, SCState*parent) :
+    SCItem(NULL),
+    attributes(st.attributes),
+    _IdTextBlock(new SCTextBlock())
+{
+    initCommon(st);
+    if ( parent == NULL )
+        this->setLevel(1);
+    else
+    {
+        parent->addState(this);
+        this->setLevel(this->parentAsSCState()->getLevel()+1);
+    }
+}
+
 SCState::SCState(const SCState& st) :
     SCItem(st.parent()),
     attributes(st.attributes),
@@ -48,7 +64,8 @@ SCState::SCState(const SCState& st) :
     if ( this->parent() == NULL )
         this->setLevel(1);
     else
-        this->setLevel(this->parentAsSCState()->getLevel()+1);}
+        this->setLevel(this->parentAsSCState()->getLevel()+1);
+}
 
 
 
@@ -80,6 +97,40 @@ SCState::~SCState()
 SCState* SCState::parentAsSCState()
 {
     return dynamic_cast<SCState*>(this->parent());
+}
+
+/**
+ * @brief SCState::initCommon
+ *
+ * called when a SCState is created
+ *
+ */
+void SCState::initCommon(const SCState&src)
+{
+    _initialState = src._initialState;
+
+    QUuid u=QUuid::createUuid();
+    attributes["uid"]->setValue(  u.toString() );
+
+    this->setObjectName(src.objectName());
+
+    _IdTextBlock->setParent(this);
+    _IdTextBlock->setText(this->objectName());
+
+    // the set of connects inherent to an SCState are for its data model text block
+    // connect changing the SCTextBlock to handleTextBlockChanged()
+    connect(_IdTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
+
+    // connect changing the name attribute to the text block
+    IAttribute* name = attributes.value("name");
+    connect(name, SIGNAL(changed(IAttribute*)), _IdTextBlock, SLOT(handleAttributeChanged(IAttribute*)));
+
+    foreach(SCTransition*srcTran,src._transitingTransitionsOut)
+    {
+        SCTransition* thisTran = new SCTransition(srcTran);
+        _transitingTransitionsOut.append(thisTran);
+    }
+
 }
 
 /**
@@ -573,9 +624,9 @@ QString SCState::getAttributeValue(QString key)
     else return QString();
 }
 
-IAttributeContainer * SCState::getAttributes()
+IAttributeContainer* SCState::getAttributes()
 {
-    return   & attributes;
+    return &attributes;
 }
 
 bool SCState::removeAttribute(QString key)
@@ -818,12 +869,8 @@ void SCState::addTransistion(SCTransition * t)
 
 void SCState::addState(SCState * s)
 {
-
-
     s->setParent(this);
-
     emit changed();
-
 }
 
 /**

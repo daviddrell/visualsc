@@ -74,7 +74,7 @@ class StateBoxGraphic :  public SelectableBoxGraphic
     Q_OBJECT
 
 public:
-    StateBoxGraphic(QGraphicsObject*parent, SCState * state);
+    StateBoxGraphic(QGraphicsObject*parent, SCState * state, SCDataModel*dm, KeyController* kc);
     ~StateBoxGraphic();
 
    // SelectableTextBlock* TextItem;    ///<  text to go in the title area.
@@ -159,43 +159,30 @@ private:
     bool isContained(QRectF);
 
 
-
-    // private slots
-
 private slots:
-
-    //void handleAttributeChanged(void *attr);
 
 
 private:
     int call;
     int returnClosestWallFace(QPointF mts,QPointF newPos);
     int returnClosestWallFace(qreal a, qreal b, qreal c, qreal d);
+
     //private data
-
     SCState * _stateModel;
-
     QPointF _diagLineStart;
     QPointF _diagLineEnd;
     bool    _diagLineDrawIt;
-
-
-
     QPointF _intersection;
-
     QColor  _finalStateColor;
     QColor  _initialStateColor;
-
     FixedTextBlock* _stateTitle;
     FixedTextBlock* _entryActionTitle;
     FixedTextBlock* _exitActionTitle;
-
     ToggleButton* _minimize;
-
     QPointF _restoreSize;
     QPointF _minimizeSize;
-
-
+    SCDataModel* _dm;
+    KeyController* _keyController;
 
 };
 

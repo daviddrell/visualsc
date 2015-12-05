@@ -6,35 +6,24 @@
 
 #define WIDTH 16
 #define HEIGHT 16
-
 #define BUFFER_X 9
 #define BUFFER_Y 7
-
 #define THICKNESS 1.67
-//#define THICKNESS 1.61803398875
-
 #define ARROW_BUFFER 4
 
-ToggleButton::ToggleButton(StateBoxGraphic* parentGraphic, int corner):
+ToggleButton::ToggleButton(StateBoxGraphic* parentGraphic, int corner, KeyController*kc, SCDataModel*dm, SCState* sm):
     QGraphicsItem(parentGraphic),
     _on(false),
     _width(WIDTH),
     _height(HEIGHT),
     _corner(corner),
-    _hovered(false)
+    _hovered(false),
+    _keyController(kc),
+    _dm(dm),
+    _state(sm)
 {
-    //this->setFlag(QGraphicsItem::ItemIsFocusable, true);
-
-//    setPos(200,50);
     this->reposition();
     this->setAcceptHoverEvents(true);
-    //this->installSceneEventFilter(parentGraphic);
-
-//    QImage img = QImage(":/SCGraphicsView/Circled Chevron Down-26.png");
-//    QImage img2 = QImage(":/SCGraphicsView/Circled Chevron Left -26.png");
-
-
-//    _defaultGraphic->fromImage(img.scaled(WIDTH,HEIGHT,Qt::IgnoreAspectRatio, Qt::FastTransformation));
 
     _defaultGraphic = new QPixmap(":/SCGraphicsView/circledchevrondown.png");
     _toggleGraphic = new QPixmap(":/SCGraphicsView/Circled Chevron Left -26.png");
@@ -44,6 +33,8 @@ ToggleButton::ToggleButton(StateBoxGraphic* parentGraphic, int corner):
     _pen.setColor(Qt::black);
     _pen.setCapStyle(Qt::RoundCap);
     _pen.setJoinStyle(Qt::RoundJoin);
+
+    connect(_keyController,SIGNAL(keyPressed(int)),this,SLOT(handleKey(int)));
 }
 
 ToggleButton::~ToggleButton()
@@ -53,6 +44,17 @@ ToggleButton::~ToggleButton()
 
     if(_toggleGraphic)
         delete _toggleGraphic;
+}
+
+void ToggleButton::handleKey(int k)
+{
+    if ( isHovered())
+    {
+        if (k == Qt::Key_T)
+        {
+            emit _dm->newSubStateTabRequested(_state);
+        }
+    }
 }
 
 bool ToggleButton::isHovered()

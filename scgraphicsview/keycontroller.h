@@ -21,10 +21,6 @@ public:
 
 private:
     int _lastKey;
-
-
-
-
 };
 
 #endif // KEYCONTROLLER_H

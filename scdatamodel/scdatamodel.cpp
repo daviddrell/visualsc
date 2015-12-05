@@ -68,8 +68,6 @@ void SCDataModel::connectDataModel()
     connect(&_reader, SIGNAL(changeStateMachineUid(QString)), this, SLOT(handleStateMachineUidLoad(QString)));
     connect(&_reader, SIGNAL(changeStateMachineAttribute(QString, QString)), this, SLOT(handleStateMachineAttributeLoad(QString,QString)));
 
-
-
 }
 
 /**
@@ -479,10 +477,39 @@ bool SCDataModel::exportToCode(QString fileName, QString &, SCDataModel::STATE_C
     return true;
 }
 
+void SCDataModel::recurisvelyCopyStateMachine(SCState*src,SCState*parent)
+{
+    SCState* s = new SCState(*src,parent);
+
+    if (_topState == NULL)
+        _topState = s;
+
+    QList<SCTransition*> tlist;
+    src->getTransitions(tlist);
+    foreach(SCTransition*tr, tlist)
+    {
+        SCTransition* t = new SCTransition(tr);
+        s->addTransistion(t);
+    }
+
+    QList<SCState*> children;
+    src->getStates(children);
+    foreach(SCState*c,children)
+    {
+        recurisvelyCopyStateMachine(c,s);
+    }
+
+}
+
+void SCDataModel::open(SCState*s)
+{
+    recurisvelyCopyStateMachine(s,NULL);
+    QList<SCTransition*> tlist;
+    _topState->getAllTransitions(tlist);
+    connectTransitionsToStatePath(tlist);
+}
 
 /**
-
-
  * @brief SCDataModel::open
  * @param file
  *

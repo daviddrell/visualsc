@@ -570,6 +570,44 @@ void MainWindow::handleNewClick()
     this->setWindowTitle("Visual Statechart Editor");
 }
 
+void MainWindow::handleNewSubStateTab(SCState*subState)
+{
+    SMProject * project;
+
+    // create the project
+    SCDataModel * dm = new SCDataModel();
+    project = new SMProject( dm, _tabWidget );
+
+    // connects for the mainwindow to other modules
+
+    // if the data model sends an error message, the main window will display it with a pop up
+    connect(project->getDM(), SIGNAL(message(QString)), this, SLOT(handleMessage(QString)));
+
+    // when the grid action is toggled, the graphics view's scene will change its background
+    connect(this, SIGNAL(gridToggled(bool)), project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
+
+    // when the data model signals set program font, set the program font
+    connect(project->getDM(), SIGNAL(setProgramFontFamily(IAttribute*)), this, SLOT(handleSetProgramFontFamily(IAttribute*)));
+    connect(project->getDM(),SIGNAL(setProgramFontSize(IAttribute*)), this, SLOT(handleSetProgramFontSize(IAttribute*)));
+    connect(project->getDM(), SIGNAL(setProgramFontBold(IAttribute*)), this, SLOT(handleSetProgramFontBold(IAttribute*)));
+
+    // when the data model emits a clicked signal, change the radio button selection
+    connect(project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
+
+    project->getDM()->open(subState);
+    SCState* topState = project->getDM()->getTopState();
+
+    _tabWidget->addTab( project->getQGraphicsView(),topState->getName());
+
+    IAttribute* nameAttr = topState->attributes["name"];
+
+    // follow name changes in root state
+    connect(nameAttr,SIGNAL(changed(IAttribute*)),this,SLOT(handleRootStateNameChanged(IAttribute*)));
+
+    _tabWidget->setTabText(1, nameAttr->asString());
+
+}
+
 void MainWindow::handleFileOpenClick()
 {
     if(_currentFolder.isEmpty())
@@ -603,7 +641,6 @@ void MainWindow::handleFileOpenClick()
 
     _project = new SMProject( dm, ui->centralWidget );
 
-    //ui->gridLayout->addWidget( _project->getQGraphicsView() );
     _tabWidget->addTab( _project->getQGraphicsView(),"name");
 
     _formEditorWindow = new SCFormView(0, _project->getDM());
@@ -633,6 +670,7 @@ void MainWindow::handleFileOpenClick()
     connect(_project->getDM(), SIGNAL(setProgramFontFamily(IAttribute*)), this, SLOT(handleSetProgramFontFamily(IAttribute*)));
     connect(_project->getDM(),SIGNAL(setProgramFontSize(IAttribute*)), this, SLOT(handleSetProgramFontSize(IAttribute*)));
     connect(_project->getDM(), SIGNAL(setProgramFontBold(IAttribute*)), this, SLOT(handleSetProgramFontBold(IAttribute*)));
+    connect(_project->getDM(),SIGNAL(newSubStateTabRequested(SCState*)),this,SLOT(handleNewSubStateTab(SCState*)));
 
     // when the data model emits a clicked signal, change the radio button selection
     connect(_project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));

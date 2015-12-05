@@ -1239,7 +1239,7 @@ void SCGraphicsView::handleNewState (SCState *newState)
     // will set the size of the model and vice versa
 
     // create the stateboxgraphic
-    stateGraphic = new StateBoxGraphic(parentGraphic, newState);
+    stateGraphic = new StateBoxGraphic(parentGraphic, newState, _dm, _keyController);
 
     //
     // if a parent state is a parallel state, then its children run in parallel.

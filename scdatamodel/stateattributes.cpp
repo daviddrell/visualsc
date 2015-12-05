@@ -30,8 +30,9 @@ StateAttributes::StateAttributes(QObject * parent, QString key) :
 {
 }
 
-StateAttributes::StateAttributes(const StateAttributes& sa): IAttributeContainer(sa)
+StateAttributes::StateAttributes(const StateAttributes& sa): IAttributeContainer()
 {
+     setAttributes(sa);
 }
 
 StateAttributes& StateAttributes::operator=( StateAttributes& sa )
@@ -104,7 +105,7 @@ void StateAttributes::setAttributes(const IAttributeContainer& sourceAttrList)
 
     // now delete local attributes that are not contained in the source list
 
-   QMapIterator<QString,IAttribute*> j(sourceAttrList);
+   QMapIterator<QString,IAttribute*> j(*this);
 
     while (j.hasNext())
     {

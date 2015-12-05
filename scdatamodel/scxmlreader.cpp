@@ -387,17 +387,6 @@ void SCXMLReader::readElement()
     bool enteredATransistionElement = false;
     bool enteredATransistionPathElement = false;
 
-    qDebug() << "READING... "<< _reader.name();
-#if 0
-    if (_reader.name() == "scxml")
-    {
-        qDebug() << "skipping scxml";
-        //emit enterStateElement();           // increase the transit level
-        readStateMachine();
-        //readState(kSTATE_TYPE_Machine);   // disabled adding a state every time openFile happens
-        enteredAStateElement = true;
-    }
-#endif
     if (_reader.name() == "state" || _reader.name() == "scxml")
     {
         _currentItemType = ItemType::STATE;

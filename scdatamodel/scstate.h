@@ -59,6 +59,7 @@ class SCDATAMODELSHARED_EXPORT  SCState : public SCItem
 public:
     SCState(QObject *parent);
     SCState(const SCState& st);
+    SCState(const SCState& st, SCState* parent);
     SCState(bool topState=false);
     ~SCState();
 
@@ -268,11 +269,11 @@ private:
 
 
     void initCommon();
+    void initCommon(const SCState&src);
 
     //private data
 
     void resetLevels(SCState* parent);
-    //StateBoxGraphic* _stateBoxGraphic;
     SCTextBlock * _IdTextBlock;
     QList<SCTransition*> _transitingTransitionsOut;
     QList<SCTransition*> _transitingTransitionsIn;
