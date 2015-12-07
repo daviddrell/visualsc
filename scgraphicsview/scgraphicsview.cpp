@@ -628,21 +628,12 @@ void SCGraphicsView::handleNewTransition (SCTransition * t)
 
     // create the transition graphic, stack its deconstructor, and create the link between the SCtransition to its graphic
     TransitionGraphic* transGraphic = new TransitionGraphic(_dm,parentGraphic, NULL, t, _keyController, _mouseController);
-    //connect(t, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));
-    //connect(transGraphic, SIGNAL(destroyed(QObject*)), this, SLOT(handleTransitionGraphicDeleted(QObject*)));
 
     // add the transitiongraphic to the map of transition graphics
     _mapTransitionToGraphic.insert(t, transGraphic);
     _hashTransitionToGraphic.insert(t, transGraphic);
 
     // this is done later after all states are added
-//    // set the text position of the event attribute
-//    PositionAttribute* textPos = (PositionAttribute*)t->getEventTextBlock()->attributes.value("position");
-//    qDebug()<< "handle new transition text pos: " << textPos->asPointF();
-//    transGraphic->setTextPos(textPos->asPointF());
-
-    // wait to do connect calls
-
     qDebug()<<"SCGraphicsView::handleNewTransition inserted a new transition graphic with event name: " << t->attributes.value("event");
 }
 

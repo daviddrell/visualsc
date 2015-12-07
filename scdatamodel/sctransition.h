@@ -55,12 +55,10 @@ class SCDATAMODELSHARED_EXPORT  SCTransition : public SCItem
 
 public:
     SCTransition(QObject * parent);
-
+    SCTransition(const SCTransition& rhs);
     ~SCTransition();
 
     SCState* parentSCState();
-
-
     bool isConnectToFinished();
     void deleteSafely();
     void setUid(QString);
@@ -68,8 +66,6 @@ public:
     QString getUidFirstName();
     void setEventName(QString text);
     QString getEventName();
-    //void setTextPos(QPointF);
- //   void setTextSize(qreal w, qreal h);
     void setText(QString eventText);
 
     TransitionStringAttribute* getTransStringAttr(QString key);
@@ -82,28 +78,14 @@ public:
     void addAttribute(QString key, QString value);
     bool removeAttribute(QString key);
 
-    //void addTextBlock(QString key, QString value);
-
     TransitionAttributes attributes;
-
     void    writeSCVXML(QXmlStreamWriter & sw);
     SCState *targetState();
-
-
     bool doNotPrint(QString);
     int doNotPrintSize();
-
-    //QList<SCTextBlock*> getTextBlocks();
-    //SCTextBlock* getTextBlock(QString textBlockName);
     SCTextBlock* getEventTextBlock();
 
-     //public data members
-
-
     void setTargetState(SCState*);
-
-//    void setFont(QString);
-//    void setFontSize(int);
     void setFont(QFont* font);
 
 
@@ -118,8 +100,6 @@ signals:
     void changedTarget(SCTransition*, SCState*);
 
 private slots:
-    //void handleLineSelected();
-   //void handleLineUnSelected();
 
     void handleTargetStateNameChanged(IAttribute*);
     void detachFromSource(QObject*);

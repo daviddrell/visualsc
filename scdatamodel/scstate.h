@@ -63,13 +63,10 @@ public:
     SCState(bool topState=false);
     ~SCState();
 
-
     void deleteSafely();
     void deleteAllSafely();
-
     QString getName();
-   // void setGraphic(StateBoxGraphic*);
-
+    void setLinkedParent(SCState*); ///< if this is a linked copy of a subsate, then this is the parent
 
 
     //void prepareForDelete();
@@ -292,6 +289,7 @@ private:
     QHash<QString,int> DO_NOT_DISPLAY_HASH;
 
     SCState* _initialState;
+    SCState* _linkedParent;
 
 };
 

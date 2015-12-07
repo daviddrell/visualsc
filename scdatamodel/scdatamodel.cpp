@@ -463,17 +463,12 @@ bool SCDataModel::exportToCode(QString fileName, QString &, SCDataModel::STATE_C
 
     }
 
-
-
     // define the signal and slot names
     cw->createStateMachines();
-
     // create the files
     cw->writeHFile();
     cw->writeCppFile();
-
     delete cw;
-
     return true;
 }
 
@@ -482,14 +477,20 @@ void SCDataModel::recurisvelyCopyStateMachine(SCState*src,SCState*parent)
     SCState* s = new SCState(*src,parent);
 
     if (_topState == NULL)
+    {
         _topState = s;
+        s->setLinkedParent(src->parentAsSCState());
+    }
+
+    emit newStateSignal(s);
 
     QList<SCTransition*> tlist;
     src->getTransitions(tlist);
     foreach(SCTransition*tr, tlist)
     {
-        SCTransition* t = new SCTransition(tr);
+        SCTransition* t = new SCTransition(*tr);
         s->addTransistion(t);
+        emit newTransitionSignal(t);
     }
 
     QList<SCState*> children;
@@ -503,10 +504,19 @@ void SCDataModel::recurisvelyCopyStateMachine(SCState*src,SCState*parent)
 
 void SCDataModel::open(SCState*s)
 {
+    emit newRootMachine(NULL);
+
     recurisvelyCopyStateMachine(s,NULL);
     QList<SCTransition*> tlist;
     _topState->getAllTransitions(tlist);
     connectTransitionsToStatePath(tlist);
+
+    // set up the transition connections in the graphics
+    for(int i = 0; i < _transitions.count(); i++)
+    {
+        // alert the graphics view and formview that the transition is ready to set up its connections
+        emit transitionsReadyToConnect(_transitions.at(i));
+    }
 }
 
 /**

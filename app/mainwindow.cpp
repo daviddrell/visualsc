@@ -193,9 +193,6 @@ void MainWindow::createFontBar()
         _fontBox->setCurrentIndex(fontIndex);
     }
 
-//    this->addToolbarSpacer(ui->mainToolBar);
-//    ui->mainToolBar->setStyleSheet("spacing: 20px");
-
     // add font size combox box
     _fontSizeBox = new QComboBox();
     _fontSizeBox->setEditable(true);
@@ -207,9 +204,6 @@ void MainWindow::createFontBar()
     {
         _fontSizeBox->setCurrentIndex(fontSizeIndex);
     }
-
-
-
 
     // bold button
     _boldAction = new QAction(tr("Bold"), this);
@@ -318,40 +312,9 @@ void MainWindow::handleItemClicked()
     else
     {
         _selectedRadioButton->toggle();
-
     }
 }
 
-///**
-// * @brief MainWindow::handleSetProgramFont
-// * @param font
-// *
-// * SLOT
-// *
-// * this is triggered by SCDataModel when the mainwindow font boxes should update
-// * for each valid font attribute given, update the corresponding combo box
-// *
-// */
-//void MainWindow::handleSetProgramFont(QFont* font)
-//{
-//    qDebug() << "mainwindow::handlesetprogramfont";
-//    // set font, if it exists
-//    int fontIndex = _fontBox->findText(font->family(), Qt::MatchFixedString);
-//    if(fontIndex>-1)
-//    {
-//        _fontBox->setCurrentIndex(fontIndex);
-//    }
-
-//    int fontSizeIndex = _fontSizeBox->findText(QString::number(font->pointSize()),0);
-//    if(fontSizeIndex>-1)
-//    {
-//        _fontSizeBox->setCurrentIndex(fontSizeIndex);
-//    }
-
-
-////    if(_boldAction->isChecked()!=font->bold()) //        _boldAction->toggle();
-
-//}
 
 /**
  * @brief MainWindow::addToolbarSpacer

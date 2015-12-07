@@ -29,7 +29,8 @@
 SCState::SCState(QObject *parent) :
     SCItem(parent),
     attributes(this, "stateAttributes"),
-    _IdTextBlock(new SCTextBlock())
+    _IdTextBlock(new SCTextBlock()),
+    _linkedParent(NULL)
 {
     initCommon();
     if ( parent == NULL )
@@ -43,7 +44,8 @@ SCState::SCState(QObject *parent) :
 SCState::SCState(const SCState& st, SCState*parent) :
     SCItem(NULL),
     attributes(st.attributes),
-    _IdTextBlock(new SCTextBlock())
+    _IdTextBlock(new SCTextBlock()),
+    _linkedParent(NULL)
 {
     initCommon(st);
     if ( parent == NULL )
@@ -58,7 +60,8 @@ SCState::SCState(const SCState& st, SCState*parent) :
 SCState::SCState(const SCState& st) :
     SCItem(st.parent()),
     attributes(st.attributes),
-    _IdTextBlock(new SCTextBlock())
+    _IdTextBlock(new SCTextBlock()),
+    _linkedParent(NULL)
 {
     initCommon();
     if ( this->parent() == NULL )
@@ -72,7 +75,8 @@ SCState::SCState(const SCState& st) :
 SCState::SCState( bool topState) :
     SCItem(NULL),
     attributes(this, "stateAttributes"),
-    _IdTextBlock(new SCTextBlock())
+    _IdTextBlock(new SCTextBlock()),
+    _linkedParent(NULL)
 {
     initCommon();
 
@@ -86,17 +90,20 @@ SCState::SCState( bool topState) :
 
 SCState::~SCState()
 {
-    // moved transition reference deletion to the deconstructor for the transition
-
-    // also delete any transitions that were transiting in and their reference to the source state
-
-
     delete _IdTextBlock;
+}
+
+void SCState::setLinkedParent(SCState* p)
+{
+    _linkedParent = p;
 }
 
 SCState* SCState::parentAsSCState()
 {
-    return dynamic_cast<SCState*>(this->parent());
+    if ( this->parent()!= NULL)
+        return dynamic_cast<SCState*>(this->parent());
+    else
+        return _linkedParent;
 }
 
 /**
@@ -855,14 +862,8 @@ void SCState::removeAllTransitionsIn()
 
 void SCState::addTransistion(SCTransition * t)
 {
-
     t->setParent(this);
-
-    //      connect (t, SIGNAL(selected()), this, SLOT(handleTransitionSelected()) );
-    //      connect (t, SIGNAL(unselected()), this, SLOT(handleTransitionUnSelected()) );
-
     emit changed();
-
 }
 
 

@@ -133,31 +133,20 @@ TransitionGraphic::TransitionGraphic(SCDataModel*dm,StateBoxGraphic *parentGraph
 
                     elbTwo->setSegmentAt(0, segment);
                 }
-                if(i==_elbows.count()-2){      // sink anchor
-                    //qDebug() << "sink anchor";
+                if(i==_elbows.count()-2)
+                {      // sink anchor
                     elbTwo->setSegmentAt(0, segment);
                     elbTwo->setSegmentAt(1, NULL);
-
                     elbOne->setSegmentAt(1, segment);
                 }
             }
             else                                // standard elbow that connects two line segments
             {
-                //qDebug() << "normal elbow";
                 elbOne->setSegmentAt(1, segment);
                 elbTwo->setSegmentAt(0, segment);
             }
 
-
-            // make the elbows invisible by default
-            //elbOne->setVisible(false);
-            //elbOne->setVisible(false);
-
-
             _lineSegments.append(segment);  // add the line segments
-
-
-
         }
 
         // set first and last elbows as the anchors and the last elbow as the terminal elbow
@@ -172,7 +161,6 @@ TransitionGraphic::TransitionGraphic(SCDataModel*dm,StateBoxGraphic *parentGraph
         _anchors[1]->setAnchor(true);
 
     } // end of loading a transition from file
-
 
     _eventText = new SelectableTextBlock(_dm,(QGraphicsObject*) _anchors[0], t->getEventTextBlock());
 

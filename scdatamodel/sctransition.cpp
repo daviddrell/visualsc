@@ -31,7 +31,6 @@ SCTransition::SCTransition(QObject * parent):
         attributes(this, "transition.attributes"),
         _eventTextBlock(new SCTextBlock()),
         _targetState(NULL)
-
 {
     /*
      event
@@ -75,6 +74,56 @@ SCTransition::SCTransition(QObject * parent):
 
     // set the event sctextblock's parent
     _eventTextBlock->setParent(this);
+}
+
+SCTransition::SCTransition(const SCTransition& rhs):
+    SCItem(NULL),
+    attributes(this, "transition.attributes"),
+    _eventTextBlock(new SCTextBlock()),
+    _targetState(NULL)
+{
+    // items in this list cannot be deleted by the user
+    DEFAULT_ATTRIBUTES_LIST << "target" << "event" << "comments" << "path" << "uid";
+
+    //DO_NOT_DISPLAY_HASH.insert("uid",0);
+
+    // SCTransition will load with target, event, commentary, and path
+    TransitionStringAttribute * target = new TransitionStringAttribute (this, "target",rhs.attributes.value("target")->asString());
+    attributes.addItem(target);
+
+    TransitionStringAttribute * event = new TransitionStringAttribute (this, "event",rhs.attributes.value("event")->asString());
+    attributes.addItem(event);
+    this->setObjectName(event->asString());
+
+    TransitionStringAttribute * comments = new TransitionStringAttribute (this, "comments",rhs.attributes.value("comments")->asString());
+    attributes.addItem(comments);
+
+    QList<QPointF> pathPts;
+    TransitionPathAttribute* srcPathAttr = dynamic_cast<TransitionPathAttribute*> (rhs.attributes.value("path"));
+    foreach(QPointF pt, srcPathAttr->asQPointFList())
+    {
+        pathPts.append(pt);
+    }
+
+    TransitionPathAttribute * path = new TransitionPathAttribute (this, QString("path"),pathPts);
+    attributes.addItem(path);
+
+    TransitionStringAttribute* uid = new TransitionStringAttribute(this, "uid", QUuid::createUuid().toString() );
+    attributes.addItem(uid);
+
+    TransitionStringAttribute* connectToFinished = new TransitionStringAttribute(this, "connectToFinished", rhs.attributes.value("connectToFinished")->asString());
+    attributes.addItem(connectToFinished);
+
+    // handle textBlock Changed for the event text box
+    connect(_eventTextBlock, SIGNAL(textChanged()), this, SLOT(handleTextBlockChanged()));
+    connect(event, SIGNAL(changed(IAttribute*)), _eventTextBlock, SLOT(handleAttributeChanged(IAttribute*)));
+
+    // set the event sctextblock's parent
+    _eventTextBlock->setParent(this);
+    this->_eventTextBlock->setText(event->asString());
+
+
+
 }
 
 SCTransition::~SCTransition()
