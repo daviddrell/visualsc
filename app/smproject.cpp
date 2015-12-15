@@ -110,6 +110,4 @@ bool SMProject::exportToCode(QString fileName, SCDataModel::STATE_CODE_MODEL mod
 
 void SMProject::close()
 {
-
-
 }

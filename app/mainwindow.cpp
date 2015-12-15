@@ -48,12 +48,12 @@ MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
         ui(new Ui::MainWindow),
         _project(0),
-        //_settings(0),
         _formEditorWindow(0),
         _textFormatToolBar(NULL),
         _scale(1),
         _gridEnable(false),
-        _tabWidget(NULL)
+        _tabWidget(NULL),
+        _tabIndex(1)
 {
 
     QCoreApplication::setOrganizationName("David W Drell");
@@ -64,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     _tabWidget = new QTabWidget();
+    _tabWidget->setTabsClosable(true);
+    connect(_tabWidget,SIGNAL(tabCloseRequested(int)),SLOT(handleTabClosing(int)));
     ui->gridLayout->addWidget(_tabWidget);
 
     // custom action connects
@@ -533,9 +535,15 @@ void MainWindow::handleNewClick()
     this->setWindowTitle("Visual Statechart Editor");
 }
 
+void MainWindow::handleTabClosing(int tabIndex)
+{
+    SMProject* tabbedProject = _tabbedProjects[tabIndex];
+    tabbedProject->deleteLater();
+}
+
 void MainWindow::handleNewSubStateTab(SCState*subState)
 {
-    SMProject * tabbedProject;
+    SMProject* tabbedProject;
 
     // create the project
     SCDataModel * dm = new SCDataModel();
@@ -567,8 +575,9 @@ void MainWindow::handleNewSubStateTab(SCState*subState)
     // follow name changes in root state
     connect(nameAttr,SIGNAL(changed(IAttribute*)),this,SLOT(handleRootStateNameChanged(IAttribute*)));
 
-    _tabWidget->setTabText(1, nameAttr->asString());
-
+    _tabWidget->setTabText(_tabIndex, nameAttr->asString());
+    _tabbedProjects.insert(_tabIndex,tabbedProject);
+    _tabIndex++;
 }
 
 void MainWindow::handleFileOpenClick()
