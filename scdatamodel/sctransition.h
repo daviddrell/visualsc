@@ -88,6 +88,8 @@ public:
     void setTargetState(SCState*);
     void setFont(QFont* font);
 
+public slots:
+    void handleAttributeChanged(IAttribute*);
 
 signals:
 

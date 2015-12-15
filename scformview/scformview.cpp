@@ -2697,21 +2697,13 @@ void SCFormView::updateCurrentlySelected()
  */
 void SCFormView::insertState()
 {
-    //SCState * st  = dynamic_cast<SCState*>(_currentlySelected);
-
-    //updateCurrentlySelected();
 
     SCState* st = _currentlySelected->getState();
     if ( st == NULL ) return;
-
-
-
-
     qDebug() << "inserting new state into parent = " + _currentlySelected->getState()->objectName();
 
     _dm->insertNewState(st);
 
-    // SCState connects
 }
 
 void SCFormView::bringToFront()

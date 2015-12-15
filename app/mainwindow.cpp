@@ -535,34 +535,34 @@ void MainWindow::handleNewClick()
 
 void MainWindow::handleNewSubStateTab(SCState*subState)
 {
-    SMProject * project;
+    SMProject * tabbedProject;
 
     // create the project
     SCDataModel * dm = new SCDataModel();
-    project = new SMProject( dm, _tabWidget );
+    tabbedProject = new SMProject( dm, NULL );
 
     // connects for the mainwindow to other modules
 
     // if the data model sends an error message, the main window will display it with a pop up
-    connect(project->getDM(), SIGNAL(message(QString)), this, SLOT(handleMessage(QString)));
+    connect(tabbedProject->getDM(), SIGNAL(message(QString)), this, SLOT(handleMessage(QString)));
 
     // when the grid action is toggled, the graphics view's scene will change its background
-    connect(this, SIGNAL(gridToggled(bool)), project->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
+    connect(this, SIGNAL(gridToggled(bool)), tabbedProject->getSCGraphicsView()->getCustomGraphicsScene(), SLOT(handleGridToggled(bool)));
 
     // when the data model signals set program font, set the program font
-    connect(project->getDM(), SIGNAL(setProgramFontFamily(IAttribute*)), this, SLOT(handleSetProgramFontFamily(IAttribute*)));
-    connect(project->getDM(),SIGNAL(setProgramFontSize(IAttribute*)), this, SLOT(handleSetProgramFontSize(IAttribute*)));
-    connect(project->getDM(), SIGNAL(setProgramFontBold(IAttribute*)), this, SLOT(handleSetProgramFontBold(IAttribute*)));
+    connect(tabbedProject->getDM(), SIGNAL(setProgramFontFamily(IAttribute*)), this, SLOT(handleSetProgramFontFamily(IAttribute*)));
+    connect(tabbedProject->getDM(),SIGNAL(setProgramFontSize(IAttribute*)), this, SLOT(handleSetProgramFontSize(IAttribute*)));
+    connect(tabbedProject->getDM(), SIGNAL(setProgramFontBold(IAttribute*)), this, SLOT(handleSetProgramFontBold(IAttribute*)));
 
     // when the data model emits a clicked signal, change the radio button selection
-    connect(project->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
+    connect(tabbedProject->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
 
-    project->getDM()->open(subState);
-    SCState* topState = project->getDM()->getTopState();
+    tabbedProject->getDM()->open(subState);
+    _project->getDM()->linkToMirrorState(tabbedProject->getDM()->getTopState()); // make sure the main data model follows changes in the tabbed view
 
-    _tabWidget->addTab( project->getQGraphicsView(),topState->getName());
+    _tabWidget->addTab( tabbedProject->getQGraphicsView(),tabbedProject->getDM()->getTopState()->getName());
 
-    IAttribute* nameAttr = topState->attributes["name"];
+    IAttribute* nameAttr = tabbedProject->getDM()->getTopState()->attributes["name"];
 
     // follow name changes in root state
     connect(nameAttr,SIGNAL(changed(IAttribute*)),this,SLOT(handleRootStateNameChanged(IAttribute*)));

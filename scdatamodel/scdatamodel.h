@@ -92,6 +92,7 @@ public:
     void openFile(QString scxmlFileName);
     void open(QString scxmlFile);
     void open(SCState*s);///< make a datamodel from one substate
+    void linkToMirrorState(SCState* topState); ///< if anything changes in mirror, change it here too
     bool save(QString scxmlFile, QString & message);
     bool exportToCode(QString cName, QString &message, SCDataModel::STATE_CODE_MODEL model);
     void initializeEmptyStateMachine();

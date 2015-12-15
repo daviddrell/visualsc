@@ -25,12 +25,14 @@
 // IAttribute - a base class for attributes
 
 
+
 IAttribute::IAttribute() : QObject(), _key()
 {
     qRegisterMetaType<IAttribute>("IAttribute");
     qRegisterMetaType<IAttribute*>("IAttribute*");
 
 }
+
 
 IAttribute::IAttribute(QObject *parent, QString initkey) : QObject(parent), _key(initkey)
 {

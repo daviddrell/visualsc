@@ -138,11 +138,8 @@ class IAttribute: public QObject
 public:
 
     IAttribute() ;
-
     IAttribute(QObject *parent, QString initkey);
-
     IAttribute(const IAttribute& a);
-
     IAttribute& operator=(const IAttribute& a);
 
     virtual QString asString(){return QString();}
@@ -157,6 +154,9 @@ signals:
 
 protected:
     QString _key;
+
+private:
+
 
 };
 

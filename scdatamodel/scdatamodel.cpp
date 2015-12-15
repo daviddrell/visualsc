@@ -486,11 +486,31 @@ void SCDataModel::recurisvelyCopyStateMachine(SCState*src,SCState*parent)
 
     QList<SCTransition*> tlist;
     src->getTransitions(tlist);
-    foreach(SCTransition*tr, tlist)
+    foreach(SCTransition*srcTrns, tlist)
     {
-        SCTransition* t = new SCTransition(*tr);
-        s->addTransistion(t);
-        emit newTransitionSignal(t);
+        SCTransition* mirrorTrns = new SCTransition(*srcTrns);
+        s->addTransistion(mirrorTrns);
+        emit newTransitionSignal(mirrorTrns);
+
+        // if any attributes of the source transition change, follow those changes in the mirror
+        // iterate through all the soruce attributes and hook up a monitor to each
+        IAttributeContainer* srcTransAttrs = srcTrns->getAttributes();
+        QMap<QString,IAttribute*>::iterator i;
+        for(i = srcTransAttrs->begin(); i != srcTransAttrs->end();i++)
+        {
+            IAttribute* attr = i.value();
+            connect(attr,SIGNAL(changed(IAttribute*)),mirrorTrns,SLOT(handleAttributeChanged(IAttribute*)));
+        }
+
+        // if any attributes of the mirrow transition change, follow those changes in the source
+        // iterate through the mirrow attributes and hook up a montior to each
+        IAttributeContainer* mirrorTransAttrs = mirrorTrns->getAttributes();
+        for(i = mirrorTransAttrs->begin(); i != mirrorTransAttrs->end();i++)
+        {
+            IAttribute* attr = i.value();
+            connect(attr,SIGNAL(changed(IAttribute*)),srcTrns,SLOT(handleAttributeChanged(IAttribute*)));
+        }
+
     }
 
     QList<SCState*> children;
@@ -502,6 +522,31 @@ void SCDataModel::recurisvelyCopyStateMachine(SCState*src,SCState*parent)
 
 }
 
+void SCDataModel::open(SCState*s)
+{
+    // this data model will link to an existing sub-state machine in another model
+    // this input state will  be the top state of this mirrored model
+    // emit new state and new transition signals so the views that are following this model
+    // can get loaded
+
+    _topState = s;
+    QList<SCState*> states;
+    s->getAllStates(states);
+    foreach(SCState*s,states)
+    {
+        emit newStateSignal(s);
+
+        QList<SCTransition*> transitions;
+        s->getTransitions(transitions);
+        foreach(SCTransition*t,transitions)
+        {
+            emit newTransitionSignal(t);
+        }
+
+    }
+}
+
+/*
 void SCDataModel::open(SCState*s)
 {
     emit newRootMachine(NULL);
@@ -517,6 +562,18 @@ void SCDataModel::open(SCState*s)
         // alert the graphics view and formview that the transition is ready to set up its connections
         emit transitionsReadyToConnect(_transitions.at(i));
     }
+
+}
+*/
+
+/**
+ * @brief this data model will follow changes in a mirrored substate machine (used for tabbed views)
+ *
+ *
+*/
+void SCDataModel::linkToMirrorState(SCState*)
+{
+
 }
 
 /**

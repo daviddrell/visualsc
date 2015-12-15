@@ -142,6 +142,19 @@ void SCTransition::setPathAttr(QString pathString)
     this->getPathAttr()->setValue(pathString);
 }
 
+void SCTransition::handleAttributeChanged(IAttribute*srcAttr)
+{
+    QMap<QString,IAttribute*>::iterator i;
+    for(i = attributes.begin(); i !=  attributes.end();i++)
+    {
+        QString key = i.value()->key();
+        if ( srcAttr->key() == key)
+        {
+            i.value()->setValue(srcAttr->asString());
+            break;
+        }
+    }
+}
 
 void SCTransition::handleTargetStateNameChanged(IAttribute * stateName)
 {
