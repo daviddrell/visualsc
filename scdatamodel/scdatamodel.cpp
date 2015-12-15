@@ -542,7 +542,16 @@ void SCDataModel::open(SCState*s)
         {
             emit newTransitionSignal(t);
         }
+    }
 
+    foreach(SCState*s,states)
+    {
+        QList<SCTransition*> transitions;
+        s->getTransitions(transitions);
+        foreach(SCTransition*t,transitions)
+        {
+            emit transitionsReadyToConnect(t);
+        }
     }
 }
 
