@@ -71,7 +71,7 @@ private:
     void loadSettings();
     void saveSettings();
     void createSettings();
-
+    void setupProject();
     void createFontBar();
 
 
@@ -128,6 +128,7 @@ private slots:
     void handleSetProgramFontFamily(IAttribute*);
     void handleSetProgramFontSize(IAttribute*);
     void handleSetProgramFontBold(IAttribute*);
+
 };
 
 #endif // MAINWINDOW_H

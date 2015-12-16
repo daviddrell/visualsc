@@ -71,6 +71,7 @@ public:
 
     //void prepareForDelete();
     virtual IAttributeContainer * getAttributes(); // reimplemented from SCItem base
+    IAttribute* getAttribute(QString key);
     QString getUid();
     QString getUidFirstName();
     QString getFamilyId();

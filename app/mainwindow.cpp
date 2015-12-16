@@ -525,20 +525,34 @@ void MainWindow::delay()
  */
 void MainWindow::handleNewClick()
 {
-    // alert the data model, graphics view, and form view to reset
-    emit reset();
+
+    if ( _project != NULL)
+    {
+         _project->getDM()->handleReset();
+         delete _project;
+         _project =  NULL;
+    }
+
+    if ( _formEditorWindow)
+    {
+        _formEditorWindow->deleteLater();
+        _formEditorWindow =NULL;
+    }
 
     // reset the current save and export files.
     _currentFileFullPath = "";
     _currentExportFullPath = "";
 
     this->setWindowTitle("Visual Statechart Editor");
+
+    setupProject();
 }
 
 void MainWindow::handleTabClosing(int tabIndex)
 {
     SMProject* tabbedProject = _tabbedProjects[tabIndex];
     tabbedProject->deleteLater();
+    _tabIndex = _tabWidget->count()-1;
 }
 
 void MainWindow::handleNewSubStateTab(SCState*subState)
@@ -562,6 +576,9 @@ void MainWindow::handleNewSubStateTab(SCState*subState)
     connect(tabbedProject->getDM(),SIGNAL(setProgramFontSize(IAttribute*)), this, SLOT(handleSetProgramFontSize(IAttribute*)));
     connect(tabbedProject->getDM(), SIGNAL(setProgramFontBold(IAttribute*)), this, SLOT(handleSetProgramFontBold(IAttribute*)));
 
+    // let the new tabbed view create its own new tabbed views from its substates
+    connect(tabbedProject->getDM(),SIGNAL(newSubStateTabRequested(SCState*)),this,SLOT(handleNewSubStateTab(SCState*)));
+
     // when the data model emits a clicked signal, change the radio button selection
     connect(tabbedProject->getDM(), SIGNAL(itemClicked()), this, SLOT(handleItemClicked()));
 
@@ -575,48 +592,22 @@ void MainWindow::handleNewSubStateTab(SCState*subState)
     // follow name changes in root state
     connect(nameAttr,SIGNAL(changed(IAttribute*)),this,SLOT(handleRootStateNameChanged(IAttribute*)));
 
+    _tabIndex = _tabWidget->count();
     _tabWidget->setTabText(_tabIndex, nameAttr->asString());
     _tabbedProjects.insert(_tabIndex,tabbedProject);
-    _tabIndex++;
+
 }
 
-void MainWindow::handleFileOpenClick()
+void MainWindow::setupProject()
 {
-    if(_currentFolder.isEmpty())
-        _currentFolder = QDir::currentPath();
-
-
-    QString newFileFullPath = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), _currentFolder, tr("SCXML Files (*.scxml)"));
-
-
-    // If open was canceled, then stop this function from continuing
-    if(newFileFullPath.isEmpty())
-        return;
-
-    if ( _project != NULL)
-    {
-         _project->getDM()->handleReset();
-         delete _project;
-         _project =  NULL;
-    }
-
-    _currentFileFullPath = newFileFullPath;
-    _currentFolder = QFileInfo(_currentFileFullPath).path();
-
-    this->setWindowTitle(_currentFileFullPath);
-
     // create the project
     SCDataModel * dm = new SCDataModel();
 
     // this is the root dm
     DataModelList::singleton()->setRoot(dm);
-
     _project = new SMProject( dm, ui->centralWidget );
-
     _tabWidget->addTab( _project->getQGraphicsView(),"name");
-
     _formEditorWindow = new SCFormView(0, _project->getDM());
-
 
     // main window actions
     connect(_formEditorWindow, SIGNAL(newClick()), this, SLOT(handleNewClick()));
@@ -628,7 +619,6 @@ void MainWindow::handleFileOpenClick()
     connect(_formEditorWindow, SIGNAL(exportClick()), this, SLOT(handleExportCodeClick()));
 
     _formEditorWindow->show();
-
 
     // connects for the mainwindow to other modules
 
@@ -650,14 +640,50 @@ void MainWindow::handleFileOpenClick()
     _project->getDM()->handleOpen(_currentFileFullPath);
 
     SCState* rootState = _project->getDM()->getTopState();
-    IAttribute* nameAttr = rootState->attributes["name"];
-
-    // follow name changes in root state
-    connect(nameAttr,SIGNAL(changed(IAttribute*)),this,SLOT(handleRootStateNameChanged(IAttribute*)));
-
-    _tabWidget->setTabText(0, nameAttr->asString());
+    if ( rootState != NULL )
+    {
+        IAttribute* nameAttr = rootState->attributes["name"];
+        // follow name changes in root state
+        connect(nameAttr,SIGNAL(changed(IAttribute*)),this,SLOT(handleRootStateNameChanged(IAttribute*)));
+        _tabWidget->setTabText(0, nameAttr->asString());
+    }
 
     saveSettings();
+
+}
+
+void MainWindow::handleFileOpenClick()
+{
+    if(_currentFolder.isEmpty())
+        _currentFolder = QDir::currentPath();
+
+    QString newFileFullPath = QFileDialog::getOpenFileName(this, tr("Open SCXML Input File"), _currentFolder, tr("SCXML Files (*.scxml)"));
+
+    // If open was canceled, then stop this function from continuing
+    if(newFileFullPath.isEmpty())
+        return;
+
+    if ( _project != NULL)
+    {
+         _project->getDM()->handleReset();
+         delete _project;
+         _project =  NULL;
+    }
+
+
+    if ( _formEditorWindow)
+    {
+        _formEditorWindow->deleteLater();
+        _formEditorWindow =NULL;
+    }
+
+
+    _currentFileFullPath = newFileFullPath;
+    _currentFolder = QFileInfo(_currentFileFullPath).path();
+
+    this->setWindowTitle(_currentFileFullPath);
+
+    setupProject();
 }
 
 void MainWindow::handleRootStateNameChanged(IAttribute*nameAttr)

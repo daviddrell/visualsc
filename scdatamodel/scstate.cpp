@@ -631,6 +631,13 @@ QString SCState::getAttributeValue(QString key)
     else return QString();
 }
 
+IAttribute* SCState::getAttribute(QString key)
+{
+    if ( attributes.contains(key))
+        return attributes[key];
+    return NULL;
+}
+
 IAttributeContainer* SCState::getAttributes()
 {
     return &attributes;

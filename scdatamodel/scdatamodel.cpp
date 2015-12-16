@@ -821,8 +821,16 @@ SCState* SCDataModel::insertNewState(SCState *parent)
 
 
 
-SCState * SCDataModel::getTopState()
+SCState* SCDataModel::getTopState()
 {
+    /*
+    if (_topState == NULL)
+    {
+        _topState = new SCState(true);
+        _topState->setStateName("state machine");
+        emit newStateSignal(_topState);
+    }
+    */
     return _topState;
 }
 
@@ -946,31 +954,19 @@ void SCDataModel::initializeEmptyStateMachine()
         _topState->deleteSafely();
         _topState = 0;
     }
-
     _topLevel =_level = 0;
-    StateAttributes * stateAttributes = new StateAttributes(0,"stateAttributes");
-
-    StateString *  sa = new StateString (0,"type","machine");
-    stateAttributes->addItem( sa );
+    _topState = new SCState(true);
+    IAttribute* attr = _topState->getAttribute("type");
+    attr->setValue("machine");
 
     StateString *nsp = new StateString(NULL,"xmlns","http://www.w3.org/2005/07/scxml");
-    stateAttributes->addItem(nsp);
+    _topState->getAttributes()->addItem(nsp);
 
-    StateName *nm = new StateName(NULL,"name", "State Machine");
-    stateAttributes->addItem(nm);
+    attr = _topState->getAttribute("name");
+    attr->setValue("State Machine");
 
-#if 0
-    _topState = new SCState(true);
-    _topState->attributes.setAttributes( *stateAttributes);
     _topState->setLevel(_level);
-
-
     _currentState  = _topState;
-#endif
-    _currentState  = _topState = NULL;
-
-    qDebug() << "initialized empty state machine! " << "_currentState: " <<nm->asString()<<" on level: "<<_level;
-    delete sa;
 
 }
 
