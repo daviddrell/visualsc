@@ -185,6 +185,16 @@ void ToggleButton::mousePressEvent ( QGraphicsSceneMouseEvent *  event)
 }
 
 
+void ToggleButton::setOn(bool on)
+{
+    if ( _on != on)
+    {
+        _on = on;
+        update();
+        emit toggled();
+    }
+}
+
 
 void ToggleButton::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {

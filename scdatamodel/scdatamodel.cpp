@@ -343,9 +343,6 @@ bool SCDataModel::save(QString fileName, QString& errorMessage)
     if ( type  && ( type->asString() == "machine"))
     {
         _writer->writeStartElement("scxml");
-//        _writer->writeAttribute("name", _topState->attributes.value("name")->asString());
-//        _writer->writeAttribute("uid", _topState->getUid());
-//        _writer->writeAttribute("xmlns", "http://www.w3.org/2005/07/scxml");
 
         // get the keys of the attributes
         QMapIterator<QString, IAttribute*> i(_topState->attributes);

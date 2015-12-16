@@ -135,14 +135,18 @@ StateBoxGraphic::StateBoxGraphic(QGraphicsObject * parent,SCState *stateModel, S
     _entryActionTitle->reposition();
     _exitActionTitle->reposition();
 
-
-
     // minimize toggle button
     _minimize = new ToggleButton(this, WallCorners::NORTHEAST,_keyController,  _dm,_stateModel);
     connect(sa, SIGNAL(changed(IAttribute*)), this->_minimize, SLOT(handleStateSizeChanged(IAttribute*)));
     connect(_minimize, SIGNAL(toggled()), this, SLOT(handleMinimize()));
 
     _minimizeSize = QPointF(MIN_WIDTH,MIN_HEIGHT);
+
+    QString minimized = _stateModel->getAttributeValue("minimized");
+    bool minVal = false;
+    if ( ! minimized.isEmpty() && minimized == "true")
+        minVal = true;
+    QMetaObject::invokeMethod(_minimize,"setOn",Qt::QueuedConnection,Q_ARG(bool,minVal));
 
 }
 
@@ -158,16 +162,23 @@ void StateBoxGraphic::handleMinimize()
     // old box will be used for state resizing
     QRectF oldBox = QRectF(pos().x(), pos().y(), _width, _height);
 
+    QString minimizedStr = _stateModel->getAttributeValue("minimized");
+    if ( minimizedStr.isEmpty())
+    {
+        QString val = "false";
+        if ( _minimize->isOn()) val ="true";
+        _stateModel->addAttribute("minimized",val);
+    }
+    IAttribute* minimizedAttr = (*_stateModel->getAttributes())["minimized"];
+
     // check if the toggle is on
     if(_minimize->isOn())
     {
-        // save the dimensions of the box
+        minimizedAttr->setValue("true");
 
+        // save the dimensions of the box
         _restoreSize = this->getSize();
         _minimizeSize.setX(this->getSize().x());
-
-        // set the size to the minimum box height
-        this->setSize(_minimizeSize);
 
         // update the corners to the new size
         this->setCornerPositions();
@@ -178,8 +189,8 @@ void StateBoxGraphic::handleMinimize()
 
             TransitionGraphic* tg = dynamic_cast<TransitionGraphic*>(it);
             CornerGrabber* cg = dynamic_cast<CornerGrabber *>(it);
-
-            if(it==_minimize||tg||it==_stateTitle||cg)
+            FixedTextBlock* text = dynamic_cast<FixedTextBlock *>(it);
+            if(it==_minimize||tg||it==_stateTitle||cg||text)
             {
 
             }
@@ -197,6 +208,8 @@ void StateBoxGraphic::handleMinimize()
     // the toggle is off, so restore the height of the box
     else
     {
+        minimizedAttr->setValue("false");
+
         _restoreSize.setX(this->getSize().x());
 
         // restore the size to the saved height

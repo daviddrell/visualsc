@@ -30,6 +30,8 @@ signals:
 
 public slots:
     void handleStateSizeChanged(IAttribute*);
+    void setOn(bool on);
+
 
 protected:
      void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -39,6 +41,7 @@ protected:
      void mousePressEvent ( QGraphicsSceneMouseEvent * event );
      void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
      void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
+
 
 private slots:
      void handleKey(int);
