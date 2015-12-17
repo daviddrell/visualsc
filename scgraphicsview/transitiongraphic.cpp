@@ -31,15 +31,19 @@ TransitionGraphic::TransitionGraphic(SCDataModel*dm,StateBoxGraphic *parentGraph
     _mouseController(mouse),
     _hasMovedSinceCreatingElbow(true),
     _isCurrentlyDeleting(false),
-    _eventText(NULL),
+    _eventTextBlock(NULL),
     _dm(dm)
 {
+
+    TransitionStringAttribute * actionAttr = dynamic_cast<TransitionStringAttribute *> (  t->attributes.value("action"));
+    connect(actionAttr,SIGNAL(changed(IAttribute*)),this,SLOT(handleActionChanged(IAttribute*)));
+    _action = actionAttr->asString();
+    _event = t->attributes.value("event")->asString();
 
     this->setFlag(QGraphicsItem::ItemIsMovable, false);
     this->setParentItem(parentGraphic);     // the source state will be this transition graphic's parent item
 
-    TransitionPathAttribute * p = dynamic_cast<TransitionPathAttribute *> (  t->attributes.value("path"));
-
+    TransitionPathAttribute * p = dynamic_cast<TransitionPathAttribute *> (  t->attributes.value("path"));    
     QList<QPointF> pointList = p->asQPointFList();
 
 
@@ -162,7 +166,8 @@ TransitionGraphic::TransitionGraphic(SCDataModel*dm,StateBoxGraphic *parentGraph
 
     } // end of loading a transition from file
 
-    _eventText = new SelectableTextBlock(_dm,(QGraphicsObject*) _anchors[0], t->getEventTextBlock());
+    _eventTextBlock = new SelectableTextBlock(_dm,(QGraphicsObject*) _anchors[0], t->getEventTextBlock());
+    _eventTextBlock->setText(getTransitionDisplayString());
 
 }   // end of constructor
 
@@ -1328,13 +1333,13 @@ void TransitionGraphic::updateModel()
 
 void TransitionGraphic::setTextPos(QPointF position)
 {
-    _eventText->setPos(position);
+    _eventTextBlock->setPos(position);
 }
 
 void TransitionGraphic::setTextSize(qreal w, qreal h)
 {
     QPoint size(w,h);
-    _eventText->setSize(size);
+    _eventTextBlock->setSize(size);
 }
 
 /**
@@ -1347,12 +1352,30 @@ void TransitionGraphic::setTextSize(qreal w, qreal h)
  */
 void TransitionGraphic::handleAttributeChanged(IAttribute *tsa)
 {
-    _eventText->setText(tsa->asString());
+    _event = tsa->asString();
+    _eventTextBlock->setText(getTransitionDisplayString());
+}
+
+QString TransitionGraphic::getTransitionDisplayString()
+{
+    QString s = _event;
+    if ( ! _action.isEmpty())
+    {
+        s.append(" : ");
+        s.append(_action);
+    }
+    return s;
+}
+
+void TransitionGraphic::handleActionChanged(IAttribute*attr)
+{
+    _action = attr->asString();
+    _eventTextBlock->setText(getTransitionDisplayString());
 }
 
 SelectableTextBlock* TransitionGraphic::getEventTextGraphic()
 {
-    return _eventText;
+    return _eventTextBlock;
 }
 
 void TransitionGraphic::getClosestSides(int* sourceSide, int* targetSide)

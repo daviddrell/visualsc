@@ -103,6 +103,7 @@ private :
     void updateLineSegments(ElbowGrabber* elbow);
     void getClosestSides(int* sourceSide, int* targetSide);
     void createCustomPath(QPointF mouseLocation, ElbowGrabber*);
+    QString getTransitionDisplayString();
 
     // private data
     SCTransition*               _transitionModel;  // data model for the transition object
@@ -114,10 +115,12 @@ private :
     MouseController*            _mouseController;
     LineSegmentGraphic*         _hoveredLine;
     ElbowGrabber*               _hoveredElbow;
-    SelectableTextBlock*        _eventText;    ///<  text to go in the title area.
+    SelectableTextBlock*        _eventTextBlock;    ///<  text to go in the title area.
     bool                        _hasMovedSinceCreatingElbow;
     bool                        _isCurrentlyDeleting;
     SCDataModel*                _dm;
+    QString                     _event;
+    QString                     _action;
 
 
 private slots:
@@ -125,6 +128,7 @@ private slots:
     void handleLineSegmentKeyPressEvent(int key);
     void createNewElbow();
     void deleteHoveredElbow();
+    void handleActionChanged(IAttribute*);
 
 };
 

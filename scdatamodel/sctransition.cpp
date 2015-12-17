@@ -42,7 +42,7 @@ SCTransition::SCTransition(QObject * parent):
      */
 
     // items in this list cannot be deleted by the user
-    DEFAULT_ATTRIBUTES_LIST << "target" << "event" << "comments" << "path" << "uid";
+    DEFAULT_ATTRIBUTES_LIST << "target" << "event" << "comments" << "path" << "uid" << "actions";
 
     //DO_NOT_DISPLAY_HASH.insert("uid",0);
 
@@ -64,6 +64,9 @@ SCTransition::SCTransition(QObject * parent):
 
     TransitionStringAttribute* uid = new TransitionStringAttribute(this, "uid", QString());
     attributes.addItem(uid);
+
+    TransitionStringAttribute * action = new TransitionStringAttribute(this, "action","");
+    attributes.addItem(action);
 
     TransitionStringAttribute* connectToFinished = new TransitionStringAttribute(this, "connectToFinished", "false");
     attributes.addItem(connectToFinished);
