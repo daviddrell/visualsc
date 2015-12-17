@@ -95,7 +95,7 @@ public:
     void linkToMirrorState(SCState* topState); ///< if anything changes in mirror, change it here too
     bool save(QString scxmlFile, QString & message);
     bool exportToCode(QString cName, QString &message, SCDataModel::STATE_CODE_MODEL model);
-    void initializeEmptyStateMachine();
+    void initializeEmptyStateMachine(bool insertRootState=false);
     bool deleteItem(QObject * item);
     void getStates(QList<SCState *>& list);
     void getAllStates(QList<SCState *>& list);

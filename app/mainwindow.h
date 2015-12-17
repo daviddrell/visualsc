@@ -71,7 +71,7 @@ private:
     void loadSettings();
     void saveSettings();
     void createSettings();
-    void setupProject();
+    void setupProject(bool insertRootState);
     void createFontBar();
 
 

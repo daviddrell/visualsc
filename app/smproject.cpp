@@ -31,7 +31,6 @@ SMProject::SMProject(SCDataModel *dm,QWidget *parentWidget): QObject(parentWidge
         _graphicsView( NULL ),
         _parentWidget(parentWidget)
 {
-        _dm->initializeEmptyStateMachine();
         _dm->connectDataModel();
 }
 

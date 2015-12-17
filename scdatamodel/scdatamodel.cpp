@@ -946,7 +946,7 @@ void SCDataModel::handleTransitUp()
  * @brief SCDataModel::initializeEmptyStateMachine
  */
 
-void SCDataModel::initializeEmptyStateMachine()
+void SCDataModel::initializeEmptyStateMachine(bool insertRootState)
 {
 
     if ( _topState != 0 )
@@ -954,20 +954,23 @@ void SCDataModel::initializeEmptyStateMachine()
         _topState->deleteSafely();
         _topState = 0;
     }
-    _topLevel =_level = 0;
-    _topState = new SCState(true);
-    IAttribute* attr = _topState->getAttribute("type");
-    attr->setValue("machine");
 
-    StateString *nsp = new StateString(NULL,"xmlns","http://www.w3.org/2005/07/scxml");
-    _topState->getAttributes()->addItem(nsp);
+    if( insertRootState)
+    {
+        _topLevel =_level = 0;
+        _topState = new SCState(true);
+        IAttribute* attr = _topState->getAttribute("type");
+        attr->setValue("machine");
 
-    attr = _topState->getAttribute("name");
-    attr->setValue("State Machine");
+        StateString *nsp = new StateString(NULL,"xmlns","http://www.w3.org/2005/07/scxml");
+        _topState->getAttributes()->addItem(nsp);
 
-    _topState->setLevel(_level);
-    _currentState  = _topState;
+        attr = _topState->getAttribute("name");
+        attr->setValue("State Machine");
 
+        _topState->setLevel(_level);
+        _currentState  = _topState;
+    }
 }
 
 

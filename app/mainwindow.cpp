@@ -126,8 +126,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    //delete _settings;
-    delete _project;
+    foreach(SMProject* proj, _tabbedProjects)
+    {
+        proj->getDM()->handleReset();
+    }
+    _tabbedProjects.clear();
+
+    if ( _project != NULL)
+    {
+         _project->getDM()->handleReset();
+         delete _project;
+         _project =  NULL;
+    }
+
+    if ( _formEditorWindow)
+    {
+        _formEditorWindow->deleteLater();
+        _formEditorWindow =NULL;
+    }
     delete ui;
 }
 
@@ -545,7 +561,7 @@ void MainWindow::handleNewClick()
 
     this->setWindowTitle("Visual Statechart Editor");
 
-    setupProject();
+    setupProject(true);
 }
 
 void MainWindow::handleTabClosing(int tabIndex)
@@ -598,10 +614,11 @@ void MainWindow::handleNewSubStateTab(SCState*subState)
 
 }
 
-void MainWindow::setupProject()
+void MainWindow::setupProject(bool insertRootState)
 {
     // create the project
     SCDataModel * dm = new SCDataModel();
+    dm->initializeEmptyStateMachine(insertRootState);
 
     // this is the root dm
     DataModelList::singleton()->setRoot(dm);
@@ -683,7 +700,7 @@ void MainWindow::handleFileOpenClick()
 
     this->setWindowTitle(_currentFileFullPath);
 
-    setupProject();
+    setupProject(false);
 }
 
 void MainWindow::handleRootStateNameChanged(IAttribute*nameAttr)
