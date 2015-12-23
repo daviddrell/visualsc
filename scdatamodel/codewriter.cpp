@@ -836,6 +836,8 @@ bool CodeWriter::writeHFile()
  */
 QString CodeWriter::toCamel(QString text)
 {
+    text.replace("-","_");
+
     // get all words separted by 1+n spaces, n = 0, 1, 2, 3, ...
     QRegExp sep("\\s+");
     QStringList qls = text.split(sep);

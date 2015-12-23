@@ -84,7 +84,7 @@ void CodeWriterPState::createCppBody()
     cPrintln("}\n",0);
 
 
-    cPrintln("std::string SessionModelStateMachineSM::actionCodeToString(int action)");
+    cPrintln("std::string "+className+ "::actionCodeToString(int action)");
     cPrintln("{");
     cPrintln("switch (action)",1);
     cPrintln("{",1);
@@ -149,9 +149,9 @@ void CodeWriterPState::cWriteStateInitialization(SCState *s)
     QString isInitial = s->isInitial() ? "true" : "false";
     QString isParallel = s->isParallel() ? "true" : "false";
 
-    cPrintln(toCamel(s->objectName() +"->setIsInitialState(" + isInitial + ");"),1);
-    cPrintln(toCamel(s->objectName() +"->setIsFinalState(" + isFinal + ");"),1);
-    cPrintln(toCamel(s->objectName() +"->setIsParallel(" + isParallel + ");"),1);
+    cPrintln(toCamel(s->objectName()) +"->setIsInitialState(" + isInitial + ");",1);
+    cPrintln(toCamel(s->objectName()) +"->setIsFinalState(" + isFinal + ");",1);
+    cPrintln(toCamel(s->objectName()) +"->setIsParallel(" + isParallel + ");",1);
 
     QList<SCTransition*> transitions;
     s->getTransitions(transitions);
