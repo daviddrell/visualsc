@@ -221,7 +221,7 @@ void CodeWriterPState::cWriteConstructor()
 
     cPrintln( className +"::" +className +"()" );
     cPrintln( "{" );
-    cPrintln( _rootStateClassName +" = new PState(\""+toCamel(rootState->objectName())+"\");",1);
+    cPrintln( _rootStateClassName +" = new PState(\""+toCamel(rootState->objectName())+"\", NULL);",1);
 
 
     //
@@ -230,7 +230,7 @@ void CodeWriterPState::cWriteConstructor()
     for(int i = 0 ; i < _machines.size(); i++)
     {
         SCState* machine = _machines.at(i);
-        cPrintln( this->toCamel( machine->objectName()) +" = new PState(\""+toCamel(machine->objectName())+"\");",1);
+        cPrintln( this->toCamel( machine->objectName()) +" = new PState(\""+toCamel(machine->objectName())+"\", "+ _rootStateClassName +");",1);
     }
     cPrintln( "" );
 
@@ -244,9 +244,9 @@ void CodeWriterPState::cWriteConstructor()
     // add the call backs
     //
 
-    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateEntered, (CallbackFuncPtrT)stateEnteredStatic, this, kSameTaskCallback);",1);
-    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateExited, (CallbackFuncPtrT)stateExitedStatic, this, kSameTaskCallback);",1);
-    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateFinished, (CallbackFuncPtrT)stateFinishedStatic, this, kSameTaskCallback);",1);
+    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateEntered, (CallbackFuncPtrT)stateEnteredStatic, this, kImmediateCallback);",1);
+    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateExited, (CallbackFuncPtrT)stateExitedStatic, this, kImmediateCallback);",1);
+    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateFinished, (CallbackFuncPtrT)stateFinishedStatic, this, kImmediateCallback);",1);
 
     cPrintln( "}\n" );
 
