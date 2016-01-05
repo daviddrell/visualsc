@@ -259,8 +259,8 @@ void MainWindow::createFontBar()
     _selectedRadioButton->toggle();
     ui->mainToolBar->addSeparator();
 
-    _pStateRadioButton->setChecked(false);
-    _qStateRadioButton->setChecked(true);
+    _pStateRadioButton->setChecked(true);
+    _qStateRadioButton->setChecked(false);
 
 }
 

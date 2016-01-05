@@ -1552,7 +1552,6 @@ bool SCDataModel::checkDataModel()
 
             if(initialStates.size()!=0)
             {
-                //            errorLog.append("State");
                 errorLog.append("State machine \""+sm->objectName()+"\" is parallel and should not have an initial state\n");
             }
         }
@@ -1570,8 +1569,7 @@ bool SCDataModel::checkDataModel()
 
             if(initialStates.size()==0)
             {
-                //            errorLog.append("State");
-                errorLog.append("State machine \""+sm->objectName()+"\" is missing an initial state\n");
+                emit message("Warnnig: State machine \""+sm->objectName()+"\" is missing an initial state\n");
             }
             else if(initialStates.size()>1)
             {

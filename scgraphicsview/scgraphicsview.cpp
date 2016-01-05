@@ -143,25 +143,12 @@ void SCGraphicsView::handleMakeTransitionConnections(SCTransition* trans)
     qDebug() << "Made it into: SCGraphicsView::handleMakeTransitionConnections for transition:"  << trans->attributes.value("event")->asString();
 
     TransitionGraphic* transGraphic = _hashTransitionToGraphic.value(trans);
-
-   // TransitionStringAttribute *targetName = dynamic_cast<TransitionStringAttribute *>(trans->attributes.value("target"));
-
-    //SCState* parentState = trans->parentSCState();
-    //SCState* targetState = lookUpTargetState(targetName->asString());
     SCState* targetState = trans->targetState();
     StateBoxGraphic * targetGraphic  = _hashStateToGraphic.value(targetState);
 
-
-
-    //qDebug() << "targetGraphic: " << targetGraphic->objectName();
-
-    // set the targetState for the transition
+   // set the targetState for the transition
     trans->setTargetState(targetState);
     transGraphic->setTargetStateGraphic(targetGraphic);
-
-    // add a transition reference for the target and source
-    //targetState->addTransitionReference(trans, SCState::kTransitIn);
-    //parentState->addTransitionReference(trans, SCState::kTransitOut);
 
     connectTransition(trans);
 }
@@ -1018,6 +1005,13 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
     StateBoxGraphic* parentGraphic = _hashStateToGraphic.value(parentState);
     StateBoxGraphic* targetGraphic = _hashStateToGraphic.value(targetState);
     TransitionGraphic* transGraphic = _hashTransitionToGraphic.value(trans);
+
+    qDebug()<<"targetGraphic->zValue() = " << targetGraphic->zValue() ;
+    qDebug()<<"parentGraphic->zValue() = " << parentGraphic->zValue() ;
+    if ( targetGraphic->zValue() > parentGraphic->zValue())
+    {
+
+    }
 
     // set the connects for the transition graphic
     connect(trans, SIGNAL(markedForDeletion(QObject*)), this, SLOT(handleTransitionDeleted(QObject*)));

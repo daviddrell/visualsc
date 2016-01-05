@@ -27,6 +27,12 @@ void CodeWriterPState::createCppBody()
     cPrintln(_rootStateClassName+"->startSM();",1);
     cPrintln("}\n",0);
 
+    cPrintln("int "+className+ "::getCurrentState()",0);
+    cPrintln("{",0);
+    cPrintln("if (currentState == NULL) return -1;",1);
+    cPrintln("return currentState->getStateId();",1);
+    cPrintln("}\n",0);
+
     cPrintln("void "+className+ "::inputEvent(int evt)",0);
     cPrintln("{",0);
     cPrintln(_rootStateClassName+"->signalEvent(evt);",1);
@@ -149,6 +155,7 @@ void CodeWriterPState::cWriteStateInitialization(SCState *s)
     QString isInitial = s->isInitial() ? "true" : "false";
     QString isParallel = s->isParallel() ? "true" : "false";
 
+    cPrintln(toCamel(s->objectName()) +"->setStateId(" + _stateNums[s->objectName()] + ");",1);
     cPrintln(toCamel(s->objectName()) +"->setIsInitialState(" + isInitial + ");",1);
     cPrintln(toCamel(s->objectName()) +"->setIsFinalState(" + isFinal + ");",1);
     cPrintln(toCamel(s->objectName()) +"->setIsParallel(" + isParallel + ");",1);
@@ -223,6 +230,8 @@ void CodeWriterPState::cWriteConstructor()
     cPrintln( "{" );
     cPrintln( _rootStateClassName +" = new PState(\""+toCamel(rootState->objectName())+"\", NULL);",1);
 
+
+    cPrintln( "currentState = NULL;",1);
 
     //
     // add all:   stateInstances = new PState()
@@ -303,6 +312,34 @@ QString CodeWriterPState::createEventEnum()
     return enumStr;
 }
 
+
+QString CodeWriterPState::createStateEnum()
+{
+    QString enumStr;
+    enumStr.append("enum " + className +"_STATES\n    {\n");
+
+    SCDataModel * dm =  DataModelList::singleton()->root();
+    QList<SCState*> allchildStates;
+    dm->getAllStates(allchildStates);
+
+    SCState * rootState = dm->getTopState();
+    QString str =toCamel("k "+this->toCamel( rootState->objectName()))+"_STATE";
+    _stateNums.insert(rootState->objectName(),str);
+    enumStr.append( "        "+ str +",\n");
+
+    for(int i = 0 ; i < allchildStates.count(); i++)
+    {
+        SCState* s = allchildStates.at(i);
+        str =toCamel("k "+this->toCamel( s->objectName()))+"_STATE";
+        _stateNums.insert(s->objectName(),str);
+        enumStr.append( "        "+ str +",\n");
+    }
+    enumStr.append("    };\n");
+    return enumStr;
+
+}
+
+
 QString CodeWriterPState::createActionEnum()
 {
     QString enumStr;
@@ -341,7 +378,6 @@ QString CodeWriterPState::createActionEnum()
     }
     enumStr.append("    };\n");
     return enumStr;
-
 }
 
 bool CodeWriterPState::writeHFile()
@@ -390,7 +426,11 @@ bool CodeWriterPState::writeHFile()
     QString actionsEnum = createActionEnum();
     hPrintln(actionsEnum,1);
 
-    hPrintln("std::string actionCodeToString(int action);\n",1);
+    QString statesEnum = createStateEnum();
+    hPrintln(statesEnum,1);
+
+    hPrintln("std::string actionCodeToString(int action);",1);
+    hPrintln("int         getCurrentState();\n",1);
 
     // private
     hPrintln("private:\n");
@@ -405,6 +445,7 @@ bool CodeWriterPState::writeHFile()
 
     //write the statemachine states
     this->hWriteStates();
+    hPrintln("PState*    currentState;\n",1);
 
     // end if define
     hPrintln("\n};\n\n#endif // "+className.toUpper()+"_H");
