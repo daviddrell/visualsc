@@ -21,7 +21,11 @@ void CodeWriterPState::createCppBody()
 {
     // this function just creates the rest of the cpp implemenation
 
-    //cPrintln( className +"::~" +className +"()" );
+    cPrintln("PState* "+className+ "::getRootState()",0);
+    cPrintln("{",0);
+    cPrintln("return "+_rootStateClassName+";",1);
+    cPrintln("}\n",0);
+
     cPrintln("void "+className+ "::start()",0);
     cPrintln("{",0);
     cPrintln(_rootStateClassName+"->startSM();",1);
@@ -36,57 +40,6 @@ void CodeWriterPState::createCppBody()
     cPrintln("void "+className+ "::inputEvent(int evt)",0);
     cPrintln("{",0);
     cPrintln(_rootStateClassName+"->signalEvent(evt);",1);
-    cPrintln("}\n",0);
-
-
-    cPrintln("void "+className+ "::stateEnteredStatic(void *, UInt32, void *userDefined, PStateCallbackArgsT *pArgs)",0);
-    cPrintln("{",0);
-    cPrintln(className+"* s= ("+className+"*) userDefined;",1);
-    cPrintln("s->stateEntered(pArgs);",1);
-    cPrintln("}\n",0);
-
-
-    cPrintln("void "+className+ "::stateEntered(PStateCallbackArgsT *pArgs)",0);
-    cPrintln("{",0);
-    cPrintln("handleStateEntered(pArgs->s->GetModT()->name);",1);
-    cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
-    cPrintln("{",1);
-    cPrintln("handleAction(pArgs->actions[i]);",2);
-    cPrintln("}",1);
-    cPrintln("}\n",0);
-
-
-
-    cPrintln("void "+className+ "::stateExitedStatic(void *, UInt32, void *userDefined, PStateCallbackArgsT *pArgs)",0);
-    cPrintln("{",0);
-    cPrintln(className+"* s= ("+className+"*) userDefined;" ,1);
-    cPrintln("s->stateExited(pArgs);",1);
-    cPrintln("}\n",0);
-
-
-    cPrintln("void "+className+ "::stateExited(PStateCallbackArgsT  *pArgs)",0);
-    cPrintln("{",0);
-    cPrintln("handleStateExited(pArgs->s->GetModT()->name);",1);
-    cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
-    cPrintln("{",1);
-    cPrintln("handleAction(pArgs->actions[i]);",2);
-    cPrintln("}",1);
-    cPrintln("}\n",0);
-
-
-    cPrintln("void "+className+ "::stateFinishedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateCallbackArgsT *pArgs)",0);
-    cPrintln("{",0);
-    cPrintln(className+"* s= ("+className+"*) userDefined;" ,1);
-    cPrintln("s->stateFinished(pArgs);",1);
-    cPrintln("}\n",0);
-
-
-    cPrintln("void "+className+ "::stateFinished(PStateCallbackArgsT  *pArgs)",0);
-    cPrintln("{",0);
-    cPrintln("for (int i = 0; i < pArgs->actionCount; i++)",1);
-    cPrintln("{",1);
-    cPrintln("handleAction(pArgs->actions[i]);",2);
-    cPrintln("}",1);
     cPrintln("}\n",0);
 
 
@@ -107,7 +60,7 @@ void CodeWriterPState::createCppBody()
     cPrintln("return \"action not found in table\";",2);
     cPrintln("break;",2);
     cPrintln("}",1);
-    cPrintln("}");
+    cPrintln("}\n");
 }
 
 
@@ -205,7 +158,7 @@ void CodeWriterPState::cWriteStateInitialization(SCState *s)
 void CodeWriterPState::cWriteDeconstructor()
 {
     cPrintln( className +"::~" +className +"()" );
-    cPrintln( "{\n}" );
+    cPrintln( "{\n}\n" );
 
 }
 
@@ -249,13 +202,6 @@ void CodeWriterPState::cWriteConstructor()
     cPrintln( toCamel( rootState->objectName()) +"->setIsRoot(true);" ,1);
     cWriteStateInitialization(rootState);
 
-    //
-    // add the call backs
-    //
-
-    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateEntered, (CallbackFuncPtrT)stateEnteredStatic, this, kImmediateCallback);",1);
-    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateExited, (CallbackFuncPtrT)stateExitedStatic, this, kImmediateCallback);",1);
-    cPrintln(toCamel( rootState->objectName())+"->addCallBackToAllDescendants(eStateFinished, (CallbackFuncPtrT)stateFinishedStatic, this, kImmediateCallback);",1);
 
     cPrintln( "}\n" );
 
@@ -403,10 +349,14 @@ bool CodeWriterPState::writeHFile()
     hPrintln("//",1);
     hPrintln("//    Call inputEvent() to drive events into the state machine",1);
     hPrintln("//",1);
-    hPrintln("//    To take action, inherit from this class and override handleAction()",1);
+    hPrintln("//    To take action, call getRootState() and connect callbacks to its enter and exit events, for example: ",1);
     hPrintln("//",1);
-    hPrintln("//    To monitor state changes, inherit from this class and override handleStateEntered() or handleStateExited()",1);
-    hPrintln("//",1);
+    hPrintln("//    dialogSM = new SipDialogStatemachineSM();",1);
+    hPrintln("//    dialogSM->getRootState()->addCallBackToAllDescendants(eStateEntered, (CallbackFuncPtrT)stateEnteredStatic, this, kAlwaysDeferCallback);",1);
+    hPrintln("//    dialogSM->getRootState()->addCallBackToAllDescendants(eStateExited, (CallbackFuncPtrT)stateExitedStatic, this, kAlwaysDeferCallback);",1);
+    hPrintln("//    dialogSM->getRootState()->addCallBackToAllDescendants(eStateFinished, (CallbackFuncPtrT)stateFinishedStatic, this, kAlwaysDeferCallback);",1);
+    hPrintln("//    dialogSM->start();",1);
+
     hPrintln("//////////////////\n",1);
 
     // public
@@ -414,11 +364,12 @@ bool CodeWriterPState::writeHFile()
     hPrintln(className+"();",1);
     hPrintln("~"+className+"();\n",1);
     hPrintln("\n",1);
-    hPrintln("void start();",1);
-    hPrintln("void inputEvent(int evt);",1);
-    hPrintln("virtual void handleAction(int action)=0;",1);
-    hPrintln("virtual void handleStateEntered(string state)=0;",1);
-    hPrintln("virtual void handleStateExited(string state)=0;\n\n",1);
+    hPrintln("void        start();",1);
+    hPrintln("void        inputEvent(int evt);",1);
+    hPrintln("std::string actionCodeToString(int action);",1);
+    hPrintln("int         getCurrentState();\n",1);
+    hPrintln("PState*     getRootState();\n",1);
+
 
     QString eventsEnum = createEventEnum();
     hPrintln(eventsEnum,1);
@@ -429,17 +380,10 @@ bool CodeWriterPState::writeHFile()
     QString statesEnum = createStateEnum();
     hPrintln(statesEnum,1);
 
-    hPrintln("std::string actionCodeToString(int action);",1);
-    hPrintln("int         getCurrentState();\n",1);
 
     // private
     hPrintln("private:\n");
-    hPrintln("static void stateEnteredStatic(void *p, UInt32 funcIndex, void *userDefined, PStateCallbackArgsT *pArgs);",1);
-    hPrintln("static void stateExitedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateCallbackArgsT *pArgs);",1);
     hPrintln("static void stateFinishedStatic(void *p, UInt32 funcIndex, void *userDefined, PStateCallbackArgsT *pArgs);",1);
-
-    hPrintln("void stateEntered(PStateCallbackArgsT *pArgs);",1);
-    hPrintln("void stateExited(PStateCallbackArgsT  *pArgs);",1);
     hPrintln("void stateFinished(PStateCallbackArgsT  *pArgs);\n\n",1);
 
 

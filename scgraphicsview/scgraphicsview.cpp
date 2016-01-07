@@ -1008,9 +1008,19 @@ void SCGraphicsView::connectTransition(SCTransition* trans)
 
     qDebug()<<"targetGraphic->zValue() = " << targetGraphic->zValue() ;
     qDebug()<<"parentGraphic->zValue() = " << parentGraphic->zValue() ;
-    if ( targetGraphic->zValue() > parentGraphic->zValue())
-    {
 
+    // are the source and target siblings?
+    if ( targetGraphic->parentObject() != parentGraphic->parentObject())
+    {
+        // make sure the arrow is not hidden underneath the parent of the target by moving the target to the back of the stack
+
+        // find topmost parent state
+        SCState* parentGroup = targetState;
+        while ( parentGroup->parent()!= _dm->getTopState())
+        {
+            parentGroup = dynamic_cast<SCState*>( parentGroup->parent());
+        }
+        emit parentGroup->sendToBack(parentGroup);
     }
 
     // set the connects for the transition graphic
