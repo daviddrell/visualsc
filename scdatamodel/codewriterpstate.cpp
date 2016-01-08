@@ -39,6 +39,7 @@ void CodeWriterPState::createCppBody()
 
     cPrintln("void "+className+ "::inputEvent(int evt)",0);
     cPrintln("{",0);
+    cPrintln("Log(kLogInfo, \"inputEvent: %s\\n\",eventCodeToString(evt).c_str()); ",1);
     cPrintln(_rootStateClassName+"->signalEvent(evt);",1);
     cPrintln("}\n",0);
 
@@ -61,6 +62,44 @@ void CodeWriterPState::createCppBody()
     cPrintln("break;",2);
     cPrintln("}",1);
     cPrintln("}\n");
+
+
+    cPrintln("std::string "+className+ "::eventCodeToString(int event)");
+    cPrintln("{");
+    cPrintln("switch (event)",1);
+    cPrintln("{",1);
+
+    for( i =  _eventNums.begin(); i != _eventNums.end();i++)
+    {
+        cPrintln("case "+ i.value()+":",1);
+        cPrintln("return \""+ i.key() +"\";",2);
+        cPrintln("break;",2);
+    }
+
+    cPrintln("default:",1);
+    cPrintln("return \"action not found in table\";",2);
+    cPrintln("break;",2);
+    cPrintln("}",1);
+    cPrintln("}\n");
+
+    cPrintln("std::string "+className+ "::stateCodeToString(int state)");
+    cPrintln("{");
+    cPrintln("switch (state)",1);
+    cPrintln("{",1);
+
+    for( i =  _stateNums.begin(); i != _stateNums.end();i++)
+    {
+        cPrintln("case "+ i.value()+":",1);
+        cPrintln("return \""+ i.key() +"\";",2);
+        cPrintln("break;",2);
+    }
+
+    cPrintln("default:",1);
+    cPrintln("return \"action not found in table\";",2);
+    cPrintln("break;",2);
+    cPrintln("}",1);
+    cPrintln("}\n");
+
 }
 
 
@@ -181,6 +220,7 @@ void CodeWriterPState::cWriteConstructor()
 
     cPrintln( className +"::" +className +"()" );
     cPrintln( "{" );
+    cPrintln( "ModC::Init(NULL, \"" + _rootStateClassName + "\", 0, 0);\n" );
     cPrintln( _rootStateClassName +" = new PState(\""+toCamel(rootState->objectName())+"\", NULL);",1);
 
 
@@ -339,7 +379,7 @@ bool CodeWriterPState::writeHFile()
     hPrintln("#ifndef "+ className.toUpper() + "_H\n#define "+className.toUpper()+"_H\n");
     hPrintln("#include \"pstate.h\"");
     hPrintln("using std::string;\n");
-    hPrintln("class "+className);
+    hPrintln("class "+className + " : public ModC");
     hPrintln("{");
     hPrintln("//////////////////",1);
     hPrintln("//",1);
@@ -367,6 +407,8 @@ bool CodeWriterPState::writeHFile()
     hPrintln("void        start();",1);
     hPrintln("void        inputEvent(int evt);",1);
     hPrintln("std::string actionCodeToString(int action);",1);
+    hPrintln("std::string eventCodeToString(int event);",1);
+    hPrintln("std::string stateCodeToString(int state);",1);
     hPrintln("int         getCurrentState();\n",1);
     hPrintln("PState*     getRootState();\n",1);
 
