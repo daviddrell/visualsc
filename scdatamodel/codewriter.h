@@ -43,10 +43,14 @@ protected:
     void hWriteActionRelaySlots();
     virtual void hWriteStates();
 
+    void resolveCollisions(QList<SCState*>);
+    void resolveCollision(SCState* one, SCState* two, int parentLevel );
+    SCState *getParentAtLevel(SCState* s, int parentLevel);
+
     void resolveCollisions(QList<CWState*>);
     void resolveCollision(CWState* one, CWState* two);
 
-    QString toCamel(QString);
+    QString toCamel(QString, bool leaveFirstLetterCap=false);
     void hPrint(QString);
     void hPrintln(QString);
     void hPrintln(QString, int);

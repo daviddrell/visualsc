@@ -166,6 +166,75 @@ bool CodeWriter::isEventDefined(QString eventName)
     }
 }
 
+void CodeWriter::resolveCollisions(QList<SCState*>states)
+{
+    bool collision = false;
+
+    // compare two different CWState's state Name
+    for(int i = 0; i < states.size()-1; i++)
+    {
+        SCState* x = states.at(i);
+        for(int k = i+1 ; k < states.size(); k++)
+        {
+            SCState* y = states.at(k);
+
+            // if they are equivalent, then call resolve collision
+
+            if(x->getUniqueName() == y->getUniqueName())
+            {
+                collision = true;
+                this->resolveCollision(x,y,1);
+            }
+        }
+    }
+
+    // if we fixed at least one collision, then ensure any new names have no collisions either
+    if(collision)
+    {
+        this->resolveCollisions(states);
+    }
+
+}
+
+SCState* CodeWriter::getParentAtLevel(SCState* s, int parentLevel)
+{
+    int level = 0;
+    while(level != parentLevel && s != NULL )
+    {
+        s = dynamic_cast<SCState*>(s->parent());
+        level++;
+    }
+    return s;
+}
+
+void CodeWriter::resolveCollision(SCState* one, SCState* two, int parentLevel )
+{
+    // get the ancestor at the CWState's current ancestor level
+    SCState* xParent = getParentAtLevel(one,parentLevel);
+    SCState* yParent = getParentAtLevel(two,parentLevel);
+    parentLevel++;
+
+    // if at least one of them is a top level child or they share a parent, then we resolve the collision using the uid
+    if(!xParent || !yParent || xParent == yParent)
+    {
+        QString oneStateName = one->objectName().append(UNDER_SCORES + one->getUidFirstName());
+        QString twoStateName = two->objectName().append(UNDER_SCORES + two->getUidFirstName());
+        one->setUniqueName(oneStateName);
+        two->setUniqueName(twoStateName);
+    }
+    else // append the parent's name
+    {
+        QString oneStateName = one->objectName().append(UNDER_SCORES + toCamel(xParent->getName()));
+        QString twoStateName = two->objectName().append(UNDER_SCORES + toCamel(yParent->getName()));
+        one->setUniqueName(oneStateName);
+        two->setUniqueName(twoStateName);
+    }
+
+    // while the names are still equivalent, run this function again
+    if(one->getUniqueName() == two->getUniqueName())
+        resolveCollision(one, two, parentLevel);
+}
+
 /**
  * @brief CodeWriter::resolveCollisions
  * @param states
@@ -834,7 +903,7 @@ bool CodeWriter::writeHFile()
  * @return
  * converts any space separated string of words and returns a camel case string
  */
-QString CodeWriter::toCamel(QString text)
+QString CodeWriter::toCamel(QString text, bool makeFirstLetterCap)
 {
     text.replace("-","_");
 
@@ -862,7 +931,14 @@ QString CodeWriter::toCamel(QString text)
     firstLetter = part.at(0);
 
 
-    ret+= firstLetter.toLower();
+    if ( makeFirstLetterCap)
+    {
+        ret+= firstLetter.toUpper();
+    }
+    else
+    {
+        ret+= firstLetter.toLower();;
+    }
     ret+= part.mid(1,part.size());
 
 

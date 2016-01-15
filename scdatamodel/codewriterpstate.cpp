@@ -5,6 +5,20 @@ CodeWriterPState::CodeWriterPState(SCState* rootMachine, QString classNameString
     CodeWriter(rootMachine, classNameString, cFileName, hFileName)
 {
 
+    // initialize the unique name to be the main name,
+    // then go and fix any name collisions
+
+    SCDataModel * dm =  DataModelList::singleton()->root();
+    QList<SCState*> allchildStates;
+    dm->getAllStates(allchildStates);
+    dm->getTopState()->setUniqueName( dm->getTopState()->objectName());
+    foreach(SCState*s, allchildStates)
+    {
+        s->setUniqueName(s->objectName());
+    }
+
+    resolveCollisions(allchildStates);
+
 }
 
 CodeWriterPState::~CodeWriterPState()
@@ -147,10 +161,16 @@ void CodeWriterPState::cWriteStateInitialization(SCState *s)
     QString isInitial = s->isInitial() ? "true" : "false";
     QString isParallel = s->isParallel() ? "true" : "false";
 
-    cPrintln(toCamel(s->objectName()) +"->setStateId(" + _stateNums[s->objectName()] + ");",1);
-    cPrintln(toCamel(s->objectName()) +"->setIsInitialState(" + isInitial + ");",1);
-    cPrintln(toCamel(s->objectName()) +"->setIsFinalState(" + isFinal + ");",1);
-    cPrintln(toCamel(s->objectName()) +"->setIsParallel(" + isParallel + ");",1);
+    QString stateName;
+    if ( s == _rootMachine)
+        stateName = toCamel(s->getUniqueName(),true);
+    else
+        stateName = toCamel(s->getUniqueName(),false);
+
+    cPrintln(stateName +"->setStateId(" + _stateNums[s->getUniqueName()] + ");",1);
+    cPrintln(stateName +"->setIsInitialState(" + isInitial + ");",1);
+    cPrintln(stateName +"->setIsFinalState(" + isFinal + ");",1);
+    cPrintln(stateName +"->setIsParallel(" + isParallel + ");",1);
 
     QList<SCTransition*> transitions;
     s->getTransitions(transitions);
@@ -159,19 +179,26 @@ void CodeWriterPState::cWriteStateInitialization(SCState *s)
         SCTransition* t = transitions[i];
         SCState* target = t->targetState();
         QString tName = t->objectName();
-        cPrintln(toCamel(s->objectName()) +"->addTransition(" + toCamel(target->objectName()) + ","+ _eventNums[tName]+");",1);
+        cPrintln(stateName +"->addTransition(" + toCamel(target->getUniqueName()) + ","+ _eventNums[tName]+");",1);
+
+        // for every out transition, check the connectToFinishedAttribute, and connect the finished signal of the state
+
+       if(t->isConnectToFinished())
+       {
+           cPrintln(stateName+"->addFinishedEvent("+_eventNums[tName]+");",1);
+       }
     }
 
     QStringList entryActions = getEntryActions(s);
     for(int a = 0 ; a < entryActions.count(); a++)
     {
-        cPrintln(toCamel(s->objectName()) +"->addEnterAction(" + _actionNums[ entryActions[a]] + ");",1);
+        cPrintln(stateName +"->addEnterAction(" + _actionNums[ entryActions[a]] + ");",1);
     }
 
     QStringList exitActions = getExitActions(s);
     for(int a = 0 ; a < exitActions.count(); a++)
     {
-        cPrintln(toCamel(s->objectName()) +"->addExitAction(" + _actionNums[exitActions[a]] + ");",1);
+        cPrintln(stateName+"->addExitAction(" + _actionNums[exitActions[a]] + ");",1);
     }
 
 
@@ -182,7 +209,7 @@ void CodeWriterPState::cWriteStateInitialization(SCState *s)
     for(int i = 0 ; i < states.count(); i++)
     {
         SCState *c = states[i];
-        cPrintln(toCamel(s->objectName()) +"->addChildState(" + toCamel(c->objectName() + ");"),1);
+        cPrintln(stateName +"->addChildState(" + toCamel(c->getUniqueName() + ");"),1);
     }
     cPrintln("");
 
@@ -216,12 +243,12 @@ void CodeWriterPState::cWriteConstructor()
         return;
     }
 
-    _rootStateClassName =  toCamel( rootState->objectName());
+    _rootStateClassName =  toCamel( rootState->objectName(),true);
 
     cPrintln( className +"::" +className +"()" );
     cPrintln( "{" );
-    cPrintln( "ModC::Init(NULL, \"" + _rootStateClassName + "\", 0, 0);\n" );
-    cPrintln( _rootStateClassName +" = new PState(\""+toCamel(rootState->objectName())+"\", NULL);",1);
+    cPrintln( "ModC::Init(NULL, \"" + _rootStateClassName + "\", 0, 0);\n",1 );
+    cPrintln( _rootStateClassName +" = new PState(\""+_rootStateClassName+"\", NULL);",1);
 
 
     cPrintln( "currentState = NULL;",1);
@@ -232,16 +259,16 @@ void CodeWriterPState::cWriteConstructor()
     for(int i = 0 ; i < _machines.size(); i++)
     {
         SCState* machine = _machines.at(i);
-        cPrintln( this->toCamel( machine->objectName()) +" = new PState(\""+toCamel(machine->objectName())+"\", "+ _rootStateClassName +");",1);
+        cPrintln( this->toCamel( machine->getUniqueName()) +" = new PState(\""+toCamel(machine->getUniqueName())+"\", "+ _rootStateClassName +");",1);
     }
     cPrintln( "" );
 
     //
     // initialize the root state
     //
-    cPrintln( toCamel( rootState->objectName()) +"->setIsRoot(true);" ,1);
-    cWriteStateInitialization(rootState);
+    cPrintln( _rootStateClassName +"->setIsRoot(true);" ,1);
 
+    cWriteStateInitialization(rootState);
 
     cPrintln( "}\n" );
 
@@ -309,15 +336,20 @@ QString CodeWriterPState::createStateEnum()
     dm->getAllStates(allchildStates);
 
     SCState * rootState = dm->getTopState();
-    QString str =toCamel("k "+this->toCamel( rootState->objectName()))+"_STATE";
-    _stateNums.insert(rootState->objectName(),str);
+
+    //
+    //  root state
+    //
+    QString stateName = toCamel("k "+  rootState->getUniqueName())+"_STATE";
+    QString str = stateName;
+    _stateNums.insert(rootState->getUniqueName(),str);
     enumStr.append( "        "+ str +",\n");
 
     for(int i = 0 ; i < allchildStates.count(); i++)
     {
         SCState* s = allchildStates.at(i);
-        str =toCamel("k "+this->toCamel( s->objectName()))+"_STATE";
-        _stateNums.insert(s->objectName(),str);
+        str = toCamel("k "+   s->getUniqueName())+"_STATE";
+        _stateNums.insert(s->getUniqueName(),str);
         enumStr.append( "        "+ str +",\n");
     }
     enumStr.append("    };\n");
@@ -453,11 +485,11 @@ void CodeWriterPState::hWriteStates()
     SCState * rootState = dm->getTopState();
     QList<SCState*> allchildStates;
     dm->getAllStates(allchildStates);
-    hPrintln("PState*    "+ this->toCamel( rootState->objectName()) +";",1);
+    hPrintln("PState*    "+ this->toCamel( rootState->objectName(),true) +";",1);
     for(int i = 0 ; i < allchildStates.count(); i++)
     {
         SCState* machine = allchildStates.at(i);
-        hPrintln("PState*    "+ this->toCamel( machine->objectName()) +";",1);
+        hPrintln("PState*    "+ this->toCamel( machine->getUniqueName()) +";",1);
     }
     hPrintln("\n");
 }

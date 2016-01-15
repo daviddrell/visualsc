@@ -66,6 +66,8 @@ public:
     void deleteSafely();
     void deleteAllSafely();
     QString getName();
+    void setUniqueName(QString);
+    QString getUniqueName();///< name with name collisions resolved
     void setLinkedParent(SCState*); ///< if this is a linked copy of a subsate, then this is the parent
 
 
@@ -287,6 +289,7 @@ private:
 
     SCState* _initialState;
     SCState* _linkedParent;
+    QString  _uniqueName;
 
 };
 

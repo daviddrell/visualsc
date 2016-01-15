@@ -29,6 +29,7 @@ protected:
     QMap<QString,QString>  _eventNums; // key= string user types into the visual editor, value = enum version of the string
     QMap<QString,QString>  _actionNums; // key= string user types into the visual editor, value = enum version of the string
     QMap<QString,QString>  _stateNums; // key= state name string user types into the visual editor, value = enum version of the string
+
 };
 
 #endif // CODEWRITTERPSTATE_H

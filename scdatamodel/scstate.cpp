@@ -213,6 +213,15 @@ void SCState::initCommon()
     qDebug()<< "_IdTextBlock = " +QString::number((int)_IdTextBlock) +", state = " + defaultName;
 }
 
+QString SCState::getUniqueName()
+{
+    return _uniqueName;
+}
+
+void SCState::setUniqueName(QString n)
+{
+    _uniqueName = n;
+}
 
 bool SCState::isFinal()
 {
