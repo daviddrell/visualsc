@@ -93,6 +93,7 @@ private:
     QRadioButton* _selectedRadioButton;
     QRadioButton* _pStateRadioButton;
     QRadioButton* _qStateRadioButton;
+    QButtonGroup* _stateTypeGroup;
 
     QTabWidget*   _tabWidget;
     QMap<int,SMProject*> _tabbedProjects; ///< key is the tab index
@@ -111,7 +112,6 @@ private slots:
     void handleNewSubStateTab(SCState*subState);
     void handleTabClosing(int);
     void handleFontRadioChanged();
-    void handlePStateQStateChanged();
     void on_actionImport_triggered();
 
     void on_actionShortcuts_triggered();

@@ -239,12 +239,13 @@ void MainWindow::createFontBar()
     _selectedRadioButton = new QRadioButton("Selected", this);
     _stateFontRadioButton = new QRadioButton("States", this);
     _transitionFontRadioButton = new QRadioButton("Transitions", this);
+
     _pStateRadioButton= new QRadioButton("PState Code", this);
     _qStateRadioButton= new QRadioButton("QState Code", this);
+    _stateTypeGroup = new QButtonGroup();
+    _stateTypeGroup->addButton(_pStateRadioButton);
+    _stateTypeGroup->addButton(_qStateRadioButton);
 
-
-    connect(_pStateRadioButton,SIGNAL(clicked()),this,SLOT(handlePStateQStateChanged()));
-    connect(_qStateRadioButton,SIGNAL(clicked()),this,SLOT(handlePStateQStateChanged()));
 
     // when a group radio button is selected, uncheck bold (this is to make it easier to trigger making all bold simultaneously)
     connect(_stateFontRadioButton, SIGNAL(clicked()), this, SLOT(handleFontRadioChanged()));
@@ -411,23 +412,6 @@ void MainWindow::handleChangeFont(QString)
     }
 }
 
-void MainWindow::handlePStateQStateChanged()
-{
-    if ( QObject::sender() == _qStateRadioButton)
-    {
-        if ( _qStateRadioButton->isChecked())
-            _pStateRadioButton->setChecked(false);
-        else
-            _pStateRadioButton->setChecked(true);
-    }
-    else if ( QObject::sender() == _pStateRadioButton)
-    {
-        if ( _pStateRadioButton->isChecked())
-            _qStateRadioButton->setChecked(false);
-        else
-            _qStateRadioButton->setChecked(true);
-    }
-}
 
 /**
  * @brief MainWindow::handleFontRadioChanged
