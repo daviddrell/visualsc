@@ -54,7 +54,7 @@ void CodeWriterPState::createCppBody()
     cPrintln("void "+className+ "::inputEvent(int evt)",0);
     cPrintln("{",0);
     cPrintln("Log(kLogInfo, \"inputEvent: %s\\n\",eventCodeToString(evt).c_str()); ",1);
-    cPrintln(_rootStateClassName+"->signalEvent(evt);",1);
+    cPrintln(_rootStateClassName+"->inputEvent(evt);",1);
     cPrintln("}\n",0);
 
 
