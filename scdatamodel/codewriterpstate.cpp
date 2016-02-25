@@ -245,9 +245,9 @@ void CodeWriterPState::cWriteConstructor()
 
     _rootStateClassName =  toCamel( rootState->objectName(),true);
 
-    cPrintln( className +"::" +className +"()" );
+    cPrintln( className +"::" +className +"(int instance)" );
     cPrintln( "{" );
-    cPrintln( "ModC::Init(NULL, \"" + _rootStateClassName + "\", 0, 0);\n",1 );
+    cPrintln( "ModC::Init(NULL, \"" + _rootStateClassName + "\", instance, 0);\n",1 );
     cPrintln( _rootStateClassName +" = new PState(\""+_rootStateClassName+"\", NULL);",1);
 
 
@@ -433,7 +433,7 @@ bool CodeWriterPState::writeHFile()
 
     // public
     hPrintln("public:\n");
-    hPrintln(className+"();",1);
+    hPrintln(className+"(int instance);",1);
     hPrintln("~"+className+"();\n",1);
     hPrintln("\n",1);
     hPrintln("void        start();",1);
