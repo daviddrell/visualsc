@@ -538,12 +538,7 @@ void CodeWriter::cWriteConstructor()
 
         // only do this for the root machine
         if(machine == _rootMachine)
-            cPrintln("connect("+cwsm->_stateName+", SIGNAL(started()), this, SIGNAL("+cwsm->_readyRelaySignal+"));",1);
-
-//        if(cwsm->isParallel())
-//        {
-//             cPrintln("connect("+cwsm->_stateName+", SIGNAL(finished()), this, SIGNAL("+cwsm->_finishedRelaySignal+"));",1);
-//        }
+            cPrintln("connect("+cwsm->_stateName+", SIGNAL(started()), this, SIGNAL("+cwsm->_readyRelaySignal+"),Qt::QueuedConnection);",1);
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
@@ -551,29 +546,21 @@ void CodeWriter::cWriteConstructor()
 
             // go through every entry/exit
 
-            cPrintln("connect("+cws->_stateName+", SIGNAL(entered()), this, SIGNAL("+cws->_entryRelaySignal+"));",1);
-            cPrintln("connect("+cws->_stateName+", SIGNAL(exited()), this, SIGNAL("+cws->_exitRelaySignal+"));",1);
+            cPrintln("connect("+cws->_stateName+", SIGNAL(entered()), this, SIGNAL("+cws->_entryRelaySignal+"),Qt::QueuedConnection);",1);
+            cPrintln("connect("+cws->_stateName+", SIGNAL(exited()), this, SIGNAL("+cws->_exitRelaySignal+"),Qt::QueuedConnection);",1);
         }
-
 
 
         // Connect the private QState entry/exit signals to their own private entry/exit slots
         cPrintln("\n//    Connect the private QState signals to private slots for entry/exit handlers",1);
 
-        //if(cwsm->isParallel())
-
 
         for(int k = 0; k < cwsm->_states.size(); k ++)
         {
             CWState* cws = cwsm->_states.at(k);
-            cPrintln("connect("+cws->_stateName+", SIGNAL(entered()), this, SLOT("+cws->_entryRelaySlot+"));",1);
-            cPrintln("connect("+cws->_stateName+", SIGNAL(exited()), this, SLOT("+cws->_exitRelaySlot+"));",1);
-
-
+            cPrintln("connect("+cws->_stateName+", SIGNAL(entered()), this, SLOT("+cws->_entryRelaySlot+"),Qt::QueuedConnection);",1);
+            cPrintln("connect("+cws->_stateName+", SIGNAL(exited()), this, SLOT("+cws->_exitRelaySlot+"),Qt::QueuedConnection);",1);
         }
-
-
-
 
         cPrintln("\n");
     }
